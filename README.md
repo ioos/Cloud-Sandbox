@@ -1,4 +1,4 @@
-# IOOS-cloud-IaC
+# Cloud-Sandbox
 
 ### Directory structure
 
