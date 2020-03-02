@@ -1,0 +1,10 @@
+{
+  "OFS"       : "liveocean",
+  "CDATE"     : "20200128",
+  "HH"        : "00",
+  "INDIR"     : "/com/liveocean/f2020.01.28",
+  "OUTDIR"    : "/com/liveocean/plots/f2020.01.28",
+  "VARS"      : ["temp", "zeta"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/plots"
+}

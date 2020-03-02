@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "liveocean",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "COMROT"    : "/com",
+  "EXEC"      : "",
+  "TIME_REF"  : "19700101",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "/LiveOcean/output",
+  "NTIMES"    : "6480",
+  "ININAME"   : "auto",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "/home/centos/IOOS-cloud-IaC/python/job/templates/liveocean.ocean.in"
+}

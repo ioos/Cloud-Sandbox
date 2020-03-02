@@ -1,0 +1,11 @@
+{
+  "OFS"       : "adnoc",
+  "CDATE"     : "20191211",
+  "HH"        : "12",
+  "TIME_REF"  : "20191212.00",
+  "NTIMES"    : "30",
+  "ININAME"   : "",
+  "OCEANIN"   : "",
+  "COMROT"    : "/mnt/efs/ec2-user/com",
+  "EXEC"      : "/opt/roms/bin/oceanM-761"
+}

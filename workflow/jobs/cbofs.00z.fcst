@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "cbofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "COMROT"    : "/com/nos",
+  "EXEC"      : "",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "/nos/cbofs/output",
+  "NTIMES"    : "720",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "/home/centos/IOOS-cloud-IaC/python/job/templates/cbofs.ocean.in"
+}

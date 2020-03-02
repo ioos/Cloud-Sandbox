@@ -1,0 +1,95 @@
+LiveOcean forecast requires at least 32GB to run on EC2
+
+On UW boiler server:
+
+/data1/parker/LiveOcean_output/plots
+
+drwxrwxr-x.  2 parker parker    46 Jan 20 06:27 forecast_P_3day_cas6_v3_lo8b
+drwxrwxr-x.  2 parker parker  4096 Jan 20 06:34 merhab_P_tracks_MERHAB_cas6_v3_lo8b
+drwxrwxr-x.  2 parker parker  4096 Jan 20 06:38 merhab_P_merhab2_cas6_v3_lo8b
+drwxrwxr-x.  2 parker parker  4096 Jan 20 07:04 merhab_P_tracks_ps_cas6_v3_lo8b
+drwxrwxr-x.  2 parker parker  4096 Jan 20 07:09 forecast_P_willapa_omega_cas6_v3_lo8b
+drwxrwxr-x.  2 parker parker  4096 Jan 20 07:20 forecast_P_rho_cas6_v3_lo8b
+
+/data1/parker/LiveOcean_output/plots/forecast_P_rho_cas6_v3_lo8b
+
+-rw-rw-r--.  1 parker parker 211792 Jan 22 06:21 plot_0000.png
+-rw-rw-r--.  1 parker parker 223534 Jan 22 06:22 plot_0001.png
+...
+-rw-rw-r--.  1 parker parker 227225 Jan 22 06:38 plot_0070.png
+-rw-rw-r--.  1 parker parker 227340 Jan 22 06:39 plot_0071.png
+-rw-rw-r--.  1 parker parker 225258 Jan 22 06:39 plot_0072.png
+-rw-rw-r--.  1 parker parker 329797 Jan 22 06:39 movie.mp4
+
+
+/data1/parker/LiveOcean_output/cas6_v3/f2020.01.22
+active_forecast
+atm1
+azu1
+carbon
+ocn4
+riv2
+surface
+tide2
+ubc2
+
+
+
+Model forcing data:
+
+/data1/parker/LiveOcean_output/cas6_v3
+
+
+drwxrwxr-x.    6 parker parker    51 May 22  2019 f2016.12.15
+drwxrwxr-x.    6 parker parker    51 May 22  2019 f2016.12.16
+drwxrwxr-x.    6 parker parker    51 May 22  2019 f2016.12.17
+drwxrwxr-x.    6 parker parker    51 May 22  2019 f2016.12.18
+drwxrwxr-x.    6 parker parker    51 May 22  2019 f2016.12.19
+...
+...
+...
+drwxr-xr-x.   11 parker parker  4096 Jan 17 06:49 f2020.01.17
+drwxr-xr-x.   11 parker parker  4096 Jan 18 06:39 f2020.01.18
+drwxr-xr-x.   11 parker parker  4096 Jan 19 06:39 f2020.01.19
+drwxr-xr-x.   11 parker parker  4096 Jan 20 07:20 f2020.01.20
+
+
+[@boiler cas6_v3]$ du -sh f2020.01.19
+18G	f2020.01.19
+
+
+Sample output: 20 days archive
+/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b
+
+Take the previous days restart file for running forecast:
+
+e.g. Hour 24 of the previous day's forecast for an initial condition:
+/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b/f2019.11.05/ocean_his_0025.nc
+
+[@boiler cas6_v3_lo8b]$ lst
+total 84
+drwxr-sr-x.  2 parker parker 4096 Jan  1 20:00 f2020.01.01
+drwxr-sr-x.  2 parker parker 4096 Jan  2 20:00 f2020.01.02
+drwxr-sr-x.  2 parker parker 4096 Jan  3 20:00 f2020.01.03
+drwxr-sr-x.  2 parker parker 4096 Jan  4 20:00 f2020.01.04
+drwxr-sr-x.  2 parker parker 4096 Jan  5 20:00 f2020.01.05
+drwxr-sr-x.  2 parker parker 4096 Jan  6 20:00 f2020.01.06
+drwxr-sr-x.  2 parker parker 4096 Jan  7 20:00 f2020.01.07
+drwxr-sr-x.  2 parker parker 4096 Jan  8 20:00 f2020.01.08
+drwxr-sr-x.  2 parker parker 4096 Jan  9 20:00 f2020.01.09
+drwxr-sr-x.  2 parker parker 4096 Jan 10 20:00 f2020.01.10
+drwxr-sr-x.  2 parker parker 4096 Jan 11 20:00 f2020.01.11
+drwxr-sr-x.  2 parker parker 4096 Jan 12 20:00 f2020.01.12
+drwxrwxr-x.  6 parker parker   88 Jan 13 15:19 ..
+drwxr-sr-x.  2 parker parker 4096 Jan 13 20:00 f2020.01.13
+drwxr-sr-x.  2 parker parker 4096 Jan 14 20:00 f2020.01.14
+drwxr-sr-x.  2 parker parker 4096 Jan 15 20:00 f2020.01.15
+drwxr-sr-x.  2 parker parker 4096 Jan 16 20:00 f2020.01.16
+drwxr-sr-x.  2 parker parker 4096 Jan 17 20:00 f2020.01.17
+drwxr-sr-x.  2 parker parker 4096 Jan 18 20:00 f2020.01.18
+drwxr-sr-x.  2 parker parker 4096 Jan 19 20:00 f2020.01.19
+drwxr-sr-x. 22 parker parker 4096 Jan 20 04:55 .
+drwxr-sr-x.  2 parker parker 4096 Jan 20 06:01 f2020.01.20
+
+[@boiler cas6_v3_lo8b]$ du -sh f2020.01.19
+51G	f2020.01.19

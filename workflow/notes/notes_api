@@ -1,0 +1,51 @@
+'''
+This is to test the usage of this system via an RESTFul API service.
+We will only simulate the API here, both the back end commands in, and the 
+interface to the backend services.
+
+For a command line interface:
+Some possible end user commands might look like the following:
+
+api submit forecast forecast.json
+api submit worklow workflow.json
+api submit job job.json
+api submit workflow.json
+api query jobnumber
+api query job.json
+
+
+api submit job.json
+
+fcst.json
+{
+  "JOBTYPE"   : "forecast",
+  "OFS"       : "liveocean",
+  "CDATE"     : "20200128",
+  "HH"        : "00",
+  "TIME_REF"  : "19700101",
+  "NTIMES"    : "6480",
+  "NPROCS"    : "4",
+  "ININAME"   : "/com/liveocean/f2020.01.27/ocean_his_0025.nc",
+  "COMROT"    : "/com",
+  "OUTDIR"    : "auto",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "/LiveOcean/output",
+  "EXEC"      : "",
+}
+
+
+plots.json
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "liveocean",
+  "CDATE"     : "20200128",
+  "HH"        : "00",
+  "INDIR"     : "/com/liveocean/f2020.01.28",
+  "OUTDIR"    : "/com/liveocean/plots/f2020.01.28",
+  "VARS"      : ["temp", "zeta"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/plots"
+}
+
+
+

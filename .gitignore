@@ -1,0 +1,16 @@
+**/__pycache__
+.DS_Store
+tmp
+*.egg-info/
+.ipynb_checkpoints
+worflow/*.ipynb
+.pytest_cache/
+workflow/dist
+workflow/*.out
+**/worker-*.dirlock
+**/purge.lock
+**/global.lock
+workflow/workflows/lo.out
+.idea/
+workflow/.idea/
+workflow/venv/

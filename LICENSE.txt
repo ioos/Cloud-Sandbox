@@ -1,0 +1,9 @@
+Copyright © 2020 RPS Group. All rights reserved.
+
+This software is the sole property of RPS Group.
+
+Rutgers University and the National Oceanic and Atmospheric Administration (NOAA) have a nonexclusive, world-wide, and
+irrevocable right to use this software for research and academic purposes, and to satisfy the requirements
+of NOAA.
+
+All other use, modification, derivatives, or distribution is forbidden without formal written permission from RPS Group.

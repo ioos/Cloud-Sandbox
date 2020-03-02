@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "ciofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "COMROT"    : "/com/nos",
+  "EXEC"      : "",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "/nos/ciofs/output",
+  "NTIMES"    : "5400",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "/home/centos/IOOS-cloud-IaC/python/job/templates/ciofs.ocean.in"
+}

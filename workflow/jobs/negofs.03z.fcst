@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "fvcomforecast",
+  "OFS"       : "negofs",
+  "CDATE"     : "today",
+  "HH"        : "03",
+  "NHOURS"    : "6",
+  "COMROT"    : "/com/nos",
+  "DATE_REF"  : "2013-01-01 00:00:00",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "/nos/negofs/output",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "auto",
+  "INTMPL"    : "auto",
+  "LOCALNEST" : "False"
+}
