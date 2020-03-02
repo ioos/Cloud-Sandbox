@@ -13,7 +13,34 @@ from plotting import tile
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
 __license__ = "See LICENSE.txt"
-__email__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
+__author__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
+
+def make_png(varnames, files, target):
+    for v in varnames:
+        for f in  files:
+            if not os.path.exists(target):
+                os.mkdir(target)
+                print(f'created target path: {target}')
+            plot(f, target, v)
+
+
+def set_filename(ncfile: str, target: str):
+    ''' create a standard named output filename to more easily make animations from plots'''
+
+    origfile = ncfile.split('/')[-1][:-3]
+
+    prefix = origfile[0:3]
+    if prefix == 'nos':
+        sequence = origfile.split('.')[3][1:4]
+    else:
+        # 012345678
+        # ocean_his
+        prefix = origfile[0:9]
+        if prefix == 'ocean_his':
+            sequence = origfile[11:14]
+
+    filename = f'{target}/f{sequence}_{varname}.png'
+    return filename
 
 
 def png_ffmpeg(source, target):
@@ -72,30 +99,29 @@ def extract_ncdata(ncfile: str, varname: str):
         # Extract field data
         data = nc.variables[varname]
 
-    d = data[:]
+    dvar = data[:]
 
     # Select time
     # NOTE: this takes first time step. was in a for loop before
-    d = d[0, :]
+    dvar = dvar[0, :]
 
     # Check for vertical coordinate
-    if d.ndim > 2:
-        d = d[-1,:] # surface is last in ROMS
+    if dvar.ndim > 2:
+        dvar = dvar[-1,:] # surface is last in ROMS
 
     # Apply mask
-    d = np.ma.masked_where(msk == 0, d)
+    dvar = np.ma.masked_where(msk == 0, dvar)
 
     # pcolor uses surrounding points, if any are masked, mask this cell
     #   see https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolor.html
-    d[:-1,:] = np.ma.masked_where(msk[1:,:] == 0, d[:-1,:])
-    d[:,:-1] = np.ma.masked_where(msk[:,1:] == 0, d[:,:-1])
+    dvar[:-1,:] = np.ma.masked_where(msk[1:,:] == 0, dvar[:-1,:])
+    dvar[:,:-1] = np.ma.masked_where(msk[:,1:] == 0, dvar[:,:-1])
 
     return d
 
-    
+   
 
-
-def extract_mskrho_latlon(ncfile: str):
+def get_projection(ncfile: str):
     ''' returns mask_rho and lat lon from netcdf file '''
 
     EPSG3857 = pyproj.Proj('EPSG:3857')
@@ -113,61 +139,10 @@ def extract_mskrho_latlon(ncfile: str):
     return msk, lo, la
 
 
-
-def make_png(varnames, files, target):
-    for v in varnames:
-        for f in  files:
-            if not os.path.exists(target):
-                os.mkdir(target)
-                print(f'created target path: {target}')
-            plot_roms(f, target, v)
-
-
-def set_filename(ncfile: str, target: str):
-    ''' create a standard named output filename to more easily make animations from plots'''
-
-    origfile = ncfile.split('/')[-1][:-3]
-
-    prefix = origfile[0:3]
-    if prefix == 'nos':
-        sequence = origfile.split('.')[3][1:4]
-    else:   
-        # 012345678
-        # ocean_his
-        prefix = origfile[0:9]
-        if prefix == 'ocean_his':
-            sequence = origfile[11:14]
-
-    filename = f'{target}/f{sequence}_{varname}.png'
-    return filename
-
-
-
-# TODO: swap varname and target, varname is an input, target is output folder
-def plot_diff(ncfile1: str, ncfile1: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
-    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
-
-    mask, lo, la = extract_mskrho_latlon(ncfile1)
-
-    data1 = extract_ncdata(ncfile1, varname)
-    data2 = extract_ncdata(ncfile2, varname)
-
-    # TODO: add error check, make sure the two plots can be compared
-    data_diff = data1 - data2
-
-    outfile = set_filename(ncfile: str, target: str):
-
-    plot_data(data_diff, vaname, outfile)
-
-    return
-
-
-
-
-def plot_data(data, varname: str, outfile: str, crop: bool = False, zoom: int = 8):
+def plot_data(data, msk, lo, la, varname: str, outfile: str, crop: bool = True, zoom: int = 8):
     ''''''
 
-    crop = True
+    #crop = True
 
     TILE3857 = tile.Tile3857()
 
@@ -225,10 +200,29 @@ def plot_data(data, varname: str, outfile: str, crop: bool = False, zoom: int = 
     return
 
 
+# TODO: swap varname and target, varname is an input, target is output folder
+def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
+    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
 
-def plot_roms(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
+    mask, lo, la = proj_msklola(ncfile1)
+
+    data1 = extract_ncdata(ncfile1, varname)
+    data2 = extract_ncdata(ncfile2, varname)
+
+    # TODO: add error check, make sure the two plots can be compared
+    data_diff = data1 - data2
+
+    outfile = set_filename(ncfile: str, target: str):
+
+    plot_data(data_diff, msk, lo, la, varname, outfile)
+
+    return
+
+
+
+# TODO: refactor using newer helper functions
+def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
     ''''''
-    # TODO: refactor using newer helper functions
 
     crop = True
 
@@ -362,7 +356,7 @@ if __name__ == '__main__':
     # ncfile='/com/liveocean/f2020.02.13/ocean_his_0001.nc'
     # target='/com/liveocean/plots/f2020.02.13'
     # plot_roms(ncfile, target, var, True, 8)
-    plot_roms(ncfile, target, var)
+    plot(ncfile, target, var)
 
     # source = f"/com/nos/plots/dbofs.20200210/f%03d_{var}.png"
     # target = f"/com/nos/plots/dbofs.20200210/{var}.mp4"
