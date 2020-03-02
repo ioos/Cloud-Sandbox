@@ -60,47 +60,175 @@ def png_ffmpeg(source, target):
         raise Exception(e)
 
 
-def plot_png(source='dubai', target='figs'):
-    '''Plot roms output and save to png'''
-
-    data = None
-    datadir = os.getenv('DATA')
-    if source == 'liveocean':
-        data = os.path.join(datadir, 'LiveOcean_output/f2019.11.06')
-    elif source == 'dubai':
-        data = os.path.join(datadir, 'dubai_his_arg.20191226')
-
-    if not os.path.exists(target):
-        os.mkdir(target)
-
-    files = sorted(glob.glob(f'{data}/*.nc'))
-
-    # Scalar variables
-    vars_scalar = [
-        'temp',
-        'zeta'
-    ]
-
-    # TODO: Fix coordinate system for u, v (and other vector quantities?). They
-    #       use Psi space, while scalar fields use Rho space. Two ways:
-    #       (1) The way Brian showed me for the maracoos project
-    #       (2) https://www.geosci-model-dev.net/12/3571/2019/gmd-12-3571-2019.html
-    vars_vector = [
-        'u',
-        'v'
-    ]
-    for v in vars_scalar:
-        for f in files:
-            print('Plotting {}'.format(f))
-            plot_roms(f, target, v)
-            print('Finished {}'.format(f))
 
 
 def extract_ncdata(ncfile: str, varname: str):
+
+    with netCDF4.Dataset(ncfile) as nc:
+
+        # extract mask
+        msk = nc.variables['mask_rho'][:]
+
+        # Extract field data
+        data = nc.variables[varname]
+
+    d = data[:]
+
+    # Select time
+    # NOTE: this takes first time step. was in a for loop before
+    d = d[0, :]
+
+    # Check for vertical coordinate
+    if d.ndim > 2:
+        d = d[-1,:] # surface is last in ROMS
+
+    # Apply mask
+    d = np.ma.masked_where(msk == 0, d)
+
+    # pcolor uses surrounding points, if any are masked, mask this cell
+    #   see https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolor.html
+    d[:-1,:] = np.ma.masked_where(msk[1:,:] == 0, d[:-1,:])
+    d[:,:-1] = np.ma.masked_where(msk[:,1:] == 0, d[:,:-1])
+
+    return d
+
+    
+
+
+def extract_mskrho_latlon(ncfile: str):
+    ''' returns mask_rho and lat lon from netcdf file '''
+
+    EPSG3857 = pyproj.Proj('EPSG:3857')
+
+    with netCDF4.Dataset(ncfile) as nc:
+
+        # Extract spatial variables
+        lon = nc.variables['lon_rho'][:]
+        lat = nc.variables['lat_rho'][:]
+        lo, la = EPSG3857(lon, lat)       # project EPSG:4326 to EPSG:3857 (web mercator)
+
+        msk = nc.variables['mask_rho'][:]
+    
+    # return msk and lat lon
+    return msk, lo, la
+
+
+
+def make_png(varnames, files, target):
+    for v in varnames:
+        for f in  files:
+            if not os.path.exists(target):
+                os.mkdir(target)
+                print(f'created target path: {target}')
+            plot_roms(f, target, v)
+
+
+def set_filename(ncfile: str, target: str):
+    ''' create a standard named output filename to more easily make animations from plots'''
+
+    origfile = ncfile.split('/')[-1][:-3]
+
+    prefix = origfile[0:3]
+    if prefix == 'nos':
+        sequence = origfile.split('.')[3][1:4]
+    else:   
+        # 012345678
+        # ocean_his
+        prefix = origfile[0:9]
+        if prefix == 'ocean_his':
+            sequence = origfile[11:14]
+
+    filename = f'{target}/f{sequence}_{varname}.png'
+    return filename
+
+
+
+# TODO: swap varname and target, varname is an input, target is output folder
+def plot_diff(ncfile1: str, ncfile1: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
+    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
+
+    mask, lo, la = extract_mskrho_latlon(ncfile1)
+
+    data1 = extract_ncdata(ncfile1, varname)
+    data2 = extract_ncdata(ncfile2, varname)
+
+    # TODO: add error check, make sure the two plots can be compared
+    data_diff = data1 - data2
+
+    outfile = set_filename(ncfile: str, target: str):
+
+    plot_data(data_diff, vaname, outfile)
+
     return
+
+
+
+
+def plot_data(data, varname: str, outfile: str, crop: bool = False, zoom: int = 8):
+    ''''''
+
+    crop = True
+
+    TILE3857 = tile.Tile3857()
+
+    # Image size based on tiles
+    mla = la[msk == 0]  # masked lat
+    mlo = lo[msk == 0]  # masked lon
+    lrt = TILE3857.tile(mlo.max(), mla.min(), zoom)
+    lrb = TILE3857.bounds(*lrt)
+    ult = TILE3857.tile(mlo.min(), mla.max(), zoom)
+    ulb = TILE3857.bounds(*ult)
+    ntx = lrt[0] - ult[0] + 1  # number of tiles in x
+    nty = lrt[1] - ult[1] + 1  # number of tiles in y
+
+    # image size/resolution
+    # dpi = 256
+    # dpi = 96
+    dpi = 128
+    # dpi = 512   # suitable for screen and web
+    height = nty * dpi
+    width = ntx * dpi
+
+    # fig = plt.figure(dpi=dpi, facecolor='#FFFFFF', edgecolor='w')
+    fig = plt.figure(facecolor='#FFFFFF', edgecolor='w')
+    # fig.set_alpha(1)
+    fig.set_figheight(height / dpi)
+    fig.set_figwidth(width / dpi)
+
+    ax = fig.add_axes([0., 0., 1., 1.], xticks=[], yticks=[])
+    ax.set_axis_off()
+    # ax.set_axis_on()
+
+    # pcolor
+    # pcolor = ax.pcolor(lo, la, d, cmap=plt.get_cmap('viridis'), edgecolors='none', linewidth=0.05)
+    pcolor = ax.pcolor(lo, la, data, cmap=plt.get_cmap('coolwarm'), edgecolor='none', linewidth=0.00)
+
+            # ax.set_frame_on(False)
+    ax.set_frame_on(True)
+    ax.set_clip_on(True)
+    ax.set_position([0, 0, 1, 1])
+
+    # fig.savefig(filename, dpi=dpi, bbox_inches='tight', pad_inches=0.0, transparent=False)
+    # fig.savefig(filename, dpi=dpi, transparent=False)
+    fig.savefig(outfile, dpi=dpi, bbox_inches=None, pad_inches=0.1, transparent=True)
+
+    plt.close(fig)
+
+    if crop:
+        with PIL.Image.open(outfile) as im:
+            zeros = PIL.Image.new('RGBA', im.size)
+            im = PIL.Image.composite(im, zeros, im)
+            bbox = im.getbbox()
+            crop = im.crop(bbox)
+            crop.save(outfile, optimize=True)
+
+    return
+
+
 
 def plot_roms(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
     ''''''
+    # TODO: refactor using newer helper functions
 
     crop = True
 
