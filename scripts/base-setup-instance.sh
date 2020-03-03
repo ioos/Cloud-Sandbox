@@ -27,10 +27,10 @@ setup_environment () {
   sudo yum -y install ksh
   sudo yum -y install wget
   sudo yum -y install glibc-devel
-  sudo yum -y install zlib
-  sudo yum -y install awscli
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
+  sudo yum -y install python3
+  sudo yum -y install awscli
 
   echo . /usr/share/Modules/init/bash >> ~/.bashrc
   echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
@@ -107,12 +107,12 @@ install_efa_driver() {
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xvf $tarfile
-  #rm $tarfile
+  rm $tarfile
 
-  #cd aws-efa-installer
+  cd aws-efa-installer
   # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
   # This installer destroyed my system the first time!!!
-  #sudo ./efa_installer.sh -y --minimal
+  sudo ./efa_installer.sh -y --minimal
 }
 
 
