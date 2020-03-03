@@ -6,21 +6,28 @@
 
 setup_environment () {
 
-  sudo mkdir -p /ptmp 
+  sudo mkdir /mnt/efs/fs1/save
+  sudo mkdir /mnt/efs/fs1/com
+  sudo mkdir /mnt/efs/fs1/ptmp
+
+  sudo ln -s /mnt/efs/fs1/save /save
+  sudo ln -s /mnt/efs/fs1/com /com
+  sudo ln -s /mnt/efs/fs1/ptmp /ptmp
+
   sudo chgrp wheel /ptmp
-  sudo  chmod 775 /ptmp
-  sudo mkdir -p /noscrub/com/nos 
-  sudo chgrp -R wheel /noscrub 
-  sudo chmod -R g+w /noscrub
-  sudo mkdir -p /save 
+  sudo chmod 775 /ptmp
+  sudo chgrp -R wheel /com
+  sudo chmod -R 775 /com
   sudo chgrp wheel /save 
   sudo chmod 775 /save
+
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
   sudo yum -y install tcsh
   sudo yum -y install ksh
   sudo yum -y install wget
   sudo yum -y install glibc-devel
+  sudo yum -y install zlib
   sudo yum -y install awscli
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
@@ -38,40 +45,98 @@ setup_environment () {
 
 
 
-install_libs () {
 
-  #wrkdir=/tmp/rpms
-  wrkdir=~/rpms
+
+install_base_rpms () {
+
+  # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18
+  libstar=base_rpms.gcc.6.5.0.el7.20191212.tgz
+
+  wrkdir=~/baserpms
+  [ -e $wrkdir ] && rm -Rf $workdir
   mkdir -p $wrkdir
   cd $wrkdir
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/nosofs_base_rpms.gcc.6.5.0.el7.20191011.tgz
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
+  tar -xvf $libstar
+  rm $libstar
+  
+  for file in `ls -1 *.rpm`
+  do
+    sudo yum -y install $file
+  done
+}
 
-  tar -xvf nosofs_base_rpms.gcc.6.5.0.el7.20191011.tgz
-  sudo yum -y install                 \
-    gcc-6.5.0-1.el7.x86_64.rpm        \
-    hdf5-1.8.21-1.el7.x86_64.rpm      \
-    netcdf-4.2-1.el7.x86_64.rpm       \
-    produtil-1.0.18-1.el7.x86_64.rpm
+
+
+install_extra_rpms () {
+
+  # bacio/v2.1.0         w3nco/v2.0.6
+  # bufr/v11.0.2         libpng/1.5.30        wgrib2/2.0.8
+  # g2/v3.1.0            sigio/v2.1.0
+  # nemsio/v2.2.4        w3emc/v2.2.0 
+
+  libstar=extra_rpms.el7.20191205.tgz
+
+  wrkdir=~/extrarpms
+  [ -e $wrkdir ] && rm -Rf $workdir
+  mkdir -p $wrkdir
+  cd $wrkdir
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
+  tar -xvf $libstar
+  rm $libstar
+
+  for file in `ls -1 *.rpm`
+  do
+    sudo yum -y install $file
+  done
+}
+
+
+install_efa_driver() {
+
+  # version=latest
+  version=1.8.3
+  tarfile=aws-efa-installer-${version}.tar.gz
+
+  wrkdir=~/efadriver
+  [ -e $wrkdir ] && rm -Rf $workdir
+  mkdir -p $wrkdir
+  cd $wrkdir
+
+  curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
+  tar -xvf $tarfile
+  #rm $tarfile
+
+  cd aws-efa-installer
+  # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+  #sudo ./efa_installer.sh -y --minimal
+}
+
+
+
+install_ffmpeg () {
+  echo "Stub"
+ #https://ioos-cloud-sandbox/public/libs/ffmpeg-git-i686-static.tar.xz
+}
+
+ #mpi/intel/2020.0.154
+install_impi () {
 
 # 2019.6-154
 # 2020.0.154
 # /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles
 
-sudo mkdir -p /usrx/modulefiles/mpi/intel
-  sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/2020.0.154
-
-}
-
-
-
-install_impi () {
+  #sudo mkdir -p /usrx/modulefiles/mpi/intel
+  #sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/2020.0.154
 
   #wrkdir=/tmp/intel_mpi
 
   wrkdir=~/intel_mpi
   mkdir -p $wrkdir
   cd $wrkdir
+
 
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/intel_mpi_2019.5.281.tgz
   tar -xvf intel_mpi_2019.5.281.tgz
