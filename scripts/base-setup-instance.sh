@@ -38,12 +38,46 @@ setup_environment () {
 
   sudo mkdir -p /usrx/modulefiles
   echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
-  echo . /usr/share/Modules/init/bash >> /etc/profile.d/custom.sh
-  echo source /usr/share/Modules/init/csh >> /etc/profile.d/custom.csh
+  echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+  echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
 }
 
 
 
+
+install_efa_driver() {
+ 
+  # This must be installed before the rest
+
+  # version=latest
+  version=1.8.3
+  tarfile=aws-efa-installer-${version}.tar.gz
+
+  wrkdir=~/efadriver
+  [ -e $wrkdir ] && rm -Rf $wrkdir
+  mkdir -p $wrkdir
+  cd $wrkdir
+
+  # If this exists, efa driver intall fails, move it
+  sudo mkdir /usr/lib/oldkernel
+  sudo mv /usr/lib/modules/3.10.0-957.1.3.el7.x86_64 /usr/lib/oldkernel
+
+  sudo yum -y install gcc
+
+  curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
+  tar -xvf $tarfile
+  rm $tarfile
+
+  cd aws-efa-installer
+
+  # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+  sudo ./efa_installer.sh -y --minimal
+
+  # Put this back in original location
+  sudo mv /usr/lib/oldkernel/3.10.0-957.1.3.el7.x86_64  /usr/lib/modules
+  sudo rmdir /usr/lib/oldkernel
+
+}
 
 
 
@@ -65,6 +99,8 @@ install_base_rpms () {
   do
     sudo yum -y install $file
   done
+
+  rm -Rf $wrkdir
 }
 
 
@@ -91,64 +127,27 @@ install_extra_rpms () {
   do
     sudo yum -y install $file
   done
-}
-
-
-install_efa_driver() {
-
-  # version=latest
-  version=1.8.3
-  tarfile=aws-efa-installer-${version}.tar.gz
-
-  wrkdir=~/efadriver
-  [ -e $wrkdir ] && rm -Rf $wrkdir
-  mkdir -p $wrkdir
-  cd $wrkdir
-
-  curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
-  tar -xvf $tarfile
-  rm $tarfile
-
-  cd aws-efa-installer
-  # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-  # This installer destroyed my system the first time!!!
-  sudo ./efa_installer.sh -y --minimal
+  
+  rm -Rf $wrkdir
 }
 
 
 
 install_ffmpeg () {
   echo "Stub"
- #https://ioos-cloud-sandbox/public/libs/ffmpeg-git-i686-static.tar.xz
+  #https://ioos-cloud-sandbox/public/libs/ffmpeg-git-i686-static.tar.xz
 }
 
- #mpi/intel/2020.0.154
-install_impi () {
 
-# 2019.6-154
-# 2020.0.154
-# /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles
+install_impi () {
+  set -x
+  pwd
+  #sudo ./aws_impi.sh install -check_efa 0
+
+  #version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
 
   #sudo mkdir -p /usrx/modulefiles/mpi/intel
-  #sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/2020.0.154
-
-  #wrkdir=/tmp/intel_mpi
-
-  wrkdir=~/intel_mpi
-  mkdir -p $wrkdir
-  cd $wrkdir
-
-
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/intel_mpi_2019.5.281.tgz
-  tar -xvf intel_mpi_2019.5.281.tgz
-
-  echo 'Starting Intel MPI silent install... please wait'
-  sudo ./install.sh -s silent.cfg 
-  echo '... Finished impi silent install'
-
-  sudo mkdir -p /usrx/modulefiles/mpi/intel
-  sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/2019.6.085
-
+  #sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
 }
 
 

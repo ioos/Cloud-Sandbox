@@ -2,9 +2,9 @@
 
 . base-setup-instance.sh
 
-setup_environment
-install_base_rpms
-install_extra_rpms
+#setup_environment
 #install_efa_driver
-#install_impi
+#install_base_rpms
+install_extra_rpms
+install_impi
 

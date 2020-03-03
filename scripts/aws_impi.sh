@@ -23,46 +23,134 @@
 
 #!/bin/bash
 
-impi_version="2019.4-070"
+#expected_impi_versions="2019.5"
+expected_impi_versions="2019.6"
+
+impi_major_version=2019
+impi_minor_version=6
+impi_symlink="/opt/intel/impi/latest"
+has_intel64_level=1
 
 function usage()
 {
-    echo "usage: aws_impi.sh ACTION [OPTIONS]"
     echo ""
-    echo "  ACTION: install | uninstall | reinstall"
-    echo "    install         - install Intel MPI ${impi_version}"
-    echo "    uninstall       - uninstall Intel MPI ${impi_version}"
-    echo "    reinstall       - reinstall Intel MPI ${impi_version}"
+    echo "usage: aws_impi.sh COMMAND [OPTIONS]"
     echo ""
-    echo "  OPTIONS: dont_check_efa"
-    echo "    dont_check_efa  - force the script to skip check for desired OFI/EFA provider capabilities"
-    echo "                      during Intel MPI installation. By default this option is disabled, i.e. the script"
-    echo "                      will try to detect whether desired OFI/EFA provider presents and"
-    echo "                      will fail if provider is absent."
+    echo "  COMMAND:"
+    echo "    install   - install Intel MPI ${impi_version}"
+    echo "    uninstall - uninstall Intel MPI ${impi_version}"
+    echo ""
+    echo "  OPTIONS:"
+    echo "    -version <version>  - Install/uninstall specific Intel MPI version (${impi_version} by default)."
+    echo "    -tuning_url <url>   - Download and setup custom tuning file during Intel MPI installation."
+    echo "                          By default installer doesn't download tuning file and the tuning file"
+    echo "                          from Intel MPI package is used."
+    echo "    -check_efa <0|1>    - Force the installer to check for desired OFI/EFA provider capabilities"
+    echo "                          during Intel MPI installation. Enabled by default."
 }
+
+# Default options
+impi_version="${impi_major_version}.${impi_minor_version}"
+tuning_url=""
+check_efa=1
 
 if [ -z $1 ]; then
     usage
     exit 1
 fi
 
-action=$1
+command=$1
+shift
 
-if [ -z $2 ]; then
-    options="check_efa" # default behavior
-else
-    options=$2
+# Parse options
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        -version)
+        impi_version="$2"
+        shift
+        shift
+        ;;
+        -tuning_url)
+        tuning_url="$2"
+        shift
+        shift
+        ;;
+        -check_efa)
+        check_efa="$2"
+        shift
+        shift
+        ;;
+        -*|--*=)
+        echo "Error: unsupported option $1" >&2
+        usage
+        exit 1
+        ;;
+    esac
+done
+
+# Check options correctness
+
+version_found=0
+for expected_version in $expected_impi_versions;
+do
+    if [ "$impi_version" == "$expected_version" ];
+    then
+        version_found=1
+        impi_major_version=$(echo $impi_version | cut -d. -f1)
+        impi_minor_version=$(echo $impi_version | cut -d. -f2)
+        break
+    fi
+done
+if [ "$version_found" == 0 ];
+then
+    echo "Unexpected IMPI version: $impi_version"
+    echo "Expected IMPI versions: $expected_impi_versions"
+    exit 1
 fi
 
-echo "action $action, options $options"
+setup_custom_tuning=0
+if [ "$tuning_url" != "" ];
+then
+    if curl --output /dev/null --silent --head --fail "$tuning_url";
+    then
+        setup_custom_tuning=1
+    else
+        echo "Can't find tuning file by url $tuning_url"
+        exit 1
+    fi
+fi
 
-impi_package_name="intel-mpi-${impi_version}"
-impi_install_path_pattern="/opt/intel/impi/2019.4*"
-impi_install_path=""
-tuning_filename="efa_tuning.dat"
-tuning_filename_path=""
-is_ubuntu=0
-libfabric_lib_path="/opt/amazon/efa/lib64"
+if [ "$check_efa" != "1" ] && [ "$check_efa" != "0" ];
+then
+    echo "Unexpected check_efa value: $check_efa"
+    usage
+    exit 1
+fi
+
+
+echo ""
+echo "COMMAND"
+echo "$command"
+echo ""
+echo "OPTIONS"
+echo "version: ${impi_major_version}.${impi_minor_version}"
+echo "tuning_url: $tuning_url"
+echo "check_efa: $check_efa"
+echo ""
+
+
+impi_package_prefix="intel-mpi"
+impi_package_name="${impi_package_prefix}-${impi_version}*"
+impi_install_path_pattern="/opt/intel/impi/${impi_version}*"
+if [ "$has_intel64_level" == "1" ];
+then
+    impi_install_path_pattern="${impi_install_path_pattern}/intel64"
+fi
+custom_tuning_filename="efa_tuning.dat"
+custom_tuning_path="${impi_symlink}/etc/${custom_tuning_filename}"
 
 is_ubuntu=`cat /etc/*release* | grep -i "ubuntu" | wc -l`
 if [ "$is_ubuntu" != "0" ];
@@ -119,89 +207,113 @@ function check_efa_provider()
     fi
 }
 
-function set_tuning_filename_path()
-{
-    if ls -d $impi_install_path_pattern > /dev/null 2>&1;
-    then
-        impi_install_path=`ls -d $impi_install_path_pattern | head -n 1`
-        tuning_filename_path="${impi_install_path}/intel64/etc/${tuning_filename}"
-    else
-        impi_install_path=""
-        tuning_filename_path=""
-    fi
-}
-
 function patch_env_files()
 {
-    set_tuning_filename_path
-
-    echo "impi_install_path $impi_install_path"
-
-    if [ "$impi_install_path" == "" ] || [ ! -d $impi_install_path ];
+    if [ "$impi_symlink" == "" ] || [ ! -d $impi_symlink ];
     then
         echo "Can't find installed Intel MPI, exit"
         exit 1
     fi
 
-    env_file="${impi_install_path}/intel64/bin/mpivars.sh"
+    ########################## mpivars.sh ##########################
+    env_file="${impi_symlink}/bin/mpivars.sh"
     if [ ! -f $env_file ] || [ -L $env_file ];
     then
         echo "Can't find ${env_file}, exit"
         exit 1
     fi
-    pattern="I_MPI_ROOT="
-    sudo sed -i "/${pattern}/a if [ -z \"\${MPIR_CVAR_CH4_OFI_ENABLE_ATOMICS}\" ]; then export MPIR_CVAR_CH4_OFI_ENABLE_ATOMICS=0 ; fi" $env_file
-    sudo sed -i "/${pattern}/a if [ -z \"\${I_MPI_OFI_LIBRARY_INTERNAL}\" ]; then export I_MPI_OFI_LIBRARY_INTERNAL=0 ; fi" $env_file
-    sudo sed -i "/${pattern}/a if [ -z \"\${I_MPI_EXTRA_FILE_SYSTEM}\" ]; then export I_MPI_EXTRA_FILE_SYSTEM=1 ; fi" $env_file
-    sudo sed -i "/${pattern}/a if [ -z \"\${ROMIO_FSTYPE_FORCE}\" ]; then export ROMIO_FSTYPE_FORCE=\"nfs:\" ; fi" $env_file
-    sudo sed -i "/${pattern}/a if [ -z \"\${I_MPI_TUNING_BIN}\" ]; then export I_MPI_TUNING_BIN=${tuning_filename_path} ; fi" $env_file
+    pattern="export I_MPI_ROOT"
     sudo sed -i "/${pattern}/a export LD_LIBRARY_PATH=${libfabric_lib_path}:\${LD_LIBRARY_PATH}" $env_file
+    sudo sed -i "/${pattern}/a if [ -z \"\${I_MPI_OFI_LIBRARY_INTERNAL}\" ]; then export I_MPI_OFI_LIBRARY_INTERNAL=0 ; fi" $env_file
+    if [ "$setup_custom_tuning" == "1" ];
+    then
+        sudo sed -i "/${pattern}/a if [ -z \"\${I_MPI_TUNING_BIN}\" ]; then export I_MPI_TUNING_BIN=${custom_tuning_path} ; fi" $env_file
+    fi
 
-    env_file="${impi_install_path}/intel64/bin/mpivars.csh"
+    ########################## mpivars.csh ##########################
+    env_file="${impi_symlink}/bin/mpivars.csh"
     if [ ! -f $env_file ] || [ -L $env_file ];
     then
         echo "Can't find ${env_file}, exit"
         exit 1
     fi
     pattern="setenv I_MPI_ROOT"
-    sudo sed -i "/${pattern}/a if \!(\$?MPIR_CVAR_CH4_OFI_ENABLE_ATOMICS) setenv MPIR_CVAR_CH4_OFI_ENABLE_ATOMICS 0" $env_file
-    sudo sed -i "/${pattern}/a if \!(\$?I_MPI_OFI_LIBRARY_INTERNAL) setenv I_MPI_OFI_LIBRARY_INTERNAL 0" $env_file
-    sudo sed -i "/${pattern}/a if \!(\$?I_MPI_EXTRA_FILE_SYSTEM) setenv I_MPI_EXTRA_FILE_SYSTEM 1" $env_file
-    sudo sed -i "/${pattern}/a if \!(\$?ROMIO_FSTYPE_FORCE) setenv ROMIO_FSTYPE_FORCE \"nfs:\"" $env_file
-    sudo sed -i "/${pattern}/a if \!(\$?I_MPI_TUNING_BIN) setenv I_MPI_TUNING_BIN ${tuning_filename_path}" $env_file
     sudo sed -i "/${pattern}/a if \!(\$?LD_LIBRARY_PATH) then\n    setenv LD_LIBRARY_PATH ${libfabric_lib_path}\nelse\n    setenv LD_LIBRARY_PATH ${libfabric_lib_path}:\${LD_LIBRARY_PATH}\nendif" $env_file
+    sudo sed -i "/${pattern}/a if \!(\$?I_MPI_OFI_LIBRARY_INTERNAL) setenv I_MPI_OFI_LIBRARY_INTERNAL 0" $env_file
+    if [ "$setup_custom_tuning" == "1" ];
+    then
+        sudo sed -i "/${pattern}/a if \!(\$?I_MPI_TUNING_BIN) setenv I_MPI_TUNING_BIN ${custom_tuning_path}" $env_file
+    fi
 
-    env_file="${impi_install_path}/intel64/modulefiles/mpi"
+    ########################## module file ##########################
+    env_file="${impi_symlink}/modulefiles/mpi"
     if [ ! -f $env_file ] || [ -L $env_file ];
     then
         echo "Can't find ${env_file}, exit"
         exit 1
     fi
-    pattern="setenv              I_MPI_ROOT"
-    sudo sed -i "/${pattern}/a setenv MPIR_CVAR_CH4_OFI_ENABLE_ATOMICS 0" $env_file
-    sudo sed -i "/${pattern}/a setenv I_MPI_OFI_LIBRARY_INTERNAL 0" $env_file
-    sudo sed -i "/${pattern}/a setenv I_MPI_EXTRA_FILE_SYSTEM 1" $env_file
-    sudo sed -i "/${pattern}/a setenv ROMIO_FSTYPE_FORCE \"nfs:\"" $env_file
-    sudo sed -i "/${pattern}/a setenv I_MPI_TUNING_BIN ${tuning_filename_path}" $env_file
+    pattern="I_MPI_ROOT"
     sudo sed -i "/${pattern}/a prepend-path LD_LIBRARY_PATH ${libfabric_lib_path}" $env_file
+    sudo sed -i "/${pattern}/a setenv I_MPI_OFI_LIBRARY_INTERNAL 0" $env_file
+    if [ "$setup_custom_tuning" == "1" ];
+    then
+        sudo sed -i "/${pattern}/a setenv I_MPI_TUNING_BIN ${custom_tuning_path}" $env_file
+    fi
 }
 
 function install_impi()
 {
-    echo "1. Checking prerequisites"
-
-    if [ "$options" == "check_efa" ];
+    if [ "$check_efa" == "1" ];
     then
+        echo "Checking libfabric EFA provider"
         check_efa_provider
     else
         echo "Skip check for libfabric EFA provider"
     fi
 
-    echo "2. Installing Intel MPI package ${impi_version}"
+    echo "Installing Intel MPI package ${impi_version}"
+
+    previous_impi_installations=""
+    if [ "$is_ubuntu" == "1" ];
+    then
+        previous_impi_installations=$(sudo apt list --installed 2>&1 | grep -i "${impi_package_prefix}-*")
+    else
+        previous_impi_installations=$(sudo yum list installed ${impi_package_prefix}-* 2>&1 | grep "${impi_package_prefix}")
+    fi
+
+    if [ "$previous_impi_installations" != "" ];
+    then
+        echo ""
+        echo "Another Intel MPI installations are detected:"
+        echo ""
+        echo "$previous_impi_installations"
+        echo ""
+        echo "Please uninstall them and run installer again."
+        echo ""
+        exit 1
+    fi
+
+    if [ "$setup_custom_tuning" == "1" ];
+    then
+        echo "Downloading Intel MPI custom tuning file"
+        custom_tuning_zip="tuning.zip"
+        curl -o $custom_tuning_zip $tuning_url
+        custom_tuning_dat=`unzip -Z1 $custom_tuning_zip | grep ".dat"`
+        unzip -o $custom_tuning_zip
+        expected_checksum=$(cat checksum.txt)
+        real_checksum=$(md5sum $custom_tuning_dat | awk '{ print $1 }')
+        echo "expected_checksum $expected_checksum"
+        echo "real_checksum $real_checksum"
+        if [ "$real_checksum" != "$expected_checksum" ];
+        then
+            echo "Unexpected tuning file checksum $real_checksum, expected $expected_checksum"
+            exit 1
+        fi
+    fi
 
     if [ "$is_ubuntu" == "1" ];
     then
-        curl -o apt_key https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+        curl -o apt_key https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-${impi_major_version}.PUB
         sudo apt-key add apt_key
         sudo sh -c 'echo deb https://apt.repos.intel.com/mpi all main > /etc/apt/sources.list.d/intel-mpi.list'
         sudo apt-get update
@@ -210,47 +322,65 @@ function install_impi()
         sudo apt install unzip -y
         rm apt_key
     else
-        sudo yum-config-manager --add-repo https://yum.repos.intel.com/mpi/setup/intel-mpi.repo
-        sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+        sudo yum-config-manager --add-repo=https://yum.repos.intel.com/mpi/setup/intel-mpi.repo
+        sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-${impi_major_version}.PUB
         sudo yum install yum-plugin-remove-with-leaves -y
         sudo yum install ${impi_package_name} -y
         sudo yum install unzip -y
     fi
 
-    echo "3. Setting Intel MPI tuning file for EFA"
+    if ! ls -d $impi_install_path_pattern > /dev/null 2>&1;
+    then
+        echo "Can't find Intel MPI installation directory"
+        exit 1
+    fi
+    impi_install_path=`ls -d ${impi_install_path_pattern} | head -n 1`
+    sudo ln -sfn $impi_install_path $impi_symlink
 
-    tuning_file_url="https://software.intel.com/sites/default/files/managed/f2/65/tuning_skx_shm-ofi_2019u4_aws.zip"
-    tuning_file_name_zip="efa_tuning.zip"
-    curl -o $tuning_file_name_zip $tuning_file_url
-    origin_tuning_file_name=`unzip -Z1 $tuning_file_name_zip | grep ".dat"`
-    unzip -o $tuning_file_name_zip
-    set_tuning_filename_path
-    sudo cp $origin_tuning_file_name $tuning_filename_path
+    if [ "$setup_custom_tuning" == "1" ];
+    then
+        echo "Copying Intel MPI custom tuning file"
+        sudo cp $custom_tuning_dat $custom_tuning_path
+        rm checksum.txt
+        rm $custom_tuning_zip
+        rm $custom_tuning_dat
+    fi
 
-    echo "4. Patching environment files"
-
+    echo "Patching environment files"
     patch_env_files
-
-    echo "5. Cleaning up temporary files"
-
-    rm checksum.txt
-    rm $tuning_file_name_zip
-    rm $origin_tuning_file_name
 
     echo "Intel MPI installation completed"
 }
 
 function uninstall_impi()
 {
-    echo "1. Removing tuning file"
+    echo "Unstalling Intel MPI package ${impi_version}"
 
-    set_tuning_filename_path
-    if [ "$tuning_filename_path" != "" ] && [ -f "$tuning_filename_path" ] && [ ! -L "$tuning_filename_path" ];
+    if ! ls -d $impi_install_path_pattern > /dev/null 2>&1;
     then
-        sudo rm $tuning_filename_path
+        echo "Can't find Intel MPI installation directory."
+        echo "Please specify the exact Intel MPI version for removal."
+        exit 1
     fi
 
-    echo "2. Unstalling Intel MPI package ${impi_version}"
+    if [ -f "${custom_tuning_path}" ] && [ ! -L "${custom_tuning_path}" ];
+    then
+        echo "Removing custom tuning file"
+        sudo rm $custom_tuning_path
+    fi
+
+    old_custom_tuning_path=${impi_install_path_pattern}/etc/${custom_tuning_filename}
+    if [ -f "${old_custom_tuning_path}" ] && [ ! -L "${old_custom_tuning_path}" ];
+    then
+        echo "Removing custom tuning file from old installation"
+        sudo rm $old_custom_tuning_path
+    fi
+
+    if [ -L "${impi_symlink}" ];
+    then
+        echo "Removing symlink"
+        sudo unlink $impi_symlink
+    fi
 
     if [ "$is_ubuntu" == "1" ];
     then
@@ -258,9 +388,9 @@ function uninstall_impi()
     else
         sudo yum remove ${impi_package_name} --remove-leaves -y
         sudo yum remove ${impi_package_name} -y
-        sudo yum remove intel-mpi-rt-2019.4-243 -y
-        sudo yum remove intel-mpi-doc-2019 -y
-        sudo yum remove intel-comp-l-all-vars-19.0.4-243 -y
+        sudo yum remove "${impi_package_prefix}-rt-${impi_major_version}*" -y
+        sudo yum remove "${impi_package_prefix}-doc-${impi_major_version}*" -y
+        sudo yum remove "intel-comp-l-all-vars-*" -y
     fi
 
     impi_opt_path="/opt/intel"
@@ -268,7 +398,6 @@ function uninstall_impi()
     then
         if [ -z "$(ls -A ${impi_opt_path})" ];
         then
-            echo "3. Deleting ${impi_opt_path}"
             sudo rm -r ${impi_opt_path}
         fi
     fi
@@ -276,16 +405,12 @@ function uninstall_impi()
     echo "Intel MPI uninstallation completed"
 }
 
-if [ "$action" == "install" ];
+if [ "$command" == "install" ];
 then
     install_impi
-elif [ "$action" == "uninstall" ];
+elif [ "$command" == "uninstall" ];
 then
     uninstall_impi
-elif [ "$action" == "reinstall" ];
-then
-    uninstall_impi
-    install_impi
 else
     usage
     exit 1
