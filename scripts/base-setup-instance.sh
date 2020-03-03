@@ -53,7 +53,7 @@ install_base_rpms () {
   libstar=base_rpms.gcc.6.5.0.el7.20191212.tgz
 
   wrkdir=~/baserpms
-  [ -e $wrkdir ] && rm -Rf $workdir
+  [ -e $wrkdir ] && rm -Rf $wrkdir
   mkdir -p $wrkdir
   cd $wrkdir
 
@@ -79,7 +79,7 @@ install_extra_rpms () {
   libstar=extra_rpms.el7.20191205.tgz
 
   wrkdir=~/extrarpms
-  [ -e $wrkdir ] && rm -Rf $workdir
+  [ -e $wrkdir ] && rm -Rf $wrkdir
   mkdir -p $wrkdir
   cd $wrkdir
 
@@ -101,7 +101,7 @@ install_efa_driver() {
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
-  [ -e $wrkdir ] && rm -Rf $workdir
+  [ -e $wrkdir ] && rm -Rf $wrkdir
   mkdir -p $wrkdir
   cd $wrkdir
 
@@ -109,8 +109,9 @@ install_efa_driver() {
   tar -xvf $tarfile
   #rm $tarfile
 
-  cd aws-efa-installer
+  #cd aws-efa-installer
   # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+  # This installer destroyed my system the first time!!!
   #sudo ./efa_installer.sh -y --minimal
 }
 
