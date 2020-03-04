@@ -6,6 +6,8 @@
 
 setup_environment () {
 
+  home=$PWD
+
   sudo mkdir /mnt/efs/fs1/save
   sudo mkdir /mnt/efs/fs1/com
   sudo mkdir /mnt/efs/fs1/ptmp
@@ -40,12 +42,16 @@ setup_environment () {
   echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
   echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
   echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+
+  cd $home
 }
 
 
 
 
 install_efa_driver() {
+
+  home=$PWD
  
   # This must be installed before the rest
 
@@ -62,6 +68,8 @@ install_efa_driver() {
   sudo mkdir /usr/lib/oldkernel
   sudo mv /usr/lib/modules/3.10.0-957.1.3.el7.x86_64 /usr/lib/oldkernel
 
+  # This will get upgraded when we install gcc 6.5
+  # Default version is needed to build the kernel driver
   sudo yum -y install gcc
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
@@ -77,11 +85,15 @@ install_efa_driver() {
   sudo mv /usr/lib/oldkernel/3.10.0-957.1.3.el7.x86_64  /usr/lib/modules
   sudo rmdir /usr/lib/oldkernel
 
+  cd $home
+
 }
 
 
 
 install_base_rpms () {
+
+  home=$PWD
 
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18
   libstar=base_rpms.gcc.6.5.0.el7.20191212.tgz
@@ -101,11 +113,15 @@ install_base_rpms () {
   done
 
   rm -Rf $wrkdir
+
+  cd $home
 }
 
 
 
 install_extra_rpms () {
+
+  home=$PWD
 
   # bacio/v2.1.0         w3nco/v2.0.6
   # bufr/v11.0.2         libpng/1.5.30        wgrib2/2.0.8
@@ -129,31 +145,59 @@ install_extra_rpms () {
   done
   
   rm -Rf $wrkdir
+
+  cd $home
 }
 
 
 
 install_ffmpeg () {
-  echo "Stub"
-  #https://ioos-cloud-sandbox/public/libs/ffmpeg-git-i686-static.tar.xz
+  home=$PWD
+
+  version=20200127
+  tarfile=ffmpeg-git-i686-static.tar.xz
+
+  wrkdir=~/ffmpeg
+  [ -e $wrkdir ] && rm -Rf $wrkdir
+  mkdir -p $wrkdir
+  cd $wrkdir
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$tarfile
+  tar -xvf $tarfile
+  rm $tarfile
+ 
+  sudo mkdir -p /usrx/ffmpeg/$version
+  sudo cp -Rp ffmpeg-git-${version}-i686-static/* /usrx/ffmpeg/$version
+
+  sudo ln -sf /usrx/ffmpeg/${version}/ffmpeg /usr/local/bin
+
+  rm -Rf $wrkdir
+
+  cd $home
 }
 
 
+
 install_impi () {
-  set -x
-  pwd
-  #sudo ./aws_impi.sh install -check_efa 0
 
-  #version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
+  home=$PWD
 
-  #sudo mkdir -p /usrx/modulefiles/mpi/intel
-  #sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
+  sudo ./aws_impi.sh install -check_efa 0
+
+  version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
+
+  sudo mkdir -p /usrx/modulefiles/mpi/intel
+  sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
+
+  cd $home
 }
 
 
 
 # Personal stuff here
 setup_aliases () {
+
+  home=$PWD
 
   echo alias lsl ls -al >> ~/.tcshrc
   echo alias lst ls -altr >> ~/.tcshrc
@@ -168,5 +212,7 @@ setup_aliases () {
   git config --global user.email patrick.tripp@rpsgroup.com
 
   #git commit --amend --reset-author
+
+  cd $home
 }
 
