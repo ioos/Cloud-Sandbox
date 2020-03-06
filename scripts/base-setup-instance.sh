@@ -29,6 +29,7 @@ setup_environment () {
   sudo yum -y install ksh
   sudo yum -y install wget
   sudo yum -y install glibc-devel
+  sudo yum -y install automake
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
   sudo yum -y install python3
@@ -143,8 +144,13 @@ install_extra_rpms () {
   do
     sudo yum -y install $file
   done
-  
+
+  # Force install newer libpng
+  sudo rpm --install --force libpng-1.5.30-1.el7.x86_64.rpm  
+
   rm -Rf $wrkdir
+
+  sudo yum -y install jasper-devel
 
   cd $home
 }
