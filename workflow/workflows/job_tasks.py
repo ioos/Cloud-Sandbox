@@ -15,7 +15,11 @@ if os.path.abspath('..') not in sys.path:
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from job.Job import Job
+
+import plotting as plot
 from plotting import plot_roms
+from plotting import plot_fvcom
+
 import utils.romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
@@ -176,12 +180,20 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
     idx = 0
     futures = []
 
+    plot_function : callable 
+
+    if job.OFS in util.roms_models:
+      plot_function = plot_roms.plot
+    elif job.OFS in util.fvcom_models:
+      plot_function = plot_fvcom.plot
+
+
     # Submit all jobs to the dask scheduler
     # TODO - parameterize filespec and get files here?
     for filename in FILES:
         for varname in job.VARS:
             log.info(f"plotting file: {filename} var: {varname}")
-            future = client.submit(plot.plot_roms, filename, target, varname)
+            future = client.submit(plot_function, filename, target, varname)
             futures.append(future)
             log.info(futures[idx])
             idx += 1

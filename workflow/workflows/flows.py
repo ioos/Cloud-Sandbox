@@ -166,11 +166,17 @@ if __name__ == '__main__':
     #fcstconf = f'../configs/ciofs.config'
     #jobfile = f'../jobs/ciofs.00z.fcst'
 
-    fcstconf = f'../configs/lmhofs.config'
-    jobfile = f'../jobs/lmhofs.00z.fcst'
+    #fcstconf = f'../configs/lmhofs.config'
+    #jobfile = f'../jobs/lmhofs.00z.fcst'
 
     #fcstconf = f'../configs/leofs.config'
     #jobfile = f'../jobs/leofs.00z.fcst'
 
-    fcstflow = test_flow(fcstconf, jobfile)
-    fcstflow.run()
+    #fcstflow = test_flow(fcstconf, jobfile)
+    #fcstflow.run()
+
+    postconf = f'../configs/post.config'
+    jobfile = f'../jobs/leofs.00z.plots'
+
+    jobflow = plot_flow(postconf, jobfile)
+    jobflow.run()

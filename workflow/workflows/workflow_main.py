@@ -62,11 +62,14 @@ def main():
     qlen = len(flowdeq)
     idx = 0
 
+
+    # Run all of the flows in the queue
     while idx < qlen:
         aflow = flowdeq.pop()
         idx += 1
+
+        # Stop if the flow failed
         state = aflow.run()
-        print(f"DEBUG: state is: {state}")
         if state.is_successful():
             continue
         else:

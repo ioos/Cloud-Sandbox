@@ -10,10 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from plotting import tile
+#import tile
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
 __license__ = "See LICENSE.txt"
-__author__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
+__email__ = "patrick.tripp@rpsgroup.com"
+
+EPSG3857 = pyproj.Proj('EPSG:3857')
+TILE3857 = tile.Tile3857()
 
 # TODO: Move to shared.py
 def make_png(varnames, files, target):
@@ -26,7 +30,7 @@ def make_png(varnames, files, target):
 
 
 # TODO: Move to shared.py
-def set_filename(ncfile: str, target: str):
+def set_filename(ncfile: str, varname: str, target: str):
     ''' create a standard named output filename to more easily make animations from plots'''
 
     origfile = ncfile.split('/')[-1][:-3]
@@ -93,8 +97,8 @@ def png_ffmpeg(source, target):
 # FVCOM 
 def extract_ncdata(ncfile: str, varname: str):
 
-        #for t in range(0, 1): # range of times to plot (time indices in file)
-        # plot(sys.argv[1], t)
+    #for t in range(0, 1): # range of times to plot (time indices in file)
+    # plot(sys.argv[1], t)
 
     timestp = 0
 
@@ -104,16 +108,25 @@ def extract_ncdata(ncfile: str, varname: str):
         # 3D variable
         #u = nc.variables['u'][t,0,:]  # sfc is first vertical level
         #v = nc.variables['v'][t,0,:]
-        # temp(time, siglay, node)
-        d3dvar = nc.variables[varname][timestp,0,:]
-
         # 2D (surface) variable
-        d2dvar = nc.variables[varname][timestp,:]
+        # temp(time, siglay, node)
+
+        vars3d = ["temp"]
+        vars2d = ["u","v"]
+
+        if varname in vars2d:
+          vardata = nc.variables[varname][timestp,:]
+
+        if varname in vars3d:
+          vardata = nc.variables[varname][timestp,0,:]
+
+        return vardata
 
 
 # FVCOM
 def get_projection(ncfile: str):
-    ''' returns lat and lon '''
+    ''' returns lo,la,loc,lac '''
+
 
     with netCDF4.Dataset(ncfile) as nc:
         
@@ -130,24 +143,30 @@ def get_projection(ncfile: str):
         lonc = np.where(lonc > 180., lonc-360., lonc)
         latc = nc.variables['latc'][:]
 
+        nv = nc.variables['nv'][:].T
+        nv = nv - 1
+
         # project to EPSG:3857 for map
     lo,la   = EPSG3857(lon,lat)
     loc,lac = EPSG3857(lonc,latc)
 
-    return lo,la,loc,lac
+    #print(f"{lo},{la},{loc},{lat},{nv}")
+    return lo,la,loc,lac,nv
 
 
 
 # FVCOM
-def plot(ncfile1: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
-    return
+#def plot(ncfile1: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
+    #return
 
 
 
 # FVCOM
-def plot_data(data, lo, la, loc, lac, varname: str, outfile: str, crop: bool = True, zoom: int = 8):
+def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: str, crop: bool = True, zoom: int = 8):
 
-    TILE3857 = tile.Tile3857()
+
+    #nv = nc.variables['nv'][:].T
+    #nv = nv - 1
 
     # render bounds, draw entire tiles in EPSG:3857
     ulll = ( # upper left  longitude, latitude
@@ -179,14 +198,14 @@ def plot_data(data, lo, la, loc, lac, varname: str, outfile: str, crop: bool = T
     lltb = TILE3857.bounds(*llt) # lower left  tile bounds ESPG:3857
 
     # image size/resolution
-    dpi    = 128
+    dpi    = 150
     scale  = 1 # multiplier to increase image size
     height = dpi*ny*scale
     width  = dpi*nx*scale
 
     #fig = plt.figure(dpi=dpi, facecolor='none', edgecolor='none')
     fig = plt.figure(facecolor='#FFFFFF', edgecolor='w')
-    #fig.set_alpha(0)
+    fig.set_alpha(0)
     fig.set_figheight(height/dpi)
     fig.set_figwidth(width/dpi)
 
@@ -194,10 +213,10 @@ def plot_data(data, lo, la, loc, lac, varname: str, outfile: str, crop: bool = T
     # ax.set_axis_off()
     ax.set_axis_on()
 
-    # filled contour
-    # tripcolor = ax.tripcolor(lo, la, nv, zeta, cmap='viridis')
-    #tripcolor = ax.tripcolor(lo, la, nv, data, cmap='viridis')
-    pcolor = ax.pcolor(lo, la, data, cmap=plt.get_cmap('coolwarm'), edgecolor='none', linewidth=0.00)
+
+    #tripcolor = ax.tripcolor(lo, la, nv, data, cmap='coolwarm')
+    tripcolor = ax.tripcolor(lo, la, nv, data, cmap=colormap, edgecolor='none', linewidth=0.00)
+    #pcolor = ax.pcolor(lo, la, data, cmap=plt.get_cmap('coolwarm'), edgecolor='none', linewidth=0.00)
 
     #ax.set_frame_on(False)
     #ax.set_clip_on(False)
@@ -209,7 +228,8 @@ def plot_data(data, lo, la, loc, lac, varname: str, outfile: str, crop: bool = T
     ax.set_xlim(ultb[0], lrtb[2])
     ax.set_ylim(lrtb[1], ultb[3])
 
-    fig.savefig(outfile, dpi=dpi, bbox_inches='tight', pad_inches=0.0, transparent=True)
+    #fig.savefig(outfile, dpi=dpi, bbox_inches='tight', pad_inches=0.0, transparent=True)
+    fig.savefig(outfile, dpi=dpi, pad_inches=0.0, transparent=False)
 
     fig.clear()
     plt.close(fig)
@@ -224,12 +244,26 @@ def plot_data(data, lo, la, loc, lac, varname: str, outfile: str, crop: bool = T
             crop.save(outfile, optimize=True)
 
 
+# FVCOM
+def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
 
-# TODO: swap varname and target, varname is an input, target is output folder
+    lo, la, loc, lac, nv = get_projection(ncfile)
+
+    vardata = extract_ncdata(ncfile, varname)
+
+    outfile = set_filename(ncfile, varname, target)
+
+    cmap = 'jet'   # temp
+    plot_data(vardata, lo, la, loc, lac, nv, varname, cmap, outfile)
+
+    return
+
+
+# FVCOM
 def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
     ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
 
-    lo, la, loc, lac = proj_lolaloclac(ncfile1)
+    lo, la, loc, lac, nv = proj_lolaloclac(ncfile1)
 
     data1 = extract_ncdata(ncfile1, varname)
     data2 = extract_ncdata(ncfile2, varname)
@@ -237,9 +271,10 @@ def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, crop: bool 
     # TODO: add error check, make sure the two plots can be compared
     data_diff = data1 - data2
 
-    outfile = set_filename(ncfile: str, target: str):
+    outfile = set_filename(ncfile1, target)
 
-    plot_data(data_diff, vaname, outfile)
+    cmap = 'seismic'   # temp
+    plot_data(data_diff, lo, la, loc, lac, nv, vaname, outfile)
 
     return
 
@@ -250,13 +285,10 @@ if __name__ == '__main__':
     # target = 'figs/test_temp.mp4'
     # png_ffmpeg(source, target)
     var = 'temp'
-    ncfile = '/com/nos/dbofs.20200210/nos.dbofs.fields.f002.20200210.t00z.nc'
-    target = '/com/nos/plots/dbofs.20200210'
-    # ncfile='/com/liveocean/f2020.02.13/ocean_his_0001.nc'
-    # target='/com/liveocean/plots/f2020.02.13'
-    # plot_roms(ncfile, target, var, True, 8)
-    #plot_roms(ncfile, target, var)
+    ncfile = '/com/nos/leofs.20200309/nos.leofs.fields.f001.20200309.t00z.nc'
+    target = '/com/nos/plots/leofs.20200309'
 
-    # source = f"/com/nos/plots/dbofs.20200210/f%03d_{var}.png"
-    # target = f"/com/nos/plots/dbofs.20200210/{var}.mp4"
-    # png_ffmpeg(source, target)
+    if not os.path.exists(target):
+        os.makedirs(target)
+
+    plot(ncfile,target,var)

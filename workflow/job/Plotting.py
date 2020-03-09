@@ -62,7 +62,7 @@ class Plotting(Job):
                 self.INDIR = f"/com/liveocean/{fdate}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/liveocean/plots/{fdate}"
-        elif self.OFS in ('cbofs', 'dbofs'):
+        elif self.OFS in ('cbofs', 'dbofs','leofs'):
             if self.INDIR == "auto":
                 self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":

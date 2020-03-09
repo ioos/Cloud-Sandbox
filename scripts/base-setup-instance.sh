@@ -165,8 +165,10 @@ install_python_modules_user () {
   . /usr/share/Modules/init/bash
   module load gcc
   pip3 install --user dask distributed
+  pip3 install --user paramiko   # needed for dask-ssh
   pip3 install --user prefect
   pip3 install --user boto3
+
 
   # Build and install the plotting module
   # This will also install dependencies

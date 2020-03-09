@@ -353,6 +353,10 @@ if __name__ == '__main__':
     var = 'temp'
     ncfile = '/com/nos/dbofs.20200210/nos.dbofs.fields.f002.20200210.t00z.nc'
     target = '/com/nos/plots/dbofs.20200210'
+
+    if not os.path.exists(target):
+        os.makedirs(target)
+
     # ncfile='/com/liveocean/f2020.02.13/ocean_his_0001.nc'
     # target='/com/liveocean/plots/f2020.02.13'
     # plot_roms(ncfile, target, var, True, 8)

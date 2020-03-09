@@ -12,6 +12,9 @@ __email__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
 debug = True
 
 
+roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
+fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
+
 def scrub_liveocean():
     ''' scrubs the disk - removes forcings/ICs and forecast data
         older than x days '''

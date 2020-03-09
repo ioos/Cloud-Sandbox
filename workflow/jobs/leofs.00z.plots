@@ -5,7 +5,7 @@
   "HH"        : "00",
   "INDIR"     : "auto",
   "OUTDIR"    : "auto",
-  "VARS"      : ["temp"],
+  "VARS"      : ["zeta","temp","salinity","h"],
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "public/nosofs/plots/dbofs",
   "FSPEC"     : "nos.leofs.fields.f*z.nc"
