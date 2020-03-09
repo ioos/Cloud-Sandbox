@@ -212,7 +212,7 @@ def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, crop: bool 
     # TODO: add error check, make sure the two plots can be compared
     data_diff = data1 - data2
 
-    outfile = set_filename(ncfile: str, target: str):
+    outfile = set_filename(ncfile, target)
 
     plot_data(data_diff, msk, lo, la, varname, outfile)
 

@@ -15,7 +15,7 @@ if os.path.abspath('..') not in sys.path:
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from job.Job import Job
-from plotting import plot
+from plotting import plot_roms
 import utils.romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."

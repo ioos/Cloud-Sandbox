@@ -2,6 +2,7 @@
 import collections
 import os
 import sys
+import re
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -17,13 +18,12 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 
 # provider = 'Local'
 # provider = 'AWS'
-fcstconf = f'{curdir}/../configs/liveocean.config'
+fcstconf = f'{curdir}/../configs/leofs.config'
 postconf = f'{curdir}/../configs/post.config'
 
 # This is used for obtaining liveocean forcing data
 # Users need to obtain credentials from UW
 sshuser = 'username@boiler.ocean.washington.edu'
-
 
 def main():
     lenargs = len(sys.argv) - 1
@@ -42,13 +42,15 @@ def main():
         jobtype = jobdict["JOBTYPE"]
         print('JOBTYPE: ', jobtype)
 
+        if re.search("forecast", jobtype):
         # Add the forecast flow
-        if jobtype == 'forecast':
+        #if jobtype == 'forecast':
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
         # Add the plot flow
-        elif jobtype == 'plotting':
+        elif re.search("plotting", jobtype):
+        #elif jobtype == 'plotting':
             postjobfile = jobfile
             plotflow = flows.plot_flow(postconf, jobfile)
             flowdeq.appendleft(plotflow)

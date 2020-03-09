@@ -81,7 +81,7 @@ case $OFS in
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export JOBARGS="$CDATE"
     cd "$JOBDIR" || exit 1
-    $JOBSCRIPT "$JOBARGS"
+    $JOBSCRIPT $JOBARGS
     ;;
   cbofs | dbofs | tbofs | gomofs | ciofs | leofs | sfbofs | ngofs | nwgofs | negofs | lmhofs )
     export HOMEnos=/save/nosofs-NCO
@@ -90,7 +90,7 @@ case $OFS in
     export cyc=$HH
     export JOBARGS="$CDATE $HH"
     cd "$JOBDIR" || exit 1
-    $JOBSCRIPT "$JOBARGS"
+    $JOBSCRIPT $JOBARGS
     ;;
   adnoc)
     EXEC=roms

@@ -8,20 +8,22 @@ setup_environment () {
 
   home=$PWD
 
-  sudo mkdir /mnt/efs/fs1/save
-  sudo mkdir /mnt/efs/fs1/com
-  sudo mkdir /mnt/efs/fs1/ptmp
+  cd /mnt/efs/fs1
 
-  sudo ln -s /mnt/efs/fs1/save /save
-  sudo ln -s /mnt/efs/fs1/com /com
+  sudo mkdir ptmp
+  sudo mkdir com
+  sudo mkdir save
+
+  sudo chgrp wheel ptmp
+  sudo chmod 775 ptmp
+  sudo chgrp wheel com
+  sudo chmod 775 com
+  sudo chgrp wheel save 
+  sudo chmod 775 save
+
   sudo ln -s /mnt/efs/fs1/ptmp /ptmp
-
-  sudo chgrp wheel /ptmp
-  sudo chmod 775 /ptmp
-  sudo chgrp -R wheel /com
-  sudo chmod -R 775 /com
-  sudo chgrp wheel /save 
-  sudo chmod 775 /save
+  sudo ln -s /mnt/efs/fs1/com /com
+  sudo ln -s /mnt/efs/fs1/save /save
 
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
@@ -32,7 +34,7 @@ setup_environment () {
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
-  sudo yum -y install python3
+  sudo yum -y install python3-devel
   sudo yum -y install awscli
 
   echo . /usr/share/Modules/init/bash >> ~/.bashrc
@@ -153,6 +155,26 @@ install_extra_rpms () {
   sudo yum -y install jasper-devel
 
   cd $home
+}
+
+
+install_python_modules_user () {
+
+  home=$PWD
+
+  . /usr/share/Modules/init/bash
+  module load gcc
+  pip3 install --user dask distributed
+  pip3 install --user prefect
+  pip3 install --user boto3
+
+  # Build and install the plotting module
+  # This will also install dependencies
+  cd ../workflow
+  python3 ./setup.py sdist
+  pip3 install --user dist/plotting-*.tar.gz
+ 
+  cd $home 
 }
 
 
