@@ -12,5 +12,5 @@
   "ININAME"   : "",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/home/centos/Cloud-Sandbox/python/job/templates/tbofs.ocean.in"
+  "OCNINTMPL" : "auto"
 }

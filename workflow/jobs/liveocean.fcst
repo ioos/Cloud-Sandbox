@@ -12,5 +12,5 @@
   "ININAME"   : "/com/liveocean/f2020.01.27/ocean_his_0025.nc",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/home/centos/Cloud-Sandbox/python/job/templates/liveocean.ocean.in"
+  "OCNINTMPL" : "auto"
 }
