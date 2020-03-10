@@ -68,11 +68,11 @@ def png_ffmpeg(source, target):
     # -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2"
 
     proc = None
-    home = os.path.expanduser("~")
-    ffmpeg = home + '/bin/ffmpeg'
+    #home = os.path.expanduser("~")
+    #ffmpeg = home + '/bin/ffmpeg'
 
     try:
-        proc = subprocess.run([ffmpeg, '-y', '-r', '8', '-i', source, '-vcodec', 'libx264', \
+        proc = subprocess.run(['ffmpeg', '-y', '-r', '8', '-i', source, '-vcodec', 'libx264', \
                                '-pix_fmt', 'yuv420p', '-crf', '23', '-vf', "pad=ceil(iw/2)*2:ceil(ih/2)*2", target], \
                               stderr=subprocess.STDOUT)
         assert proc.returncode == 0

@@ -114,7 +114,7 @@ Example: jobs/dbofs.config
   "ININAME"   : "",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/home/centos/IOOS-cloud-IaC/python/job/templates/dbofs.ocean.in"
+  "OCNINTMPL" : "/home/centos/Cloud-Sandbox/python/job/templates/dbofs.ocean.in"
 }
 ```
 

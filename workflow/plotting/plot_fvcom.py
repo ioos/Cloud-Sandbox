@@ -70,16 +70,15 @@ def png_ffmpeg(source, target):
     # ff_str = f'ffmpeg -y -start_number 30 -r 1 -i {source} -vcodec libx264 -pix_fmt yuv420p -crf 25 {target}'
     # ff_str = f'ffmpeg -y -r 8 -i {source} -vcodec libx264 -pix_fmt yuv420p -crf 23 {target}'
 
-    # ffmpeg is currently installed in user home directory. Install to standard location, or someplace in PATH envvar
     # x264 codec enforces even dimensions
     # -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2"
 
     proc = None
-    home = os.path.expanduser("~")
-    ffmpeg = home + '/bin/ffmpeg'
+    #home = os.path.expanduser("~")
+    #ffmpeg = home + '/bin/ffmpeg'
 
     try:
-        proc = subprocess.run([ffmpeg, '-y', '-r', '8', '-i', source, '-vcodec', 'libx264', \
+        proc = subprocess.run(['ffmpeg', '-y', '-r', '8', '-i', source, '-vcodec', 'libx264', \
                                '-pix_fmt', 'yuv420p', '-crf', '23', '-vf', "pad=ceil(iw/2)*2:ceil(ih/2)*2", target], \
                               stderr=subprocess.STDOUT)
         assert proc.returncode == 0
@@ -104,21 +103,26 @@ def extract_ncdata(ncfile: str, varname: str):
 
     with netCDF4.Dataset(ncfile) as nc:
 
-        # get variable of interest here
         # 3D variable
         #u = nc.variables['u'][t,0,:]  # sfc is first vertical level
         #v = nc.variables['v'][t,0,:]
-        # 2D (surface) variable
         # temp(time, siglay, node)
+        #temp = nc.variables['temp'][t,0,:]
 
-        vars3d = ["temp"]
-        vars2d = ["u","v"]
+        # 2D (surface) variable
+        #zeta = nc.variables['zeta'][t,:]
+
+        vars2d = ["zeta", "short_wave", "net_heat_flux", "uwind_speed", "vwind_speed"]
+        vars3d = ["temp","salinity","u","v"]
 
         if varname in vars2d:
           vardata = nc.variables[varname][timestp,:]
-
-        if varname in vars3d:
-          vardata = nc.variables[varname][timestp,0,:]
+        elif varname in vars3d:
+          vardata = nc.variables[varname][timestp,0,:]   # sfc
+        else:
+          print('Unsupported varname in extract_ncdata: ' + varname)
+          traceback.print_stack()
+          raise Exception()
 
         return vardata
 
@@ -254,7 +258,8 @@ def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int =
     outfile = set_filename(ncfile, varname, target)
 
     cmap = 'jet'   # temp
-    plot_data(vardata, lo, la, loc, lac, nv, varname, cmap, outfile)
+
+    plot_data(vardata, lo, la, loc, lac, nv, varname, outfile, cmap)
 
     return
 
@@ -284,7 +289,7 @@ if __name__ == '__main__':
     # source = 'figs/temp/his_arg_temp_%04d.png'
     # target = 'figs/test_temp.mp4'
     # png_ffmpeg(source, target)
-    var = 'temp'
+    var = 'h'
     ncfile = '/com/nos/leofs.20200309/nos.leofs.fields.f001.20200309.t00z.nc'
     target = '/com/nos/plots/leofs.20200309'
 

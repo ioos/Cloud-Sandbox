@@ -80,19 +80,23 @@ def cluster_terminate(cluster):
 # cluster
 @task
 def push_pyEnv(cluster):
-    host = cluster.getHosts()[0]
-    log.info(f"push_pyEnv host is {host}")
 
-    # Push and install anything in dist folder
-    dists = glob.glob(f'{curdir}/../dist/*.tar.gz')
-    for dist in dists:
-        log.info(f"pushing python dist: {dist}")
-        subprocess.run(["scp", dist, f"{host}:~"], stderr=subprocess.STDOUT)
+    hosts = cluster.getHosts()
 
-        path, lib = os.path.split(dist)
-        log.info(f"push_pyEnv installing module: {lib}")
+    for host in hosts:
 
-        subprocess.run(["ssh", host, "pip3", "install", "--upgrade", "--user", lib], stderr=subprocess.STDOUT)
+        log.info(f"push_pyEnv host is {host}")
+
+        # Push and install anything in dist folder
+        dists = glob.glob(f'{curdir}/../dist/*.tar.gz')
+        for dist in dists:
+            log.info(f"pushing python dist: {dist}")
+            subprocess.run(["scp", dist, f"{host}:~"], stderr=subprocess.STDOUT)
+
+            path, lib = os.path.split(dist)
+            log.info(f"push_pyEnv installing module: {lib}")
+
+            subprocess.run(["ssh", host, "pip3", "install", "--upgrade", "--user", lib], stderr=subprocess.STDOUT)
     return
 
 

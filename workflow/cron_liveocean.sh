@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $HOME/IOOS-cloud-IaC/python
+cd $HOME/Cloud-Sandbox/python
 
 fcst=jobs/liveocean.qops.job
 plots=jobs/liveocean.qops.plots.job

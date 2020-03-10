@@ -44,13 +44,11 @@ def main():
 
         if re.search("forecast", jobtype):
         # Add the forecast flow
-        #if jobtype == 'forecast':
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
         # Add the plot flow
         elif re.search("plotting", jobtype):
-        #elif jobtype == 'plotting':
             postjobfile = jobfile
             plotflow = flows.plot_flow(postconf, jobfile)
             flowdeq.appendleft(plotflow)

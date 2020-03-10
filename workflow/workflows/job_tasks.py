@@ -16,7 +16,6 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 
 from job.Job import Job
 
-import plotting as plot
 from plotting import plot_roms
 from plotting import plot_fvcom
 
@@ -52,29 +51,6 @@ def ncfiles_from_Job(job: Job):
 
 
 #####################################################################
-
-
-# generic
-@task
-def make_plots(filename, target, varname):
-    log.info(f"plotting {filename} {target} {varname}")
-    plot.plot_roms(filename, target, varname)
-    return
-
-
-#####################################################################
-
-
-# job
-@task
-def make_mpegs(job: Job):
-    # TODO: make the filespec a function parameter
-    for var in job.VARS:
-        source = f"{job.OUTDIR}/ocean_his_%04d_{var}.png"
-        target = f"{job.OUTDIR}/{var}.mp4"
-        plot.png_ffmpeg(source, target)
-    return
-
 
 # job
 # TODO: make sshuser an optional Job parameter
@@ -143,6 +119,12 @@ def daskmake_mpegs(client: Client, job: Job):
     idx = 0
     futures = []
 
+
+    if job.OFS in util.roms_models:
+      plot_function = plot_roms.png_ffmpeg
+    elif job.OFS in util.fvcom_models:
+      plot_function = plot_fvcom.png_ffmpeg
+
     for var in job.VARS:
         # source = f"{job.OUTDIR}/ocean_his_%04d_{var}.png"
         source = f"{job.OUTDIR}/f%03d_{var}.png"
@@ -150,7 +132,7 @@ def daskmake_mpegs(client: Client, job: Job):
 
         log.info(f"Creating movie for {var}")
         log.info(f"source:{source} target:{target}")
-        future = client.submit(plot.png_ffmpeg, source, target)
+        future = client.submit(plot_function, source, target)
         futures.append(future)
         log.info(futures[idx])
         idx += 1
