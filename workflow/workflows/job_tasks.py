@@ -16,9 +16,9 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 
 from job.Job import Job
 
-from plotting import plot_roms
-from plotting import plot_fvcom
-
+#from plotting import plot_roms
+import plotting.plot_roms as plot_roms
+import plotting.plot_fvcom as plot_fvcom
 import utils.romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
@@ -51,6 +51,15 @@ def ncfiles_from_Job(job: Job):
 
 
 #####################################################################
+
+
+@task
+def baseline_from_Job(job: Job):
+    SOURCE = job.BASELINE
+    filespec = job.FSPEC
+    FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
+    return FILES
+
 
 # job
 # TODO: make sshuser an optional Job parameter
@@ -109,7 +118,7 @@ def get_forcing(job: Job, sshuser=None):
 
 # job, dask
 @task
-def daskmake_mpegs(client: Client, job: Job):
+def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     log.info(f"In daskmake_mpegs")
 
     # TODO: make the filespec a function parameter
@@ -127,8 +136,13 @@ def daskmake_mpegs(client: Client, job: Job):
 
     for var in job.VARS:
         # source = f"{job.OUTDIR}/ocean_his_%04d_{var}.png"
-        source = f"{job.OUTDIR}/f%03d_{var}.png"
-        target = f"{job.OUTDIR}/{var}.mp4"
+
+        if diff:
+            source = f"{job.OUTDIR}/f%03d_{var}_diff.png"
+            target = f"{job.OUTDIR}/{var}_diff.mp4"
+        else:
+            source = f"{job.OUTDIR}/f%03d_{var}.png"
+            target = f"{job.OUTDIR}/{var}.mp4"
 
         log.info(f"Creating movie for {var}")
         log.info(f"source:{source} target:{target}")
@@ -197,3 +211,70 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
 
     return
 #####################################################################
+
+
+
+@task
+def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: Job):
+    ''' Create plots of baseline - experiment '''
+    
+    target = job.OUTDIR
+
+    log.info(f"In daskmake_diff_plots {EXPERIMENT}")
+
+    log.info(f"Target is : {target}")
+    if not os.path.exists(target):
+        os.makedirs(target)
+
+    idx = 0
+    futures = []
+
+    plot_function : callable
+    vminmax : callable
+
+    # ROMS and FVCOM grids are handled differently
+    if job.OFS in util.roms_models:
+      plot_function = plot_roms.plot_diff
+      vminmax = plot_roms.get_vmin_vmax
+    elif job.OFS in util.fvcom_models:
+      plot_function = plot_fvcom.plot_diff
+      #vminmax = plot_fvcom.get_vmin_vmax
+
+    baselen = len(BASELINE)
+    explen  = len(EXPERIMENT)
+
+    if baselen != explen:
+        log.error(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
+        raise signals.FAIL() 
+
+    lastbase = BASELINE[baselen-1]
+    lastexp = EXPERIMENT[explen-1]
+
+    # Loop through the variable list
+    for varname in job.VARS:
+
+        # Get the scale to use for all of the plots, use the last file in the sequence
+        #vmin, vmax = vminmax(lastbase, lastexp, varname)
+
+        #vmax = plot_roms.vmax(lastbase, lastexp, varname)
+        #vmin = -vmax
+        vmin, vmax = vminmax(lastbase, lastexp, varname)
+
+        idx = 0
+        while idx < explen:
+            expfile  = EXPERIMENT[idx]
+            basefile = BASELINE[idx]
+    
+            log.info(f"plotting diff for {expfile} {basefile} var: {varname}")
+            future = client.submit(plot_function, basefile, expfile, target, varname, vmin=vmin, vmax=vmax)
+            futures.append(future)
+            log.info(futures[idx])
+            idx += 1
+
+    # Wait for the jobs to complete
+    for future in futures:
+        result = future.result()
+        #log.info(result)
+    return
+#####################################################################
+

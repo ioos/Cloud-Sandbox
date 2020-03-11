@@ -59,24 +59,32 @@ class Plotting(Job):
 
         CDATE = self.CDATE
 
+        # TODO: Set up optional specification of BASELINE folder in job json.
+
         if self.OFS == "liveocean":
             fdate = f"f{CDATE[0:4]}.{CDATE[4:6]}.{CDATE[6:8]}"
             if self.INDIR == "auto":
                 self.INDIR = f"/com/liveocean/{fdate}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/liveocean/plots/{fdate}"
+            self.BASELINE = f"/com/liveocean-uw/{fdate}"
+
         elif self.OFS in util.nosofs_models:
             if self.INDIR == "auto":
                 self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}"
+            self.BASELINE = f"/com/nos-noaa/{self.OFS}.{self.CDATE}"
         elif self.OFS == "adnoc":
             if self.INDIR == "auto":
                 self.INDIR = f"/com/adnoc/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/adnoc/plots/{self.OFS}.{self.CDATE}" 
+            self.BASELINE = f"/com/adnoc-baseline/{self.OFS}.{self.CDATE}"
+
         else:
             raise Exception(f"{self.OFS} is not a supported forecast")
+
 
         return
     ########################################################################

@@ -124,12 +124,12 @@ def start_dask(cluster) -> Client:
         proc = subprocess.Popen(["dask-scheduler", "--host", host, "--port", port],
                                 # stderr=subprocess.DEVNULL)
                                 stderr=subprocess.STDOUT)
-        time.sleep(3)
+        time.sleep(15)
         cluster.setDaskScheduler(proc)
 
         wrkrproc = subprocess.Popen(["dask-worker", "--nprocs", str(nprocs), "--nthreads", "1",
                                      f"{host}:{port}"], stderr=subprocess.STDOUT)
-        time.sleep(3)
+        time.sleep(15)
         cluster.setDaskWorker(wrkrproc)
 
         daskclient = Client(f"{host}:{port}")
