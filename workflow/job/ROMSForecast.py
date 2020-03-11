@@ -74,7 +74,7 @@ class ROMSForecast(Job):
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
+        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs"):
             self.__make_oceanin_nosofs()
         else:
             raise Exception(f"{OFS} is not a supported forecast")

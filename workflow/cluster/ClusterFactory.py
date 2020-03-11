@@ -38,7 +38,7 @@ class ClusterFactory:
         elif provider == 'Local':
             newcluster = LocalCluster(configfile)
 
-        print("About to return from factory.cluster")
+        log.info(f"Created new {provider} cluster")
         return newcluster
 
 

@@ -7,12 +7,15 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 from job.Job import Job
+import utils.romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = True
+
+
 
 class Plotting(Job):
 
@@ -62,11 +65,16 @@ class Plotting(Job):
                 self.INDIR = f"/com/liveocean/{fdate}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/liveocean/plots/{fdate}"
-        elif self.OFS in ('cbofs', 'dbofs','leofs'):
+        elif self.OFS in util.nosofs_models:
             if self.INDIR == "auto":
                 self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}"
+        elif self.OFS == "adnoc":
+            if self.INDIR == "auto":
+                self.INDIR = f"/com/adnoc/{self.OFS}.{self.CDATE}"
+            if self.OUTDIR == "auto":
+                self.OUTDIR = f"/com/adnoc/plots/{self.OFS}.{self.CDATE}" 
         else:
             raise Exception(f"{self.OFS} is not a supported forecast")
 

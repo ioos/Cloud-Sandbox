@@ -1,7 +1,7 @@
 {
   "JOBTYPE"   : "plotting",
   "OFS"       : "tbofs",
-  "CDATE"     : "today",
+  "CDATE"     : "20200310",
   "HH"        : "00",
   "INDIR"     : "auto",
   "OUTDIR"    : "auto",

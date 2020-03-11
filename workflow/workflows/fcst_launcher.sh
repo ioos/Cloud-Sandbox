@@ -83,7 +83,7 @@ case $OFS in
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
     ;;
-  cbofs | dbofs | tbofs | gomofs | ciofs | leofs | sfbofs | ngofs | nwgofs | negofs | lmhofs )
+  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
     export HOMEnos=/save/nosofs-NCO
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh

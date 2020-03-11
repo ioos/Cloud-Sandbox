@@ -140,7 +140,7 @@ def daskmake_mpegs(client: Client, job: Job):
     # Wait for the jobs to complete
     for future in futures:
         result = future.result()
-        log.info(result)
+        #log.info(result)
 
     return
 
@@ -183,7 +183,7 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
     # Wait for the jobs to complete
     for future in futures:
         result = future.result()
-        log.info(result)
+        #log.info(result)
 
     # Was unable to get it to work using client.map() gather
     # filenames = FILES[0:1]

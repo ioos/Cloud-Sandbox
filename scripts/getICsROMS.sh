@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 
 . /usr/share/Modules/init/sh
 module load produtil
@@ -21,8 +21,7 @@ url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$CDATE
 if [ -d $COMDIR ]; then
  list=`ls -1 $COMDIR | wc -l`
  if [ $list -gt 4 ] ; then
-   echo "Looks like ICs already exist. Remove the files to force the download..."
-   echo ".... skipping."
+   echo "It looks like ICs already exist. Remove the files to force the download... skipping."
    exit 0
  fi
 fi
