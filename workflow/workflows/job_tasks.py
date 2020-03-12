@@ -55,7 +55,7 @@ def ncfiles_from_Job(job: Job):
 
 @task
 def baseline_from_Job(job: Job):
-    SOURCE = job.BASELINE
+    SOURCE = job.VERIFDIR
     filespec = job.FSPEC
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES

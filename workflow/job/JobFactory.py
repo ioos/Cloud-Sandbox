@@ -28,7 +28,7 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
-        elif jobtype == 'plotting':
+        elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
             newjob = Plotting(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')

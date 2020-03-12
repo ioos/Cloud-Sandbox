@@ -48,9 +48,15 @@ def main():
             flowdeq.appendleft(fcstflow)
 
         # Add the plot flow
-        elif re.search("plotting", jobtype):
+        elif jobtype == "plotting":
             postjobfile = jobfile
             plotflow = flows.plot_flow(postconf, jobfile)
+            flowdeq.appendleft(plotflow)
+
+        # Add the diff plot flow
+        elif jobtype == "plotting_diff":
+            postjobfile = jobfile
+            plotflow = flows.diff_plot_flow(postconf, jobfile)
             flowdeq.appendleft(plotflow)
 
         else:
