@@ -14,7 +14,7 @@ import cluster.nodeInfo as nodeInfo
 from cluster.Cluster import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
-__license__ = "Proprietary, see LICENSE file."
+__license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = False
