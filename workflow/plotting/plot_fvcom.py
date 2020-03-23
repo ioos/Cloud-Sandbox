@@ -1,5 +1,6 @@
 import glob
 import os
+import sys
 import traceback
 import subprocess
 
@@ -9,8 +10,11 @@ import PIL.Image
 import numpy as np
 import matplotlib.pyplot as plt
 
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
+
 from plotting import tile
-#import tile
+from plotting import shared
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -19,7 +23,8 @@ __email__ = "patrick.tripp@rpsgroup.com"
 EPSG3857 = pyproj.Proj('EPSG:3857')
 TILE3857 = tile.Tile3857()
 
-# TODO: Move to shared.py
+debug = False
+
 def make_png(varnames, files, target):
     for v in varnames:
         for f in  files:
@@ -27,70 +32,27 @@ def make_png(varnames, files, target):
                 os.mkdir(target)
                 print(f'created target path: {target}')
             plot(f, target, v)
+    return
 
 
-# TODO: Move to shared.py
-def set_filename(ncfile: str, varname: str, target: str):
-    ''' create a standard named output filename to more easily make animations from plots'''
+def get_vmin_vmax(ncfile1_base: str, ncfile1_exp: str, varname: str) -> float:
+    ''' use this to set the vmin and vmax for a series of diff plots with uniform scales 
+        use a pair of files that are late in the sequence '''
 
-    origfile = ncfile.split('/')[-1][:-3]
+    print(f"DEBUG: in get_vmin_vmax: {ncfile1_base} {ncfile1_exp} {varname}")
 
-    prefix = origfile[0:3]
-    if prefix == 'nos':
-        sequence = origfile.split('.')[3][1:4]
-    else:
-        # 012345678
-        # ocean_his
-        prefix = origfile[0:9]
-        if prefix == 'ocean_his':
-            sequence = origfile[11:14]
+    vmin=-1.0
+    vmax=1.0
 
-    filename = f'{target}/f{sequence}_{varname}.png'
-    return filename
+    d1_base = extract_ncdata(ncfile1_base, varname)
+    d1_exp  = extract_ncdata(ncfile1_exp, varname)
+    d1 = d1_base - d1_exp
+    dmax1 = np.amax(d1)
+    dmin1 = np.amin(d1)
+    vmax = max(abs(dmax1),abs(dmin1))
+    vmin = -vmax
 
-
-# TODO: Move to shared.py
-def png_ffmpeg(source, target):
-    '''Make a movie from a set of sequential png files
-
-    Parameters
-    ----------
-    source : string
-        Path to sequentially named image files
-        Example: '/path/to/images/prefix_%04d_varname.png'
-    target : string
-        Path to location to store output video file
-        Example: '/path/to/output/prefix_varname.mp4'
-    '''
-
-    # Add exception if there are no files found for source
-
-    # print(f"DEBUG: in png_ffmpeg. source: {source} target: {target}")
-
-    # ff_str = f'ffmpeg -y -start_number 30 -r 1 -i {source} -vcodec libx264 -pix_fmt yuv420p -crf 25 {target}'
-    # ff_str = f'ffmpeg -y -r 8 -i {source} -vcodec libx264 -pix_fmt yuv420p -crf 23 {target}'
-
-    # x264 codec enforces even dimensions
-    # -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2"
-
-    proc = None
-    #home = os.path.expanduser("~")
-    #ffmpeg = home + '/bin/ffmpeg'
-
-    try:
-        proc = subprocess.run(['ffmpeg', '-y', '-r', '8', '-i', source, '-vcodec', 'libx264', \
-                               '-pix_fmt', 'yuv420p', '-crf', '23', '-vf', "pad=ceil(iw/2)*2:ceil(ih/2)*2", target], \
-                              stderr=subprocess.STDOUT)
-        assert proc.returncode == 0
-        print(f'Created animation: {target}')
-    except AssertionError as e:
-        print(f'Creating animation failed for {target}. Return code: {proc.returncode}')
-        traceback.print_stack()
-        raise Exception(e)
-    except Exception as e:
-        print('Exception from ffmpeg', e)
-        traceback.print_stack()
-        raise Exception(e)
+    return vmin, vmax
 
 
 # FVCOM 
@@ -160,17 +122,13 @@ def get_projection(ncfile: str):
 
 
 # FVCOM
-#def plot(ncfile1: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
-    #return
+def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: str, 
+              crop: bool=True, zoom: int=8, diff: bool=False, vmin: float=-1.0, vmax: float=1.0):
 
+    plt.rcParams.update({'font.size': 3})
 
-
-# FVCOM
-def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: str, crop: bool = True, zoom: int = 8):
-
-
-    #nv = nc.variables['nv'][:].T
-    #nv = nv - 1
+    fg_color = 'white'
+    bg_color = 'black'
 
     # render bounds, draw entire tiles in EPSG:3857
     ulll = ( # upper left  longitude, latitude
@@ -202,38 +160,48 @@ def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: 
     lltb = TILE3857.bounds(*llt) # lower left  tile bounds ESPG:3857
 
     # image size/resolution
-    dpi    = 150
-    scale  = 1 # multiplier to increase image size
-    height = dpi*ny*scale
-    width  = dpi*nx*scale
+    dpi    = 384
+    scale  = 1.0
+    height = dpi * ny * scale
+    width  = dpi * nx * scale
 
     #fig = plt.figure(dpi=dpi, facecolor='none', edgecolor='none')
-    fig = plt.figure(facecolor='#FFFFFF', edgecolor='w')
-    fig.set_alpha(0)
-    fig.set_figheight(height/dpi)
-    fig.set_figwidth(width/dpi)
+    fig = plt.figure(dpi=dpi, facecolor='#000000', edgecolor='w')
+    #fig.set_alpha(1)
+    fig.set_figheight(height / dpi)
+    fig.set_figwidth(width / dpi)
 
-    ax = fig.add_axes([0., 0., 1., 1.], xticks=[], yticks=[])
-    # ax.set_axis_off()
-    ax.set_axis_on()
+    ax = fig.add_axes([0., 0., 1.0, 1.0], xticks=[], yticks=[])
+    ax.set_axis_off()
 
+    if diff:
+        #tripcolor = ax.tripcolor(lo, la, nv, data, cmap='coolwarm')
+        tripcolor = ax.tripcolor(lo, la, nv, data, vmin=vmin, vmax=vmax, cmap=plt.get_cmap(colormap), edgecolor='none', linewidth=0.00)
+    else:
+        tripcolor = ax.tripcolor(lo, la, nv, data, cmap=colormap, edgecolor='none', linewidth=0.00)
 
-    #tripcolor = ax.tripcolor(lo, la, nv, data, cmap='coolwarm')
-    tripcolor = ax.tripcolor(lo, la, nv, data, cmap=colormap, edgecolor='none', linewidth=0.00)
-    #pcolor = ax.pcolor(lo, la, data, cmap=plt.get_cmap('coolwarm'), edgecolor='none', linewidth=0.00)
+    title = outfile.split("/")[-1].split(".")[0]
+    ax.set_title(title, color=bg_color)
 
-    #ax.set_frame_on(False)
-    #ax.set_clip_on(False)
-    ax.set_frame_on(True)
-    ax.set_clip_on(True)
+    #ax.set_clip_on(True)
+    ax.set_clip_on(False)
+    ax.set_frame_on(False)
 
-    ax.set_position([0, 0, 1, 1])
+    #ax.set_position([0, 0, 1, 1])
+
+    ax.set_aspect(1.0)
+
+    print(f"vmin: {vmin}, vmax: {vmax}")
+    cb = fig.colorbar(tripcolor, ax=ax, ticks=[vmin, 0, vmax], location='bottom',shrink=0.6, extend='neither')
+    cb.ax.tick_params(axis='both', which='major', labelsize=3)
+    cb.ax.tick_params(axis='both', which='minor', labelsize=3)
 
     ax.set_xlim(ultb[0], lrtb[2])
     ax.set_ylim(lrtb[1], ultb[3])
 
     #fig.savefig(outfile, dpi=dpi, bbox_inches='tight', pad_inches=0.0, transparent=True)
-    fig.savefig(outfile, dpi=dpi, pad_inches=0.0, transparent=False)
+    #fig.savefig(outfile, dpi=dpi, pad_inches=0.0, transparent=False)
+    fig.savefig(outfile,dpi=dpi,facecolor="grey", bbox_inches='tight', pad_inches=0.025, transparent=True)
 
     fig.clear()
     plt.close(fig)
@@ -247,39 +215,48 @@ def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: 
             crop = im.crop(bbox)
             crop.save(outfile, optimize=True)
 
+    print(f"Created plot: {outfile}")
+    return
 
 # FVCOM
 def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
 
     lo, la, loc, lac, nv = get_projection(ncfile)
 
-    vardata = extract_ncdata(ncfile, varname)
+    data = extract_ncdata(ncfile, varname)
 
-    outfile = set_filename(ncfile, varname, target)
+    outfile = shared.set_filename(ncfile, varname, target)
 
-    cmap = 'jet'   # temp
+    colormap = 'jet'  # temp
 
-    plot_data(vardata, lo, la, loc, lac, nv, varname, outfile, cmap)
+    plot_data(data, lo, la, loc, lac, nv, varname, outfile, colormap)
 
     return
 
 
 # FVCOM
-def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
+def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str,
+              vmin: float=-1.0, vmax: float=1.0, crop: bool=False, zoom: int=8):
     ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
 
-    lo, la, loc, lac, nv = proj_lolaloclac(ncfile1)
+    if debug:
+        print(f"file1: {ncfile1}")
+        print(f"file2: {ncfile2}")
+        print(f"vmin, vmax: {vmin}, {vmax}")
+
+    lo, la, loc, lac, nv = get_projection(ncfile1)
 
     data1 = extract_ncdata(ncfile1, varname)
     data2 = extract_ncdata(ncfile2, varname)
 
     # TODO: add error check, make sure the two plots can be compared
-    data_diff = data1 - data2
+    data = data1 - data2
 
-    outfile = set_filename(ncfile1, target)
+    outfile = shared.set_diff_filename(ncfile1, varname, target)
 
-    cmap = 'seismic'   # temp
-    plot_data(data_diff, lo, la, loc, lac, nv, vaname, outfile)
+    colormap = 'seismic'  # temp
+
+    plot_data(data, lo, la, loc, lac, nv, varname, outfile, colormap, diff=True, vmin=vmin, vmax=vmax)
 
     return
 
@@ -289,11 +266,19 @@ if __name__ == '__main__':
     # source = 'figs/temp/his_arg_temp_%04d.png'
     # target = 'figs/test_temp.mp4'
     # png_ffmpeg(source, target)
-    var = 'h'
-    ncfile = '/com/nos/leofs.20200309/nos.leofs.fields.f001.20200309.t00z.nc'
-    target = '/com/nos/plots/leofs.20200309'
+    #var = 'h'
+    #ncfile = '/com/nos/leofs.20200309/nos.leofs.fields.f001.20200309.t00z.nc'
+    #target = '/com/nos/plots/leofs.20200309'
+  
+    ncfile='/com/nos/negofs.20200312/nos.negofs.fields.f048.20200312.t03z.nc'
+    ncfile_noaa='/com/nos-noaa/negofs.20200312/nos.negofs.fields.f048.20200312.t03z.nc'
+    target = '/com/nos/plots/negofs.20200312'
+    var = 'temp'
 
     if not os.path.exists(target):
         os.makedirs(target)
 
-    plot(ncfile,target,var)
+    vmin, vmax = get_vmin_vmax(ncfile_noaa, ncfile, var)
+    #plot_diff(ncfile_noaa, ncfile, target, var, vmin=-0.1, vmax=0.1)
+    plot_diff(ncfile_noaa, ncfile, target, var, vmin,  vmax)
+    #plot(ncfile,target,var)

@@ -250,7 +250,7 @@ class AWSCluster(Cluster):
             )
 
         # Wait a little more. sshd is sometimes slow to come up
-        time.sleep(60)
+        time.sleep(90)
         # Assume the nodes are ready, set to False if not
         ready = True
 

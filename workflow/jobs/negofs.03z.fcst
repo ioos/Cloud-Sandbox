@@ -3,7 +3,7 @@
   "OFS"       : "negofs",
   "CDATE"     : "today",
   "HH"        : "03",
-  "NHOURS"    : "6",
+  "NHOURS"    : "48",
   "COMROT"    : "/com/nos",
   "DATE_REF"  : "2013-01-01 00:00:00",
   "BUCKET"    : "ioos-cloud-sandbox",

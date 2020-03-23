@@ -49,6 +49,8 @@ export OFS=$7
 #mpirun --version | grep "Open MPI"
 #openmpi=$?
 
+# for openMPI openmpi=1
+# for Intel MPI set impi=1
 if [[ $OFS == "adnoc" ]]; then
   openmpi=1
   impi=0
@@ -59,12 +61,13 @@ fi
   
 #TODO: Make this section a switch statement instead
 
-
 if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
   #export MPIOPTS="-launch-agent ssh -host $HOSTS -n $NPROCS -npernode $PPN"
 elif [ $impi -eq 1 ]; then
   export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
+  export I_MPI_OFI_LIBRARY_INTERNAL=1   # Using AWS EFA Fabric on AWS
+  export I_MPI_DEBUG=1
 else
   echo "ERROR: Unsupported mpirun version ..."
   exit 1

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# -lt 3 ] ; then
-  echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [destination path]"
+  echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [/com/nos-noaa | other destination]"
   exit 1
 fi
 
@@ -24,7 +24,7 @@ NOMADS=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/$OFS.$CDATE
 
 # Download every hour forecast
 ###############################################################
-hlist='01 02 03 04 05 06 07 08 09'
+hlist='00 01 02 03 04 05 06 07 08 09'
 ehr=48
 
 for hh in $hlist

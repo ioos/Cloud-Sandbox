@@ -19,6 +19,7 @@ from job.Job import Job
 #from plotting import plot_roms
 import plotting.plot_roms as plot_roms
 import plotting.plot_fvcom as plot_fvcom
+import plotting.shared as plot_shared
 import utils.romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
@@ -128,11 +129,7 @@ def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     idx = 0
     futures = []
 
-
-    if job.OFS in util.roms_models:
-      plot_function = plot_roms.png_ffmpeg
-    elif job.OFS in util.fvcom_models:
-      plot_function = plot_fvcom.png_ffmpeg
+    plot_function = plot_shared.png_ffmpeg
 
     for var in job.VARS:
         # source = f"{job.OUTDIR}/ocean_his_%04d_{var}.png"
@@ -229,16 +226,16 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     idx = 0
     futures = []
 
-    plot_function : callable
-    vminmax : callable
+    #plot_function : callable
+    #vminmax : callable
 
     # ROMS and FVCOM grids are handled differently
     if job.OFS in util.roms_models:
-      plot_function = plot_roms.plot_diff
-      vminmax = plot_roms.get_vmin_vmax
+      #plot_function = plot_roms.plot_diff
+      plot_module = plot_roms
     elif job.OFS in util.fvcom_models:
-      plot_function = plot_fvcom.plot_diff
-      #vminmax = plot_fvcom.get_vmin_vmax
+      #plot_function = plot_fvcom.plot_diff
+      plot_module = plot_fvcom
 
     baselen = len(BASELINE)
     explen  = len(EXPERIMENT)
@@ -254,11 +251,7 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     for varname in job.VARS:
 
         # Get the scale to use for all of the plots, use the last file in the sequence
-        #vmin, vmax = vminmax(lastbase, lastexp, varname)
-
-        #vmax = plot_roms.vmax(lastbase, lastexp, varname)
-        #vmin = -vmax
-        vmin, vmax = vminmax(lastbase, lastexp, varname)
+        vmin, vmax = plot_module.get_vmin_vmax(lastbase, lastexp, varname)
 
         idx = 0
         while idx < explen:
@@ -266,7 +259,7 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
             basefile = BASELINE[idx]
     
             log.info(f"plotting diff for {expfile} {basefile} var: {varname}")
-            future = client.submit(plot_function, basefile, expfile, target, varname, vmin=vmin, vmax=vmax)
+            future = client.submit(plot_module.plot_diff, basefile, expfile, target, varname, vmin=vmin, vmax=vmax)
             futures.append(future)
             log.info(futures[idx])
             idx += 1

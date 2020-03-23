@@ -15,6 +15,8 @@ lmhofs
 ciofs
 "
 
+fixdirs='negofs'
+
 bucket=ioos-cloud-sandbox
 version=v3.2.1
 
