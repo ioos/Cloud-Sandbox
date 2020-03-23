@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
+
 if [ $# -ne 3 ] ; then
   echo "Usage: $0 YYYYMMDD HH cbofs|ngofs etc."
   exit -1

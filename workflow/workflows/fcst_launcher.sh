@@ -3,7 +3,7 @@ set -xa
 ulimit -c unlimited
 ulimit -s unlimited
 
-#__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 

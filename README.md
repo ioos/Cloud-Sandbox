@@ -138,3 +138,4 @@ OUTDIR    - model output directory. "auto" = automatically set this, based on CD
 OCEANIN   - name of the ocean.in file to use. "auto" = automatically create this based on a template.
 OCNINTMPL - template ocean.in file to use.
 ```
+Copyright © 2020 RPS Group, Inc. All rights reserved.

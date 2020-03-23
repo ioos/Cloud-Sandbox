@@ -13,7 +13,7 @@ import cluster_tasks as ctasks
 import job_tasks as jtasks
 from cluster.Cluster import Cluster
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 

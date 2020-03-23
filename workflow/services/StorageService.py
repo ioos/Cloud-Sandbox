@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
-__email__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
+__email__ = "patrick.tripp@rpsgroup.com"
 
 class StorageService(ABC):
     ''' This is an abstract base class for cloud storage.

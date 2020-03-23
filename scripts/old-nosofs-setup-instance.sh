@@ -3,6 +3,10 @@
 # This script will setup the required system components, libraries
 # and tools needed for nosofs/ROMS forecast models on RHEL 7 systems.
 
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
+
 # --assumeyes -y
 
 sudo yum -y install tcsh

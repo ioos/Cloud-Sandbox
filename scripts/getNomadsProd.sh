@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
+
 if [ $# -lt 3 ] ; then
   echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [/com/nos-noaa | other destination]"
   exit 1

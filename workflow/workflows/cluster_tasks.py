@@ -21,7 +21,7 @@ if os.path.abspath('..') not in sys.path:
 from cluster.Cluster import Cluster
 from cluster.ClusterFactory import ClusterFactory
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 

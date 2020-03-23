@@ -9,7 +9,7 @@ if os.path.abspath('..') not in sys.path:
 from job.Job import Job
 import utils.romsUtil as util
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
