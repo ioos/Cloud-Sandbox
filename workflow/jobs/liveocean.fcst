@@ -1,15 +1,15 @@
 {
   "JOBTYPE"   : "romsforecast",
   "OFS"       : "liveocean",
-  "CDATE"     : "20200128",
+  "CDATE"     : "20191106",
   "HH"        : "00",
   "COMROT"    : "/com",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "/LiveOcean/output",
-  "NTIMES"    : "10",
-  "ININAME"   : "/com/liveocean/f2020.01.27/ocean_his_0025.nc",
+  "NTIMES"    : "180",
+  "ININAME"   : "/com/liveocean/f2019.11.05/ocean_his_0025.nc",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
   "OCNINTMPL" : "auto"

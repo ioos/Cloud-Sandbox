@@ -25,9 +25,11 @@ How to setup the workflow:
 
 See: workflow_main.py - This is the main entry point. 
 
-There are two configuration files that are hardcoded internally. These should be changed for your particular configuration. These correspond to the machine configuration used for the forecast and post processing flows.
+There are two configuration files that need to be specified. These should be changed for your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-fcstconf = f'{curdir}/../configs/liveocean.config'
+Examples:
+
+fcstconf = f'{curdir}/../configs/cbofs.config'
 
 postconf = f'{curdir}/../configs/post.config'
 
@@ -39,11 +41,11 @@ For examples:
 
 See:
 
- jobs/liveocean.qops.job (forecast)
+ jobs/cbofs.00z.fcst (forecast)
 
  and
 
- jobs/liveocean.qops.plots.job (post)
+ jobs/cbofs.00z.plots (plots)
 
 To submit the job(s) (and to optionally log to an output file and run as a background process):
 
@@ -51,7 +53,7 @@ To submit the job(s) (and to optionally log to an output file and run as a backg
 
 Note: job2 will only run if job1 finishes without error.
 
-If using the cloud, cloud resources will be provisioned for you, based on the configuration files specified in step 1. The cloud resources will be automatically terminated when each job finishes.
+If using the cloud, cloud resources will be provisioned for you, based on the configuration files specified in step 1. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
 
 To customize the flows see: flows.py
 To add any additional tasks, see: workflow_tasks.py
@@ -63,25 +65,26 @@ To add additional Cluster functionality or define new Cluster implementations:
   See the classes in the ./cluster folder.
 
 See the ./plotting folder for plotting jobs.
+
 ```
-Example: configs/dbofs.config
+Example: configs/cbofs.config
 {
-   "platform"  : "AWS",
-   "region"    : "us-east-1",
-   "nodeType"  : "c5.xlarge",
-   "nodeCount" : 1,
-   "tags"      : [ 
+"platform"  : "AWS",
+"region"    : "us-east-1",
+"nodeType"  : "c5.xlarge",
+"nodeCount" : 2,
+"tags"      : [ 
                 { "Key": "Name", "Value": "IOOS-cloud-sandbox" },
-                { "Key": "NAME", "Value": "dbofs-fcst" }
+                { "Key": "Project", "Value": "IOOS-cloud-sandbox" },
+                { "Key": "NAME", "Value": "cbofs-fcst" }
               ],
-   "image_id"  : "ami-0xxxx",
-   "key_name"  : "your-pem-key",
-   "sg_id1"    : "sg-0xxxx1",
-   "sg_id2"    : "sg-0xxxx2",
-   "sg_id3"    : "sg-0xxxx3",
-   "subnet_id" : "subnet-0xxxx",
-   "placement_group" : "cloud-sandbox-cluster"
+"image_id"  : "ami-0c999999999999999",
+"key_name"  : "your-pem-key",
+"sg_ids"    : ["sg-00000000000000123", "sg-00000000000000345", "sg-00000000000000678"],
+"subnet_id" : "subnet-09abc999999999999",
+"placement_group" : "your-cluster-placement-group"
 }
+
 ```
 
 ```
@@ -93,29 +96,30 @@ nodeCount - # of instances to provision.
 tags      - The tags to add to these resources, used for tracking usage.
 image_id  - For AWS, the AMI id to use for each instance.
 key_name  - The private key file to use to ssh into the instances.
-sg_id1-3  - The AWS security groups to use. (TODO: Make this a list)
+sg_ids    - The AWS security groups to use.
 subnet_id - The subnet id to launch in.
 placement_group - The cluster placement group. If multiple nodes are specified, all nodes will run in close proximity to each other.
 ```
 
 ```
-Example: jobs/dbofs.config
+Example: jobs/cbofs.00z.fcst
 {
-  "JOBTYPE"   : "forecast",
-  "OFS"       : "dbofs",
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "cbofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "COMROT"    : "/com/nos",
   "EXEC"      : "",
   "TIME_REF"  : "20160101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "/nos/dbofs/output",
-  "NTIMES"    : "720",
+  "BCKTFLDR"  : "/nos/cbofs/output",
+  "NTIMES"    : "34560",
   "ININAME"   : "",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/home/centos/Cloud-Sandbox/python/job/templates/dbofs.ocean.in"
+  "OCNINTMPL" : "auto"
 }
+
 ```
 
 ```
