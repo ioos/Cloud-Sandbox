@@ -1,7 +1,7 @@
 # keep things cloud platform agnostic at this layer
 # Do not call any cloud platform specific APIs
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 

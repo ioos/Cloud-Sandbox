@@ -5,7 +5,7 @@ import math
 import numpy as np
 import os.path
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 
 def _qkx(qk):

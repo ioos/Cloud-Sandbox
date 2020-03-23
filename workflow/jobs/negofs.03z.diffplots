@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "negofs",
+  "CDATE"     : "20200312",
+  "HH"        : "03",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VERIFDIR"  : "auto",
+  "VARS"      : ["zeta", "temp", "salinity"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/negofs",
+  "FSPEC"     : "nos.negofs.fields.f*z.nc"
+}

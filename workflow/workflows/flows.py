@@ -13,7 +13,7 @@ import cluster_tasks as ctasks
 import job_tasks as jtasks
 from cluster.Cluster import Cluster
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
@@ -111,6 +111,52 @@ def plot_flow(postconf, postjobfile) -> Flow:
     return plotflow
 
 
+
+def diff_plot_flow(postconf, postjobfile) -> Flow:
+    with Flow('diff plotting') as diff_plotflow:
+        #####################################################################
+        # POST Processing
+        #####################################################################
+
+        # Start a machine
+        postmach = ctasks.cluster_init(postconf)
+        pmStarted = ctasks.cluster_start(postmach)
+
+        # Push the env, install required libs on post machine
+        # TODO: install all of the 3rd party dependencies on AMI
+        pushPy = ctasks.push_pyEnv(postmach, upstream_tasks=[pmStarted])
+
+        # Start a dask scheduler on the new post machine
+        daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pmStarted])
+
+        # Setup the post job
+        plotjob = tasks.job_init(postmach, postjobfile, upstream_tasks=[pmStarted])
+
+        # Get list of files from job specified directory
+        FILES = jtasks.ncfiles_from_Job(plotjob)
+        BASELINE = jtasks.baseline_from_Job(plotjob)
+
+        # Make plots
+        plots = jtasks.daskmake_diff_plots(daskclient, FILES, BASELINE, plotjob)
+        plots.set_upstream([daskclient])
+
+        storage_service = tasks.storage_init(provider)
+        pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
+        pngtocloud.set_upstream(plots)
+
+        # Make movies
+        mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, diff=True, upstream_tasks=[plots])
+        mp4tocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.mp4'], public=True)
+        mp4tocloud.set_upstream(mpegs)
+
+        closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[mpegs])
+        pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
+
+        #######################################################################
+
+    return diff_plotflow
+
+
 def test_flow(fcstconf, fcstjobfile) -> Flow:
     with Flow('fcst workflow') as testflow:
         # Create the cluster object
@@ -166,11 +212,17 @@ if __name__ == '__main__':
     #fcstconf = f'../configs/ciofs.config'
     #jobfile = f'../jobs/ciofs.00z.fcst'
 
-    fcstconf = f'../configs/lmhofs.config'
-    jobfile = f'../jobs/lmhofs.00z.fcst'
+    #fcstconf = f'../configs/lmhofs.config'
+    #jobfile = f'../jobs/lmhofs.00z.fcst'
 
     #fcstconf = f'../configs/leofs.config'
     #jobfile = f'../jobs/leofs.00z.fcst'
 
-    fcstflow = test_flow(fcstconf, jobfile)
-    fcstflow.run()
+    #fcstflow = test_flow(fcstconf, jobfile)
+    #fcstflow.run()
+
+    postconf = f'../configs/post.config'
+    jobfile = f'../jobs/tbofs.00z.plots'
+
+    jobflow = diff_plot_flow(postconf, jobfile)
+    jobflow.run()

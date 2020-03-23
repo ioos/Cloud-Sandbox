@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
+
 ipkgver=2018.5.288
 impiver=2018.6.288
 #cd intel_mpi_$ipkgver

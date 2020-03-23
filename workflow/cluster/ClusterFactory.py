@@ -6,7 +6,7 @@ from cluster.Cluster import Cluster
 from cluster.AWSCluster import AWSCluster
 from cluster.LocalCluster import LocalCluster
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
@@ -38,7 +38,7 @@ class ClusterFactory:
         elif provider == 'Local':
             newcluster = LocalCluster(configfile)
 
-        print("About to return from factory.cluster")
+        log.info(f"Created new {provider} cluster")
         return newcluster
 
 

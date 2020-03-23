@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
+
 #. /usr/share/Modules/init/bash
 #module load gcc
 #module load produtils

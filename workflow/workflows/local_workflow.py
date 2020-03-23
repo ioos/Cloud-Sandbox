@@ -8,7 +8,7 @@ from dask.distributed import Client
 # 3rd party dependencies
 from prefect import Flow
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 

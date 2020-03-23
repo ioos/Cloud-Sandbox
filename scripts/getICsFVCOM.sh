@@ -1,4 +1,8 @@
 #!/bin/bash
+#set -x
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
 
 . /usr/share/Modules/init/sh
 module load produtil
@@ -41,7 +45,7 @@ flist="
   $pfx.forecast.${CDATE}.t${cyc}z.in
   $pfx.init.nowcast.$sfx
 "
-
+#nos.negofs.river.20200312.t03z.nc.tar
 
 for file in $flist
 do
@@ -49,16 +53,15 @@ do
   wget -nc $nomads/$file
 done
 
-# If negofs or nwgofs, we can either retrieve the obc file from NOMADS
+# If negofs or nwgofs, we can either retrieve the obc file from NOMADS as done above
 # OR we can copy it from a locally ran ngofs forecast from the same day
-# /com/nos/ngofs.20200225
-# nos.ngofs.nestnode.negofs.forecast.20200225.t03z.nc
-# nos.ngofs.nestnode.nwgofs.forecast.20200225.t03z.nc
 #
-# Rename 
+# Example:
+# Rename:
 # /com/nos/ngofs.20200225/nos.ngofs.nestnode.nwgofs.forecast.20200225.t03z.nc
 # to: 
 # /com/nos/nwgofs.20200225/nos.nwgofs.obc.20200225.03.nc
+
 
 # Fetch the restart/init file
 # The restart file is the next cycle's 'init' file

@@ -13,8 +13,8 @@ from botocore.exceptions import ClientError
 import cluster.nodeInfo as nodeInfo
 from cluster.Cluster import Cluster
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
-__license__ = "Proprietary, see LICENSE file."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+__license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = False
@@ -245,12 +245,12 @@ class AWSCluster(Cluster):
                 InstanceIds=[instance.instance_id],
                 WaiterConfig={
                     'Delay': 10,
-                    'MaxAttempts': 6
+                    'MaxAttempts': 3 
                 }
             )
 
         # Wait a little more. sshd is sometimes slow to come up
-        time.sleep(60)
+        time.sleep(90)
         # Assume the nodes are ready, set to False if not
         ready = True
 

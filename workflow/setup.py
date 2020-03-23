@@ -1,10 +1,13 @@
 from setuptools import setup
+#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+#__license__ = "See LICENSE.txt"
+#__email__ = "patrick.tripp@rpsgroup.com"
 
 # setup plotting
 setup(name="plotting",
       version='0.3.0',
       description='Plotting for ROMS',
-      url='https://github.com/asascience/IOOS-cloud-IaC/python/plotting',
+      url='https://github.com/asascience/Cloud-Sandbox/python/plotting',
       author='RPS North America',
       author_email='rpsgroup.com',
       packages=['plotting'],
@@ -22,7 +25,7 @@ setup(name="plotting",
 # setup(name="pyclusterwf",
 #      version='0.1b1',
 #      description='Cloud cluster classes',
-#      url='https://github.com/asascience/IOOS-cloud-IaC/python',
+#      url='https://github.com/asascience/Cloud-Sandbox/python',
 #      author='RPS North America',
 #      author_email='rpsgroup.com',
 #      packages=['cluster','job','services','workflows','utils'],

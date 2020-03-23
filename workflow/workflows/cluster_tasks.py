@@ -21,7 +21,7 @@ if os.path.abspath('..') not in sys.path:
 from cluster.Cluster import Cluster
 from cluster.ClusterFactory import ClusterFactory
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
@@ -80,19 +80,23 @@ def cluster_terminate(cluster):
 # cluster
 @task
 def push_pyEnv(cluster):
-    host = cluster.getHosts()[0]
-    log.info(f"push_pyEnv host is {host}")
 
-    # Push and install anything in dist folder
-    dists = glob.glob(f'{curdir}/../dist/*.tar.gz')
-    for dist in dists:
-        log.info(f"pushing python dist: {dist}")
-        subprocess.run(["scp", dist, f"{host}:~"], stderr=subprocess.STDOUT)
+    hosts = cluster.getHosts()
 
-        path, lib = os.path.split(dist)
-        log.info(f"push_pyEnv installing module: {lib}")
+    for host in hosts:
 
-        subprocess.run(["ssh", host, "pip3", "install", "--upgrade", "--user", lib], stderr=subprocess.STDOUT)
+        log.info(f"push_pyEnv host is {host}")
+
+        # Push and install anything in dist folder
+        dists = glob.glob(f'{curdir}/../dist/*.tar.gz')
+        for dist in dists:
+            log.info(f"pushing python dist: {dist}")
+            subprocess.run(["scp", dist, f"{host}:~"], stderr=subprocess.STDOUT)
+
+            path, lib = os.path.split(dist)
+            log.info(f"push_pyEnv installing module: {lib}")
+
+            subprocess.run(["ssh", host, "pip3", "install", "--upgrade", "--user", lib], stderr=subprocess.STDOUT)
     return
 
 
@@ -120,12 +124,10 @@ def start_dask(cluster) -> Client:
         proc = subprocess.Popen(["dask-scheduler", "--host", host, "--port", port],
                                 # stderr=subprocess.DEVNULL)
                                 stderr=subprocess.STDOUT)
-        time.sleep(3)
         cluster.setDaskScheduler(proc)
 
         wrkrproc = subprocess.Popen(["dask-worker", "--nprocs", str(nprocs), "--nthreads", "1",
                                      f"{host}:{port}"], stderr=subprocess.STDOUT)
-        time.sleep(3)
         cluster.setDaskWorker(wrkrproc)
 
         daskclient = Client(f"{host}:{port}")
@@ -134,6 +136,7 @@ def start_dask(cluster) -> Client:
         # TODO: Refactor this, make Dask an optional part of the cluster
         # TODO: scale this to multiple hosts
         try:
+            time.sleep(45)
             proc = subprocess.Popen(["dask-ssh", "--nprocs", str(nprocs), "--scheduler-port", port, host],
                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 

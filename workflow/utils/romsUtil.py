@@ -5,12 +5,18 @@ import os
 import re
 import subprocess
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
-__email__ = "Kenny Ells, Brian McKenna, Patrick Tripp"
+__email__ = "patrick.tripp@rpsgroup.com"
 
 debug = True
 
+
+roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
+fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
+
+nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs", 
+                  "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
 
 def scrub_liveocean():
     ''' scrubs the disk - removes forcings/ICs and forecast data

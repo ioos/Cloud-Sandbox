@@ -1,23 +1,9 @@
 buckets='
-apptio-eds-108193140983
-eds-master
-eds-snowball
-edsapilogs
-hycomglobal
-radials
-rpsgfs
 '
 
 declare -a projects
 
 projects=(
-EDS
-EDS
-EDS
-EDS
-EDS
-EDS/OTT-RADIALS
-EDS
 )
 
 index=0

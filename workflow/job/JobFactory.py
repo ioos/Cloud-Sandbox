@@ -5,7 +5,7 @@ from job.ROMSForecast import ROMSForecast
 from job.Plotting import Plotting
 from job.FVCOMForecast import FVCOMForecast
 
-__copyright__ = "Copyright © 2020 RPS Group. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
@@ -28,7 +28,7 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
-        elif jobtype == 'plotting':
+        elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
             newjob = Plotting(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
