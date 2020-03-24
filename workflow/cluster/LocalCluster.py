@@ -14,10 +14,11 @@ debug = False
 class LocalCluster(Cluster):
 
     def __init__(self, configfile):
-        self.__daskscheduler: Popen
-        self.__daskworker: Popen
 
-        self.configfile = configfile
+        self.daskscheduler: Popen = None
+        self.daskworker: Popen = None
+
+        self.__configfile = configfile
 
         self.__state = "none"  # This could be an enumeration of none, running, stopped, error
         self.platform = 'Local'
@@ -80,15 +81,15 @@ class LocalCluster(Cluster):
         return
 
     def terminate(self):
+
         # Terminate any running dask scheduler
-        print("In LocalCluster.terminate ..........................")
         self.terminateDaskWorker()
         self.terminateDaskScheduler()
         return ["LocalCluster"]
 
     def getHosts(self):
         # return [os.uname().nodename]
-        return '127.0.0.1'
+        return ['127.0.0.1']
 
     def getHostsCSV(self):
         # return os.uname().nodename

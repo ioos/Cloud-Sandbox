@@ -272,7 +272,8 @@ class AWSCluster(Cluster):
 
 
     def terminate(self):
-        self.terminateDaskScheduler()
+
+        self.terminateDaskWorker()
 
         # Terminate any running dask scheduler
         self.terminateDaskScheduler()

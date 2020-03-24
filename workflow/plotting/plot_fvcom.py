@@ -191,7 +191,7 @@ def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: 
 
     ax.set_aspect(1.0)
 
-    print(f"vmin: {vmin}, vmax: {vmax}")
+    #print(f"vmin: {vmin}, vmax: {vmax}")
     cb = fig.colorbar(tripcolor, ax=ax, ticks=[vmin, 0, vmax], location='bottom',shrink=0.6, extend='neither')
     cb.ax.tick_params(axis='both', which='major', labelsize=3)
     cb.ax.tick_params(axis='both', which='minor', labelsize=3)

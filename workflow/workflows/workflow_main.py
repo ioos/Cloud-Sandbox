@@ -16,13 +16,14 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-# provider = 'Local'
-# provider = 'AWS'
 fcstconf = f'{curdir}/../configs/ioos.config'
 postconf = f'{curdir}/../configs/post.config'
 
+#fcstconf = f'{curdir}/../configs/local.config'
+#postconf = f'{curdir}/../configs/local.config'
+
 # This is used for obtaining liveocean forcing data
-# Users need to obtain credentials from UW
+# LieOcean users need to obtain credentials from UW
 sshuser = 'username@boiler.ocean.washington.edu'
 
 def main():
