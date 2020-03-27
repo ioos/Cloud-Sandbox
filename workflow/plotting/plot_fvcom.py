@@ -20,6 +20,9 @@ __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
+# This is a fix for matplotlib OSX thread issue
+plt.switch_backend('Agg')
+
 EPSG3857 = pyproj.Proj('EPSG:3857')
 TILE3857 = tile.Tile3857()
 

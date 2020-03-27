@@ -16,11 +16,11 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-fcstconf = f'{curdir}/../configs/ioos.config'
-postconf = f'{curdir}/../configs/post.config'
+#fcstconf = f'{curdir}/../configs/ioos.config'
+#postconf = f'{curdir}/../configs/post.config'
 
-#fcstconf = f'{curdir}/../configs/local.config'
-#postconf = f'{curdir}/../configs/local.config'
+fcstconf = f'{curdir}/../configs/local.config'
+postconf = f'{curdir}/../configs/local.config'
 
 # This is used for obtaining liveocean forcing data
 # LieOcean users need to obtain credentials from UW
