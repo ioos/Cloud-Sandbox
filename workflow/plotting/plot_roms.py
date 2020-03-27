@@ -10,6 +10,9 @@ import PIL.Image
 import numpy as np
 import matplotlib.pyplot as plt
 
+# This is a fix for matplotlib OSX thread issue
+plt.switch_backend('Agg')
+
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 

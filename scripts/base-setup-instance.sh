@@ -52,7 +52,10 @@ setup_environment () {
   cd $home
 }
 
-
+setup_environment_osx () {
+  cd ~/.ssh
+  cat id_rsa.pub >> authorized_keys
+}
 
 
 install_efa_driver() {
@@ -183,6 +186,26 @@ install_python_modules_user () {
 }
 
 
+install_python_modules_osx () {
+
+  home=$PWD
+
+  pip3 install --user dask distributed
+  pip3 install --user paramiko   # needed for dask-ssh
+  pip3 install --user prefect
+  pip3 install --user boto3
+
+
+  # Build and install the plotting module
+  # This will also install dependencies
+  cd ../workflow
+  python3 ./setup.py sdist
+  pip3 install --user dist/plotting-*.tar.gz
+
+  cd $home
+}
+
+
 
 install_ffmpeg () {
   home=$PWD
@@ -207,6 +230,17 @@ install_ffmpeg () {
   rm -Rf $wrkdir
 
   cd $home
+}
+
+install_ffmpeg_osx () {
+
+  which brew > /dev/null
+  if [ $? -ne 0 ] ; then
+    echo "Homebrew is missing ... install Homebrew then retry ... exiting"
+    exit 1
+  fi
+
+  brew install ffmpeg
 }
 
 
