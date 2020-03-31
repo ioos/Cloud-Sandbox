@@ -3,6 +3,7 @@ import collections
 import os
 import sys
 import re
+from signal import signal, SIGINT
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -23,10 +24,17 @@ postconf = f'{curdir}/../configs/post.config'
 #postconf = f'{curdir}/../configs/local.config'
 
 # This is used for obtaining liveocean forcing data
-# LieOcean users need to obtain credentials from UW
+# LiveOcean users need to obtain credentials from UW
 sshuser = 'username@boiler.ocean.washington.edu'
 
+def handler(signal_received, frame):
+    print('SIGINT or CTRL-C detected. Exiting gracefully')
+    raise signals.FAIL()
+
 def main():
+
+    signal(SIGINT, handler)
+
     lenargs = len(sys.argv) - 1
     joblist = []
 
@@ -50,15 +58,13 @@ def main():
 
         # Add the plot flow
         elif jobtype == "plotting":
-            postjobfile = jobfile
             plotflow = flows.plot_flow(postconf, jobfile)
             flowdeq.appendleft(plotflow)
 
         # Add the diff plot flow
         elif jobtype == "plotting_diff":
-            postjobfile = jobfile
-            plotflow = flows.diff_plot_flow(postconf, jobfile)
-            flowdeq.appendleft(plotflow)
+            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
+            flowdeq.appendleft(diffplotflow)
 
         else:
             print(f"jobtype: {jobtype} is not supported")
