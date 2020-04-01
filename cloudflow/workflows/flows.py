@@ -28,7 +28,7 @@ log.addHandler(ch)
 provider = 'AWS'
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
-    # fcstconf = f'{curdir}/configs/liveocean.config'
+    # fcstconf = f'{curdir}/cluster/configs/liveocean.config'
     # print(f"DEBUG: fcstconf is {fcstconf}")
     # fcstjobfile = 'garbage'
 
@@ -156,6 +156,20 @@ def diff_plot_flow(postconf, postjobfile) -> Flow:
 
     return diff_plotflow
 
+def notebook_flow(postconf, pyfile) -> Flow:
+    with Flow('notebook flow') as nb_flow:
+        #####################################################################
+        # POST Processing
+        #####################################################################
+
+        # Start a machine
+        #postmach = ctasks.cluster_init(postconf)
+        #pmStarted = ctasks.cluster_start(postmach)
+
+        # Just run locally for now
+        notebook_task = jtasks.run_pynotebook(pyfile)
+    return nb_flow
+
 
 def test_flow(fcstconf, fcstjobfile) -> Flow:
     with Flow('fcst workflow') as testflow:
@@ -197,32 +211,8 @@ if __name__ == '__main__':
 
     signal(SIGINT, handler)
 
-    #fcstconf = f'../configs/negofs.config'
-    #jobfile = f'../jobs/negofs.03z.fcst'
-
-    #fcstconf = f'../configs/tbofs.config'
-    #jobfile = f'../jobs/tbofs.00z.fcst'
-
-    #fcstconf = f'../configs/gomofs.config'
-    #jobfile = f'../jobs/gomofs.00z.fcst'
-
-    #fcstconf = f'../configs/sfbofs.config'
-    #jobfile = f'../jobs/sfbofs.03z.fcst'
-
-    #fcstconf = f'../configs/ciofs.config'
-    #jobfile = f'../jobs/ciofs.00z.fcst'
-
-    #fcstconf = f'../configs/lmhofs.config'
-    #jobfile = f'../jobs/lmhofs.00z.fcst'
-
-    #fcstconf = f'../configs/leofs.config'
-    #jobfile = f'../jobs/leofs.00z.fcst'
-
-    #fcstflow = test_flow(fcstconf, jobfile)
-    #fcstflow.run()
-
-    postconf = f'../configs/post.config'
-    jobfile = f'../jobs/tbofs.00z.plots'
+    postconf = f'../cluster/configs/post.config'
+    jobfile = f'../job/jobs/tbofs.00z.plots'
 
     jobflow = diff_plot_flow(postconf, jobfile)
     jobflow.run()

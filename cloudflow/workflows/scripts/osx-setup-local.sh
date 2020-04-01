@@ -8,6 +8,7 @@
 #install_base_rpms
 #install_extra_rpms
 #install_impi
+
 install_ffmpeg_osx
-#install_python_modules_osx
+install_python_modules_osx
 

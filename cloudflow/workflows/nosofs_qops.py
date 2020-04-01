@@ -17,8 +17,8 @@ __email__ = "patrick.tripp@rpsgroup.com"
 # Set these for specific use
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-fcstconf = f'{curdir}/../configs/nosofs.config'
-postconf = f'{curdir}/../configs/post.config'
+fcstconf = f'{curdir}/../cluster/configs/nosofs.config'
+postconf = f'{curdir}/../cluster/configs/post.config'
 
 # This is used for obtaining liveocean forcing data
 # Users need to obtain credentials from UW
