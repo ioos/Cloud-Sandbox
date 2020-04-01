@@ -7,6 +7,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = False
 
+
 class Job(ABC):
     ''' This is an abstract base class for job classes
         It defines a generic interface to implement

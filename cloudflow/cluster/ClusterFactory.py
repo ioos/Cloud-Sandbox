@@ -2,9 +2,10 @@ import json
 import logging
 
 from prefect.engine import signals
-from cluster.Cluster import Cluster
-from cluster.AWSCluster import AWSCluster
-from cluster.LocalCluster import LocalCluster
+
+#from .Cluster  import Cluster
+from .AWSCluster  import AWSCluster
+from .LocalCluster  import LocalCluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

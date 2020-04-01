@@ -16,13 +16,13 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-from job.Job import Job
+from ..job.Job import Job
 
 #from plotting import plot_roms
 import plotting.plot_roms as plot_roms
 import plotting.plot_fvcom as plot_fvcom
 import plotting.shared as plot_shared
-import utils.romsUtil as util
+from ..utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

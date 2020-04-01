@@ -7,8 +7,8 @@ if os.path.abspath('..') not in sys.path:
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-from job.Job import Job
-import utils.romsUtil as util
+from . import Job
+from ..utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -17,7 +17,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 debug = False
 
 
-class ROMSForecast(Job):
+class ROMSForecast(Job.Job):
 
     # TODO: make self and cfDict consistent
     def __init__(self, configfile, NPROCS):

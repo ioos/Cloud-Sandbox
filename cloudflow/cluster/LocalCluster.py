@@ -3,7 +3,7 @@ import json
 import os
 from subprocess import Popen
 
-from cluster.Cluster import Cluster
+from . import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -11,7 +11,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = False
 
-class LocalCluster(Cluster):
+class LocalCluster(Cluster.Cluster):
 
     def __init__(self, configfile):
 

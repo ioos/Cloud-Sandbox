@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Local dependencies
-import tasks
-import job_tasks as jtasks
-import cluster_tasks as ctasks
+from . import tasks
+from . import job_tasks as jtasks
+from . import cluster_tasks as ctasks
 
 from dask.distributed import Client
 # 3rd party dependencies

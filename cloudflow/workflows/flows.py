@@ -3,15 +3,24 @@
 
 
 '''
+import os
+import sys
 from signal import signal, SIGINT
 import logging
 from distributed import Client
 from prefect import Flow
 from prefect.engine import signals
-import tasks as tasks
-import cluster_tasks as ctasks
-import job_tasks as jtasks
-from cluster.Cluster import Cluster
+
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
+if os.path.abspath('.') not in sys.path:
+    sys.path.append(os.path.abspath('.'))
+
+from . import tasks as tasks
+from . import cluster_tasks as ctasks
+from . import job_tasks as jtasks
+
+#from cluster.Cluster import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -155,6 +164,7 @@ def diff_plot_flow(postconf, postjobfile) -> Flow:
         #######################################################################
 
     return diff_plotflow
+
 
 def notebook_flow(postconf, pyfile) -> Flow:
     with Flow('notebook flow') as nb_flow:
