@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import nodeInfo
+from . import nodeInfo
 
 nodetype = 'c5n.2xlarge'
 ppn = nodeInfo.getPPN(nodetype)

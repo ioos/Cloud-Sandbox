@@ -1,9 +1,9 @@
 import json
 
-from job.Job import Job
-from job.ROMSForecast import ROMSForecast
-from job.Plotting import Plotting
-from job.FVCOMForecast import FVCOMForecast
+from .Job import Job
+from .ROMSForecast import ROMSForecast
+from .Plotting import Plotting
+from .FVCOMForecast import FVCOMForecast
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -11,6 +11,8 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = True
 
+
+# noinspection PyCallingNonCallable
 class JobFactory:
 
     def __init__(self):

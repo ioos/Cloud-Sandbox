@@ -23,12 +23,12 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-from job.Job import Job
-from job.JobFactory import JobFactory
-from cluster.Cluster import Cluster
+from ..job.Job import Job
+from ..job.JobFactory import JobFactory
+from ..cluster.Cluster import Cluster
 
-from services.StorageService import StorageService
-from services.S3Storage import S3Storage
+from ..services.StorageService import StorageService
+from ..services.S3Storage import S3Storage
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

@@ -2,8 +2,8 @@
 import collections
 import os
 import sys
-import utils.romsUtil as util
-import flows
+from ..utils import romsUtil as util
+from . import flows
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

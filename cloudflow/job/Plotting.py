@@ -6,8 +6,8 @@ import sys
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from job.Job import Job
-import utils.romsUtil as util
+from . import Job
+from ..utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -16,8 +16,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 debug = True
 
 
-
-class Plotting(Job):
+class Plotting(Job.Job):
 
     def __init__(self, configfile, NPROCS):
 

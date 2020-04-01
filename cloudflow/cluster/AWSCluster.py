@@ -10,8 +10,8 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
-import cluster.nodeInfo as nodeInfo
-from cluster.Cluster import Cluster
+from . import nodeInfo
+from . Cluster import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
