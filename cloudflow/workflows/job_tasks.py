@@ -6,6 +6,8 @@ import subprocess
 import sys
 import os
 import glob
+import traceback
+
 from distributed import Client
 from prefect.engine import signals
 from prefect import task
@@ -62,9 +64,26 @@ def baseline_from_Job(job: Job):
     return FILES
 
 
-# job
-# TODO: make sshuser an optional Job parameter
-# TODO: make this model agnostic
+@task
+def run_pynotebook(pyfile: str):
+
+    print(f'Running {pyfile}')
+
+    try:
+        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
+        if result.returncode != 0:
+            log.exception(f'{pyfile} returned non zero exit ...')
+            raise signals.FAIL()
+
+    except Exception as e:
+        log.exception(f'{pyfile} caused an exception ...')
+        traceback.print_stack()
+        raise signals.FAIL()
+
+    print(f'Finished running {pyfile}')
+    return
+
+
 @task
 def get_forcing(job: Job, sshuser=None):
     """ job - Job object """
@@ -91,7 +110,7 @@ def get_forcing(job: Job, sshuser=None):
     # ROMS models
     elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
         comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/../../scripts/getICsROMS.sh"
+        script = f"{curdir}/../../workflows/scripts/getICsROMS.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
@@ -101,7 +120,7 @@ def get_forcing(job: Job, sshuser=None):
     # FVCOM models
     elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
         comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/../../scripts/getICsFVCOM.sh"
+        script = f"{curdir}/../../workflows/scripts/getICsFVCOM.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:

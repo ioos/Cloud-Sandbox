@@ -25,16 +25,16 @@ postconf = ''
 postjobfile = ''
 
 if provider == 'AWS':
-    fcstconf = 'configs/liveocean.config'
-    fcstjobfile = 'jobs/20191106.liveocean.job'
-    postconf = 'configs/post.config'
-    postjobfile = 'jobs/lo.plots.job'
+    fcstconf = 'cluster/configs/liveocean.config'
+    fcstjobfile = 'job/jobs/20191106.liveocean.job'
+    postconf = 'cluster/configs/post.config'
+    postjobfile = 'job/jobs/lo.plots.job'
 
 elif provider == 'Local':
-    fcstconf = 'configs/local.config'
-    fcstjobfile = 'jobs/liveocean.job'
-    postconf = 'configs/local.post'
-    postjobfile = 'jobs/plots.local.job'
+    fcstconf = 'cluster/configs/local.config'
+    fcstjobfile = 'job/jobs/liveocean.job'
+    postconf = 'cluster/configs/local.post'
+    postjobfile = 'job/jobs/plots.local.job'
 
 # This is used for obtaining liveocean forcing data
 sshuser = 'username@boiler.ocean.washington.edu'

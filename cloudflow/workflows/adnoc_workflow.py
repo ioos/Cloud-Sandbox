@@ -20,11 +20,11 @@ fcstconf = ""
 fcstjobfile = ""
 
 if provider == 'AWS':
-    fcstconf = 'configs/adnoc.config'
-    fcstjobfile = 'jobs/adnoc.job'
+    fcstconf = 'cluster/configs/adnoc.config'
+    fcstjobfile = 'job/jobs/adnoc.job'
 elif provider == 'Local':
-    fcstconf = 'configs/local.config'
-    fcstjobfile = 'jobs/adnoc.job'
+    fcstconf = 'cluster/configs/local.config'
+    fcstjobfile = 'job/jobs/adnoc.job'
 
 with Flow('ofs workflow') as flow:
     #####################################################################
