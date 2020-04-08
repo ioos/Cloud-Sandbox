@@ -19,9 +19,10 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 from ..job.Job import Job
 
 #from plotting import plot_roms
-import plotting.plot_roms as plot_roms
-import plotting.plot_fvcom as plot_fvcom
-import plotting.shared as plot_shared
+from ..plotting import plot_roms
+
+from ..plotting import plot_fvcom
+from ..plotting import shared as plot_shared
 from ..utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
