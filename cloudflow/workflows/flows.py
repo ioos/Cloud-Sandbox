@@ -181,6 +181,13 @@ def notebook_flow(postconf, pyfile) -> Flow:
     return nb_flow
 
 
+def notebook_test(pyfile) -> Flow:
+    with Flow('notebook test') as nbtest_flow:
+        notebook_task = jtasks.run_pynotebook(pyfile)
+
+    return nbtest_flow
+
+
 def test_flow(fcstconf, fcstjobfile) -> Flow:
     with Flow('fcst workflow') as testflow:
         # Create the cluster object
