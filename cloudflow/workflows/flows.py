@@ -34,7 +34,7 @@ formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcNa
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
-provider = 'AWS'
+storage_provider = 'AWS'
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     # fcstconf = f'{curdir}/cluster/configs/liveocean.config'
@@ -103,7 +103,7 @@ def plot_flow(postconf, postjobfile) -> Flow:
         plots = jtasks.daskmake_plots(daskclient, FILES, plotjob)
         plots.set_upstream([daskclient])
 
-        storage_service = tasks.storage_init(provider)
+        storage_service = tasks.storage_init(storage_provider)
         pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
         pngtocloud.set_upstream(plots)
 
@@ -149,7 +149,7 @@ def diff_plot_flow(postconf, postjobfile) -> Flow:
         plots = jtasks.daskmake_diff_plots(daskclient, FILES, BASELINE, plotjob)
         plots.set_upstream([daskclient])
 
-        storage_service = tasks.storage_init(provider)
+        storage_service = tasks.storage_init(storage_provider)
         pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
         pngtocloud.set_upstream(plots)
 

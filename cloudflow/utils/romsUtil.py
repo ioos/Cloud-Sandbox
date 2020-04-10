@@ -9,8 +9,7 @@ __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
-debug = True
-
+debug = False
 
 roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
 fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]

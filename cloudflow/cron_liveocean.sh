@@ -3,7 +3,7 @@
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
-cd $HOME/Cloud-Sandbox/python
+cd $HOME/Cloud-Sandbox/cloudflow
 
 fcst=job/jobs/liveocean.qops.job
 plots=job/jobs/liveocean.qops.plots.job

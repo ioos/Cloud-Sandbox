@@ -8,9 +8,9 @@
                 { "Key": "Project", "Value": "IOOS-cloud-sandbox" },
                 { "Key": "NAME", "Value": "liveocean-fcst" }
               ],
-"image_id"  : "ami-036c6254b1f08d282",
+"image_id"  : "ami-0c9d9d7cb44764792",
 "key_name"  : "patrick-ioos-cloud-sandbox",
 "sg_ids"    : ["sg-006041073bfa7b072", "sg-0a48755f7b926b051", "sg-04a6bcecaec589f64"],
-"subnet_id" : "subnet-09dae53e246bd68e4",
+"subnet_id" : "subnet-050093b957519d622",
 "placement_group" : "IOOS-cloud-sandbox-cluster-placement-group"
 }
