@@ -72,7 +72,7 @@ def main():
 
         # Add the diff plot flow
         elif jobtype == "plotting_diff":
-            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
+            diffplotflow = flows.diff_plot_flow(postconf, jobfile, sshuser)
             flowdeq.appendleft(diffplotflow)
 
         else:
@@ -101,7 +101,7 @@ def main():
                 elapsed = end_time - start_time
                 mins = elapsed / 60.0
                 hrs = mins / 60.0
-                log.info(f"Elapsed Time: {hrs:.3f} hours")
+                log.info(f"Elapsed Time: {hrs:.3f} hours (4 nodes)")
             continue
         else:
             log.error(f"{aflow.name} failed")

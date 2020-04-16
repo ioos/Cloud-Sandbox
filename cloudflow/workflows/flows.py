@@ -3,6 +3,8 @@
 
 
 '''
+print(f"file: {__file__} | name: {__name__} | package: {__package__}")
+
 import os
 import sys
 from signal import signal, SIGINT
@@ -16,9 +18,9 @@ if os.path.abspath('..') not in sys.path:
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))
 
-from . import tasks as tasks
-from . import cluster_tasks as ctasks
-from . import job_tasks as jtasks
+import tasks as tasks
+import cluster_tasks as ctasks
+import job_tasks as jtasks
 
 #from cluster.Cluster import Cluster
 
@@ -121,7 +123,7 @@ def plot_flow(postconf, postjobfile) -> Flow:
 
 
 
-def diff_plot_flow(postconf, postjobfile) -> Flow:
+def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
     with Flow('diff plotting') as diff_plotflow:
         #####################################################################
         # POST Processing
@@ -141,13 +143,16 @@ def diff_plot_flow(postconf, postjobfile) -> Flow:
         # Setup the post job
         plotjob = tasks.job_init(postmach, postjobfile, upstream_tasks=[pmStarted])
 
+        # Retrieve the baseline operational forecast data
+        getbaseline = jtasks.get_baseline(plotjob, sshuser)
+
         # Get list of files from job specified directory
         FILES = jtasks.ncfiles_from_Job(plotjob)
-        BASELINE = jtasks.baseline_from_Job(plotjob)
+        BASELINE = jtasks.baseline_from_Job(plotjob, upstream_tasks=[getbaseline])
 
         # Make plots
         plots = jtasks.daskmake_diff_plots(daskclient, FILES, BASELINE, plotjob)
-        plots.set_upstream([daskclient])
+        plots.set_upstream([daskclient, getbaseline])
 
         storage_service = tasks.storage_init(storage_provider)
         pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)

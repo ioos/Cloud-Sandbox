@@ -265,6 +265,25 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
 
     return
 
+def get_baselines_lo(cdate, vdir, sshuser):
+
+    remotepath = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
+    fdate = lo_date(cdate)
+
+    if not os.path.exists(vdir):
+        os.makedirs(vdir)
+    else:
+        print(f"Directory {vdir} already exists .... not downloading.")
+        print(f"Remove the {vdir} directory to force the download.")
+        return
+
+    # Get the forcing
+    scpdir = f"{sshuser}:{remotepath}/{fdate}/\*"
+
+    # TODO: add exception handing, check return value from scp
+    subprocess.run(["scp", "-p", scpdir, vdir], stderr=subprocess.STDOUT)
+
+    return
 
 def get_ICs_lo(cdate, localpath, sshuser):
     ''' Get the atmospheric forcing and boundary layer conditions and ICs
