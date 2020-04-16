@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
+print(f"file: {__file__} | name: {__name__} | package: {__package__}")
+
 import collections
 import os
 import sys
+
+if os.path.abspath('.') not in sys.path:
+    sys.path.append(os.path.abspath('.'))
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 # Local dependencies
-from ..utils import romsUtil as util
-from . import flows
+from utils import romsUtil as util
+import flows
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

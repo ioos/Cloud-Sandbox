@@ -84,6 +84,36 @@ def run_pynotebook(pyfile: str):
     print(f'Finished running {pyfile}')
     return
 
+@task
+def get_baseline(job: Job, sshuser=None):
+    """ Retrieve operational forecast files for comparison to quasi-operational forecasts
+        job - Job object 
+    """
+
+    cdate = job.CDATE
+    ofs = job.OFS
+    vdir = job.VERIFDIR
+    hh = job.HH
+
+   
+    if ofs == 'liveocean':
+        try:
+            util.get_baseline_lo(cdate, vdir, sshuser)
+        except Exception as e:
+            log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
+            raise signals.FAIL()
+    elif ofs in util.nosofs_models:
+        script = f"{curdir}/scripts/getNomadsProd.sh"
+
+        result = subprocess.run([script, ofs, cdate, hh, vdir], stderr=subprocess.STDOUT)
+        if result.returncode != 0:
+            log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
+            raise signals.FAIL()A
+    else:
+        log.exception(f'{ofs} is not supported')
+        raise signals.FAIL() 
+    return
+
 
 @task
 def get_forcing(job: Job, sshuser=None):
@@ -111,7 +141,7 @@ def get_forcing(job: Job, sshuser=None):
     # ROMS models
     elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
         comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/../../workflows/scripts/getICsROMS.sh"
+        script = f"{curdir}/scripts/getICsROMS.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
@@ -121,7 +151,7 @@ def get_forcing(job: Job, sshuser=None):
     # FVCOM models
     elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
         comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/../../workflows/scripts/getICsFVCOM.sh"
+        script = f"{curdir}/scripts/getICsFVCOM.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:

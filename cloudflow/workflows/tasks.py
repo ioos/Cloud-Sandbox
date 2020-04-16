@@ -6,6 +6,7 @@ functions. Prefect forces some design choices.
 
 Keep things cloud platform agnostic at this layer.
 """
+print(f"file: {__file__} | name: {__name__} | package: {__package__}")
 
 import os
 import sys
@@ -23,12 +24,12 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-from ..job.Job import Job
-from ..job.JobFactory import JobFactory
-from ..cluster.Cluster import Cluster
+from cloudflow.job.Job import Job
+from cloudflow.job.JobFactory import JobFactory
+from cloudflow.cluster.Cluster import Cluster
 
-from ..services.StorageService import StorageService
-from ..services.S3Storage import S3Storage
+from cloudflow.services.StorageService import StorageService
+from cloudflow.services.S3Storage import S3Storage
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
