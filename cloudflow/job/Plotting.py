@@ -6,8 +6,8 @@ import sys
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from . import Job
-from ..utils import romsUtil as util
+from cloudflow.job.Job import Job
+from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -16,7 +16,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 debug = True
 
 
-class Plotting(Job.Job):
+class Plotting(Job):
 
     def __init__(self, configfile, NPROCS):
 

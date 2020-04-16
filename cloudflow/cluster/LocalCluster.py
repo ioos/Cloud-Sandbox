@@ -3,7 +3,7 @@ import json
 import os
 from subprocess import Popen
 
-from . import Cluster
+from cloudflow.cluster.Cluster import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -11,7 +11,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 debug = False
 
-class LocalCluster(Cluster.Cluster):
+class LocalCluster(Cluster):
 
     def __init__(self, configfile):
 

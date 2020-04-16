@@ -2,8 +2,8 @@
 
 # keep things cloud platform agnostic at this layer
 
-from . import tasks
-from . import cluster_tasks as ctasks
+from cloudflow.workflows import tasks
+from cloudflow.workflows import cluster_tasks as ctasks
 
 # 3rd party dependencies
 from prefect import Flow

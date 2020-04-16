@@ -18,9 +18,9 @@ if os.path.abspath('..') not in sys.path:
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))
 
-import tasks as tasks
-import cluster_tasks as ctasks
-import job_tasks as jtasks
+from cloudflow.workflows import tasks
+from cloudflow.workflows import cluster_tasks as ctasks
+from cloudflow.workflows import job_tasks as jtasks
 
 #from cluster.Cluster import Cluster
 

@@ -18,8 +18,8 @@ from prefect.triggers import all_finished
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from ..cluster.Cluster import Cluster
-from ..cluster.ClusterFactory import ClusterFactory
+from cloudflow.cluster.Cluster import Cluster
+from cloudflow.cluster.ClusterFactory import ClusterFactory
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

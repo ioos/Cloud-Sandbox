@@ -1,9 +1,9 @@
 import json
 
-from .Job import Job
-from .ROMSForecast import ROMSForecast
-from .Plotting import Plotting
-from .FVCOMForecast import FVCOMForecast
+from cloudflow.job.Job import Job
+from cloudflow.job.ROMSForecast import ROMSForecast
+from cloudflow.job.Plotting import Plotting
+from cloudflow.job.FVCOMForecast import FVCOMForecast
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

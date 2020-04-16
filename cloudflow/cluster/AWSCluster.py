@@ -10,8 +10,8 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
-from . import nodeInfo
-from . Cluster import Cluster
+from cloudflow.cluster import nodeInfo
+from cloudflow.cluster.Cluster import Cluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
