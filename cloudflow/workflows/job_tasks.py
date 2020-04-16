@@ -14,16 +14,17 @@ from prefect import task
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
+
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-from ..job.Job import Job
+from cloudflow.job.Job import Job
 
 #from plotting import plot_roms
-from ..plotting import plot_roms
+from cloudflow.plotting import plot_roms
 
-from ..plotting import plot_fvcom
-from ..plotting import shared as plot_shared
-from ..utils import romsUtil as util
+from cloudflow.plotting import plot_fvcom
+from cloudflow.plotting import shared as plot_shared
+from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -100,7 +101,7 @@ def get_baseline(job: Job, sshuser=None):
         try:
             util.get_baseline_lo(cdate, vdir, sshuser)
         except Exception as e:
-            log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
+            log.exception(f'Retrieving baselines failed ...')
             raise signals.FAIL()
     elif ofs in util.nosofs_models:
         script = f"{curdir}/scripts/getNomadsProd.sh"
@@ -108,7 +109,7 @@ def get_baseline(job: Job, sshuser=None):
         result = subprocess.run([script, ofs, cdate, hh, vdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
-            raise signals.FAIL()A
+            raise signals.FAIL()
     else:
         log.exception(f'{ofs} is not supported')
         raise signals.FAIL() 

@@ -12,8 +12,8 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 # Local dependencies
-from utils import romsUtil as util
-import flows
+from cloudflow.utils import romsUtil as util
+from cloudflow.workflows import flows
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

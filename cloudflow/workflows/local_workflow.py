@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-# Local dependencies
-from . import tasks
-from . import job_tasks as jtasks
-from . import cluster_tasks as ctasks
-
 from dask.distributed import Client
 # 3rd party dependencies
 from prefect import Flow
+
+# Local dependencies
+from cloudflow.workflows import tasks
+from cloudflow.workflows import job_tasks as jtasks
+from cloudflow.workflows import cluster_tasks as ctasks
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

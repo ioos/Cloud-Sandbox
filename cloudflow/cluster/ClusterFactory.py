@@ -3,9 +3,8 @@ import logging
 
 from prefect.engine import signals
 
-#from .Cluster  import Cluster
-from .AWSCluster  import AWSCluster
-from .LocalCluster  import LocalCluster
+from cloudflow.cluster.AWSCluster  import AWSCluster
+from cloudflow.cluster.LocalCluster  import LocalCluster
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

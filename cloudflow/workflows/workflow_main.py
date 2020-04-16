@@ -8,8 +8,8 @@ from signal import signal, SIGINT
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from ..utils import romsUtil as util
-from . import flows
+from cloudflow.utils import romsUtil as util
+from cloudflow.workflows import flows
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -29,7 +29,7 @@ sshuser = 'username@boiler.ocean.washington.edu'
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signals.FAIL()
+    raise signal.FAIL()
 
 def main():
 
