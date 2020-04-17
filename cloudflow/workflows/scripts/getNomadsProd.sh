@@ -1,11 +1,12 @@
 #!/bin/bash
+set -x
 
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
 if [ $# -lt 3 ] ; then
-  echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [/com/nos-noaa | other destination]"
+  echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [/com/nos-noaa/cbofs.20200416 | other destination]"
   exit 1
 fi
 
@@ -34,17 +35,18 @@ hlist='00 01 02 03 04 05 06 07 08 09'
 
 # Most forecasts are 48 hours, with some exceptions
 ehr=48
-case $ofs in
-    'gomofs' )
+case $OFS in
+    gomofs )
     ehr=72
     ;;
-    'ngofs')
+    ngofs)
     ehr=54
     ;;
-    'leofs')
+    leofs)
     ehr=120
     ;;
 esac
+
 
 for hh in $hlist
 do
@@ -55,7 +57,12 @@ done
 hh=10
 while [ $hh -le $ehr ]
 do
-  wget -nc $NOMADS/nos.$OFS.fields.f0$hh.$CDATE.t${CYC}z.nc
+  if [ $hh -lt 100 ] ; then
+    hhstr="0$hh"
+  else
+    hhstr="$hh"
+  fi
+  wget -nc $NOMADS/nos.$OFS.fields.f$hhstr.$CDATE.t${CYC}z.nc
   ((err += $?))
   ((hh += 1))
 done

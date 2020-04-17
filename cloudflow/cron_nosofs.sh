@@ -19,6 +19,6 @@ cd $HOME/Cloud-Sandbox/cloudflow
 fcst=job/jobs/${ofs}.${cyc}z.fcst
 plots=job/jobs/${ofs}.${cyc}z.diffplots
 
-./workflows/nosofs_qops.py $ofs $fcst $plots > $HOME/${ofs}.log 2>&1
+./workflows/nosofs_qops.py $fcst $plots > $HOME/${ofs}.log 2>&1
 
 

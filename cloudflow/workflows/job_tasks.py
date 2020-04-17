@@ -20,10 +20,10 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 from cloudflow.job.Job import Job
 
 #from plotting import plot_roms
-from cloudflow.plotting import plot_roms
+from plotting import plot_roms
 
-from cloudflow.plotting import plot_fvcom
-from cloudflow.plotting import shared as plot_shared
+from plotting import plot_fvcom
+from plotting import shared as plot_shared
 from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
