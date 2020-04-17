@@ -12,12 +12,13 @@ setup(name="plotting",
       author_email='rpsgroup.com',
       packages=['plotting'],
       install_requires=[
-          'plotting',
           'pyproj',
           'cmocean',
           'numpy',
           'matplotlib',
           'netCDF4',
+          'dask',
+          'distributed',
           'Pillow']
       )
 

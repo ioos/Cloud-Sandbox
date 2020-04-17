@@ -4,4 +4,6 @@ cmocean
 numpy
 matplotlib
 netCDF4
+dask
+distributed
 Pillow==6.2.1

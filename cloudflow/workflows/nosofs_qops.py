@@ -4,6 +4,7 @@ print(f"file: {__file__} | name: {__name__} | package: {__package__}")
 import collections
 import os
 import sys
+import re
 
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))
@@ -48,15 +49,19 @@ def main():
         print('JOBTYPE: ', jobtype)
 
         # Add the forecast flow
-        if jobtype == 'forecast':
+        if re.search("forecast", jobtype):
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
         # Add the plot flow
-        elif jobtype == 'plotting':
-            postjobfile = jobfile
+        elif jobtype == "plotting":
             plotflow = flows.plot_flow(postconf, jobfile)
             flowdeq.appendleft(plotflow)
+
+        # Add the diff plot flow
+        elif jobtype == "plotting_diff":
+            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
+            flowdeq.appendleft(diffplotflow)
 
         else:
             print(f"jobtype: {jobtype} is not supported")

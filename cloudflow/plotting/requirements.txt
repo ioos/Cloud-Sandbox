@@ -1,4 +1,6 @@
 pyproj
+dask
+distributed
 cmocean
 numpy
 matplotlib

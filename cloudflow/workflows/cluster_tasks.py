@@ -136,7 +136,7 @@ def start_dask(cluster) -> Client:
         # TODO: Refactor this, make Dask an optional part of the cluster
         # TODO: scale this to multiple hosts
         try:
-            time.sleep(75)
+            time.sleep(90)
             proc = subprocess.Popen(["dask-ssh", "--nprocs", str(nprocs), "--scheduler-port", port, host],
                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
