@@ -117,6 +117,7 @@ def plot_flow(postconf, postjobfile) -> Flow:
         closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[mpegs])
         pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
 
+
         #######################################################################
 
     return plotflow
@@ -167,29 +168,36 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
 
         #######################################################################
+        # This will add Kenny's HLFS if it is found on S3 - for demo
+        injected = tasks.fetchpy_and_run(plotjob, storage_service)
 
     return diff_plotflow
 
 
-def notebook_flow(postconf, pyfile) -> Flow:
+def notebook_flow(postconf,jobfile) -> Flow:
+
     with Flow('notebook flow') as nb_flow:
         #####################################################################
         # POST Processing
         #####################################################################
-
         # Start a machine
         #postmach = ctasks.cluster_init(postconf)
         #pmStarted = ctasks.cluster_start(postmach)
 
-        # Just run locally for now
-        notebook_task = jtasks.run_pynotebook(pyfile)
+        # Optionally inject a user supplied python script
+        postmach = ctasks.cluster_init(postconf)
+        pmStarted = ctasks.cluster_start(postmach)
+
+        plotjob = tasks.job_init(postmach, jobfile, upstream_tasks=[pmStarted])
+
+        storage_service = tasks.storage_init(storage_provider)
+        injected = tasks.fetchpy_and_run(plotjob, storage_service)
     return nb_flow
 
 
 def notebook_test(pyfile) -> Flow:
     with Flow('notebook test') as nbtest_flow:
-        notebook_task = jtasks.run_pynotebook(pyfile)
-
+        notebook_task = tasks.run_pynotebook(pyfile)
     return nbtest_flow
 
 
@@ -233,8 +241,11 @@ if __name__ == '__main__':
 
     signal(SIGINT, handler)
 
-    postconf = f'../cluster/configs/post.config'
-    jobfile = f'../job/jobs/tbofs.00z.plots'
+    postconf = f'./cluster/configs/local.config'
+    jobfile = f'./job/jobs/cbofs.00z.plots'
+    #jobflow = diff_plot_flow(postconf, jobfile)
+    #jobflow.run()
 
-    jobflow = diff_plot_flow(postconf, jobfile)
-    jobflow.run()
+    # Test the notebook flow
+    nbflow = notebook_flow(postconf, jobfile)
+    nbflow.run()

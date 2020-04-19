@@ -14,6 +14,7 @@ import pprint
 import subprocess
 import glob
 import logging
+import traceback
 
 from prefect import task
 from prefect.engine import signals
@@ -198,8 +199,89 @@ def forecast_run(cluster: Cluster, job: Job):
     log.info('Forecast finished successfully')
     return
 
-
 #######################################################################
+
+@task
+def run_pynotebook(pyfile: str):
+
+    print(f'Running {pyfile}')
+
+    try:
+        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
+        if result.returncode != 0:
+            log.exception(f'{pyfile} returned non zero exit ...')
+            raise signals.FAIL()
+
+    except Exception as e:
+        log.exception(f'{pyfile} caused an exception ...')
+        traceback.print_stack()
+        raise signals.FAIL()
+
+    print(f'Finished running {pyfile}')
+    return
+
+
+@task
+def fetchpy_and_run(job: Job, service: StorageService):
+
+    # WARNING!!!!! This allows arbitrary code execution!!!
+
+    # Retrieve package to run from S3
+    # .py file 
+    # and a config file
+
+    if job.OFS != 'cbofs':
+        log.info('This only works for cbofs currently ... skipping')
+        return
+
+    bucket = job.BUCKET   # this is ioos-cloud-sandbox
+
+    folder = 'cloudflow/inject'
+
+    localtmp = f'/tmp/{folder}'
+    if not os.path.exists(localtmp):
+        os.makedirs(localtmp)
+
+    # Retrieve config/job file
+    configname = 'hlfs.config'
+    key = f'{folder}/{configname}'
+    configfile = f'{localtmp}/{configname}'
+
+    if service.file_exists(bucket, key):
+        service.downloadFile(bucket, key, configfile)
+    else:
+        log.info('No user supplied config file available ... skipping')
+        return
+
+    filename = 'hlfs.py'
+
+    key = f'{folder}/{filename}'
+    pyfile = f'{localtmp}/{filename}'
+
+    if service.file_exists(bucket, key):
+        service.downloadFile(bucket, key, pyfile)
+    else:
+        log.info('No user supplied python script available ... skipping')
+        return 
+
+    # retrieved the python and config files, run it
+    curdir = os.getcwd()
+    os.chdir(localtmp)
+    try:
+        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
+        if result.returncode != 0:
+            log.exception(f'{pyfile} returned non zero exit ...')
+            raise signals.FAIL()
+
+    except Exception as e:
+        log.exception(f'{pyfile} caused an exception ...')
+        traceback.print_stack()
+        raise signals.FAIL()
+
+    os.chdir(curdir)
+
+    return
+
 
 
 if __name__ == '__main__':
