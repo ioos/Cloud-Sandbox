@@ -31,6 +31,7 @@ NOMADS=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/$OFS.$CDATE
 
 # Download every hour forecast
 ###############################################################
+# Forecasts don't follow the same pattern, some don't have f000, some are 3 hourly (gomofs)
 hlist='00 01 02 03 04 05 06 07 08 09'
 
 # Most forecasts are 48 hours, with some exceptions
@@ -50,8 +51,7 @@ esac
 
 for hh in $hlist
 do
-  wget -nc $NOMADS/nos.$OFS.fields.f0$hh.$CDATE.t${CYC}z.nc
-  ((err += $?))
+  wget -nc -nv $NOMADS/nos.$OFS.fields.f0$hh.$CDATE.t${CYC}z.nc
 done
 
 hh=10
@@ -62,8 +62,7 @@ do
   else
     hhstr="$hh"
   fi
-  wget -nc $NOMADS/nos.$OFS.fields.f$hhstr.$CDATE.t${CYC}z.nc
-  ((err += $?))
+  wget -nc -nv $NOMADS/nos.$OFS.fields.f$hhstr.$CDATE.t${CYC}z.nc
   ((hh += 1))
 done
 ###############################################################
@@ -71,23 +70,14 @@ done
 # Get the nestnode files if ngofs
 if [[ $OFS == "ngofs" ]] ; then
   # nos.nwgofs.obc.20191218.t03z.nc  
-  wget -nc $NOMADS/../negofs.${CDATE}/nos.negofs.obc.$CDATE.t${CYC}z.nc
-  ((err += $?))
+  wget -nc -nv $NOMADS/../negofs.${CDATE}/nos.negofs.obc.$CDATE.t${CYC}z.nc
   mv nos.negofs.obc.$CDATE.t${CYC}z.nc nos.ngofs.nestnode.negofs.forecast.$CDATE.t${CYC}z.nc
 
-  wget -nc $NOMADS/../nwgofs.${CDATE}/nos.nwgofs.obc.$CDATE.t${CYC}z.nc
-  ((err += $?))
+  wget -nc -nv $NOMADS/../nwgofs.${CDATE}/nos.nwgofs.obc.$CDATE.t${CYC}z.nc
   mv nos.nwgofs.obc.$CDATE.t${CYC}z.nc nos.ngofs.nestnode.nwgofs.forecast.$CDATE.t${CYC}z.nc
 fi
 
 # Get the log and .in config files
-wget -nc $NOMADS/nos.$OFS.forecast.$CDATE.t${CYC}z.in
-((err += $?))
-wget -nc $NOMADS/nos.$OFS.forecast.$CDATE.t${CYC}z.log
-((err += $?))
+wget -nc -nv $NOMADS/nos.$OFS.forecast.$CDATE.t${CYC}z.in
+wget -nc -nv $NOMADS/nos.$OFS.forecast.$CDATE.t${CYC}z.log
 
-if [ $err -eq 0 ] ; then
-  exit 0
-else
-  exit $err
-fi

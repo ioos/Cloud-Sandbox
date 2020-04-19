@@ -20,12 +20,8 @@ class S3Storage(StorageService):
     def __init__(self):
         print('init stub')
 
-    def uploadFile(self, filename: str, bucket: str, key: str, public: bool = False):
 
-        if debug:
-            print("DEBUG: filename: ", filename)
-            print("DEBUG: key: ", key)
-            print("DEBUG: bucket: ", bucket)
+    def uploadFile(self, filename: str, bucket: str, key: str, public: bool = False):
 
         s3 = boto3.client('s3')
         try:
@@ -36,6 +32,29 @@ class S3Storage(StorageService):
         except ClientError as e:
             log.error(e)
             raise Exception from e
+
+
+    def downloadFile(self, bucket: str, key: str, filename: str):
+
+        s3 = boto3.client('s3')
+        try:
+            s3.download_file(bucket, key, filename)
+        except ClientError as e:
+            log.error(e)
+            raise Exception from e
+
+
+    def file_exists(self, bucket: str, key: str) -> bool:
+
+        s3 = boto3.client('s3')
+        try:
+            response = s3.head_object(Bucket=bucket,Key=key)
+        except ClientError as e:
+            log.error(e)
+            return False
+
+        return True
+
 
 
 if __name__ == '__main__':

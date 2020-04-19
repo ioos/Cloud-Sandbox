@@ -12,8 +12,18 @@ class StorageService(ABC):
     def __init__(self):
         print('init stub')
 
+
     @abstractmethod
     def uploadFile(self, filename: str, bucket: str, key: str, public: bool = False):
+        pass
+
+
+    @abstractmethod
+    def downloadFile(self, bucket: str, key: str, filename: str):
+        pass
+
+    @abstractmethod
+    def file_exists(self, bucket: str, key: str):
         pass
 
 

@@ -65,26 +65,6 @@ def baseline_from_Job(job: Job):
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES
 
-
-@task
-def run_pynotebook(pyfile: str):
-
-    print(f'Running {pyfile}')
-
-    try:
-        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
-        if result.returncode != 0:
-            log.exception(f'{pyfile} returned non zero exit ...')
-            raise signals.FAIL()
-
-    except Exception as e:
-        log.exception(f'{pyfile} caused an exception ...')
-        traceback.print_stack()
-        raise signals.FAIL()
-
-    print(f'Finished running {pyfile}')
-    return
-
 @task
 def get_baseline(job: Job, sshuser=None):
     """ Retrieve operational forecast files for comparison to quasi-operational forecasts
