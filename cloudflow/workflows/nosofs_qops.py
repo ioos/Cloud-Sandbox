@@ -5,6 +5,8 @@ import collections
 import os
 import sys
 import re
+from signal import signal, SIGINT
+from pathlib import Path
 
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))
@@ -22,13 +24,26 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 # Set these for specific use
 curdir = os.path.dirname(os.path.abspath(__file__))
+homedir = Path.home()
 
 fcstconf = f'{curdir}/../cluster/configs/nosofs.config'
 postconf = f'{curdir}/../cluster/configs/post.config'
 
 # This is used for obtaining liveocean forcing data
 # Users need to obtain credentials from UW
-sshuser = 'username@boiler.ocean.washington.edu'
+sshuser = 'ptripp@boiler.ocean.washington.edu'
+
+log = logging.getLogger('qops_timing')
+log.setLevel(logging.DEBUG)
+ch = logging.FileHandler(f"{homedir}/qops_forecast.log")
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
+ch.setFormatter(formatter)
+log.addHandler(ch)
+
+def handler(signal_received, frame):
+    print('SIGINT or CTRL-C detected. Exiting gracefully')
+    raise signal.FAIL()
 
 
 def main():
@@ -50,6 +65,10 @@ def main():
 
         # Add the forecast flow
         if re.search("forecast", jobtype):
+            OFS = jobdict["OFS"]
+            fcstdict = util.readConfig(fcstconf)
+            nodetype = fcstdict["nodeType"]
+            nodecnt = fcstdict["nodeCount"]
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
@@ -73,11 +92,23 @@ def main():
     while idx < qlen:
         aflow = flowdeq.pop()
         idx += 1
+
+        if re.search("fcst", aflow.name):
+            start_time = time.time()
+            log.info(f"Forecast flow starting - {OFS}")
+
         state = aflow.run()
-        print(f"DEBUG: state is: {state}")
+
         if state.is_successful():
+            if re.search("fcst", aflow.name):
+                end_time = time.time()
+                elapsed = end_time - start_time
+                mins = elapsed / 60.0
+                hrs = mins / 60.0
+                log.info(f"Elapsed Time: {hrs:.3f} hours - {nodecnt} x {nodetype} - {OFS}")
             continue
         else:
+            log.error(f"{aflow.name} failed - {OFS}")
             break
 
 
