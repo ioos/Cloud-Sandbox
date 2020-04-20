@@ -50,7 +50,7 @@ flist="
 for file in $flist
 do
   echo "wget $nomads/$file"
-  wget -nc $nomads/$file
+  wget -nc -nv $nomads/$file
 done
 
 # If negofs or nwgofs, we can either retrieve the obc file from NOMADS as done above
@@ -82,7 +82,7 @@ fi
 ifile=${pfx}.init.nowcast.${nsfx}
 rfile=${pfx}.rst.nowcast.${sfx}
 
-wget -nc ${nomads}/$ifile
+wget -nc -nv ${nomads}/$ifile
 if [[ $? -ne 0 ]] ; then
   echo "ERROR: Unable to retrieve $ifile from $nomads"
 fi

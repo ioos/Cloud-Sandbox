@@ -139,7 +139,7 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         pushPy = ctasks.push_pyEnv(postmach, upstream_tasks=[pmStarted])
 
         # Start a dask scheduler on the new post machine
-        daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pmStarted])
+        daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pushPy])
 
         # Setup the post job
         plotjob = tasks.job_init(postmach, postjobfile, upstream_tasks=[pmStarted])
