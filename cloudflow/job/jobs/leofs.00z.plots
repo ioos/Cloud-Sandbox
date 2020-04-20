@@ -8,5 +8,5 @@
   "VARS"      : ["zeta","temp"],
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "public/nosofs/plots/leofs",
-  "FSPEC"     : "nos.leofs.fields.f*z.nc"
+  "FSPEC"     : "nos.leofs.fields.f*t00z.nc"
 }

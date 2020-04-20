@@ -56,7 +56,7 @@ $pfx.forecast.${CDATE}.t${cyc}z.in
 
 for file in $icfiles
 do
-  wget -nc ${url}/$file
+  wget -nc -nv ${url}/$file
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: Unable to retrieve $file from $url"
     exit -1
@@ -69,7 +69,7 @@ cp -pf $pfx.roms.tides.$sfx nos.${ofs}.roms.tides.nc
 if [ "$ofs" -eq "gomofs" ]; then
   #nos.gomofs.clim.20200226.t00z.nc
   climfile=$pfx.clim.$sfx
-  wget -nc ${url}/$climfile
+  wget -nc -nv ${url}/$climfile
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: Unable to retrieve $climfile from $url"
     exit -1
@@ -93,7 +93,7 @@ fi
 ifile=${pfx}.init.nowcast.${nsfx}
 rfile=${pfx}.rst.nowcast.${sfx}
 
-wget -nc ${url}/$ifile
+wget -nc -nv ${url}/$ifile
 if [[ $? -ne 0 ]] ; then
   echo "ERROR: Unable to retrieve $file from \n $url"
   exit -1

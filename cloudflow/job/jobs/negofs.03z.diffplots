@@ -9,5 +9,5 @@
   "VARS"      : ["zeta", "temp", "salinity"],
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "public/nosofs/plots/negofs",
-  "FSPEC"     : "nos.negofs.fields.f*z.nc"
+  "FSPEC"     : "nos.negofs.fields.f*t03z.nc"
 }
