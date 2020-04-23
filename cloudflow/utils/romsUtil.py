@@ -265,7 +265,7 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
 
     return
 
-def get_baselines_lo(cdate, vdir, sshuser):
+def get_baseline_lo(cdate, vdir, sshuser):
 
     remotepath = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
     fdate = lo_date(cdate)
