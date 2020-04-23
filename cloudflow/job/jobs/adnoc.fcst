@@ -1,11 +1,16 @@
 {
+  "JOBTYPE"   : "romsforecast",
   "OFS"       : "adnoc",
   "CDATE"     : "20191211",
-  "HH"        : "12",
+  "HH"        : "00",
+  "COMROT"    : "/mnt/efs/ROMS",
+  "EXEC"      : "",
   "TIME_REF"  : "20191212.00",
-  "NTIMES"    : "30",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "NTIMES"    : "34560",
   "ININAME"   : "",
-  "OCEANIN"   : "",
-  "COMROT"    : "/mnt/efs/ec2-user/com",
-  "EXEC"      : "/opt/roms/bin/oceanM-761"
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
 }
