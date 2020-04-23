@@ -7,7 +7,7 @@ ulimit -s unlimited
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
-if [ $# -ne 7 ] ; then
+if [ $# -lt 7 ] ; then
   echo "Usage: $0 YYYYMMDD HH COMOUT NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
   exit 1
 fi
@@ -30,7 +30,7 @@ export NPROCS=$4
 export PPN=$5
 export HOSTS=$6
 export OFS=$7
-
+export EXEC=$8       # only used for ADNOC currently
 
 #OpenMPI
 #mpirun --version
@@ -96,11 +96,11 @@ case $OFS in
     $JOBSCRIPT $JOBARGS
     ;;
   adnoc)
-    EXEC=roms
+    EXEC=${EXEC:-roms}
     export JOBDIR=$COMOUT
     mkdir -p "$JOBDIR"/output
     cd "$JOBDIR" || exit 1
-    mpirun "$MPIOPTS" $EXEC ocean.in > ocean.log
+    mpirun $MPIOPTS $EXEC ocean.in > ocean.log
     ;;
 
   *)
