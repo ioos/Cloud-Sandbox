@@ -66,7 +66,7 @@ done
 # Need to rename the tides file - roms is still using generic name
 cp -pf $pfx.roms.tides.$sfx nos.${ofs}.roms.tides.nc 
 
-if [ "$ofs" -eq "gomofs" ]; then
+if [[ "$ofs" == "gomofs" ]]; then
   #nos.gomofs.clim.20200226.t00z.nc
   climfile=$pfx.clim.$sfx
   wget -nc -nv ${url}/$climfile
@@ -86,7 +86,7 @@ ncyc=`echo $NEXT | cut -c9-10`
 
 nsfx=${NCDATE}.t${ncyc}z.nc
 
-if [ "$cyc" -eq "18" ] ; then
+if [[ $cyc -eq 18 ]] ; then
   url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$NCDATE 
 fi
 
