@@ -6,13 +6,14 @@ functions. Prefect forces some design choices.
 
 Keep things cloud platform agnostic at this layer.
 """
-print(f"file: {__file__} | name: {__name__} | package: {__package__}")
+#print(f"file: {__file__} | name: {__name__} | package: {__package__}")
 
 import os
 import sys
 import pprint
 import subprocess
 import glob
+import time
 import logging
 import traceback
 
@@ -185,8 +186,14 @@ def forecast_run(cluster: Cluster, job: Job):
         raise signals.FAIL()
 
     try:
-        result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS], \
-                                stderr=subprocess.STDOUT)
+
+        if OFS == "adnoc":
+            time.sleep(60)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
+                                    stderr=subprocess.STDOUT)
+        else:
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS], \
+                                    stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
