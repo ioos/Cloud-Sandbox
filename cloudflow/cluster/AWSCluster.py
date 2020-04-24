@@ -206,6 +206,7 @@ class AWSCluster(Cluster):
     def getCoresPN(self):
         return self.PPN
 
+
     def start(self):
         ec2 = boto3.resource('ec2', region_name=self.region)
 

@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>AWSCluster module &mdash; CloudFlow 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cluster module" href="Cluster.html" />
+    <link rel="prev" title="cluster" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> CloudFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../settingup.html">Setting up CloudFlows</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">cluster</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AWSCluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Cluster.html">Cluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ClusterFactory.html">ClusterFactory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LocalCluster.html">LocalCluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nodeInfo.html">nodeInfo module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../job/modules.html">job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting/modules.html">plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/modules.html">services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils/modules.html">utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflows/modules.html">workflows</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CloudFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">cluster</a> &raquo;</li>
+        
+      <li>AWSCluster module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/cluster/AWSCluster.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-AWSCluster">
+<span id="awscluster-module"></span><h1>AWSCluster module<a class="headerlink" href="#module-AWSCluster" title="Permalink to this headline">¶</a></h1>
+<p>Cluster implementation for AWS EC2 clusters.</p>
+<dl class="py class">
+<dt id="AWSCluster.AWSCluster">
+<em class="property">class </em><code class="sig-prename descclassname">AWSCluster.</code><code class="sig-name descname">AWSCluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.cluster.Cluster.Cluster</span></code></p>
+<p>Implementation of the Cluster interface for AWS</p>
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.platform">
+<code class="sig-name descname">platform</code><a class="headerlink" href="#AWSCluster.AWSCluster.platform" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will always be ‘AWS’ for this implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.nodeType">
+<code class="sig-name descname">nodeType</code><a class="headerlink" href="#AWSCluster.AWSCluster.nodeType" title="Permalink to this definition">¶</a></dt>
+<dd><p>EC2 instance type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.nodeCount">
+<code class="sig-name descname">nodeCount</code><a class="headerlink" href="#AWSCluster.AWSCluster.nodeCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of instances in this cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.NPROCS">
+<code class="sig-name descname">NPROCS</code><a class="headerlink" href="#AWSCluster.AWSCluster.NPROCS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total number of processors in this cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.PPN">
+<code class="sig-name descname">PPN</code><a class="headerlink" href="#AWSCluster.AWSCluster.PPN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of processors (physical cores) per node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.tags">
+<code class="sig-name descname">tags</code><a class="headerlink" href="#AWSCluster.AWSCluster.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specific tags to attach to the resources provisioned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dictionary/s of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.image_id">
+<code class="sig-name descname">image_id</code><a class="headerlink" href="#AWSCluster.AWSCluster.image_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>AWS EC2 AMI - Amazon Machine Image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.key_name">
+<code class="sig-name descname">key_name</code><a class="headerlink" href="#AWSCluster.AWSCluster.key_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private key used for SSH access to the instance. This should be configured when creating the AMI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.sg_ids">
+<code class="sig-name descname">sg_ids</code><a class="headerlink" href="#AWSCluster.AWSCluster.sg_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Security group ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list: str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.subnet_id">
+<code class="sig-name descname">subnet_id</code><a class="headerlink" href="#AWSCluster.AWSCluster.subnet_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>VPC subnet ID to run in</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.placement_group">
+<code class="sig-name descname">placement_group</code><a class="headerlink" href="#AWSCluster.AWSCluster.placement_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cluster placement group to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.AWSCluster">
+<code class="sig-name descname">AWSCluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.AWSCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor. Returns a new AWSCluster object initialized with the settings in <cite>configfile</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getCoresPN">
+<code class="sig-name descname">getCoresPN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getCoresPN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of cores per node in this cluster. Assumes a heterogenous cluster.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getState">
+<code class="sig-name descname">getState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the cluster state. Not currently used.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.setState">
+<code class="sig-name descname">setState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.setState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the cluster state. Not currently used.</p>
+<p>TODO: Can use a class property instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.readConfig">
+<code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.readConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a JSON configuration file <cite>configfile</cite> into a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the cluster. This will provision the configured cluster in the cloud.
+Returns a list of AWS Instances. See boto3 documentation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.terminate">
+<code class="sig-name descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminate the cluster. Terminate the EC2 instances in this cluster.
+Returns a list of AWS Results. See boto3 documentation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getHosts">
+<code class="sig-name descname">getHosts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHosts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of hosts in this cluster</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">getHostsCSV() :</code></dt>
+<dd><p>Get a comma separated list of hosts in this cluster</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<code class="sig-name descname">getCoresPN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<code class="sig-name descname">getHosts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getHostsCSV">
+<code class="sig-name descname">getHostsCSV</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHostsCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="id2">
+<code class="sig-name descname">getState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.parseConfig">
+<code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.parseConfig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a JSON configuration file <cite>configfile</cite> into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configfile</strong> (<em>string</em>) – Should be a full path and filename of a JSON configuration file for this cluster.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cfDict</strong> – Dictionary containing this cluster parameterized settings.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<code class="sig-name descname">setState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="id5">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="id6">
+<code class="sig-name descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Cluster.html" class="btn btn-neutral float-right" title="Cluster module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="cluster" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Patrick Tripp
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

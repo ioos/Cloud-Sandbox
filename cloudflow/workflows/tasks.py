@@ -1,6 +1,6 @@
 """
 
-Module of Prefect @task annotated functions for use in cloud based numerical 
+Module of Prefect task annotated functions for use in cloud based numerical 
 weather modelling workflows. These tasks are basically wrappers around other
 functions. Prefect forces some design choices.
 
