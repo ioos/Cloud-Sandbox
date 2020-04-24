@@ -64,11 +64,12 @@ def main():
     for jobfile in joblist:
         jobdict = util.readConfig(jobfile)
         jobtype = jobdict["JOBTYPE"]
+        OFS = jobdict["OFS"]
+
         print('JOBTYPE: ', jobtype)
 
         # Add the forecast flow
         if re.search("forecast", jobtype):
-            OFS = jobdict["OFS"]
             fcstdict = util.readConfig(fcstconf)
             nodetype = fcstdict["nodeType"]
             nodecnt = fcstdict["nodeCount"]
