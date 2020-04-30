@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" A driver to run workflows from provided job configuration files """
 import collections
 import os
 import sys

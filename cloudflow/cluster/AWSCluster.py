@@ -1,8 +1,7 @@
 """
-
 Cluster implementation for AWS EC2 clusters.
-
 """
+
 import time
 import json
 import logging
@@ -35,76 +34,47 @@ class AWSCluster(Cluster):
     Attributes
     ----------
     platform  : str
-      This will always be 'AWS' for this implementation.
+        The cloud provider. This will always be 'AWS' for this implementation.
 
     nodeType  : str
-      EC2 instance type.
+        EC2 instance type.
 
     nodeCount : int
-      Number of instances in this cluster.
+        Number of instances in this cluster.
 
     NPROCS    : int
-      Total number of processors in this cluster.
+        Total number of processors in this cluster.
 
     PPN       : int
-      Number of processors (physical cores) per node.
+        Number of processors (physical cores) per node.
 
     tags      : list of dictionary/s of str
-      Specific tags to attach to the resources provisioned.
+        Specific tags to attach to the resources provisioned.
 
     image_id  : str
-      AWS EC2 AMI - Amazon Machine Image
+        AWS EC2 AMI - Amazon Machine Image
 
     key_name  : str
-      Private key used for SSH access to the instance. This should be configured when creating the AMI.
+         Private key used for SSH access to the instance. This should be configured when creating the AMI.
 
-    sg_ids    : list: str
-      Security group ids
+    sg_ids    : list of str
+        Security group ids
 
     subnet_id : str
-      VPC subnet ID to run in
+        VPC subnet ID to run in
 
     placement_group : str
-      The cluster placement group to use.
+        The cluster placement group to use.
 
-    Methods
-    -------
+    daskscheduler : Popen
+        a reference to the Dask scheduler process started on the cluster
 
-    AWSCluster(configfile : str)
-      Constructor. Returns a new AWSCluster object initialized with the settings in `configfile`.
-
-    getCoresPN()
-      Returns the number of cores per node in this cluster. Assumes a heterogenous cluster.
-
-    getState()
-      Returns the cluster state. Not currently used.
-
-    setState(state: str)
-      Set the cluster state. Not currently used.
-
-      TODO: Can use a class property instead.
-
-    readConfig(configfile : str)
-      Reads a JSON configuration file `configfile` into a dictionary.
-
-    start()
-      Start the cluster. This will provision the configured cluster in the cloud.
-      Returns a list of AWS Instances. See boto3 documentation.
-
-    terminate()
-      Terminate the cluster. Terminate the EC2 instances in this cluster.
-      Returns a list of AWS Results. See boto3 documentation.
-
-    getHosts()
-      Get the list of hosts in this cluster
-
-    getHostsCSV() :
-      Get a comma separated list of hosts in this cluster
-
+    daskworker : Popen
+        a reference to the Dask worker process started on the cluster
     """
 
     def __init__(self, configfile):
-        """ The config file contains the required parameters in JSON
+        """ Constructor
 
         Parameters
         ----------
@@ -113,7 +83,8 @@ class AWSCluster(Cluster):
 
         Returns
         -------
-        An initialized instance of AWSCluster
+        AWSCluster
+            An initialized instance of this class.
         """
 
         self.platform = 'AWS'
@@ -143,28 +114,25 @@ class AWSCluster(Cluster):
 
         log.info(f"nodeCount: {self.nodeCount}  PPN: {self.PPN}")
 
-    ''' 
-    Function  Definitions
-    =====================
-    '''
 
     def getState(self):
+        """ Returns the cluster state. Not currently used. """
         return self.__state
 
     def setState(self, state):
+        """ Set the cluster state. Not currently used."""
         self.__state = state
         return self.__state
 
     ########################################################################
 
     def readConfig(self, configfile):
-        """
-        Reads a JSON configuration file `configfile` into a dictionary.
+        """ Reads a JSON configuration file into a dictionary.
 
         Parameters
         ----------
-        configfile : string
-          Should be a full path and filename of a JSON configuration file for this cluster.
+        configfile : str
+          Full path and filename of a JSON configuration file for this cluster.
 
         Returns
         -------
@@ -185,7 +153,14 @@ class AWSCluster(Cluster):
     ########################################################################
 
     def parseConfig(self, cfDict):
+        """ Parses the configuration dictionary to class attributes
 
+        Parameters
+        ----------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings.
+
+        """
         self.platform = cfDict['platform']
         self.region = cfDict['region']
         self.nodeType = cfDict['nodeType']
@@ -204,10 +179,24 @@ class AWSCluster(Cluster):
     """ Implemented abstract methods """
 
     def getCoresPN(self):
+        """ Get the number of cores per node in this cluster.
+
+        Returns
+        -------
+        self.PPN : int
+            the number of cores per node in this cluster. Assumes a heterogenous cluster. """
+
         return self.PPN
 
 
     def start(self):
+        """ Provision the configured cluster in the cloud.
+
+        Returns
+        -------
+        self.__instances : list of EC2.Intance
+            the list of Instances started. See boto3 documentation.
+        """
         ec2 = boto3.resource('ec2', region_name=self.region)
 
         try:
@@ -246,7 +235,7 @@ class AWSCluster(Cluster):
                 InstanceIds=[instance.instance_id],
                 WaiterConfig={
                     'Delay': 10,
-                    'MaxAttempts': 6 
+                    'MaxAttempts': 6
                 }
             )
 
@@ -273,7 +262,14 @@ class AWSCluster(Cluster):
 
 
     def terminate(self):
+        """ Shutdown and remove the EC2 Instances in this cluster.
+            Also terminates any associated Dask Worker and Scheduler processes.
 
+        Returns
+        -------
+        responses : list of dict
+            a list of the responses from EC2.Instance.terminate(). See boto3 documentation.
+        """
         self.terminateDaskWorker()
 
         # Terminate any running dask scheduler
@@ -291,14 +287,31 @@ class AWSCluster(Cluster):
 
         return responses
 
+
     def getHosts(self):
+        """ Get the list of hosts in this cluster
+
+        Returns
+        -------
+        hosts : list of str
+            list of private dns names
+        """
         hosts = []
 
         for instance in self.__instances:
             hosts.append(instance.private_dns_name)
         return hosts
 
+
     def getHostsCSV(self):
+        """ Get a comma separated list of hosts in this cluster
+
+        Returns
+        -------
+        hosts : str
+            a comma separated list of private dns names
+        """
+
         hosts = ''
 
         instcnt = len(self.__instances)
@@ -313,26 +326,25 @@ class AWSCluster(Cluster):
                 hosts += hostname + ','
         return hosts
 
-    ########################################################################
 
 
-    ########################################################################
-    # This is a bit of a hack to satisfy AWS
     def __placementGroup(self):
+        """ This is a bit of a hack to satisfy AWS. Only c5 and c5n type of instances support placement group """
+
         group = {}
         if self.nodeType.startswith('c5'):
             group = {'GroupName': self.placement_group}
 
         return group
 
-    ########################################################################
 
     ########################################################################
-    # Specify an efa enabled network interface if supported by node type
-    # Also attaches security groups
+
     #
-    # TODO: refactor Groups
+
     def __netInterface(self):
+        """ Specify an efa enabled network interface if supported by node type.
+            Also attaches security groups """
 
         interface = {
             'AssociatePublicIpAddress': True,

@@ -12,85 +12,121 @@ __email__ = "patrick.tripp@rpsgroup.com"
 class Cluster(ABC):
     """Abstract base class for cloud clusters. It defines a generic interface to implement
 
-    Attributes:
-        daskscheduler (Popen): a reference to the Dask scheduler process started on the cluster
-        daskworker    (Popen): a reference to the Dask worker process started on the cluster
+    Attributes
+    ----------
+    daskscheduler : Popen
+        a reference to the Dask scheduler process started on the cluster
 
-    Methods:
-        setDaskScheduler(proc: Popen)
-          Save the Popen process for dask-scheduler
+    daskworker : Popen
+        a reference to the Dask worker process started on the cluster
 
-        terminateDaskScheduler()
-          Cleanup/kill the dask-scheduler process
+    configfile : str
+        A JSON configuration file containing the required parameters for this class.
 
-        setDaskWorker(proc: Popen)
-          Save the Popen process for dask-worker
+    platform  : str
+        The type of platform or provider
 
-        terminateDaskWorker()
-          Cleanup/kill the dask-worker process
+    Methods
+    -------
+    terminateDaskScheduler()
+      Cleanup/kill the dask-scheduler process
 
-    Abstract Methods:
+    setDaskWorker(proc: Popen)
+      Save the Popen process for dask-worker
 
-        getCoresPN()
-          Get the number of cores per node in this cluster. Assumes a heterogenous cluster.
+    terminateDaskWorker()
+      Cleanup/kill the dask-worker process
 
-        getState()
-          Get the cluster state.
+    Abstract Methods
+    ----------------
+    getCoresPN()
+      Get the number of cores per node in this cluster. Assumes a heterogenous cluster.
 
-        setState()
-          Set the cluster state.
-          TODO: Can use a class property instead.
+    getState()
+      Get the cluster state.
 
-        readConfig()
-          Read the cluster configuration.
+    setState()
+      Set the cluster state.
 
-        parseConfig()
-          Parse the cluster configuration. This might contain parameters that are required by
-          specific cloud providers.
+    readConfig()
+      Read the cluster configuration.
 
-        start()
-          Start the cluster.
+    parseConfig()
+      Parse the cluster configuration. This might contain parameters that are required by
+      specific cloud providers.
 
-        terminate()
-          Terminate the cluster.
+    start()
+      Start the cluster.
 
-        getHosts()
-          Get the list of hosts in this cluster
+    terminate()
+      Terminate the cluster.
 
-        getHostsCSV() :
-          Get a comma separated list of hosts in this cluster
+    getHosts()
+      Get the list of hosts in this cluster
+
+    getHostsCSV() :
+      Get a comma separated list of hosts in this cluster
 
     """
 
     # TODO: Put Dask stuff in its own class
     def __init__(self):
-        """Constructor method
-        """
+        """ Constructor """
+
         self.daskscheduler = None
         self.daskworker = None
 
         self.configfile = None
         self.platform = None
 
+
     def setDaskScheduler(self, proc: Popen):
-        """"""
+        """ Save the Popen process for dask-scheduler
+
+        Parameters
+        ----------
+        proc: Popen
+            The dask-scheduler process
+
+        Returns
+        -------
+        proc : Popen
+            The dask-scheduler process
+        """
+
         self.daskscheduler = proc
         return proc
 
+
     def terminateDaskScheduler(self):
-        """ If process hasn't terminated yet, terminate it. """
+        """ Kills the dask-scheduler process if it hasn't terminated yet. """
         if self.daskscheduler is not None:
             poll = self.daskscheduler.poll()
             if poll is None:
                 self.daskscheduler.kill()
         return
 
+
     def setDaskWorker(self, proc: Popen):
+        """ Save the Popen process for dask-worker
+
+        Parameters
+        ----------
+        proc: Popen
+            The dask-worker process
+
+        Returns
+        -------
+        proc : Popen
+            The dask-worker process
+        """
+
         self.daskworker = proc
         return proc
 
+
     def terminateDaskWorker(self):
-        """ If process hasn't terminated yet, terminate it. """
+        """ Kills the dask-worker process if it hasn't terminated yet. """
         if self.daskworker is not None:
             poll = self.daskworker.poll()
 
@@ -120,7 +156,7 @@ class Cluster(ABC):
         pass
 
     @abstractmethod
-    def parseConfig(self):
+    def parseConfig(self, cfDict : dict):
         pass
 
     @abstractmethod
@@ -131,13 +167,9 @@ class Cluster(ABC):
     def terminate(self):
         pass
 
-    ''' get the list of hostnames or IPs in this cluster  '''
-
     @abstractmethod
     def getHosts(self):
         pass
-
-    ''' get a comma separated list of hosts in this cluster '''
 
     @abstractmethod
     def getHostsCSV(self):

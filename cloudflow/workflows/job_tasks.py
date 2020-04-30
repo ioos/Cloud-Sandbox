@@ -1,4 +1,5 @@
 """
+Collection of Job related functions wrapped as Prefect Tasks
 """
 # Python dependencies
 import logging
@@ -6,7 +7,6 @@ import subprocess
 import sys
 import os
 import glob
-import traceback
 
 from distributed import Client
 from prefect.engine import signals
@@ -18,8 +18,6 @@ if os.path.abspath('..') not in sys.path:
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from cloudflow.job.Job import Job
-
-#from plotting import plot_roms
 from plotting import plot_roms
 
 from plotting import plot_fvcom
@@ -36,6 +34,21 @@ log.setLevel(logging.DEBUG)
 # generic, should be job
 @task
 def ncfiles_glob(SOURCE, filespec: str = "*.nc"):
+    """ Provides a list of files that match the parameters
+
+    Parameters
+    ----------
+    SOURCE : str
+        A pathname to the files
+
+    filespec : str
+        A regular expression of the files to include
+
+    Returns
+    -------
+    FILES : list of str
+        A list of files located at SOURCE that match the filespec
+    """
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     for f in FILES:
         log.info('found the following files:')
@@ -43,32 +56,62 @@ def ncfiles_glob(SOURCE, filespec: str = "*.nc"):
     return FILES
 
 
-#####################################################################
-
 
 # job
 @task
 def ncfiles_from_Job(job: Job):
+    """ Provides a list of files that match the parameters provided by the Job object
+
+    Parameters
+    ----------
+    job : Job
+        The Job object. Must contain SOURCE and filespec attributes.
+
+    Returns
+    -------
+    FILES : list of str
+        A list of files located at SOURCE that match the filespec
+    """
     SOURCE = job.INDIR
     filespec = job.FSPEC
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES
 
 
-#####################################################################
 
 
 @task
 def baseline_from_Job(job: Job):
+    """ Provides a list of the verification files that match the parameters provided by the Job object
+
+    Parameters
+    ----------
+    job : Job
+        The Job object. Must contain SOURCE and filespec attributes.
+
+    Returns
+    -------
+    FILES : list of str
+        A list of files located at SOURCE that match the filespec
+    """
+
     SOURCE = job.VERIFDIR
     filespec = job.FSPEC
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES
 
+
 @task
 def get_baseline(job: Job, sshuser=None):
     """ Retrieve operational forecast files for comparison to quasi-operational forecasts
-        job - Job object 
+
+    Parameters
+    ----------
+    job : Job
+        The Job object.
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
     cdate = job.CDATE
@@ -76,7 +119,6 @@ def get_baseline(job: Job, sshuser=None):
     vdir = job.VERIFDIR
     hh = job.HH
 
-   
     if ofs == 'liveocean':
         try:
             util.get_baseline_lo(cdate, vdir, sshuser)
@@ -92,13 +134,22 @@ def get_baseline(job: Job, sshuser=None):
             raise signals.FAIL()
     else:
         log.exception(f'{ofs} is not supported')
-        raise signals.FAIL() 
+        raise signals.FAIL()
     return
 
 
 @task
 def get_forcing(job: Job, sshuser=None):
-    """ job - Job object """
+    """ Retrieve operational moddel forcing data and initial conditions
+
+    Parameters
+    ----------
+    job : Job
+        The Job object.
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server. Required for LiveOcean.
+    """
 
     # Open and parse jobconfig file
     # "OFS"       : "liveocean",
@@ -145,12 +196,23 @@ def get_forcing(job: Job, sshuser=None):
     return
 
 
-#######################################################################
-
 
 # job, dask
 @task
 def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
+    """ Create mpegs from plots
+
+    Parameters
+    ----------
+    client : distributed.Client
+        The Dask Client to use for running the job
+
+    job : Job
+
+    diff : bool
+        True - create mpegs from the difference plots
+        False - create mpegs from the forecast plots
+    """
     log.info(f"In daskmake_mpegs")
 
     # TODO: make the filespec a function parameter
@@ -187,12 +249,22 @@ def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     return
 
 
-#######################################################################
-
 
 # job, dask
 @task
 def daskmake_plots(client: Client, FILES: list, job: Job):
+    """ Create plots using a Dask distributed Client
+
+    Parameters
+    ----------
+    client : distributed.Client
+        The Dask Client to use for running the job
+
+    FILES : list of str
+        The source input files.
+
+    job : Job
+    """
     target = job.OUTDIR
 
     log.info(f"In daskmake_plots {FILES}")
@@ -204,7 +276,7 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
     idx = 0
     futures = []
 
-    plot_function : callable 
+    plot_function : callable
 
     if job.OFS in util.roms_models:
       plot_function = plot_roms.plot
@@ -238,14 +310,27 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
     # print("Results:", results)
 
     return
-#####################################################################
 
 
 
 @task
 def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: Job):
-    ''' Create plots of baseline - experiment '''
-    
+    """ Create difference plots using a Dask distributed Client
+
+    Parameters
+    ----------
+    client : distributed.Client
+        The Dask Client to use for running the job
+
+    EXPERIMENT : list of str
+        The local forecast output files.
+
+    BASELINE : list of str
+        The list of operational verification forecast output files.
+
+    job : Job
+    """
+
     target = job.OUTDIR
 
     log.info(f"In daskmake_diff_plots {EXPERIMENT}")
@@ -273,7 +358,7 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
 
     if baselen != explen:
         log.error(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
-        raise signals.FAIL() 
+        raise signals.FAIL()
 
     lastbase = BASELINE[baselen-1]
     lastexp = EXPERIMENT[explen-1]
@@ -288,7 +373,7 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
         while idx < explen:
             expfile  = EXPERIMENT[idx]
             basefile = BASELINE[idx]
-    
+
             log.info(f"plotting diff for {expfile} {basefile} var: {varname}")
             future = client.submit(plot_module.plot_diff, basefile, expfile, target, varname, vmin=vmin, vmax=vmax)
             futures.append(future)
@@ -300,5 +385,5 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
         result = future.result()
         #log.info(result)
     return
-#####################################################################
+
 

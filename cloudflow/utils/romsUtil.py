@@ -1,3 +1,6 @@
+""" Various routines, not just for ROMS models anymore.
+TODO: Rename this module.
+"""
 import datetime
 import json
 import math
@@ -14,12 +17,12 @@ debug = False
 roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
 fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
 
-nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs", 
+nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
                   "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
 
 def scrub_liveocean():
-    ''' scrubs the disk - removes forcings/ICs and forecast data
-        older than x days '''
+    """ scrubs the disk - removes forcings/ICs and forecast data
+        older than x days """
 
     # This is done in a shell script called by cron
 
@@ -38,7 +41,7 @@ def scrub_liveocean():
 
 
 def readConfig(configfile):
-    ''' converts a JSON document to a python dictionary '''
+    """ converts a JSON document to a python dictionary """
 
     if debug: print(f"DEBUG: in romsUtil : configfile is: {configfile}")
 
@@ -56,6 +59,7 @@ def readConfig(configfile):
 
 
 def sedoceanin(template, outfile, settings):
+    """ substitues the templated fields with specified settings, like sed """
     with open(template, 'r') as infile:
         lines = infile.readlines()
 
@@ -76,6 +80,8 @@ def sedoceanin(template, outfile, settings):
 
 
 def makeOceanin(NPROCS, settings, template, outfile, ratio=1.0):
+    """ creates the ocean.in file for ROMS forecasts using templated variables """
+
     tiles = getTiling(NPROCS, ratio)
 
     reptiles = {
@@ -92,6 +98,9 @@ def makeOceanin(NPROCS, settings, template, outfile, ratio=1.0):
 
 
 def ndays(cdate1, cdate2):
+    """ Calculate the number of days between two dates
+
+    """
     dt = datetime.timedelta(days=0)
 
     y1 = int(cdate1[0:4])
@@ -139,7 +148,7 @@ def ndays(cdate1, cdate2):
 
 
 def ndate_hrs(cdate :str, hours :int):
-    ''' return the YYYYMMDD for CDATE +/- hours '''
+    """ return the YYYYMMDD for CDATE +/- hours """
 
     y1 = int(cdate[0:4])
     m1 = int(cdate[4:6].lstrip("0"))
@@ -163,7 +172,7 @@ def ndate_hrs(cdate :str, hours :int):
 
 
 def ndate(cdate, days):
-    ''' return the YYYYMMDD for CDATE +/- days '''
+    """ return the YYYYMMDD for CDATE +/- days """
 
     y1 = int(cdate[0:4])
     m1 = int(cdate[4:6].lstrip("0"))
@@ -180,7 +189,7 @@ def ndate(cdate, days):
 
 
 def lo_date(cdate):
-    ''' return the LiveOcean format of date e.g. f2019.11.06'''
+    """ return the LiveOcean format of date e.g. f2019.11.06"""
 
     fdate = f"f{cdate[0:4]}.{cdate[4:6]}.{cdate[6:8]}"
 
@@ -191,16 +200,24 @@ def lo_date(cdate):
 
 
 def getTiling(totalCores, ratio=1.0):
-    ''' Algorithm
+    """ Determines the ROMS tiling to use based on the number of cores available.
+    Sets NtileI and NtileJ
 
-      prefer a square or closest to it
+    Parameters
+    ----------
+    totalCores : int
+        The number of cores to use
 
-      It might be more optimal to have a ratio similar to the grid ratio
+    ratio : float
+        The approximate aspect ratio of the model grid, I/J
 
-      if sqrt of total is an integer then use it for I and J
-      if not find factorization closest to square
+    Notes
+    -----
+    prefer a square or closest to it
+    if sqrt of total is an integer then use it for I and J
+    if not find factorization closest to square
 
-      examples:
+    examples:
 
         assert must be even, there are no even primes > 2
         36 = sqrt(36) = ceil(6)  36 mod 6 = 0 - DONE
@@ -208,8 +225,11 @@ def getTiling(totalCores, ratio=1.0):
         32 = sqrt(32) = 5.65 32 mod 6 != 0
                                 mod 5 != 0
                                 mod 4 == 0
-                              32 / 4 = 8 DONE NtileI=8, NtileJ=4
-    '''
+                                32 / 4 = 8 DONE NtileI=8, NtileJ=4
+
+    It might be more optimal to have a ratio similar to the grid ratio. This is an optional setting
+
+    """
 
     NtileI = 1
     NtileJ = 1
@@ -266,6 +286,7 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
     return
 
 def get_baseline_lo(cdate, vdir, sshuser):
+    """ Retrieve operational LiveOcean forecast data from UW """
 
     remotepath = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
     fdate = lo_date(cdate)
@@ -286,11 +307,11 @@ def get_baseline_lo(cdate, vdir, sshuser):
     return
 
 def get_ICs_lo(cdate, localpath, sshuser):
-    ''' Get the atmospheric forcing and boundary layer conditions and ICs
+    """ Get the atmospheric forcing and boundary layer conditions and ICs
         for LiveOcean ROMS model.
 
         This requires an account on the remote server with private key authentication.
-    '''
+    """
 
     # TODO: Parameterize this
     restart_file = "ocean_his_0025.nc"

@@ -5,9 +5,21 @@ __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
 class StorageService(ABC):
-    ''' This is an abstract base class for cloud storage.
+    """ Abstract base class for cloud storage.
         It defines a generic interface to implement
-    '''
+
+    Abstract Methods
+    ----------------
+    uploadFile
+        Upload a file
+
+    downloadFile
+        Download a file
+
+    file_exists
+        Test if a file exists
+
+    """
 
     def __init__(self):
         print('init stub')

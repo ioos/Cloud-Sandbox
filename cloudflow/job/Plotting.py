@@ -17,8 +17,60 @@ debug = True
 
 
 class Plotting(Job):
+    """ Implementation of Job class for plotting jobs
+
+    Attributes
+    ----------
+    configfile : str
+        A JSON configuration file containing the required parameters for this class.
+
+    jobtype : str
+        The specific type of plotting job.
+
+    NPROCS : int
+        Total number of processors in this cluster.
+
+    OFS : str
+        The ocean forecast to run.
+
+    CDATE : str
+        The forecast date in format YYYYMMDD
+
+    HH : string
+        The forecast cycle in format HH
+
+    BUCKET : str
+        The cloud bucket name for saving results
+
+    BCKTFLDR : str
+        The cloud folder name for saving results
+
+    INDIR : str
+        The full path to the input folder, usually the same as the OUTDIR for the forecast job
+
+    OUTDIR : str
+        The full path to the output folder
+
+    VARS : list of str
+        The forecast fields to plot
+
+    FSPEC : list
+        The regular expression of the filename specifier for list of input files
+
+    VERIFDIR : str
+        The full path to the location of the verification dataset
+    """
 
     def __init__(self, configfile, NPROCS):
+        """ Constructor
+
+        Parameters
+        ----------
+        configfile : str
+
+        NPROCS : int
+            The number of processors to run the job on
+        """
 
         self.configfile = configfile
         self.NPROCS = NPROCS
@@ -37,9 +89,15 @@ class Plotting(Job):
 
         self.parseConfig(cfDict)
 
-    ########################################################################
 
     def parseConfig(self, cfDict):
+        """ Parses the configuration dictionary to class attributes
+
+        Parameters
+        ----------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings.
+        """
 
         self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
@@ -80,15 +138,15 @@ class Plotting(Job):
                 self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":
                 self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}"
-            if self.VERIFDIR == "auto": 
+            if self.VERIFDIR == "auto":
                 self.VERIFDIR = f"/com/nos-noaa/{self.OFS}.{self.CDATE}"
 
         elif self.OFS == "adnoc":
             if self.INDIR == "auto":
                 self.INDIR = f"/com/adnoc/{self.OFS}.{self.CDATE}"
             if self.OUTDIR == "auto":
-                self.OUTDIR = f"/com/adnoc/plots/{self.OFS}.{self.CDATE}" 
-            if self.VERIFDIR == "auto": 
+                self.OUTDIR = f"/com/adnoc/plots/{self.OFS}.{self.CDATE}"
+            if self.VERIFDIR == "auto":
                 self.VERIFDIR = f"/com/adnoc-baseline/{self.OFS}.{self.CDATE}"
 
         else:
@@ -96,7 +154,6 @@ class Plotting(Job):
 
 
         return
-    ########################################################################
 
 
 if __name__ == '__main__':

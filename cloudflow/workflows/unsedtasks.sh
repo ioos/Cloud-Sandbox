@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Python autodoc does not work with annotated @task functions. Temporarily remove those annotations before
+# generating the documentation.
 flist='
 cluster_tasks.py
 job_tasks.py

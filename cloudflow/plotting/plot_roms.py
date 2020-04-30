@@ -1,14 +1,13 @@
-import glob
+""" Plotting routines for ROMS forecasts """
+
 import os
 import sys
-import traceback
-import subprocess
 
-import pyproj
-import netCDF4
 import PIL.Image
-import numpy as np
 import matplotlib.pyplot as plt
+import netCDF4
+import numpy as np
+import pyproj
 
 # This is a fix for matplotlib OSX thread issue
 plt.switch_backend('Agg')
@@ -39,8 +38,8 @@ def make_png(varnames, files, target):
 
 
 def get_vmin_vmax(ncfile1_base: str, ncfile1_exp: str, varname: str) -> float:
-    ''' use this to set the vmin and vmax for a series of diff plots with uniform scales 
-        use a pair of files that are late in the sequence '''
+    """ use this to set the vmin and vmax for a series of diff plots with uniform scales
+        use a pair of files that are late in the sequence """
 
     vmin=-1.0
     vmax=1.0
@@ -87,10 +86,10 @@ def extract_ncdata(ncfile: str, varname: str):
 
     return dvar
 
-   
+
 # ROMS
 def get_projection(ncfile: str):
-    ''' returns mask_rho and lat lon from netcdf file '''
+    """ returns mask_rho and lat lon from netcdf file """
 
     with netCDF4.Dataset(ncfile) as nc:
 
@@ -100,15 +99,14 @@ def get_projection(ncfile: str):
         lo, la = EPSG3857(lon, lat)       # project EPSG:4326 to EPSG:3857 (web mercator)
 
         msk = nc.variables['mask_rho'][:]
-    
+
     # return msk and lat lon
     return msk, lo, la
 
 
 # ROMS
-def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str, 
+def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str,
               crop: bool=True, zoom: int=8, diff: bool=False, vmin: float=-1.0, vmax: float=1.0):
-    ''''''
 
     plt.rcParams.update({'font.size': 3})
 
@@ -169,7 +167,7 @@ def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str,
     #ax.tick_params(axis='both', which='minor', labelsize=12)
 
     #set_aspect
-    
+
     ax.set_clip_on(True)
     ax.set_frame_on(False)
 
@@ -188,7 +186,7 @@ def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str,
     #cb = fig.colorbar(pcolor, ax=ax, ticks=[vmin, vmin/2, 0, vmax/2, vmax], location='bottom',shrink=0.9, extend='both')
     cb = fig.colorbar(pcolor, ax=ax, ticks=[vmin, 0, vmax], location='bottom',shrink=0.7, extend='neither')
     #cb = fig.colorbar(pcolor, ax=ax, location='bottom')
-    
+
 
     # set colorbar tick color
     #cb.ax.yaxis.set_tick_params(color=fg_color)
@@ -196,7 +194,7 @@ def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str,
     cb.ax.tick_params(axis='both', which='major', labelsize=3)
     cb.ax.tick_params(axis='both', which='minor', labelsize=3)
 
-    # set colorbar edgecolor 
+    # set colorbar edgecolor
     #cb.outline.set_edgecolor(fg_color)
 
     # set colorbar ticklabels
@@ -225,7 +223,7 @@ def plot_data(data, msk, lo, la, varname: str, outfile: str, colormap: str,
 # ROMS
 def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int = 8):
 
-    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
+    """ given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable """
 
     mask, lo, la = get_projection(ncfile)
 
@@ -240,9 +238,9 @@ def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int =
 
 
 # ROMS
-def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str, 
+def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str,
               vmin: float=-1.0, vmax: float=1.0, crop: bool=False, zoom: int=8):
-    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
+    """ given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable """
 
 
     if debug:

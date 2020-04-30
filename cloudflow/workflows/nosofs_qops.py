@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-print(f"file: {__file__} | name: {__name__} | package: {__package__}")
-
+""" Driver for quasi-operational workflows """
 import collections
-import os
-import sys
-import re
 import logging
+import os
+import re
+import sys
 import time
-
-from signal import signal, SIGINT
 from pathlib import Path
+from signal import signal
 
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))

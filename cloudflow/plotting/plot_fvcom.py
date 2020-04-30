@@ -1,14 +1,13 @@
-import glob
+""" Plotting routines for FVCOM forecasts """
 import os
 import sys
 import traceback
-import subprocess
 
-import pyproj
-import netCDF4
 import PIL.Image
-import numpy as np
 import matplotlib.pyplot as plt
+import netCDF4
+import numpy as np
+import pyproj
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -29,6 +28,19 @@ TILE3857 = tile.Tile3857()
 debug = False
 
 def make_png(varnames, files, target):
+    """
+
+    Parameters
+    ----------
+    varnames : list of str
+        List of variables to plot
+
+    files : list of str
+        List of files to create plots from
+
+    target : str
+        Output directory for plots
+    """
     for v in varnames:
         for f in  files:
             if not os.path.exists(target):
@@ -39,8 +51,8 @@ def make_png(varnames, files, target):
 
 
 def get_vmin_vmax(ncfile1_base: str, ncfile1_exp: str, varname: str) -> float:
-    ''' use this to set the vmin and vmax for a series of diff plots with uniform scales 
-        use a pair of files that are late in the sequence '''
+    """ use this to set the vmin and vmax for a series of diff plots with uniform scales
+        use a pair of files that are late in the sequence """
 
     print(f"DEBUG: in get_vmin_vmax: {ncfile1_base} {ncfile1_exp} {varname}")
 
@@ -58,7 +70,7 @@ def get_vmin_vmax(ncfile1_base: str, ncfile1_exp: str, varname: str) -> float:
     return vmin, vmax
 
 
-# FVCOM 
+# FVCOM
 def extract_ncdata(ncfile: str, varname: str):
 
     #for t in range(0, 1): # range of times to plot (time indices in file)
@@ -94,11 +106,11 @@ def extract_ncdata(ncfile: str, varname: str):
 
 # FVCOM
 def get_projection(ncfile: str):
-    ''' returns lo,la,loc,lac '''
+    """ returns lo,la,loc,lac """
 
 
     with netCDF4.Dataset(ncfile) as nc:
-        
+
         nv = nc.variables['nv'][:].T
         nv = nv - 1
 
@@ -125,7 +137,7 @@ def get_projection(ncfile: str):
 
 
 # FVCOM
-def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: str, 
+def plot_data(data, lo, la, loc, lac, nv, varname: str, outfile: str, colormap: str,
               crop: bool=True, zoom: int=8, diff: bool=False, vmin: float=-1.0, vmax: float=1.0):
 
     plt.rcParams.update({'font.size': 3})
@@ -240,7 +252,7 @@ def plot(ncfile: str, target: str, varname: str, crop: bool = False, zoom: int =
 # FVCOM
 def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str,
               vmin: float=-1.0, vmax: float=1.0, crop: bool=False, zoom: int=8):
-    ''' given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable '''
+    """ given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable """
 
     if debug:
         print(f"file1: {ncfile1}")
@@ -272,7 +284,7 @@ if __name__ == '__main__':
     #var = 'h'
     #ncfile = '/com/nos/leofs.20200309/nos.leofs.fields.f001.20200309.t00z.nc'
     #target = '/com/nos/plots/leofs.20200309'
-  
+
     ncfile='/com/nos/negofs.20200312/nos.negofs.fields.f048.20200312.t03z.nc'
     ncfile_noaa='/com/nos-noaa/negofs.20200312/nos.negofs.fields.f048.20200312.t03z.nc'
     target = '/com/nos/plots/negofs.20200312'

@@ -1,3 +1,4 @@
+""" Abstract base class for Job """
 from abc import ABC, abstractmethod
 import json
 
@@ -9,12 +10,27 @@ debug = False
 
 
 class Job(ABC):
-    ''' This is an abstract base class for job classes
-        It defines a generic interface to implement
-    '''
+    """ Abstract base class for types of Job
+
+    Attributes
+    ----------
+    configfile : str
+    jobtype : str
+    CDATE : str
+    HH : str
+    OFS : str
+    OUTDIR : str
+    INDIR : str
+    NPROCS : int
+    settings : dict
+    VARS : list
+    FSPEC : str
+
+    """
 
     @abstractmethod
     def __init__(self):
+        """ Constructor """
 
         self.configfile = ''
         self.jobtype = ''
@@ -28,14 +44,22 @@ class Job(ABC):
         self.VARS = None
         self.FSPEC = None
 
-    ########################################################################
+
 
     def readConfig(self, configfile):
+        """ reads the JSON file into a dictionary
+
+        Parameters
+        ----------
+        configfile : str
+            A JSON configuration file containing the required parameters for this class.
+
+        """
 
         with open(configfile, 'r') as cf:
             cfDict = json.load(cf)
 
-        if (debug):
+        if debug:
             print(json.dumps(cfDict, indent=4))
             print(str(cfDict))
 

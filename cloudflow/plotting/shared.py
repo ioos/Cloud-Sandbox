@@ -1,3 +1,5 @@
+""" Shared routines for plotting """
+
 import subprocess
 import traceback
 
@@ -9,7 +11,7 @@ debug = False
 
 
 def set_filename(ncfile: str, varname: str, target: str):
-    ''' create a standard named output filename to more easily make animations from plots'''
+    """ create a standard named output filename to more easily make animations from plots"""
 
     origfile = ncfile.split('/')[-1][:-3]
 
@@ -29,7 +31,7 @@ def set_filename(ncfile: str, varname: str, target: str):
 
 # Generic
 def set_diff_filename(ncfile: str, varname: str, target: str):
-    ''' create a standard named output filename to more easily make animations from plots'''
+    """ create a standard named output filename to more easily make animations from plots"""
 
     origfile = ncfile.split('/')[-1][:-3]
 
@@ -49,17 +51,17 @@ def set_diff_filename(ncfile: str, varname: str, target: str):
 
 
 def png_ffmpeg(source, target):
-    '''Make a movie from a set of sequential png files
+    """Make a movie from a set of sequential png files
 
     Parameters
     ----------
-    source : string
+    source : str
         Path to sequentially named image files
         Example: '/path/to/images/prefix_%04d_varname.png'
-    target : string
+    target : str
         Path to location to store output video file
         Example: '/path/to/output/prefix_varname.mp4'
-    '''
+    """
 
     # Add exception if there are no files found for source
 
