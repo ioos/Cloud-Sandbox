@@ -16,3 +16,4 @@ workflow/.idea/
 workflow/venv/
 .eggs/
 dist/
+docs/build/
