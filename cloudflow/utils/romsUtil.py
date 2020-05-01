@@ -210,26 +210,25 @@ def getTiling(totalCores, ratio=1.0):
 
     ratio : float
         The approximate aspect ratio of the model grid, I/J
-
-    Notes
-    -----
-    prefer a square or closest to it
-    if sqrt of total is an integer then use it for I and J
-    if not find factorization closest to square
-
-    examples:
-
-        assert must be even, there are no even primes > 2
-        36 = sqrt(36) = ceil(6)  36 mod 6 = 0 - DONE
-
-        32 = sqrt(32) = 5.65 32 mod 6 != 0
-                                mod 5 != 0
-                                mod 4 == 0
-                                32 / 4 = 8 DONE NtileI=8, NtileJ=4
-
-    It might be more optimal to have a ratio similar to the grid ratio. This is an optional setting
-
     """
+
+    '''
+    Basic algorithm.
+    prefer a square or closest to it.
+    if sqrt of total is an integer then use it for I and J.
+    if not, find factorization closest to square.
+
+    36 = sqrt(36) = ceil(6)  36 mod 6 = 0 - DONE
+    NtileI=6, NtileJ=6
+    32 = sqrt(32) = 5.65 32
+    mod 6 != 0
+    mod 5 != 0
+    mod 4 == 0
+    32 / 4 = 8 - DONE
+    NtileI=8, NtileJ=4
+
+    It might be more optimal to have a ratio similar to the grid ratio.
+    '''
 
     NtileI = 1
     NtileJ = 1

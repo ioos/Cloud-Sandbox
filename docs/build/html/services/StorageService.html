@@ -165,8 +165,18 @@
 <dt id="StorageService.StorageService">
 <em class="property">class </em><code class="sig-prename descclassname">StorageService.</code><code class="sig-name descname">StorageService</code><a class="headerlink" href="#StorageService.StorageService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<p>This is an abstract base class for cloud storage.
-It defines a generic interface to implement</p>
+<dl class="simple">
+<dt>Abstract base class for cloud storage.</dt><dd><p>It defines a generic interface to implement</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>uploadFile</dt><dd><p>Upload a file</p>
+</dd>
+<dt>downloadFile</dt><dd><p>Download a file</p>
+</dd>
+<dt>file_exists</dt><dd><p>Test if a file exists</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="StorageService.StorageService.downloadFile">
 <em class="property">abstract </em><code class="sig-name descname">downloadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.downloadFile" title="Permalink to this definition">¶</a></dt>
@@ -206,7 +216,7 @@ It defines a generic interface to implement</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

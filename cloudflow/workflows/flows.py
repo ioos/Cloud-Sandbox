@@ -1,8 +1,5 @@
 #!/usr/bin/python3
-"""
-Collection of functions that provide pre-defined Prefect Flow contexts for use in the cloud
-"""
-print(f"file: {__file__} | name: {__name__} | package: {__package__}")
+""" Collection of functions that provide pre-defined Prefect Flow contexts for use in the cloud """
 
 import os
 import sys
@@ -55,6 +52,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     -------
     fcstflow : prefect.Flow
     """
+
     # fcstconf = f'{curdir}/cluster/configs/liveocean.config'
     # print(f"DEBUG: fcstconf is {fcstconf}")
     # fcstjobfile = 'garbage'
@@ -283,7 +281,7 @@ def notebook_test(pyfile) -> Flow:
 def test_flow(fcstconf, fcstjobfile) -> Flow:
     """ Provides a Prefect Flow for testing purposes.
 
-        Parameters
+    Parameters
     ----------
     fcstconf : str
         The JSON configuration file for the Cluster to create
@@ -295,6 +293,7 @@ def test_flow(fcstconf, fcstjobfile) -> Flow:
     -------
     testflow : prefect.Flow
     """
+
     with Flow('fcst workflow') as testflow:
         # Create the cluster object
         cluster = ctasks.cluster_init(fcstconf)

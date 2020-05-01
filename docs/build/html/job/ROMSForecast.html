@@ -168,15 +168,210 @@
 <dt id="ROMSForecast.ROMSForecast">
 <em class="property">class </em><code class="sig-prename descclassname">ROMSForecast.</code><code class="sig-name descname">ROMSForecast</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em>, <em class="sig-param"><span class="n">NPROCS</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ROMSForecast.ROMSForecast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.job.Job.Job</span></code></p>
+<p>Implementation of Job class for ROMS Forecasts</p>
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.jobtype">
+<code class="sig-name descname">jobtype</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.jobtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Always ‘romsforecast’ for this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.configfile">
+<code class="sig-name descname">configfile</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.configfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A JSON configuration file containing the required parameters for this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.NPROCS">
+<code class="sig-name descname">NPROCS</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.NPROCS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total number of processors in this cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.OFS">
+<code class="sig-name descname">OFS</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.OFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ocean forecast to run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.CDATE">
+<code class="sig-name descname">CDATE</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.CDATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The forecast date in format YYYYMMDD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.HH">
+<code class="sig-name descname">HH</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.HH" title="Permalink to this definition">¶</a></dt>
+<dd><p>The forecast cycle in format HH</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.COMROT">
+<code class="sig-name descname">COMROT</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.COMROT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base directory to use, e.g. /com/nos</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.EXEC">
+<code class="sig-name descname">EXEC</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.EXEC" title="Permalink to this definition">¶</a></dt>
+<dd><p>The model executable to run. Only used for ADNOC currently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.TIME_REF">
+<code class="sig-name descname">TIME_REF</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.TIME_REF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Templated TIME_REF field value for ROMS ocean.in</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.BUCKET">
+<code class="sig-name descname">BUCKET</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.BUCKET" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cloud bucket name for saving results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.BCKTFLDR">
+<code class="sig-name descname">BCKTFLDR</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.BCKTFLDR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cloud folder name for saving results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.NTIMES">
+<code class="sig-name descname">NTIMES</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.NTIMES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Templated NTIMES field value for ROMS ocean.in</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.ININAME">
+<code class="sig-name descname">ININAME</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.ININAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The file to use as a restart file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.OUTDIR">
+<code class="sig-name descname">OUTDIR</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.OUTDIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full path to the output folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.OCEANIN">
+<code class="sig-name descname">OCEANIN</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.OCEANIN" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ocean.in file to use or “AUTO” to use a template</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.OCNINTMPL">
+<code class="sig-name descname">OCNINTMPL</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.OCNINTMPL" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ocean.in template to use or “AUTO” to use the default template</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ROMSForecast.ROMSForecast.TEMPLPATH">
+<code class="sig-name descname">TEMPLPATH</code><a class="headerlink" href="#ROMSForecast.ROMSForecast.TEMPLPATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full path to the templates to use</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="ROMSForecast.ROMSForecast.make_oceanin">
 <code class="sig-name descname">make_oceanin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ROMSForecast.ROMSForecast.make_oceanin" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create the ocean.in file from a template</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="ROMSForecast.ROMSForecast.parseConfig">
 <code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ROMSForecast.ROMSForecast.parseConfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parses the configuration dictionary to class attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cfDict</strong> (<em>dict</em>) – Dictionary containing this cluster parameterized settings.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -202,7 +397,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

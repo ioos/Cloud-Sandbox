@@ -7,9 +7,12 @@ job_tasks.py
 tasks.py
 '
 
+curdir=$PWD
+
+cd ../cloudflow/workflows/
+
 for file in $flist
 do
-  mv $file.bak $file
+  sed -i.bak 's/@task/\#@task/g' $file
 done
-
 

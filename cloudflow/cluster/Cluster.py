@@ -25,48 +25,6 @@ class Cluster(ABC):
 
     platform  : str
         The type of platform or provider
-
-    Methods
-    -------
-    terminateDaskScheduler()
-      Cleanup/kill the dask-scheduler process
-
-    setDaskWorker(proc: Popen)
-      Save the Popen process for dask-worker
-
-    terminateDaskWorker()
-      Cleanup/kill the dask-worker process
-
-    Abstract Methods
-    ----------------
-    getCoresPN()
-      Get the number of cores per node in this cluster. Assumes a heterogenous cluster.
-
-    getState()
-      Get the cluster state.
-
-    setState()
-      Set the cluster state.
-
-    readConfig()
-      Read the cluster configuration.
-
-    parseConfig()
-      Parse the cluster configuration. This might contain parameters that are required by
-      specific cloud providers.
-
-    start()
-      Start the cluster.
-
-    terminate()
-      Terminate the cluster.
-
-    getHosts()
-      Get the list of hosts in this cluster
-
-    getHostsCSV() :
-      Get a comma separated list of hosts in this cluster
-
     """
 
     # TODO: Put Dask stuff in its own class
@@ -141,38 +99,54 @@ class Cluster(ABC):
 
     @abstractmethod
     def getCoresPN(self) -> int:
+        """Get the number of cores per node in this cluster. Assumes a heterogenous cluster."""
         pass
 
     @abstractmethod
     def getState(self):
+        """Get the cluster state."""
         pass
 
     @abstractmethod
     def setState(self):
+        """ Set the cluster state."""
         pass
 
     @abstractmethod
     def readConfig(self):
+        """ Read the cluster configuration."""
         pass
 
     @abstractmethod
     def parseConfig(self, cfDict : dict):
+        """ Parse the cluster configuration. This might contain parameters that are required by
+        specific cloud providers.
+
+        Parameters
+        ----------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings. 
+        """
         pass
 
     @abstractmethod
     def start(self):
+        """ Start the cluster."""
         pass
 
     @abstractmethod
     def terminate(self):
+        """Terminate the cluster."""
         pass
 
     @abstractmethod
     def getHosts(self):
+        """ Get the list of hosts in this cluster."""
         pass
 
     @abstractmethod
     def getHostsCSV(self):
+        """ Get a comma separated list of hosts in this cluster."""
         pass
 
 

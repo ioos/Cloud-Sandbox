@@ -166,29 +166,71 @@
             
   <div class="section" id="module-tasks">
 <span id="tasks-module"></span><h1>tasks module<a class="headerlink" href="#module-tasks" title="Permalink to this headline">¶</a></h1>
-<p>Module of Prefect task annotated functions for use in cloud based numerical
+<p>Collection of Prefect task annotated functions for use in cloud based numerical
 weather modelling workflows. These tasks are basically wrappers around other
-functions. Prefect forces some design choices.</p>
+functions.</p>
 <p>Keep things cloud platform agnostic at this layer.</p>
 <dl class="py function">
 <dt id="tasks.fetchpy_and_run">
 <code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">fetchpy_and_run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em>, <em class="sig-param"><span class="n">service</span><span class="p">:</span> <span class="n">cloudflow.services.StorageService.StorageService</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.fetchpy_and_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Prototype for injecting user developed scripts into a workflow. This is currently implemented only for the
+hlfs example. Additional work is needed to generalize this process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The job configuration file</p></li>
+<li><p><strong>service</strong> (<a class="reference internal" href="../services/StorageService.html#StorageService.StorageService" title="StorageService.StorageService"><em>StorageService</em></a>) – The cloud or local storage service implementation</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>WARNING!!!!! This could potentially allow arbitrary code execution!!!</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="tasks.forecast_run">
 <code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">forecast_run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span><span class="p">:</span> <span class="n">cloudflow.cluster.Cluster.Cluster</span></em>, <em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.forecast_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run the forecast</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster</strong> (<a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster"><em>Cluster</em></a>) – The cluster to run on</p></li>
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The job to run</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="tasks.job_init">
 <code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">job_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span><span class="p">:</span> <span class="n">cloudflow.cluster.Cluster.Cluster</span></em>, <em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span> &#x2192; cloudflow.job.Job.Job<a class="headerlink" href="#tasks.job_init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Initialize the Job object.
+:param cluster: The Cluster object to use for this Job
+:type cluster: Cluster
+:param configfile: The Job configuration file
+:type configfile: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>job</strong> – An implemented sub-class of Job</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job">Job</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>We can’t really separate the hardware from the job, nprocs is needed to setup the Job</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="tasks.run_pynotebook">
 <code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">run_pynotebook</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pyfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.run_pynotebook" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wraps the execution of a python3 script</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pyfile</strong> (<em>The path and filename of the python3 script to run.</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="tasks.save_to_cloud">
@@ -197,16 +239,13 @@ functions. Prefect forces some design choices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – <dl class="simple">
-<dt>A Job object that contains the required attributes:</dt><dd><p>BUCKET - bucket name
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – A Job object that contains the required attributes.
+BUCKET - bucket name
 BCKTFOLDER - bucket folder
 CDATE - simulation date
-OUTDIR - source path</p>
-</dd>
-</dl>
-</p></li>
+OUTDIR - source path</p></li>
 <li><p><strong>service</strong> (<a class="reference internal" href="../services/StorageService.html#StorageService.StorageService" title="StorageService.StorageService"><em>StorageService</em></a>) – An implemented service for your cloud provider.</p></li>
-<li><p><strong>filespecs</strong> (<em>list of strings</em>) – file specifications to match using glob.glob
+<li><p><strong>filespecs</strong> (<em>list of str</em>) – file specifications to match using glob.glob
 Example: [“<em>.nc”, “</em>.png”]</p></li>
 <li><p><strong>public</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the files should be made public. Default: False</p></li>
 </ul>
@@ -263,7 +302,7 @@ multiple cloud platforms.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

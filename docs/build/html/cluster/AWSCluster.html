@@ -173,7 +173,7 @@
 <dl class="py attribute">
 <dt id="AWSCluster.AWSCluster.platform">
 <code class="sig-name descname">platform</code><a class="headerlink" href="#AWSCluster.AWSCluster.platform" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will always be ‘AWS’ for this implementation.</p>
+<dd><p>The cloud provider. This will always be ‘AWS’ for this implementation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -264,7 +264,7 @@
 <dd><p>Security group ids</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list: str</p>
+<dd class="field-odd"><p>list of str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -291,16 +291,68 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.AWSCluster">
-<code class="sig-name descname">AWSCluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.AWSCluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructor. Returns a new AWSCluster object initialized with the settings in <cite>configfile</cite>.</p>
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.daskscheduler">
+<code class="sig-name descname">daskscheduler</code><a class="headerlink" href="#AWSCluster.AWSCluster.daskscheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>a reference to the Dask scheduler process started on the cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Popen</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AWSCluster.AWSCluster.daskworker">
+<code class="sig-name descname">daskworker</code><a class="headerlink" href="#AWSCluster.AWSCluster.daskworker" title="Permalink to this definition">¶</a></dt>
+<dd><p>a reference to the Dask worker process started on the cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Popen</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="AWSCluster.AWSCluster.getCoresPN">
 <code class="sig-name descname">getCoresPN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getCoresPN" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the number of cores per node in this cluster. Assumes a heterogenous cluster.</p>
+<dd><p>Get the number of cores per node in this cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>self.PPN</strong> – the number of cores per node in this cluster. Assumes a heterogenous cluster.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getHosts">
+<code class="sig-name descname">getHosts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHosts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of hosts in this cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>hosts</strong> – list of private dns names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSCluster.AWSCluster.getHostsCSV">
+<code class="sig-name descname">getHostsCSV</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHostsCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a comma separated list of hosts in this cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>hosts</strong> – a comma separated list of private dns names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -310,76 +362,23 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="AWSCluster.AWSCluster.setState">
-<code class="sig-name descname">setState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.setState" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the cluster state. Not currently used.</p>
-<p>TODO: Can use a class property instead.</p>
+<dt id="AWSCluster.AWSCluster.parseConfig">
+<code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.parseConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the configuration dictionary to class attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cfDict</strong> (<em>dict</em>) – Dictionary containing this cluster parameterized settings.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="AWSCluster.AWSCluster.readConfig">
-<code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.readConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a JSON configuration file <cite>configfile</cite> into a dictionary.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.start">
-<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start the cluster. This will provision the configured cluster in the cloud.
-Returns a list of AWS Instances. See boto3 documentation.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.terminate">
-<code class="sig-name descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.terminate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Terminate the cluster. Terminate the EC2 instances in this cluster.
-Returns a list of AWS Results. See boto3 documentation.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.getHosts">
-<code class="sig-name descname">getHosts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHosts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the list of hosts in this cluster</p>
-</dd></dl>
-
-<dl class="py method">
-<dt>
-<code class="sig-name descname">getHostsCSV() :</code></dt>
-<dd><p>Get a comma separated list of hosts in this cluster</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="id0">
-<code class="sig-name descname">getCoresPN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="id1">
-<code class="sig-name descname">getHosts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.getHostsCSV">
-<code class="sig-name descname">getHostsCSV</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.getHostsCSV" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="id2">
-<code class="sig-name descname">getState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="AWSCluster.AWSCluster.parseConfig">
-<code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.parseConfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="id3">
-<code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a JSON configuration file <cite>configfile</cite> into a dictionary.</p>
+<code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.readConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a JSON configuration file into a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>configfile</strong> (<em>string</em>) – Should be a full path and filename of a JSON configuration file for this cluster.</p>
+<dd class="field-odd"><p><strong>configfile</strong> (<em>str</em>) – Full path and filename of a JSON configuration file for this cluster.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>cfDict</strong> – Dictionary containing this cluster parameterized settings.</p>
@@ -391,19 +390,41 @@ Returns a list of AWS Results. See boto3 documentation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id4">
-<code class="sig-name descname">setState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="AWSCluster.AWSCluster.setState">
+<code class="sig-name descname">setState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.setState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the cluster state. Not currently used.</p>
+</dd></dl>
 
 <dl class="py method">
-<dt id="id5">
-<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="AWSCluster.AWSCluster.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provision the configured cluster in the cloud.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>self.__instances</strong> – the list of Instances started. See boto3 documentation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of EC2.Intance</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt id="id6">
-<code class="sig-name descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="AWSCluster.AWSCluster.terminate">
+<code class="sig-name descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSCluster.AWSCluster.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Shutdown and remove the EC2 Instances in this cluster.</dt><dd><p>Also terminates any associated Dask Worker and Scheduler processes.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>responses</strong> – a list of the responses from EC2.Instance.terminate(). See boto3 documentation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -429,7 +450,7 @@ Returns a list of AWS Results. See boto3 documentation.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

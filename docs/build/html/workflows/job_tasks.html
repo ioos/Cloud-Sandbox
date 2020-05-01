@@ -166,49 +166,135 @@
             
   <div class="section" id="module-job_tasks">
 <span id="job-tasks-module"></span><h1>job_tasks module<a class="headerlink" href="#module-job_tasks" title="Permalink to this headline">¶</a></h1>
+<p>Collection of Job related functions wrapped as Prefect Tasks</p>
 <dl class="py function">
 <dt id="job_tasks.baseline_from_Job">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">baseline_from_Job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.baseline_from_Job" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Provides a list of the verification files that match the parameters provided by the Job object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The Job object. Must contain SOURCE and filespec attributes.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>FILES</strong> – A list of files located at SOURCE that match the filespec</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.daskmake_diff_plots">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">daskmake_diff_plots</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n">distributed.client.Client</span></em>, <em class="sig-param"><span class="n">EXPERIMENT</span><span class="p">:</span> <span class="n">list</span></em>, <em class="sig-param"><span class="n">BASELINE</span><span class="p">:</span> <span class="n">list</span></em>, <em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.daskmake_diff_plots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create plots of baseline - experiment</p>
+<dd><p>Create difference plots using a Dask distributed Client</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>distributed.Client</em>) – The Dask Client to use for running the job</p></li>
+<li><p><strong>EXPERIMENT</strong> (<em>list of str</em>) – The local forecast output files.</p></li>
+<li><p><strong>BASELINE</strong> (<em>list of str</em>) – The list of operational verification forecast output files.</p></li>
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.daskmake_mpegs">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">daskmake_mpegs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n">distributed.client.Client</span></em>, <em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em>, <em class="sig-param"><span class="n">diff</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.daskmake_mpegs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create mpegs from plots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>distributed.Client</em>) – The Dask Client to use for running the job</p></li>
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – </p></li>
+<li><p><strong>diff</strong> (<em>bool</em>) – True - create mpegs from the difference plots
+False - create mpegs from the forecast plots</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.daskmake_plots">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">daskmake_plots</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n">distributed.client.Client</span></em>, <em class="sig-param"><span class="n">FILES</span><span class="p">:</span> <span class="n">list</span></em>, <em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.daskmake_plots" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create plots using a Dask distributed Client</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>distributed.Client</em>) – The Dask Client to use for running the job</p></li>
+<li><p><strong>FILES</strong> (<em>list of str</em>) – The source input files.</p></li>
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.get_baseline">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">get_baseline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em>, <em class="sig-param"><span class="n">sshuser</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.get_baseline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve operational forecast files for comparison to quasi-operational forecasts
-job - Job object</p>
+<dd><p>Retrieve operational forecast files for comparison to quasi-operational forecasts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The Job object.</p></li>
+<li><p><strong>sshuser</strong> (<em>str</em>) – The user and host to use for retrieving data from a remote server. Required for LiveOcean.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.get_forcing">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">get_forcing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em>, <em class="sig-param"><span class="n">sshuser</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.get_forcing" title="Permalink to this definition">¶</a></dt>
-<dd><p>job - Job object</p>
+<dd><p>Retrieve operational moddel forcing data and initial conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The Job object.</p></li>
+<li><p><strong>sshuser</strong> (<em>str</em>) – The user and host to use for retrieving data from a remote server. Required for LiveOcean.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.ncfiles_from_Job">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">ncfiles_from_Job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.ncfiles_from_Job" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Provides a list of files that match the parameters provided by the Job object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job</strong> (<a class="reference internal" href="../job/Job.html#Job.Job" title="Job.Job"><em>Job</em></a>) – The Job object. Must contain SOURCE and filespec attributes.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>FILES</strong> – A list of files located at SOURCE that match the filespec</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="job_tasks.ncfiles_glob">
 <code class="sig-prename descclassname">job_tasks.</code><code class="sig-name descname">ncfiles_glob</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">SOURCE</span></em>, <em class="sig-param"><span class="n">filespec</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'*.nc'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#job_tasks.ncfiles_glob" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Provides a list of files that match the parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>SOURCE</strong> (<em>str</em>) – A pathname to the files</p></li>
+<li><p><strong>filespec</strong> (<em>str</em>) – A regular expression of the files to include</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>FILES</strong> – A list of files located at SOURCE that match the filespec</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 
@@ -232,7 +318,7 @@ job - Job object</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

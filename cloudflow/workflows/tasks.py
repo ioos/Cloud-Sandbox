@@ -98,16 +98,16 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
     Parameters
     ----------
     job : Job
-      A Job object that contains the required attributes:
-        BUCKET - bucket name
-        BCKTFOLDER - bucket folder
-        CDATE - simulation date
-        OUTDIR - source path
+      A Job object that contains the required attributes.
+      BUCKET - bucket name
+      BCKTFOLDER - bucket folder
+      CDATE - simulation date
+      OUTDIR - source path
 
     service : StorageService
       An implemented service for your cloud provider.
 
-    filespecs : list of strings
+    filespecs : list of str
       file specifications to match using glob.glob
       Example: ["*.nc", "*.png"]
 

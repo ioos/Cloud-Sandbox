@@ -166,10 +166,26 @@
             
   <div class="section" id="module-run_adnoc">
 <span id="run-adnoc-module"></span><h1>run_adnoc module<a class="headerlink" href="#module-run_adnoc" title="Permalink to this headline">¶</a></h1>
+<p>Driver for running ADNOC forecasts</p>
 <dl class="py function">
 <dt id="run_adnoc.fcst_flow">
 <code class="sig-prename descclassname">run_adnoc.</code><code class="sig-name descname">fcst_flow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcstconf</span></em>, <em class="sig-param"><span class="n">fcstjobfile</span></em><span class="sig-paren">)</span> &#x2192; prefect.core.flow.Flow<a class="headerlink" href="#run_adnoc.fcst_flow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Forecast workflow</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fcstconf</strong> (<em>str</em>) – The cluster config file to use for this forecast.</p></li>
+<li><p><strong>fcstjobfile</strong> (<em>str</em>) – The job config file to use for this forecast.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>flow</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>prefect.Flow</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="run_adnoc.handler">
@@ -203,7 +219,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

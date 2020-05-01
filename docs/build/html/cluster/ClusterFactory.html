@@ -164,6 +164,7 @@
             
   <div class="section" id="module-ClusterFactory">
 <span id="clusterfactory-module"></span><h1>ClusterFactory module<a class="headerlink" href="#module-ClusterFactory" title="Permalink to this headline">¶</a></h1>
+<p>Class factory for different sub-classes of Cluster</p>
 <dl class="py class">
 <dt id="ClusterFactory.ClusterFactory">
 <em class="property">class </em><code class="sig-prename descclassname">ClusterFactory.</code><code class="sig-name descname">ClusterFactory</code><a class="headerlink" href="#ClusterFactory.ClusterFactory" title="Permalink to this definition">¶</a></dt>
@@ -171,12 +172,36 @@
 <dl class="py method">
 <dt id="ClusterFactory.ClusterFactory.cluster">
 <code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ClusterFactory.ClusterFactory.cluster" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates a new Cluster object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configfile</strong> (<em>string</em>) – Full path and filename of a JSON configuration file for this cluster.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>newcluster</strong> – Returns a new instance of a Cluster implementation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="Cluster.html#Cluster.Cluster" title="Cluster.Cluster">Cluster</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="ClusterFactory.ClusterFactory.readconfig">
 <code class="sig-name descname">readconfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ClusterFactory.ClusterFactory.readconfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads the configuration file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configfile</strong> (<em>string</em>) – Full path and filename of a JSON configuration file for this cluster.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cfdict</strong> – Dictionary representation of JSON configfile</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -202,7 +227,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

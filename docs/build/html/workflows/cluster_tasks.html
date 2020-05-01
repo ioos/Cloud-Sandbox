@@ -166,35 +166,87 @@
             
   <div class="section" id="module-cluster_tasks">
 <span id="cluster-tasks-module"></span><h1>cluster_tasks module<a class="headerlink" href="#module-cluster_tasks" title="Permalink to this headline">¶</a></h1>
+<p>Various cluster related functions wrapped as Prefect Tasks</p>
 <dl class="py function">
 <dt id="cluster_tasks.cluster_init">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">cluster_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span> &#x2192; cloudflow.cluster.Cluster.Cluster<a class="headerlink" href="#cluster_tasks.cluster_init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a new Cluster object using the ClusterFactory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>string</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>newcluster</strong> – Object returned will be a sub-class of Cluster</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster">Cluster</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cluster_tasks.cluster_start">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">cluster_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cluster_tasks.cluster_start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Start the cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cluster</strong> (<a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster"><em>Cluster</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cluster_tasks.cluster_terminate">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">cluster_terminate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cluster_tasks.cluster_terminate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Terminate the cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cluster</strong> (<a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster"><em>Cluster</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cluster_tasks.dask_client_close">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">dask_client_close</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">daskclient</span><span class="p">:</span> <span class="n">distributed.client.Client</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cluster_tasks.dask_client_close" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Close the Dask Client</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>daskclient</strong> (<em>Dask distributed.Client</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cluster_tasks.push_pyEnv">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">push_pyEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cluster_tasks.push_pyEnv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Push any local python packages to the newly started cluster and pip3 install them. This is needed when local changes to the plotting
+routines exist. The cluster may not have the updated version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cluster</strong> (<a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster"><em>Cluster</em></a>) – </p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Use python3 setup.py sdist to create the distributable source package to upload.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cluster_tasks.start_dask">
 <code class="sig-prename descclassname">cluster_tasks.</code><code class="sig-name descname">start_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster</span></em><span class="sig-paren">)</span> &#x2192; distributed.client.Client<a class="headerlink" href="#cluster_tasks.start_dask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a Dask cluster on the remote or local host</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cluster</strong> (<a class="reference internal" href="../cluster/Cluster.html#Cluster.Cluster" title="Cluster.Cluster"><em>Cluster</em></a>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>daskclient</strong> – The connected Dask Client to use for submitting jobs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dask distributed.Client</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 
@@ -218,7 +270,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

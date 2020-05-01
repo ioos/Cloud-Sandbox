@@ -168,10 +168,160 @@
 <dt id="Plotting.Plotting">
 <em class="property">class </em><code class="sig-prename descclassname">Plotting.</code><code class="sig-name descname">Plotting</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em>, <em class="sig-param"><span class="n">NPROCS</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plotting.Plotting" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.job.Job.Job</span></code></p>
+<p>Implementation of Job class for plotting jobs</p>
+<dl class="py attribute">
+<dt id="Plotting.Plotting.configfile">
+<code class="sig-name descname">configfile</code><a class="headerlink" href="#Plotting.Plotting.configfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A JSON configuration file containing the required parameters for this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.jobtype">
+<code class="sig-name descname">jobtype</code><a class="headerlink" href="#Plotting.Plotting.jobtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The specific type of plotting job.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.NPROCS">
+<code class="sig-name descname">NPROCS</code><a class="headerlink" href="#Plotting.Plotting.NPROCS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total number of processors in this cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.OFS">
+<code class="sig-name descname">OFS</code><a class="headerlink" href="#Plotting.Plotting.OFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ocean forecast to run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.CDATE">
+<code class="sig-name descname">CDATE</code><a class="headerlink" href="#Plotting.Plotting.CDATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The forecast date in format YYYYMMDD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.HH">
+<code class="sig-name descname">HH</code><a class="headerlink" href="#Plotting.Plotting.HH" title="Permalink to this definition">¶</a></dt>
+<dd><p>The forecast cycle in format HH</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.BUCKET">
+<code class="sig-name descname">BUCKET</code><a class="headerlink" href="#Plotting.Plotting.BUCKET" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cloud bucket name for saving results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.BCKTFLDR">
+<code class="sig-name descname">BCKTFLDR</code><a class="headerlink" href="#Plotting.Plotting.BCKTFLDR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cloud folder name for saving results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.INDIR">
+<code class="sig-name descname">INDIR</code><a class="headerlink" href="#Plotting.Plotting.INDIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full path to the input folder, usually the same as the OUTDIR for the forecast job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.OUTDIR">
+<code class="sig-name descname">OUTDIR</code><a class="headerlink" href="#Plotting.Plotting.OUTDIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full path to the output folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.VARS">
+<code class="sig-name descname">VARS</code><a class="headerlink" href="#Plotting.Plotting.VARS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The forecast fields to plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.FSPEC">
+<code class="sig-name descname">FSPEC</code><a class="headerlink" href="#Plotting.Plotting.FSPEC" title="Permalink to this definition">¶</a></dt>
+<dd><p>The regular expression of the filename specifier for list of input files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Plotting.Plotting.VERIFDIR">
+<code class="sig-name descname">VERIFDIR</code><a class="headerlink" href="#Plotting.Plotting.VERIFDIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full path to the location of the verification dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="Plotting.Plotting.parseConfig">
 <code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plotting.Plotting.parseConfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parses the configuration dictionary to class attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cfDict</strong> (<em>dict</em>) – Dictionary containing this cluster parameterized settings.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -197,7 +347,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

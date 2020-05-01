@@ -164,12 +164,122 @@
             
   <div class="section" id="module-Job">
 <span id="job-module"></span><h1>Job module<a class="headerlink" href="#module-Job" title="Permalink to this headline">¶</a></h1>
+<p>Abstract base class for Job</p>
 <dl class="py class">
 <dt id="Job.Job">
 <em class="property">class </em><code class="sig-prename descclassname">Job.</code><code class="sig-name descname">Job</code><a class="headerlink" href="#Job.Job" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<p>This is an abstract base class for job classes
-It defines a generic interface to implement</p>
+<p>Abstract base class for types of Job</p>
+<dl class="py attribute">
+<dt id="Job.Job.configfile">
+<code class="sig-name descname">configfile</code><a class="headerlink" href="#Job.Job.configfile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.jobtype">
+<code class="sig-name descname">jobtype</code><a class="headerlink" href="#Job.Job.jobtype" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.CDATE">
+<code class="sig-name descname">CDATE</code><a class="headerlink" href="#Job.Job.CDATE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.HH">
+<code class="sig-name descname">HH</code><a class="headerlink" href="#Job.Job.HH" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.OFS">
+<code class="sig-name descname">OFS</code><a class="headerlink" href="#Job.Job.OFS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.OUTDIR">
+<code class="sig-name descname">OUTDIR</code><a class="headerlink" href="#Job.Job.OUTDIR" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.INDIR">
+<code class="sig-name descname">INDIR</code><a class="headerlink" href="#Job.Job.INDIR" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.NPROCS">
+<code class="sig-name descname">NPROCS</code><a class="headerlink" href="#Job.Job.NPROCS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.settings">
+<code class="sig-name descname">settings</code><a class="headerlink" href="#Job.Job.settings" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.VARS">
+<code class="sig-name descname">VARS</code><a class="headerlink" href="#Job.Job.VARS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Job.Job.FSPEC">
+<code class="sig-name descname">FSPEC</code><a class="headerlink" href="#Job.Job.FSPEC" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="Job.Job.parseConfig">
 <em class="property">abstract </em><code class="sig-name descname">parseConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfDict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Job.Job.parseConfig" title="Permalink to this definition">¶</a></dt>
@@ -178,7 +288,13 @@ It defines a generic interface to implement</p>
 <dl class="py method">
 <dt id="Job.Job.readConfig">
 <code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Job.Job.readConfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>reads the JSON file into a dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configfile</strong> (<em>str</em>) – A JSON configuration file containing the required parameters for this class.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -204,7 +320,7 @@ It defines a generic interface to implement</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>

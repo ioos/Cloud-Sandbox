@@ -163,6 +163,7 @@
             
   <div class="section" id="module-plot_fvcom">
 <span id="plot-fvcom-module"></span><h1>plot_fvcom module<a class="headerlink" href="#module-plot_fvcom" title="Permalink to this headline">¶</a></h1>
+<p>Plotting routines for FVCOM forecasts</p>
 <dl class="py function">
 <dt id="plot_fvcom.extract_ncdata">
 <code class="sig-prename descclassname">plot_fvcom.</code><code class="sig-name descname">extract_ncdata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_fvcom.extract_ncdata" title="Permalink to this definition">¶</a></dt>
@@ -184,7 +185,16 @@ use a pair of files that are late in the sequence</p>
 <dl class="py function">
 <dt id="plot_fvcom.make_png">
 <code class="sig-prename descclassname">plot_fvcom.</code><code class="sig-name descname">make_png</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">varnames</span></em>, <em class="sig-param"><span class="n">files</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_fvcom.make_png" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>varnames</strong> (<em>list of str</em>) – List of variables to plot</p></li>
+<li><p><strong>files</strong> (<em>list of str</em>) – List of files to create plots from</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – Output directory for plots</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="plot_fvcom.plot">
@@ -224,7 +234,7 @@ use a pair of files that are late in the sequence</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Patrick Tripp
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
 
     </p>
   </div>
