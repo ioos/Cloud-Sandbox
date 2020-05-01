@@ -14,12 +14,27 @@ debug = True
 
 # noinspection PyCallingNonCallable
 class JobFactory:
+    """ Class factory for different Job implementations """
 
     def __init__(self):
         return
 
 
     def job(self, configfile: str, NPROCS: int) -> Job:
+        """ Create a new specific type of Job instance
+
+        Parameters
+        ----------
+        configfile : str
+
+        NPROCS : int
+            The number of processors to run the job on
+
+        Returns
+        -------
+        newjob : Job
+
+        """
 
         newjob = None
 
@@ -38,13 +53,26 @@ class JobFactory:
         return newjob
 
 
+    # TODO: this is so frequently used, don't need multiple definitions of it
     def readconfig(self,configfile):
+        """ Reads a JSON configuration file into a dictionary.
+
+        Parameters
+        ----------
+        configfile : str
+          Full path and filename of a JSON configuration file for this cluster.
+
+        Returns
+        -------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings.
+        """
 
         with open(configfile, 'r') as cf:
-            cfdict = json.load(cf)
+            cfDict = json.load(cf)
 
         if debug:
-            print(json.dumps(cfdict, indent=4))
-            print(str(cfdict))
+            print(json.dumps(cfDict, indent=4))
+            print(str(cfDict))
 
-        return cfdict
+        return cfDict

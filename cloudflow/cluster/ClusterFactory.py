@@ -1,3 +1,5 @@
+""" Class factory for different sub-classes of Cluster """
+
 import json
 import logging
 
@@ -18,10 +20,23 @@ log.setLevel(logging.DEBUG)
 class ClusterFactory:
 
     def __init__(self):
+        """ Constructor """
         return
 
 
     def cluster(self,configfile):
+        """ Creates a new Cluster object
+
+        Parameters
+        ----------
+        configfile : string
+            Full path and filename of a JSON configuration file for this cluster.
+
+        Returns
+        -------
+        newcluster : Cluster
+            Returns a new instance of a Cluster implementation.
+        """
 
         cfdict = self.readconfig(configfile)
 
@@ -44,6 +59,18 @@ class ClusterFactory:
 
 
     def readconfig(self,configfile):
+        """ Reads the configuration file
+
+        Parameters
+        ----------
+        configfile : string
+            Full path and filename of a JSON configuration file for this cluster.
+
+        Returns
+        -------
+        cfdict : dict
+            Dictionary representation of JSON configfile
+        """
 
         with open(configfile, 'r') as cf:
             cfdict = json.load(cf)

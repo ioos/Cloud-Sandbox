@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>plot_roms module &mdash; CloudFlow 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shared module" href="shared.html" />
+    <link rel="prev" title="plot_fvcom module" href="plot_fvcom.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> CloudFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../settingup.html">Setting up CloudFlows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/modules.html">cluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../job/modules.html">job</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">plotting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_fvcom.html">plot_fvcom module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">plot_roms module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shared.html">shared module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tile.html">tile module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../services/modules.html">services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils/modules.html">utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflows/modules.html">workflows</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CloudFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">plotting</a> &raquo;</li>
+        
+      <li>plot_roms module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/plotting/plot_roms.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-plot_roms">
+<span id="plot-roms-module"></span><h1>plot_roms module<a class="headerlink" href="#module-plot_roms" title="Permalink to this headline">¶</a></h1>
+<p>Plotting routines for ROMS forecasts</p>
+<dl class="py function">
+<dt id="plot_roms.extract_ncdata">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">extract_ncdata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.extract_ncdata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.get_projection">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">get_projection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.get_projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns mask_rho and lat lon from netcdf file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.get_vmin_vmax">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">get_vmin_vmax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile1_base</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">ncfile1_exp</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#plot_roms.get_vmin_vmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>use this to set the vmin and vmax for a series of diff plots with uniform scales
+use a pair of files that are late in the sequence</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.make_png">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">make_png</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">varnames</span></em>, <em class="sig-param"><span class="n">files</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.make_png" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.plot">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">target</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">crop</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">8</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.plot_data">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">plot_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">msk</span></em>, <em class="sig-param"><span class="n">lo</span></em>, <em class="sig-param"><span class="n">la</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">outfile</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">colormap</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">crop</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">8</span></em>, <em class="sig-param"><span class="n">diff</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">vmin</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">- 1.0</span></em>, <em class="sig-param"><span class="n">vmax</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.plot_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="plot_roms.plot_diff">
+<code class="sig-prename descclassname">plot_roms.</code><code class="sig-name descname">plot_diff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ncfile1</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">ncfile2</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">target</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">varname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">vmin</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">- 1.0</span></em>, <em class="sig-param"><span class="n">vmax</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">crop</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">8</span></em><span class="sig-paren">)</span><a class="headerlink" href="#plot_roms.plot_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>given two input netcdf files, create a plot of ncfile1 - ncfile2 for specified variable</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shared.html" class="btn btn-neutral float-right" title="shared module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_fvcom.html" class="btn btn-neutral float-left" title="plot_fvcom module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020 RPS Group, Inc. All rights reserved.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,12 +1,10 @@
 """
-
-Module of Prefect @task annotated functions for use in cloud based numerical 
+Collection of Prefect task annotated functions for use in cloud based numerical
 weather modelling workflows. These tasks are basically wrappers around other
-functions. Prefect forces some design choices.
+functions.
 
 Keep things cloud platform agnostic at this layer.
 """
-#print(f"file: {__file__} | name: {__name__} | package: {__package__}")
 
 import os
 import sys
@@ -100,16 +98,16 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
     Parameters
     ----------
     job : Job
-      A Job object that contains the required attributes:
-        BUCKET - bucket name
-        BCKTFOLDER - bucket folder
-        CDATE - simulation date
-        OUTDIR - source path
+      A Job object that contains the required attributes.
+      BUCKET - bucket name
+      BCKTFOLDER - bucket folder
+      CDATE - simulation date
+      OUTDIR - source path
 
     service : StorageService
       An implemented service for your cloud provider.
 
-    filespecs : list of strings
+    filespecs : list of str
       file specifications to match using glob.glob
       Example: ["*.nc", "*.png"]
 
@@ -147,7 +145,24 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
 # cluster, job
 @task
 def job_init(cluster: Cluster, configfile) -> Job:
-    # We can't really separate the hardware from the job, nprocs is needed
+    """ Initialize the Job object.
+    Parameters
+    ----------
+    cluster : Cluster
+        The Cluster object to use for this Job
+
+    configfile : str
+        The Job configuration file
+
+    Returns
+    -------
+    job : Job
+        An implemented sub-class of Job
+
+    Notes
+    -----
+        We can't really separate the hardware from the job, nprocs is needed to setup the Job
+    """
     NPROCS = cluster.nodeCount * cluster.PPN
 
     if debug: print(f"DEBUG: in tasks job_init configfile: {configfile}")
@@ -161,12 +176,20 @@ def job_init(cluster: Cluster, configfile) -> Job:
     return job
 
 
-#######################################################################
 
 
 # cluster, job
 @task
 def forecast_run(cluster: Cluster, job: Job):
+    """ Run the forecast
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
     PPN = cluster.getCoresPN()
 
     # Easier to read
@@ -210,8 +233,13 @@ def forecast_run(cluster: Cluster, job: Job):
 
 @task
 def run_pynotebook(pyfile: str):
+    """ Wraps the execution of a python3 script
 
-    print(f'Running {pyfile}')
+    Parameters
+    ----------
+    pyfile : The path and filename of the python3 script to run.
+    """
+    log.info(f'Running {pyfile}')
 
     try:
         result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
@@ -230,11 +258,24 @@ def run_pynotebook(pyfile: str):
 
 @task
 def fetchpy_and_run(job: Job, service: StorageService):
+    """ Prototype for injecting user developed scripts into a workflow. This is currently implemented only for the
+    hlfs example. Additional work is needed to generalize this process.
 
-    # WARNING!!!!! This allows arbitrary code execution!!!
+    Parameters
+    ----------
+    job : Job
+        The job configuration file
+
+    service : StorageService
+        The cloud or local storage service implementation
+
+    Notes
+    -----
+    WARNING!!!!! This could potentially allow arbitrary code execution!!!
+    """
 
     # Retrieve package to run from S3
-    # .py file 
+    # .py file
     # and a config file
 
     if job.OFS != 'cbofs':
@@ -269,7 +310,7 @@ def fetchpy_and_run(job: Job, service: StorageService):
         service.downloadFile(bucket, key, pyfile)
     else:
         log.info('No user supplied python script available ... skipping')
-        return 
+        return
 
     # retrieved the python and config files, run it
     curdir = os.getcwd()
@@ -288,7 +329,6 @@ def fetchpy_and_run(job: Job, service: StorageService):
     os.chdir(curdir)
 
     return
-
 
 
 if __name__ == '__main__':

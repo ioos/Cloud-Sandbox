@@ -1,9 +1,5 @@
 #!/usr/bin/python3
-'''
-
-
-'''
-print(f"file: {__file__} | name: {__name__} | package: {__package__}")
+""" Collection of functions that provide pre-defined Prefect Flow contexts for use in the cloud """
 
 import os
 import sys
@@ -39,6 +35,24 @@ log.addHandler(ch)
 storage_provider = 'AWS'
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
+    """ Provides a Prefect Flow for a forecast workflow.
+
+    Parameters
+    ----------
+    fcstconf : str
+        The JSON configuration file for the Cluster to create
+
+    fcstjobfile : str
+        The JSON configuration file for the forecast Job
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server.
+
+    Returns
+    -------
+    fcstflow : prefect.Flow
+    """
+
     # fcstconf = f'{curdir}/cluster/configs/liveocean.config'
     # print(f"DEBUG: fcstconf is {fcstconf}")
     # fcstjobfile = 'garbage'
@@ -79,6 +93,22 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
 
 def plot_flow(postconf, postjobfile) -> Flow:
+    """ Provides a Prefect Flow for a plotting workflow. Also creates mpegs of sequential plots.
+    Plots and mpegs are uploaded to the cloud.
+
+    Parameters
+    ----------
+    postconf : str
+        The JSON configuration file for the Cluster to create
+
+    postjobfile : str
+        The JSON configuration file for the plotting Job
+
+    Returns
+    -------
+    plotflow : prefect.Flow
+    """
+
     with Flow('plotting') as plotflow:
         #####################################################################
         # POST Processing
@@ -123,8 +153,26 @@ def plot_flow(postconf, postjobfile) -> Flow:
     return plotflow
 
 
-
 def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
+    """ Provides a Prefect Flow for a plotting workflow that plots the difference between the experimental or
+    quasi-operational forecast and the official operational forecast. Also creates mpegs of sequential plots.
+    Plots and mpegs are uploaded to the cloud.
+
+    Parameters
+    ----------
+    postconf : str
+        The JSON configuration file for the Cluster to create
+
+    postjobfile : str
+        The JSON configuration file for the plotting Job
+
+    sshuser : str
+        The optional user and host to use for retrieving data from a remote server.
+
+    Returns
+    -------
+    diff_plotflow : prefect.Flow
+    """
     with Flow('diff plotting') as diff_plotflow:
         #####################################################################
         # POST Processing
@@ -175,6 +223,23 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
 
 
 def notebook_flow(postconf,jobfile) -> Flow:
+    """ Provides a Prefect Flow for a running a python script in a Flow context. Originally designed for exported
+    Jupyter Notebook .py scripts.
+
+    Not fully tested. Designed for post jobs that require an on-demand compute node.
+
+    Parameters
+    ----------
+    postconf : str
+        The JSON configuration file for the Cluster to create
+
+    jobfile : str
+        The JSON configuration file for the post Job
+
+    Returns
+    -------
+    nb_flow : prefect.Flow
+    """
 
     with Flow('notebook flow') as nb_flow:
         #####################################################################
@@ -196,12 +261,39 @@ def notebook_flow(postconf,jobfile) -> Flow:
 
 
 def notebook_test(pyfile) -> Flow:
+    """ Provides a Prefect Flow for a running a python script in a Flow context. Originally designed for exported
+    Jupyter Notebook .py scripts. Used to test user developed scripts before injection in quasi-operational workflows.
+
+    Parameters
+    ----------
+    pyfile : str
+        The python script to run.
+
+    Returns
+    -------
+    nbtest_flow : prefect.Flow
+    """
     with Flow('notebook test') as nbtest_flow:
         notebook_task = tasks.run_pynotebook(pyfile)
     return nbtest_flow
 
 
 def test_flow(fcstconf, fcstjobfile) -> Flow:
+    """ Provides a Prefect Flow for testing purposes.
+
+    Parameters
+    ----------
+    fcstconf : str
+        The JSON configuration file for the Cluster to create
+
+    fcstjobfile : str
+        The JSON configuration file for the Job
+
+    Returns
+    -------
+    testflow : prefect.Flow
+    """
+
     with Flow('fcst workflow') as testflow:
         # Create the cluster object
         cluster = ctasks.cluster_init(fcstconf)
@@ -235,7 +327,7 @@ def test_flow(fcstconf, fcstjobfile) -> Flow:
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signals.FAIL() 
+    raise signals.FAIL()
 
 if __name__ == '__main__':
 

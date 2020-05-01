@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+""" Older workflows used during development. """
+
 from dask.distributed import Client
 # 3rd party dependencies
 from prefect import Flow
@@ -41,7 +43,7 @@ sshuser = 'username@boiler.ocean.washington.edu'
 
 with Flow('plot only') as plotonly:
     # Start a machine
-    postmach = ctasks.cluster_init(postconf, provider)
+    postmach = ctasks.cluster_init(postconf)
     pmStarted = ctasks.cluster_start(postmach)
 
     # Push the env, install required libs on post machine
@@ -80,7 +82,7 @@ with Flow('ofs workflow') as flow:
     #####################################################################
 
     # Create the cluster object
-    cluster = ctasks.cluster_init(fcstconf, 'AWS')
+    cluster = ctasks.cluster_init(fcstconf)
 
     # Start the cluster
     fcStarted = ctasks.cluster_start(cluster)
@@ -107,7 +109,7 @@ with Flow('ofs workflow') as flow:
     # or run on the local machine? concurrrently?
 
     # Start a machine
-    postmach = ctasks.cluster_init(postconf, provider)
+    postmach = ctasks.cluster_init(postconf)
     pmStarted = ctasks.cluster_start(postmach, upstream_tasks=[fcstStatus])
 
     # Push the env, install required libs on post machine

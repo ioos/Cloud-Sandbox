@@ -160,8 +160,9 @@ class TileBase(abc.ABC):
 class Tile4326(TileBase):
     """EPSG:4326 implementation of TileBase for tile operations
 
-    Note:
-    for tests:
+    Notes
+    -----
+    For tests:
         - sum of first two digits of quadtree should NEVER be less than 2 or greater than 4
            +--------+--------+
            |xxxxxxxx|xxxxxxxx| (x) denotes tiles/pixels out of EPSG:4326 space

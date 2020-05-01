@@ -1,4 +1,5 @@
 """
+Various cluster related functions wrapped as Prefect Tasks
 """
 
 # Python dependencies
@@ -38,7 +39,17 @@ log.setLevel(logging.DEBUG)
 # cluster
 @task
 def cluster_init(config) -> Cluster:
+    """ Create a new Cluster object using the ClusterFactory
 
+    Parameters
+    ----------
+    config : string
+
+    Returns
+    -------
+    newcluster : Cluster
+        Object returned will be a sub-class of Cluster
+    """
     factory = ClusterFactory()
     newcluster = factory.cluster(config)
 
@@ -50,6 +61,13 @@ def cluster_init(config) -> Cluster:
 # cluster
 @task
 def cluster_start(cluster):
+    """ Start the cluster
+
+    Parameters
+    ----------
+    cluster : Cluster
+
+    """
     log.info('Starting ' + str(cluster.nodeCount) + ' instances ...')
     try:
         cluster.start()
@@ -65,6 +83,13 @@ def cluster_start(cluster):
 # cluster
 @task(trigger=all_finished)
 def cluster_terminate(cluster):
+    """ Terminate the cluster
+
+    Parameters
+    ----------
+    cluster : Cluster
+    """
+
     responses = cluster.terminate()
     # Just check the state
     log.info('Responses from terminate: ')
@@ -80,6 +105,18 @@ def cluster_terminate(cluster):
 # cluster
 @task
 def push_pyEnv(cluster):
+    """ Push any local python packages to the newly started cluster and pip3 install them. This is needed when local changes to the plotting
+    routines exist. The cluster may not have the updated version.
+
+    Parameters
+    ----------
+    cluster : Cluster
+
+    Notes
+    -----
+    Use python3 setup.py sdist to create the distributable source package to upload.
+
+    """
 
     hosts = cluster.getHosts()
 
@@ -107,6 +144,17 @@ def push_pyEnv(cluster):
 # @task(max_retries=0, retry_delay=timedelta(seconds=10))
 @task
 def start_dask(cluster) -> Client:
+    """ Create a Dask cluster on the remote or local host
+
+    Parameters
+    ----------
+    cluster : Cluster
+
+    Returns
+    -------
+    daskclient : Dask distributed.Client
+        The connected Dask Client to use for submitting jobs
+    """
     # Only single host supported currently
     host = cluster.getHostsCSV()
 
@@ -158,6 +206,12 @@ def start_dask(cluster) -> Client:
 # dask
 @task
 def dask_client_close(daskclient: Client):
+    """ Close the Dask Client
+
+    Parameters
+    ----------
+    daskclient : Dask distributed.Client
+    """
     daskclient.close()
     return
 

@@ -18,11 +18,78 @@ debug = False
 
 
 class ROMSForecast(Job):
+    """ Implementation of Job class for ROMS Forecasts
+
+    Attributes
+    ----------
+    jobtype : str
+        Always 'romsforecast' for this class.
+
+    configfile : str
+        A JSON configuration file containing the required parameters for this class.
+
+    NPROCS : int
+        Total number of processors in this cluster.
+
+    OFS : str
+        The ocean forecast to run.
+
+    CDATE : str
+        The forecast date in format YYYYMMDD
+
+    HH : str
+        The forecast cycle in format HH
+
+    COMROT : str
+        The base directory to use, e.g. /com/nos
+
+    EXEC : str
+        The model executable to run. Only used for ADNOC currently.
+
+    TIME_REF : str
+        Templated TIME_REF field value for ROMS ocean.in
+
+    BUCKET : str
+        The cloud bucket name for saving results
+
+    BCKTFLDR : str
+        The cloud folder name for saving results
+
+    NTIMES : str
+        Templated NTIMES field value for ROMS ocean.in
+
+    ININAME : str
+        The file to use as a restart file.
+
+    OUTDIR : str
+        The full path to the output folder
+
+    OCEANIN : str
+        The ocean.in file to use or "AUTO" to use a template
+
+    OCNINTMPL : str
+        The ocean.in template to use or "AUTO" to use the default template
+
+    TEMPLPATH : str
+        The full path to the templates to use
+
+    """
+
 
     # TODO: make self and cfDict consistent
     def __init__(self, configfile, NPROCS):
+        """ Constructor
 
-        self.jobtype = 'roms'
+        Parameters
+        ----------
+        configfile : str
+
+        NPROCS : int
+            The number of processors to run the job on
+
+        """
+
+        self.jobtype = 'romsforecast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
@@ -36,8 +103,15 @@ class ROMSForecast(Job):
         self.parseConfig(cfDict)
         self.make_oceanin()
 
-    ########################################################################
+
     def parseConfig(self, cfDict):
+        """ Parses the configuration dictionary to class attributes
+
+        Parameters
+        ----------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings.
+        """
 
         self.OFS = cfDict['OFS']
         self.CDATE = cfDict['CDATE']
@@ -62,14 +136,12 @@ class ROMSForecast(Job):
 
         return
 
-    ########################################################################
 
     def make_oceanin(self):
-
+        """ Create the ocean.in file from a template"""
         OFS = self.OFS
 
         # Create the ocean.in file from a template
-        # TODO: Make ocean in for NOSOFS
         if OFS == 'liveocean':
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
@@ -81,9 +153,10 @@ class ROMSForecast(Job):
 
         return
 
-    ########################################################################
+
 
     def __make_oceanin_lo(self):
+        """ Create the ocean.in file for liveocean forecasts """
 
         CDATE = self.CDATE
         OFS = self.OFS
@@ -127,9 +200,10 @@ class ROMSForecast(Job):
             util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=ratio)
         return
 
-    ########################################################################
+
 
     def __make_oceanin_nosofs(self):
+        """ Create the ocean.in file for nosofs forecasts """
 
         CDATE = self.CDATE
         HH = self.HH
@@ -177,9 +251,10 @@ class ROMSForecast(Job):
 
         return
 
-    ########################################################################
+
 
     def __make_oceanin_adnoc(self):
+        """ Create the ocean.in file for adnoc forecasts """
 
         CDATE = self.CDATE
         OFS = self.OFS
@@ -204,7 +279,7 @@ class ROMSForecast(Job):
             util.makeOceanin(self.NPROCS, settings, template, outfile)
 
         return
-    ########################################################################
+
 
 
 if __name__ == '__main__':

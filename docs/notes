@@ -1,0 +1,7 @@
+pip3 install --user recommonmark
+sphinx-apidoc -e -o source/plotting ../cloudflow/plotting/
+sphinx-apidoc -o source/utils ../cloudflow/utils
+make clean
+vi source/conf.py
+vi source/index.rst
+make html

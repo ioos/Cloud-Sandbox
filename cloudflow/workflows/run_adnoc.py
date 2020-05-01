@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+""" Driver for running ADNOC forecasts """
 import os
 import sys
 import re
@@ -25,9 +25,23 @@ def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     raise signal.FAIL()
 
+
+
 def fcst_flow(fcstconf, fcstjobfile ) -> Flow:
+    """ Forecast workflow
 
+    Parameters
+    ----------
+    fcstconf : str
+        The cluster config file to use for this forecast.
 
+    fcstjobfile : str
+        The job config file to use for this forecast.
+
+    Returns
+    -------
+    flow : prefect.Flow
+    """
     with Flow('fcst workflow') as flow:
         #####################################################################
         # FORECAST
@@ -72,7 +86,7 @@ def main():
         sys.exit()
 
     fcstconf = f'{curdir}/../cluster/configs/adnoc.config'
-      
+
     jobfile = os.path.abspath(sys.argv[1])
     jobdict = util.readConfig(jobfile)
     jobtype = jobdict["JOBTYPE"]

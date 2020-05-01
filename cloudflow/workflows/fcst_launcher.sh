@@ -1,4 +1,7 @@
 #!/bin/bash
+# Script used to launch forecasts.
+# BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
+
 set -xa
 ulimit -c unlimited
 ulimit -s unlimited
@@ -19,7 +22,7 @@ fi
 #export FI_PROVIDER=tcp
 
 # This was created to launch a job via Python
-# The Python scripts create the cluster on-demand 
+# The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
 
 
@@ -58,7 +61,7 @@ else
   openmpi=0
   impi=1
 fi
-  
+
 #TODO: Make this section a switch statement instead
 
 if [ $openmpi -eq 1 ]; then
@@ -108,4 +111,4 @@ case $OFS in
     exit 1
     ;;
 esac
- 
+

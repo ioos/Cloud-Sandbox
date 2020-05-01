@@ -12,7 +12,7 @@ setup(name="cloudflow",
     author_email='patrick.tripp@rpsgroup.com',
     license="LICENSE.txt",
     setup_requires=['setuptools_scm'],
-    packages=[ 'cloudflow/cluster', 'cloudflow/job', 
+    packages=[ 'cloudflow/cluster', 'cloudflow/job',
                'cloudflow/plotting', 'cloudflow/services', 'cloudflow/utils',
                'cloudflow/workflows'
              ],
@@ -29,5 +29,5 @@ setup(name="cloudflow",
         'boto3',
         'prefect',
         'dask',
-        'distributed']
+        'distributed', 'PIL', 'matplotlib', 'netCDF4', 'numpy', 'pyproj', 'plotting']
      )
