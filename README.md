@@ -1,25 +1,29 @@
 # Cloud-Sandbox
 
+## CloudFlow API Specification
+https://asascience.github.io/Cloud-Sandbox
+
 ### Directory structure
 
     .
-    ├── workflow            # Python3 workflow sources
-    │   ├── cluster         # Cluster abstract base class and implementations 
-    │   ├── configs         # cluster configuration files (JSON)
-    │   ├── job             # Job abstract base class and implementations
-    │   │   └── templates   # Ocean model input namelist templates
-    │   ├── jobs            # job configuration files (JSON)
-    │   ├── plotting        # plotting and mp4 routines
-    │   ├── services        # Cloud agnostic interfaces and implementations e.g. S3
-    │   ├── tests           # Misc. testing. (TODO: add unit testing)
-    │   ├── utils           # Various utility functions, e.g. getTiling(totalCores), ndate(), etc.
-    │   └── workflows       # Workflows and workflow tasks
-    ├── scripts             # BASH scripts for various tasks
+    ├── cloudflow            Python3 cloudflow sources
+    │   ├── cluster          Cluster abstract base class and implementations 
+    │   │   └── configs      cluster configuration files (JSON)
+    │   ├── job              Job abstract base class and implementations
+    │   │   ├── jobs         job configuration files (JSON)
+    │   │   └── templates    Ocean model input namelist templates
+    │   ├── plotting         plotting and mp4 routines
+    │   ├── services         Cloud agnostic interfaces and implementations e.g. S3
+    │   ├── tests            Misc. testing. (TODO: add unit testing)
+    │   ├── utils            Various utility functions, e.g. getTiling(totalCores), ndate(), etc.
+    │   └── workflows        Workflows and workflow tasks
+    │       └── scripts      BASH scripts for various tasks
+    ├── docs                 Documentation
     └── README.md
 
-### workflows
+### Workflows
 
-How to setup the workflow:
+How to setup the workflows:
 
 1. Setup the machine configuration files for the forecast and/or post processing.
 
@@ -88,7 +92,7 @@ Example: configs/cbofs.config
 ```
 
 ```
-Description of variables:
+Description of variables for cluster:
 platform  - The cloud provider being used? Current options are AWS or Local (runs on local machine).
 region    - The AWS region to create your resources in.
 nodeType  - EC2 instance type.
@@ -123,6 +127,7 @@ Example: jobs/cbofs.00z.fcst
 ```
 
 ```
+Description of variables for jobs
 JOBTYPE   - current options are "forecast" and "plotting"
 OFS       - name of the forecast. Current options are "cbofs", "dbofs", "liveocean"
 CDATE     - run date, format YYYYMMDD or "today" = today's date

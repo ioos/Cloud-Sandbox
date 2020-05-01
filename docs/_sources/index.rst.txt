@@ -7,7 +7,6 @@ CloudFlow
    :maxdepth: 4
    :caption: Contents
 
-   settingup
    cluster/modules
    job/modules
    plotting/modules
