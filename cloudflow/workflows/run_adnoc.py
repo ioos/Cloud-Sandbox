@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Driver for running ADNOC forecasts """
+
 import os
 import sys
 import re
@@ -26,7 +27,6 @@ def handler(signal_received, frame):
     raise signal.FAIL()
 
 
-
 def fcst_flow(fcstconf, fcstjobfile ) -> Flow:
     """ Forecast workflow
 
@@ -42,6 +42,7 @@ def fcst_flow(fcstconf, fcstjobfile ) -> Flow:
     -------
     flow : prefect.Flow
     """
+
     with Flow('fcst workflow') as flow:
         #####################################################################
         # FORECAST

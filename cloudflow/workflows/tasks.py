@@ -5,7 +5,7 @@ functions.
 
 Keep things cloud platform agnostic at this layer.
 """
-
+#print(f"file: {__file__} | name: {__name__} | package: {__package__}")
 import os
 import sys
 import pprint
