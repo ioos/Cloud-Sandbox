@@ -22,7 +22,7 @@ class StorageService(ABC):
     """
 
     def __init__(self):
-        print('init stub')
+        return
 
 
     @abstractmethod

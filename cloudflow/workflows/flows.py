@@ -325,6 +325,34 @@ def test_flow(fcstconf, fcstjobfile) -> Flow:
     return testflow
 
 
+
+def test_nbflow(pyfile: str):
+    
+    nbtest = notebook_test(pyfile)
+    state = nbtest.run()
+
+    if state.is_successful():
+        return "PASSED"
+    else:
+        return "FAILED"
+
+
+def inject_notebook() :
+    ''' Convert the current notebook to python, test it, and upload it for the next forecast cycle.
+    '''
+
+    from cloudflow.utils import notebook as nbutils
+
+    #pyfile = nbutils.convert_nb2inject()
+    pyfile = nbutils.convert_notebook()
+    result = test_nbflow(pyfile)
+
+    print(result)
+
+    if result == "PASSED":
+        nbutils.inject(pyfile, storage_provider)
+
+
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     raise signals.FAIL()
