@@ -1,7 +1,7 @@
 {
   "JOBTYPE"   : "romsforecast",
   "OFS"       : "cbofs",
-  "CDATE"     : "today",
+  "CDATE"     : "20200517",
   "HH"        : "00",
   "COMROT"    : "/com/nos",
   "EXEC"      : "",
