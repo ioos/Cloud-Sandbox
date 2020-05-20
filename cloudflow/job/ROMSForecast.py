@@ -43,6 +43,9 @@ class ROMSForecast(Job):
     COMROT : str
         The base directory to use, e.g. /com/nos
 
+    PTMP : str
+        The base directory for the scratch disk, usually /ptmp
+
     EXEC : str
         The model executable to run. Only used for ADNOC currently.
 
@@ -117,6 +120,7 @@ class ROMSForecast(Job):
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']
+        self.PTMP = cfDict['PTMP']
         self.EXEC = cfDict['EXEC']
         self.TIME_REF = cfDict['TIME_REF']
         self.BUCKET = cfDict['BUCKET']
@@ -161,6 +165,7 @@ class ROMSForecast(Job):
         CDATE = self.CDATE
         OFS = self.OFS
         COMROT = self.COMROT
+        PTMP = self.PTMP
 
         template = self.OCNINTMPL
 
@@ -177,7 +182,7 @@ class ROMSForecast(Job):
             os.makedirs(self.OUTDIR)
 
         if self.ININAME == "auto":
-            self.ININAME = f"{COMROT}/liveocean/{fprevdate}/ocean_his_0025.nc"
+            self.ININAME = f"{PTMP}/liveocean/{fprevdate}/ocean_his_0025.nc"
 
         DSTART = util.ndays(CDATE, self.TIME_REF)
         # DSTART = days from TIME_REF to start of forecast day larger minus smaller date

@@ -32,7 +32,7 @@ formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcNa
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
-storage_provider = 'AWS'
+provider = 'AWS'
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.
@@ -65,26 +65,30 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Create the cluster object
         cluster = ctasks.cluster_init(fcstconf)
 
+        # scratch disk
+        # TODO: /ptmp should come from the fcstjob
+        scratch = tasks.create_scratch(provider,fcstconf,'/ptmp')
+
         # Setup the job
         fcstjob = tasks.job_init(cluster, fcstjobfile)
-
+        
         # Get forcing data
-        forcing = jtasks.get_forcing(fcstjob, sshuser)
+        forcing = jtasks.get_forcing(fcstjob, sshuser, upstream_tasks=[scratch])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster)
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+
+        # Mount the scratch disk
+        scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
 
         # Run the forecast
-        fcst_run = tasks.forecast_run(cluster, fcstjob)
+        fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[scratch_mount])
 
         # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster)
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
 
-        fcstflow.add_edge(cluster, fcstjob)
-        fcstflow.add_edge(fcstjob, forcing)
-        fcstflow.add_edge(forcing, cluster_start)
-        fcstflow.add_edge(cluster_start, fcst_run)
-        fcstflow.add_edge(fcst_run, cluster_stop)
+        # Delete the scratch disk
+        scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cluster_stop])
 
         # If the fcst fails, then set the whole flow to fail
         fcstflow.set_reference_tasks([fcst_run, cluster_stop])
@@ -135,7 +139,7 @@ def plot_flow(postconf, postjobfile) -> Flow:
         plots = jtasks.daskmake_plots(daskclient, FILES, plotjob)
         plots.set_upstream([daskclient])
 
-        storage_service = tasks.storage_init(storage_provider)
+        storage_service = tasks.storage_init(provider)
         pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
         pngtocloud.set_upstream(plots)
 
@@ -203,7 +207,7 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         plots = jtasks.daskmake_diff_plots(daskclient, FILES, BASELINE, plotjob)
         plots.set_upstream([daskclient, getbaseline])
 
-        storage_service = tasks.storage_init(storage_provider)
+        storage_service = tasks.storage_init(provider)
         pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
         pngtocloud.set_upstream(plots)
 
@@ -255,7 +259,7 @@ def notebook_flow(postconf,jobfile) -> Flow:
 
         plotjob = tasks.job_init(postmach, jobfile, upstream_tasks=[pmStarted])
 
-        storage_service = tasks.storage_init(storage_provider)
+        storage_service = tasks.storage_init(provider)
         injected = tasks.fetchpy_and_run(plotjob, storage_service)
     return nb_flow
 

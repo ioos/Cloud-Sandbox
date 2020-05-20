@@ -44,6 +44,9 @@ class FVCOMForecast(Job):
     COMROT : str
         The base directory to use, e.g. /com/nos
 
+    PTMP : str
+        The base directory for the scratch disk, usually /ptmp
+
     DATE_REF : str
         Templated DATE_REF field value for FVCOM namelist
 
@@ -119,6 +122,7 @@ class FVCOMForecast(Job):
         self.HH = cfDict['HH']
         self.NHOURS = cfDict['NHOURS']
         self.COMROT = cfDict['COMROT']
+        self.PTMP = cfDict['PTMP']
         self.DATE_REF = cfDict['DATE_REF']
         self.BUCKET = cfDict['BUCKET']
         self.BCKTFLDR = cfDict['BCKTFLDR']

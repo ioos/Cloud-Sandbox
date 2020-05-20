@@ -160,10 +160,12 @@ def get_forcing(job: Job, sshuser=None):
     cdate = job.CDATE
     ofs = job.OFS
     comrot = job.COMROT
+    ptmp = job.PTMP
     hh = job.HH
 
     if ofs == 'liveocean':
         comdir = f"{comrot}/{ofs}"
+        ptmp = f"{ptmp}/{ofs}"
         try:
             util.get_ICs_lo(cdate, comdir, sshuser)
         except Exception as e:

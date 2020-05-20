@@ -31,6 +31,9 @@ from cloudflow.cluster.Cluster import Cluster
 from cloudflow.services.StorageService import StorageService
 from cloudflow.services.S3Storage import S3Storage
 
+from cloudflow.services.ScratchDisk import ScratchDisk
+from cloudflow.services.AWSScratchDisk import AWSScratchDisk
+
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
@@ -40,6 +43,39 @@ debug = False
 
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
+
+# Scratch disk
+##############
+
+@task
+def create_scratch(provider: str, config: str, mountpath: str = '/ptmp') -> ScratchDisk:
+    """ Provides a high speed scratch disk if available """
+
+    if provider == 'AWS':
+        scratch = AWSScratchDisk(config)
+
+    elif provider == 'Local':
+        log.error('Coming soon ...')
+        raise signals.FAIL()
+    else:
+        log.error('Unsupported provider')
+        raise signals.FAIL()
+
+    scratch.create(mountpath)
+    return scratch
+
+
+@task
+def mount_scratch(scratch: ScratchDisk, cluster: Cluster):
+    hosts = cluster.getHosts() 
+    scratch.remote_mount(hosts)
+    return
+
+
+@task
+def delete_scratch(scratch: ScratchDisk):
+    scratch.delete()
+    return
 
 # Storage
 #######################################################################

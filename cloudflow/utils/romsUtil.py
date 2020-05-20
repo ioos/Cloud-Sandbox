@@ -284,6 +284,7 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
 
     return
 
+
 def get_baseline_lo(cdate, vdir, sshuser):
     """ Retrieve operational LiveOcean forecast data from UW """
 

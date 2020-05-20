@@ -38,7 +38,8 @@ class AWSScratchDisk(ScratchDisk):
         self.subnet_id = cfDict['subnet_id']
         self.region = cfDict['region']
 
-        pass
+        return
+
 
 
     def create(self, mountpath: str = '/ptmp'):
