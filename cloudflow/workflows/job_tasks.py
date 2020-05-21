@@ -78,6 +78,30 @@ def ncfiles_from_Job(job: Job):
     return FILES
 
 
+@task
+def ptmp2com(job: Job):
+    """ Transfer completed run from scratch disk to com """
+    
+    # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB $5.18 of compute cost
+    # nos does it in the forecast script and renames the files in the process
+    if job.OFS == "liveocean":
+        fdate = utils.lo_date(job.CDATE)
+        ptmp = f"{job.PTMP}/liveocean/{fdate}"
+        comout = f"{job.COMROT}/liveocean/{fdate}"
+
+        try:
+            result = subprocess.run(['cp', '-Rpf', f"{ptmp}/*", comout ],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.exception(f'error copying data to {comout} ...')
+        except Exception as e:
+            log.exception(f'exception copying data to {comout} ...')
+            raise signals.FAIL()
+    else:
+        print("This is not implemented for NOSOFS")
+        pass
+
+    return
 
 
 @task

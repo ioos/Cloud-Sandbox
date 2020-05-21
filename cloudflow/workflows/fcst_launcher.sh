@@ -88,6 +88,7 @@ case $OFS in
     export JOBARGS="$CDATE"
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
+    result=$?
     ;;
   cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
     export HOMEnos=/save/nosofs-NCO
@@ -97,6 +98,7 @@ case $OFS in
     export JOBARGS="$CDATE $HH"
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
+    result=$?
     ;;
   adnoc)
     EXEC=${EXEC:-roms}
@@ -104,6 +106,7 @@ case $OFS in
     mkdir -p "$JOBDIR"/output
     cd "$JOBDIR" || exit 1
     mpirun $MPIOPTS $EXEC ocean.in > ocean.log
+    result=$?
     ;;
 
   *)
@@ -112,3 +115,4 @@ case $OFS in
     ;;
 esac
 
+exit $result

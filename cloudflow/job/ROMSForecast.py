@@ -182,7 +182,7 @@ class ROMSForecast(Job):
             os.makedirs(self.OUTDIR)
 
         if self.ININAME == "auto":
-            self.ININAME = f"{PTMP}/liveocean/{fprevdate}/ocean_his_0025.nc"
+            self.ININAME = f"{COMROT}/{OFS}/{fprevdate}/ocean_his_0025.nc"
 
         DSTART = util.ndays(CDATE, self.TIME_REF)
         # DSTART = days from TIME_REF to start of forecast day larger minus smaller date

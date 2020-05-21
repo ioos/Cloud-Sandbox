@@ -28,6 +28,7 @@ class AWSScratchDisk(ScratchDisk):
         self.dnsname: str = None
         self.filesystemid: str = None
         self.status: str = 'uninitialized'
+        self.mountpath: str = '/ptmp'  # default can be reset in create()
 
         self.provider: str = 'AWS'
         self.capacity: int = 1200   # The smallest is 1.2 TB
@@ -44,6 +45,8 @@ class AWSScratchDisk(ScratchDisk):
 
     def create(self, mountpath: str = '/ptmp'):
         """ Create a new FSx scratch disk and mount it locally """
+
+        self.mountpath = mountpath
 
         client = boto3.client('fsx', region_name=self.region)
 
@@ -75,7 +78,7 @@ class AWSScratchDisk(ScratchDisk):
         '''
 
         log.info("FSx drive creation in progress...")
-        print('Status: ', self.status)
+        #print('Status: ', self.status)
         #print(json.dumps(response, indent=4))
         #print(response)
         self.filesystemid = response['FileSystem']['FileSystemId']
@@ -83,26 +86,26 @@ class AWSScratchDisk(ScratchDisk):
         self.mountname = response['FileSystem']['LustreConfiguration']['MountName']
 
         # Now mount it
-        self.__mount(mountpath)
-        print(self.filesystemid)
-        print(self.dnsname)
-        print(self.mountname)
+        self.__mount()
+        #print(self.filesystemid)
+        #print(self.dnsname)
+        #print(self.mountname)
 
 
-    def __mount(self, mountpath: str = '/ptmp' ):
+    def __mount(self):
         """ Mount the disk when it is ready """
 
         client = boto3.client('fsx', region_name=self.region)
 
-        maxtries=15
+        maxtries=20
         delay=30
 
         # Wait for it to be ready
         for x in range(maxtries):
 
-            log.info("Waiting for FSx disk to become AVAILABLE ... this could take up to 6 minutes")
+            log.info("Waiting for FSx disk to become AVAILABLE ... this could take up to 10 minutes")
 
-            if x == maxtries:
+            if x == maxtries-1:
                 log.exception('maxtries exceeded waiting for disk to become available ...')
                 traceback.print_stack()
                 raise signals.FAIL()
@@ -110,29 +113,38 @@ class AWSScratchDisk(ScratchDisk):
             response = client.describe_file_systems(FileSystemIds=[self.filesystemid])
             # 'Lifecycle': 'AVAILABLE' | 'CREATING' | 'FAILED' | 'DELETING' | 'MISCONFIGURED' | 'UPDATING',
             status = response['FileSystems'][0]['Lifecycle']
-            print(f'FSx status: {status}')
+            #print(f'FSx status: {status}')
 
             # Mount it
             if status == 'AVAILABLE':
+                log.info("FSx scratch disk is ready. Attempting to mount it locally...")
                 try:
                     ''' sudo mount -t lustre -o noatime,flock fs-0efe931e2cc043a6d.fsx.us-east-1.amazonaws.com@tcp:/6i6xxbmv  /ptmp '''
-                    result = subprocess.run(['sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', f'{self.dnsname}@tcp:/{self.mountname}', mountpath ],
-                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    result = subprocess.run(['sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', 
+                                            f'{self.dnsname}@tcp:/{self.mountname}', self.mountpath ],
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-                    print(result.stdout)
                     if result.returncode != 0:
-                        log.exception('unable to mount scratch disk ...')
-                        traceback.print_stack()
+                        log.exception('error attempting to mount scratch disk ...')
                         raise signals.FAIL()
+
+                    # Chmod to make it writeable by all
+                    result = subprocess.run(['sudo', 'chmod', '777', self.mountpath ],
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+                    if result.returncode != 0:
+                        log.exception('error attempting to chmod scratch disk ...')
+                        raise signals.FAIL()
+
                 except Exception as e:
                     log.exception('unable to mount scratch disk ...')
                     traceback.print_stack()
                     raise signals.FAIL()
 
                 self.status='available'
+                log.info(f"FSx scratch is mounted locally at {self.mountpath}")
                 break
             else: 
-                print('Waiting for FSx disk to become AVAILABLE to mount')
                 time.sleep(delay)
 
         return
@@ -143,18 +155,27 @@ class AWSScratchDisk(ScratchDisk):
 
         client = boto3.client('fsx', region_name=self.region)
 
+        log.info('Unmounting FSx disk at {self.mountpath} ...')
+        try:
+            result = subprocess.run(['sudo', 'umount', '-f', self.mountpath ],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.exception(f'error while unmounting scratch disk at {self.mountpath} ...')
+        except Exception as e:
+            log.exception('Exception while unmounting scratch disk at {self.mountpath} ...')
+ 
         try:
             response = client.delete_file_system(FileSystemId=self.filesystemid)
             if response['Lifecycle'] == 'DELETING':
-                print(f'FSx disk {self.filesystemid} is DELETING')
+                log.info(f'FSx disk {self.filesystemid} is DELETING')
                 self.status='deleted'
             else:
-                print(f'Something went wrong when deleting the FSx disk {self.filesystemid} ... manually check the status')
+                log.info(f'Something went wrong when deleting the FSx disk {self.filesystemid} ... manually check the status')
                 self.status='error'
 
         except ClientError as e:
-            log.exception('ClientError exception in createCluster' + str(e))
-            raise Exception() from e
+            log.exception('ClientError exception in AWSScratch.delete. ' + str(e))
+            raise signals.FAIL()
 
 
     def remote_mount(self, hosts: list):
@@ -163,13 +184,13 @@ class AWSScratchDisk(ScratchDisk):
         for host in hosts:
 
             try:
-                result = subprocess.run(['ssh', host, 'sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', f'{self.dnsname}@tcp:/{self.mountname}', mountpath ],
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                result = subprocess.run(['ssh', host, 'sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', 
+                                        f'{self.dnsname}@tcp:/{self.mountname}', self.mountpath ],
+                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
                 print(result.stdout)
                 if result.returncode != 0:
                     log.exception('unable to mount scratch disk on host...', host)
-                    traceback.print_stack()
                     raise signals.FAIL()
 
             except Exception as e:

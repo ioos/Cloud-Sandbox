@@ -83,15 +83,18 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
         # Run the forecast
         fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[scratch_mount])
-
+        
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
 
+        # Copy the results to /com (liveocean)
+        cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
+
         # Delete the scratch disk
-        scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cluster_stop])
+        scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cp2com])
 
         # If the fcst fails, then set the whole flow to fail
-        fcstflow.set_reference_tasks([fcst_run, cluster_stop])
+        fcstflow.set_reference_tasks([fcst_run, cp2com])
 
     return fcstflow
 
