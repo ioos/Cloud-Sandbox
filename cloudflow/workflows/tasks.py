@@ -278,9 +278,12 @@ def run_pynotebook(pyfile: str):
     log.info(f'Running {pyfile}')
 
     try:
-        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
+        result = subprocess.run(['python3', pyfile], 
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, text=True)
+        print(result.stdout)
         if result.returncode != 0:
             log.exception(f'{pyfile} returned non zero exit ...')
+            traceback.print_stack()
             raise signals.FAIL()
 
     except Exception as e:
@@ -288,7 +291,6 @@ def run_pynotebook(pyfile: str):
         traceback.print_stack()
         raise signals.FAIL()
 
-    print(f'Finished running {pyfile}')
     return
 
 

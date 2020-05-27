@@ -6,4 +6,4 @@ matplotlib
 netCDF4
 dask
 distributed
-Pillow==6.2.1
+Pillow
