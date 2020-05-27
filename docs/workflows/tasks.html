@@ -170,6 +170,17 @@ weather modelling workflows. These tasks are basically wrappers around other
 functions.</p>
 <p>Keep things cloud platform agnostic at this layer.</p>
 <dl class="py function">
+<dt id="tasks.create_scratch">
+<code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">create_scratch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">provider</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/ptmp'</span></em><span class="sig-paren">)</span> &#x2192; cloudflow.services.ScratchDisk.ScratchDisk<a class="headerlink" href="#tasks.create_scratch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a high speed scratch disk if available</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tasks.delete_scratch">
+<code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">delete_scratch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scratch</span><span class="p">:</span> <span class="n">cloudflow.services.ScratchDisk.ScratchDisk</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.delete_scratch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="tasks.fetchpy_and_run">
 <code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">fetchpy_and_run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="p">:</span> <span class="n">cloudflow.job.Job.Job</span></em>, <em class="sig-param"><span class="n">service</span><span class="p">:</span> <span class="n">cloudflow.services.StorageService.StorageService</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.fetchpy_and_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prototype for injecting user developed scripts into a workflow. This is currently implemented only for the
@@ -219,6 +230,11 @@ hlfs example. Additional work is needed to generalize this process.</p>
 <p class="rubric">Notes</p>
 <p>We can’t really separate the hardware from the job, nprocs is needed to setup the Job</p>
 </dd></dl>
+
+<dl class="py function">
+<dt id="tasks.mount_scratch">
+<code class="sig-prename descclassname">tasks.</code><code class="sig-name descname">mount_scratch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scratch</span><span class="p">:</span> <span class="n">cloudflow.services.ScratchDisk.ScratchDisk</span></em>, <em class="sig-param"><span class="n">cluster</span><span class="p">:</span> <span class="n">cloudflow.cluster.Cluster.Cluster</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tasks.mount_scratch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="tasks.run_pynotebook">

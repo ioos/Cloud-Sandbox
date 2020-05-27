@@ -29,5 +29,5 @@ setup(name="cloudflow",
         'boto3',
         'prefect',
         'dask',
-        'distributed', 'PIL', 'matplotlib', 'netCDF4', 'numpy', 'pyproj', 'plotting']
+        'distributed', 'PIL', 'matplotlib', 'netCDF4', 'numpy', 'pyproj', 'plotting', 'botocore']
      )

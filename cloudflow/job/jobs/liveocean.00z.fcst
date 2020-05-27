@@ -4,6 +4,7 @@
   "CDATE"     : "today",
   "HH"        : "00",
   "COMROT"    : "/com",
+  "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",
   "BUCKET"    : "ioos-cloud-sandbox",

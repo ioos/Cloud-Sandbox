@@ -4,6 +4,7 @@
   "CDATE"     : "20191211",
   "HH"        : "00",
   "COMROT"    : "/mnt/efs/ROMS",
+  "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "20191212.00",
   "BUCKET"    : "",

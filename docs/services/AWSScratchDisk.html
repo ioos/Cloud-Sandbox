@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StorageService module &mdash; CloudFlow 1.1.0 documentation</title>
+  <title>AWSScratchDisk module &mdash; CloudFlow 1.1.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ScratchDisk module" href="ScratchDisk.html" />
-    <link rel="prev" title="S3Storage module" href="S3Storage.html" /> 
+    <link rel="next" title="utils" href="../utils/modules.html" />
+    <link rel="prev" title="ScratchDisk module" href="ScratchDisk.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,9 +87,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../plotting/modules.html">plotting</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="S3Storage.html">S3Storage module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">StorageService module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StorageService.html">StorageService module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ScratchDisk.html">ScratchDisk module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AWSScratchDisk.html">AWSScratchDisk module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AWSScratchDisk module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utils/modules.html">utils</a></li>
@@ -141,13 +141,13 @@
         
           <li><a href="modules.html">services</a> &raquo;</li>
         
-      <li>StorageService module</li>
+      <li>AWSScratchDisk module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/services/StorageService.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/services/AWSScratchDisk.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -160,38 +160,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-StorageService">
-<span id="storageservice-module"></span><h1>StorageService module<a class="headerlink" href="#module-StorageService" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-AWSScratchDisk">
+<span id="awsscratchdisk-module"></span><h1>AWSScratchDisk module<a class="headerlink" href="#module-AWSScratchDisk" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="StorageService.StorageService">
-<em class="property">class </em><code class="sig-prename descclassname">StorageService.</code><code class="sig-name descname">StorageService</code><a class="headerlink" href="#StorageService.StorageService" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<dl class="simple">
-<dt>Abstract base class for cloud storage.</dt><dd><p>It defines a generic interface to implement</p>
+<dt id="AWSScratchDisk.AWSScratchDisk">
+<em class="property">class </em><code class="sig-prename descclassname">AWSScratchDisk.</code><code class="sig-name descname">AWSScratchDisk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.services.ScratchDisk.ScratchDisk</span></code></p>
+<p>AWS implementation of scratch disk.</p>
+<dl class="py method">
+<dt id="AWSScratchDisk.AWSScratchDisk.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/ptmp'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new FSx scratch disk and mount it locally</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mountpath</strong> (<em>str</em>) – The path where the disk will be mounted. Default = /ptmp” (optional)</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>uploadFile</dt><dd><p>Upload a file</p>
-</dd>
-<dt>downloadFile</dt><dd><p>Download a file</p>
-</dd>
-<dt>file_exists</dt><dd><p>Test if a file exists</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSScratchDisk.AWSScratchDisk.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete this FSx disk</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="AWSScratchDisk.AWSScratchDisk.remote_mount">
+<code class="sig-name descname">remote_mount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hosts</span><span class="p">:</span> <span class="n">list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk.remote_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mount this FSx disk on remote hosts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hosts</strong> (<em>list of str</em>) – The list of remote hosts</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="StorageService.StorageService.downloadFile">
-<em class="property">abstract </em><code class="sig-name descname">downloadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.downloadFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="StorageService.StorageService.file_exists">
-<em class="property">abstract </em><code class="sig-name descname">file_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.file_exists" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="StorageService.StorageService.uploadFile">
-<em class="property">abstract </em><code class="sig-name descname">uploadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">public</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.uploadFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -205,10 +207,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ScratchDisk.html" class="btn btn-neutral float-right" title="ScratchDisk module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../utils/modules.html" class="btn btn-neutral float-right" title="utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="S3Storage.html" class="btn btn-neutral float-left" title="S3Storage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ScratchDisk.html" class="btn btn-neutral float-left" title="ScratchDisk module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

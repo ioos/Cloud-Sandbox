@@ -243,7 +243,6 @@ ad_LBC(isTvar) ==   RadNud     RadNud     Clo     Clo \    ! idbio(1), NO3
 
   LnudgeTCLM == 9*T
 
-  #SSFNAME == /com/liveocean/forcing/f2019.11.06/riv2/rivers.nc
   SSFNAME == rivers.nc
 
 ! Logical switches (TRUE/FALSE) to activate writing of biological tracers
