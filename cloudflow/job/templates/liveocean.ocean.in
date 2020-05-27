@@ -573,8 +573,8 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 ! line per entry with a vertical bar (|) symbol after each entry,
 ! except the last one.
 
-     BRYNAME == /com/liveocean/forcing/__FDATE__/ocn4/ocean_bry.nc
-     CLMNAME == /com/liveocean/forcing/__FDATE__/ocn4/ocean_clm.nc
+     BRYNAME == /ptmp/liveocean/forcing/__FDATE__/ocn4/ocean_bry.nc
+     CLMNAME == /ptmp/liveocean/forcing/__FDATE__/ocn4/ocean_clm.nc
 
 ! Input climatology nudging coefficients file name.
 
@@ -582,29 +582,29 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-     SSFNAME == /com/liveocean/forcing/__FDATE__/riv2/rivers.nc
+     SSFNAME == /ptmp/liveocean/forcing/__FDATE__/riv2/rivers.nc
 
      NFFILES == 9                          ! number of unique forcing files
 
-     FRCNAME == /com/liveocean/forcing/__FDATE__/tide2/tides.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/lwrad_down.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/Pair.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/Qair.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/rain.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/swrad.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/Tair.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/Uwind.nc \
-                /com/liveocean/forcing/__FDATE__/atm1/Vwind.nc  
+     FRCNAME == /ptmp/liveocean/forcing/__FDATE__/tide2/tides.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/lwrad_down.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/Pair.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/Qair.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/rain.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/swrad.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/Tair.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/Uwind.nc \
+                /ptmp/liveocean/forcing/__FDATE__/atm1/Vwind.nc  
 
 ! Output NetCDF file names, [1:Ngrids].
 
-     RSTNAME == /com/liveocean/__FDATE__/ocean_rst.nc
-     HISNAME == /com/liveocean/__FDATE__/ocean_his.nc
-     AVGNAME == /com/liveocean/__FDATE__/ocean_avg.nc
-     DIANAME == /com/liveocean/__FDATE__/ocean_dia.nc
+     RSTNAME == /ptmp/liveocean/__FDATE__/ocean_rst.nc
+     HISNAME == /ptmp/liveocean/__FDATE__/ocean_his.nc
+     AVGNAME == /ptmp/liveocean/__FDATE__/ocean_avg.nc
+     DIANAME == /ptmp/liveocean/__FDATE__/ocean_dia.nc
 
 ! Input ASCII parameter filenames.
-     BPARNAM = /com/liveocean/__FDATE__/npzd2o_Banas.in     
+     BPARNAM = /ptmp/liveocean/__FDATE__/npzd2o_Banas.in     
 
 
 

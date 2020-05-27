@@ -6,3 +6,5 @@ services
 
    S3Storage
    StorageService
+   ScratchDisk
+   AWSScratchDisk

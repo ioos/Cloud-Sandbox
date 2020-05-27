@@ -284,6 +284,7 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
 
     return
 
+
 def get_baseline_lo(cdate, vdir, sshuser):
     """ Retrieve operational LiveOcean forecast data from UW """
 
@@ -304,6 +305,7 @@ def get_baseline_lo(cdate, vdir, sshuser):
     subprocess.run(["scp", "-p", scpdir, vdir], stderr=subprocess.STDOUT)
 
     return
+
 
 def get_ICs_lo(cdate, localpath, sshuser):
     """ Get the atmospheric forcing and boundary layer conditions and ICs

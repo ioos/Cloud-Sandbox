@@ -189,9 +189,18 @@
         <li><a href="cluster/AWSCluster.html#module-AWSCluster">module</a>
 </li>
       </ul></li>
+      <li><a href="cluster/AWSCluster.html#AWSCluster.AWSCluster">AWSCluster (class in AWSCluster)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cluster/AWSCluster.html#AWSCluster.AWSCluster">AWSCluster (class in AWSCluster)</a>
+      <li>
+    AWSScratchDisk
+
+      <ul>
+        <li><a href="services/AWSScratchDisk.html#module-AWSScratchDisk">module</a>
+</li>
+      </ul></li>
+      <li><a href="services/AWSScratchDisk.html#AWSScratchDisk.AWSScratchDisk">AWSScratchDisk (class in AWSScratchDisk)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -269,10 +278,10 @@
         <li><a href="workflows/cluster_tasks.html#module-cluster_tasks">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="workflows/cluster_tasks.html#cluster_tasks.cluster_terminate">cluster_terminate() (in module cluster_tasks)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ClusterFactory
 
@@ -300,6 +309,14 @@
         <li><a href="job/ROMSForecast.html#ROMSForecast.ROMSForecast.configfile">(ROMSForecast.ROMSForecast attribute)</a>
 </li>
       </ul></li>
+      <li><a href="services/AWSScratchDisk.html#AWSScratchDisk.AWSScratchDisk.create">create() (AWSScratchDisk.AWSScratchDisk method)</a>
+
+      <ul>
+        <li><a href="services/ScratchDisk.html#ScratchDisk.ScratchDisk.create">(ScratchDisk.ScratchDisk method)</a>
+</li>
+      </ul></li>
+      <li><a href="workflows/tasks.html#tasks.create_scratch">create_scratch() (in module tasks)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -322,8 +339,6 @@
         <li><a href="cluster/LocalCluster.html#LocalCluster.LocalCluster.daskscheduler">(LocalCluster.LocalCluster attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cluster/AWSCluster.html#AWSCluster.AWSCluster.daskworker">daskworker (AWSCluster.AWSCluster attribute)</a>
 
       <ul>
@@ -332,7 +347,17 @@
         <li><a href="cluster/LocalCluster.html#LocalCluster.LocalCluster.daskworker">(LocalCluster.LocalCluster attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="job/FVCOMForecast.html#FVCOMForecast.FVCOMForecast.DATE_REF">DATE_REF (FVCOMForecast.FVCOMForecast attribute)</a>
+</li>
+      <li><a href="services/AWSScratchDisk.html#AWSScratchDisk.AWSScratchDisk.delete">delete() (AWSScratchDisk.AWSScratchDisk method)</a>
+
+      <ul>
+        <li><a href="services/ScratchDisk.html#ScratchDisk.ScratchDisk.delete">(ScratchDisk.ScratchDisk method)</a>
+</li>
+      </ul></li>
+      <li><a href="workflows/tasks.html#tasks.delete_scratch">delete_scratch() (in module tasks)</a>
 </li>
       <li><a href="workflows/flows.html#flows.diff_plot_flow">diff_plot_flow() (in module flows)</a>
 </li>
@@ -628,6 +653,8 @@
       <ul>
         <li><a href="cluster/AWSCluster.html#module-AWSCluster">AWSCluster</a>
 </li>
+        <li><a href="services/AWSScratchDisk.html#module-AWSScratchDisk">AWSScratchDisk</a>
+</li>
         <li><a href="cluster/Cluster.html#module-Cluster">Cluster</a>
 </li>
         <li><a href="workflows/cluster_tasks.html#module-cluster_tasks">cluster_tasks</a>
@@ -664,6 +691,8 @@
 </li>
         <li><a href="services/S3Storage.html#module-S3Storage">S3Storage</a>
 </li>
+        <li><a href="services/ScratchDisk.html#module-ScratchDisk">ScratchDisk</a>
+</li>
         <li><a href="plotting/shared.html#module-shared">shared</a>
 </li>
         <li><a href="services/StorageService.html#module-StorageService">StorageService</a>
@@ -675,6 +704,10 @@
         <li><a href="workflows/workflow_main.html#module-workflow_main">workflow_main</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="workflows/tasks.html#tasks.mount_scratch">mount_scratch() (in module tasks)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -858,6 +891,14 @@
         <li><a href="cluster/LocalCluster.html#LocalCluster.LocalCluster.PPN">(LocalCluster.LocalCluster attribute)</a>
 </li>
       </ul></li>
+      <li><a href="job/FVCOMForecast.html#FVCOMForecast.FVCOMForecast.PTMP">PTMP (FVCOMForecast.FVCOMForecast attribute)</a>
+
+      <ul>
+        <li><a href="job/ROMSForecast.html#ROMSForecast.ROMSForecast.PTMP">(ROMSForecast.ROMSForecast attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="workflows/job_tasks.html#job_tasks.ptmp2com">ptmp2com() (in module job_tasks)</a>
+</li>
       <li><a href="workflows/cluster_tasks.html#cluster_tasks.push_pyEnv">push_pyEnv() (in module cluster_tasks)</a>
 </li>
   </ul></td>
@@ -889,6 +930,8 @@
       <li><a href="utils/romsUtil.html#romsUtil.readConfig">readConfig() (in module romsUtil)</a>
 
       <ul>
+        <li><a href="services/ScratchDisk.html#ScratchDisk.readConfig">(in module ScratchDisk)</a>
+</li>
         <li><a href="job/Job.html#Job.Job.readConfig">(Job.Job method)</a>
 </li>
       </ul></li>
@@ -896,6 +939,12 @@
 </li>
       <li><a href="cluster/LocalCluster.html#LocalCluster.LocalCluster.readConfig">readConfig() (LocalCluster.LocalCluster method)</a>
 </li>
+      <li><a href="services/AWSScratchDisk.html#AWSScratchDisk.AWSScratchDisk.remote_mount">remote_mount() (AWSScratchDisk.AWSScratchDisk method)</a>
+
+      <ul>
+        <li><a href="services/ScratchDisk.html#ScratchDisk.ScratchDisk.remote_mount">(ScratchDisk.ScratchDisk method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -939,6 +988,15 @@
       <li><a href="services/S3Storage.html#S3Storage.S3Storage">S3Storage (class in S3Storage)</a>
 </li>
       <li><a href="workflows/tasks.html#tasks.save_to_cloud">save_to_cloud() (in module tasks)</a>
+</li>
+      <li>
+    ScratchDisk
+
+      <ul>
+        <li><a href="services/ScratchDisk.html#module-ScratchDisk">module</a>
+</li>
+      </ul></li>
+      <li><a href="services/ScratchDisk.html#ScratchDisk.ScratchDisk">ScratchDisk (class in ScratchDisk)</a>
 </li>
       <li><a href="utils/romsUtil.html#romsUtil.scrub_liveocean">scrub_liveocean() (in module romsUtil)</a>
 </li>
