@@ -23,6 +23,7 @@ class AWSScratchDisk(ScratchDisk):
     """
 
     def __init__(self, config: str):
+        """ Constructor """
 
         self.mountname: str = None
         self.dnsname: str = None
@@ -44,7 +45,13 @@ class AWSScratchDisk(ScratchDisk):
 
 
     def create(self, mountpath: str = '/ptmp'):
-        """ Create a new FSx scratch disk and mount it locally """
+        """ Create a new FSx scratch disk and mount it locally 
+
+        Parameters
+        ----------
+        mountpath : str
+            The path where the disk will be mounted. Default = /ptmp" (optional)
+        """
 
         self.mountpath = mountpath
 
@@ -179,7 +186,13 @@ class AWSScratchDisk(ScratchDisk):
 
 
     def remote_mount(self, hosts: list):
-        """ Mount this FSx disk on remote hosts """
+        """ Mount this FSx disk on remote hosts 
+
+        Parameters
+        ----------
+        hosts : list of str
+          The list of remote hosts
+        """
 
         for host in hosts:
 

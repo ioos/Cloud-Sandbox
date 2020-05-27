@@ -12,25 +12,33 @@ class ScratchDisk(ABC):
 
     Abstract Methods
     ----------------
-
-
     """
 
     def __init__(self):
+        """ Constructor """
         provider: str = None
         status: str = None
         pass
 
     @abstractmethod
     def create(self):
+        """ Create the scratch disk """
         pass
 
     @abstractmethod
     def delete(self):
+        """ Delete the scratch disk """
         pass
 
     @abstractmethod
     def remote_mount(self, hosts: list):
+        """ Mount the scratch disk on remote hosts 
+
+        Parameters
+        ----------
+        hosts : list of str
+          The list of remote hosts
+        """
         pass
 
 
