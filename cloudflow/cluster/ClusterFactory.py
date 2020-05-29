@@ -44,8 +44,8 @@ class ClusterFactory:
 
         if provider == 'AWS':
 
+            log.info(f'Attempting to make a new cluster : {provider}')
             try:
-                print('Attempting to make a newcluster :', provider)
                 newcluster = AWSCluster(configfile)
             except Exception as e:
                 log.exception('Could not create cluster: ' + str(e))

@@ -291,18 +291,28 @@ def get_baseline_lo(cdate, vdir, sshuser):
     remotepath = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
     fdate = lo_date(cdate)
 
-    if not os.path.exists(vdir):
-        os.makedirs(vdir)
-    else:
-        print(f"Directory {vdir} already exists .... not downloading.")
-        print(f"Remove the {vdir} directory to force the download.")
-        return
+    if os.path.exists(vdir):
+        if len(os.listdir(vdir)) != 0:
+            print(f"Baselines seem to already exist in  {vdir} ... not downloading.")
+            print(f"Remove the {vdir} directory to force the download.")
+            return
+        else:
+            # We will scp the entire path from UW so delete existing directory
+            os.rmdir(vdir)
 
     # Get the forcing
-    scpdir = f"{sshuser}:{remotepath}/{fdate}/\*"
+    scpdir = f"{sshuser}:{remotepath}/{fdate}"
 
     # TODO: add exception handing, check return value from scp
-    subprocess.run(["scp", "-p", scpdir, vdir], stderr=subprocess.STDOUT)
+    # Python can not escape the \* as desired, so we have to scp -rp
+    # could probably use shell=True style instead
+
+    # Remove the trailing path specifier from vdir
+    vpath = '/'.join(vdir.split('/')[0:-1])
+
+    result = subprocess.run(["scp", "-rp", scpdir, vpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if result != 0:
+        print("Error retrieving liveocean baselines: ", result.stdout)
 
     return
 
@@ -314,7 +324,6 @@ def get_ICs_lo(cdate, localpath, sshuser):
         This requires an account on the remote server with private key authentication.
     """
 
-    # TODO: Parameterize this
     restart_file = "ocean_his_0025.nc"
     remotepath = "/data1/parker/LiveOcean_output/cas6_v3"
     remotepath_rst = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
@@ -329,6 +338,8 @@ def get_ICs_lo(cdate, localpath, sshuser):
     if not os.path.exists(forcedir):
         os.makedirs(forcedir)
     else:
+
+        # TODO: check if empty
         print(f"Forcing directory {forcedir} already exists .... not downloading.")
         print(f"Remove the {forcedir} directory to force the download.")
         return
@@ -343,7 +354,11 @@ def get_ICs_lo(cdate, localpath, sshuser):
     # SSFNAME == /com/liveocean/forcing/f2019.11.06/riv2/rivers.nc
     # SSFNAME == rivers.nc
     # ln -s {forcedir}/{fdate}/riv2/rivers.nc {localpath}/{fdate}/rivers.nc
-    subprocess.run(["ln", "-s", f"{forcedir}/riv2/rivers.nc", \
+    #subprocess.run(["ln", "-s", f"{forcedir}/riv2/rivers.nc", \
+                    #f"{localpath}/{fdate}/rivers.nc"], stderr=subprocess.STDOUT)
+
+    # TODO - add error checking and return code
+    subprocess.run(["cp", "-pf", f"{forcedir}/riv2/rivers.nc", \
                     f"{localpath}/{fdate}/rivers.nc"], stderr=subprocess.STDOUT)
 
     # Get the restart file from the previous day's forecast

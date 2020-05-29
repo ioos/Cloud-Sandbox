@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import logging
 import subprocess
 import time
@@ -23,15 +24,28 @@ log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 
 
-
-def main():
-
+def create_delete():
     config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
     fsx = AWSScratchDisk(config)
     fsx.create('/ptmp')
     print("FSx disk was created and mounted locally")
     fsx.delete()
-    
+
+def main():
+
+    config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
+    disk1 = AWSScratchDisk(config)
+    disk1.users += 1
+    print(f"Ptmp users is: {disk1.users}")
+
+
+    disk2 = AWSScratchDisk(config)
+    print(f"Ptmp users is: {disk2.users}")
+    disk2.users += 1
+    print(f"Ptmp users is: {disk2.users}")
+    print(f"Ptmp users is: {disk1.users}")
+    time.sleep(60)
+
     return
 
 

@@ -17,6 +17,7 @@ import traceback
 
 from prefect import task
 from prefect.engine import signals
+from prefect.triggers import all_finished
 
 # Local dependencies
 
@@ -48,11 +49,27 @@ log.setLevel(logging.DEBUG)
 ##############
 
 @task
-def create_scratch(provider: str, config: str, mountpath: str = '/ptmp') -> ScratchDisk:
-    """ Provides a high speed scratch disk if available """
+def create_scratch(provider: str, configfile: str, mountpath: str = '/ptmp') -> ScratchDisk:
+    """ Provides a high speed scratch disk if available. Creates and mounts the disk.
+
+    Parameters
+    ----------
+    provider : str
+      Name of an implemented provider.
+
+    configfile : str
+        The Job configuration file
+      
+
+    Returns
+    -------
+    scratch : ScratchDisk
+      Returns the ScratchDisk object
+
+    """
 
     if provider == 'AWS':
-        scratch = AWSScratchDisk(config)
+        scratch = AWSScratchDisk(configfile)
 
     elif provider == 'Local':
         log.error('Coming soon ...')
@@ -67,13 +84,30 @@ def create_scratch(provider: str, config: str, mountpath: str = '/ptmp') -> Scra
 
 @task
 def mount_scratch(scratch: ScratchDisk, cluster: Cluster):
+    """ Mounts the scratch disk on each node of the cluster
+
+    Parameters
+    ----------
+    scratch : ScratchDisk
+      The scratch disk object
+    cluster : Cluster
+      The cluster object that contains the hostnames
+    """ 
+
     hosts = cluster.getHosts() 
     scratch.remote_mount(hosts)
     return
 
 
-@task
+@task(trigger=all_finished)
 def delete_scratch(scratch: ScratchDisk):
+    """ Unmounts and deletes the scratch disk
+    
+    Parameters
+    ----------
+    scratch : ScratchDisk
+      The scratch disk object
+    """
     scratch.delete()
     return
 

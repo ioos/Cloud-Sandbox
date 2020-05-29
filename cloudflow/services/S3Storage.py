@@ -84,7 +84,7 @@ class S3Storage(StorageService):
 
 
     def file_exists(self, bucket: str, key: str) -> bool:
-        """
+        """ Test if the specified file exists in the S3 bucket
 
         Parameters
         ----------

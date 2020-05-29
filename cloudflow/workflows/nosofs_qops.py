@@ -81,7 +81,7 @@ def main():
 
         # Add the diff plot flow
         elif jobtype == "plotting_diff":
-            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
+            diffplotflow = flows.diff_plot_flow(postconf, jobfile, sshuser)
             flowdeq.appendleft(diffplotflow)
 
         else:

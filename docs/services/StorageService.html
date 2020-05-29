@@ -166,32 +166,59 @@
 <dt id="StorageService.StorageService">
 <em class="property">class </em><code class="sig-prename descclassname">StorageService.</code><code class="sig-name descname">StorageService</code><a class="headerlink" href="#StorageService.StorageService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<dl class="simple">
-<dt>Abstract base class for cloud storage.</dt><dd><p>It defines a generic interface to implement</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>uploadFile</dt><dd><p>Upload a file</p>
-</dd>
-<dt>downloadFile</dt><dd><p>Download a file</p>
-</dd>
-<dt>file_exists</dt><dd><p>Test if a file exists</p>
-</dd>
-</dl>
+<p>Abstract base class for cloud storage.
+It defines a generic interface to implement</p>
 <dl class="py method">
 <dt id="StorageService.StorageService.downloadFile">
 <em class="property">abstract </em><code class="sig-name descname">downloadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.downloadFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Interface to download a file from the storage provider</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The key for the file</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – The path and filename to save the file as</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="StorageService.StorageService.file_exists">
 <em class="property">abstract </em><code class="sig-name descname">file_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.file_exists" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Test if the specified file exists in the storage provider bucket</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The S3 key for the file to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if file exists
+False if file does not exist</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="StorageService.StorageService.uploadFile">
 <em class="property">abstract </em><code class="sig-name descname">uploadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">public</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#StorageService.StorageService.uploadFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Interface to upload a file to the storage provider</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The path and filename to upload</p></li>
+<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The key to store the file as</p></li>
+<li><p><strong>public</strong> (<em>bool</em>) – If file should be made publicly accessible or not</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

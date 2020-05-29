@@ -155,6 +155,9 @@ def start_dask(cluster) -> Client:
     daskclient : Dask distributed.Client
         The connected Dask Client to use for submitting jobs
     """
+    # TODO: Refactor this, make Dask an optional part of the cluster
+    # TODO: scale this to multiple hosts
+
     # Only single host supported currently
     host = cluster.getHostsCSV()
 
@@ -179,25 +182,42 @@ def start_dask(cluster) -> Client:
         cluster.setDaskWorker(wrkrproc)
 
         daskclient = Client(f"{host}:{port}")
+        return daskclient
+
     else:
         # Use dask-ssh instead of multiple ssh calls
-        # TODO: Refactor this, make Dask an optional part of the cluster
-        # TODO: scale this to multiple hosts
+        interval=10
+        maxtries=12
+        num=0
+
+        while num < maxtries:
+            log.info('Pinging ssh service on remote host ... ')
+            tryssh = subprocess.run(["ssh", host, "ls"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if tryssh.returncode == 0:
+                break
+            #print(tryssh.stdout) 
+            log.info(f'Host not ready, sleeping for {interval} seconds ... {num}')
+            time.sleep(interval)
+            num += 1
+            if (num + 1) == maxtries:
+                log.exception(f'Unable to ssh to host {host}')
+                raise signals.FAIL()
+ 
         try:
-            time.sleep(15)
+            log.info('Starting dask and connecting a client ...')
             proc = subprocess.Popen(["dask-ssh", "--nprocs", str(nprocs), "--scheduler-port", port, host],
                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-            log.info('Connecting a dask client ')
-
             # Keep a reference to this process so we can kill it later
             cluster.setDaskScheduler(proc)
-            daskclient = Client(f"{host}:{port}")
+            time.sleep(interval)
         except Exception as e:
             log.info("In start_dask during subprocess.Popen :" + str(e))
             traceback.print_stack()
+            raise signals.FAIL()
 
-    return daskclient
+        daskclient = Client(f"{host}:{port}")
+
+        return daskclient
 
 
 #####################################################################

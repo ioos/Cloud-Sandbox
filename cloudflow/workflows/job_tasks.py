@@ -7,6 +7,7 @@ import subprocess
 import sys
 import os
 import glob
+import shutil
 
 from distributed import Client
 from prefect.engine import signals
@@ -28,10 +29,11 @@ __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
+debug = False
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 
-# generic, should be job
+
 @task
 def ncfiles_glob(SOURCE, filespec: str = "*.nc"):
     """ Provides a list of files that match the parameters
@@ -56,8 +58,6 @@ def ncfiles_glob(SOURCE, filespec: str = "*.nc"):
     return FILES
 
 
-
-# job
 @task
 def ncfiles_from_Job(job: Job):
     """ Provides a list of files that match the parameters provided by the Job object
@@ -80,25 +80,38 @@ def ncfiles_from_Job(job: Job):
 
 @task
 def ptmp2com(job: Job):
-    """ Transfer completed run from scratch disk to com """
+    """ Transfer completed run from scratch disk to com 
+
+    Parameters
+    ----------
+    job : Job
+        The Job object with CDATE, PTMP, and COMROT attributes set.
+    """
     
-    # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB $5.18 of compute cost
-    # nos does it in the forecast script and renames the files in the process
+    # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB 
+    # If done in the cluster ~$5.18 of compute cost, do it in the head node instead
+    # NOS does it in the forecast script and renames the files in the process 
     if job.OFS == "liveocean":
-        fdate = utils.lo_date(job.CDATE)
-        ptmp = f"{job.PTMP}/liveocean/{fdate}"
-        comout = f"{job.COMROT}/liveocean/{fdate}"
+        fdate = util.lo_date(job.CDATE)
+        ptmp = f'{job.PTMP}/liveocean/{fdate}/*'
+        comout = job.COMROT + '/liveocean/' + fdate
+
+        if debug:
+            print(f"ptmp: {ptmp}, comout: {comout}")
 
         try:
-            result = subprocess.run(['cp', '-Rpf', f"{ptmp}/*", comout ],
+            cmd = f'cp -pf {ptmp} {comout}'
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
-                log.exception(f'error copying data to {comout} ...')
+                log.error(result.stdout)
+                log.error(f'error copying data from {ptmp} to {comout}')
         except Exception as e:
-            log.exception(f'exception copying data to {comout} ...')
+            log.exception(result.stdout)
+            log.exception(f'exception copying data from {ptmp} to {comout}')
             raise signals.FAIL()
     else:
-        print("This is not implemented for NOSOFS")
+        log.info("Skipping ... NOSOFS does this in the forecast script")
         pass
 
     return
@@ -175,21 +188,13 @@ def get_forcing(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
-    # Open and parse jobconfig file
-    # "OFS"       : "liveocean",
-    # "CDATE"     : "20191106",
-    # "ININAME"   : "/com/liveocean/f2019.11.05/ocean_his_0025.nc",
-
-    # jobDict = util.readConfig(jobconfig)
     cdate = job.CDATE
     ofs = job.OFS
     comrot = job.COMROT
-    ptmp = job.PTMP
     hh = job.HH
 
     if ofs == 'liveocean':
         comdir = f"{comrot}/{ofs}"
-        ptmp = f"{ptmp}/{ofs}"
         try:
             util.get_ICs_lo(cdate, comdir, sshuser)
         except Exception as e:
@@ -222,8 +227,6 @@ def get_forcing(job: Job, sshuser=None):
     return
 
 
-
-# job, dask
 @task
 def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     """ Create mpegs from plots
@@ -241,7 +244,6 @@ def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     """
     log.info(f"In daskmake_mpegs")
 
-    # TODO: make the filespec a function parameter
     if not os.path.exists(job.OUTDIR):
         os.makedirs(job.OUTDIR)
 
@@ -250,8 +252,8 @@ def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
 
     plot_function = plot_shared.png_ffmpeg
 
+    # TODO: make the filespec a function parameter
     for var in job.VARS:
-        # source = f"{job.OUTDIR}/ocean_his_%04d_{var}.png"
 
         if diff:
             source = f"{job.OUTDIR}/f%03d_{var}_diff.png"
@@ -270,13 +272,10 @@ def daskmake_mpegs(client: Client, job: Job, diff: bool=False):
     # Wait for the jobs to complete
     for future in futures:
         result = future.result()
-        #log.info(result)
 
     return
 
 
-
-# job, dask
 @task
 def daskmake_plots(client: Client, FILES: list, job: Job):
     """ Create plots using a Dask distributed Client
@@ -295,7 +294,6 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
 
     log.info(f"In daskmake_plots {FILES}")
 
-    log.info(f"Target is : {target}")
     if not os.path.exists(target):
         os.makedirs(target)
 
@@ -311,7 +309,6 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
 
 
     # Submit all jobs to the dask scheduler
-    # TODO - parameterize filespec and get files here?
     for filename in FILES:
         for varname in job.VARS:
             log.info(f"plotting file: {filename} var: {varname}")
@@ -323,7 +320,6 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
     # Wait for the jobs to complete
     for future in futures:
         result = future.result()
-        #log.info(result)
 
     # Was unable to get it to work using client.map() gather
     # filenames = FILES[0:1]
@@ -373,20 +369,19 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
 
     # ROMS and FVCOM grids are handled differently
     if job.OFS in util.roms_models:
-      #plot_function = plot_roms.plot_diff
       plot_module = plot_roms
     elif job.OFS in util.fvcom_models:
-      #plot_function = plot_fvcom.plot_diff
       plot_module = plot_fvcom
 
     baselen = len(BASELINE)
     explen  = len(EXPERIMENT)
 
     if baselen != explen:
-        log.error(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
-        raise signals.FAIL()
+        log.warning(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
 
-    lastbase = BASELINE[baselen-1]
+    #lastbase = BASELINE[baselen-1]
+    # Refactored this to support short experiment runs
+    lastbase = BASELINE[explen-1]
     lastexp = EXPERIMENT[explen-1]
 
     # Loop through the variable list
@@ -409,7 +404,6 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     # Wait for the jobs to complete
     for future in futures:
         result = future.result()
-        #log.info(result)
-    return
 
+    return
 

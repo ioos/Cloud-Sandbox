@@ -265,11 +265,6 @@ def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str,
     return
 
 
-
-#def get_vmin_vmax(ncfile1_base: str, ncfile1_exp: str, ncfile2_base: str, ncfile2_exp, varname: str):
-#''' takes four filename arguments, two baseline files (base) and two experiment files (exp)
-
-
 if __name__ == '__main__':
     # source = 'figs/temp/his_arg_temp_%04d.png'
     # target = 'figs/test_temp.mp4'

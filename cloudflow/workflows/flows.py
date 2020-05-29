@@ -18,8 +18,6 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-#from cluster.Cluster import Cluster
-
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
@@ -53,10 +51,6 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     fcstflow : prefect.Flow
     """
 
-    # fcstconf = f'{curdir}/cluster/configs/liveocean.config'
-    # print(f"DEBUG: fcstconf is {fcstconf}")
-    # fcstjobfile = 'garbage'
-
     with Flow('fcst workflow') as fcstflow:
         #####################################################################
         # FORECAST
@@ -65,18 +59,20 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Create the cluster object
         cluster = ctasks.cluster_init(fcstconf)
 
-        # scratch disk
-        # TODO: /ptmp should come from the fcstjob
-        scratch = tasks.create_scratch(provider,fcstconf,'/ptmp')
-
         # Setup the job
         fcstjob = tasks.job_init(cluster, fcstjobfile)
-        
+       
+        # Note: These do not run in parallel as hoped
+ 
         # Get forcing data
-        forcing = jtasks.get_forcing(fcstjob, sshuser, upstream_tasks=[scratch])
+        forcing = jtasks.get_forcing(fcstjob, sshuser)
+
+        # scratch disk
+        # TODO: /ptmp should come from the fcstjob?
+        scratch = tasks.create_scratch(provider,fcstconf,'/ptmp', upstream_tasks=[forcing])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, scratch])
 
         # Mount the scratch disk
         scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
@@ -180,14 +176,23 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
     -------
     diff_plotflow : prefect.Flow
     """
+
     with Flow('diff plotting') as diff_plotflow:
         #####################################################################
         # POST Processing
         #####################################################################
 
-        # Start a machine
+        # Read the post machine config
         postmach = ctasks.cluster_init(postconf)
-        pmStarted = ctasks.cluster_start(postmach)
+
+        # Setup the post job
+        plotjob = tasks.job_init(postmach, postjobfile)
+
+        # Retrieve the baseline operational forecast data
+        getbaseline = jtasks.get_baseline(plotjob, sshuser)
+
+        # Start the machine
+        pmStarted = ctasks.cluster_start(postmach, upstream_tasks=[getbaseline])
 
         # Push the env, install required libs on post machine
         # TODO: install all of the 3rd party dependencies on AMI
@@ -195,12 +200,6 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
 
         # Start a dask scheduler on the new post machine
         daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pushPy])
-
-        # Setup the post job
-        plotjob = tasks.job_init(postmach, postjobfile, upstream_tasks=[pmStarted])
-
-        # Retrieve the baseline operational forecast data
-        getbaseline = jtasks.get_baseline(plotjob, sshuser)
 
         # Get list of files from job specified directory
         FILES = jtasks.ncfiles_from_Job(plotjob)
@@ -301,33 +300,16 @@ def test_flow(fcstconf, fcstjobfile) -> Flow:
     testflow : prefect.Flow
     """
 
-    with Flow('fcst workflow') as testflow:
+    with Flow('test workflow') as testflow:
+
         # Create the cluster object
         cluster = ctasks.cluster_init(fcstconf)
 
         # Setup the job
         fcstjob = tasks.job_init(cluster, fcstjobfile)
 
-        # Get forcing data
-        forcing = jtasks.get_forcing(fcstjob)
-
-        # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster)
-
-        # Run the forecast
-        fcst_run = tasks.forecast_run(cluster, fcstjob)
-
-        # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster)
-
-        testflow.add_edge(cluster, fcstjob)
-        testflow.add_edge(fcstjob, forcing)
-        testflow.add_edge(forcing, cluster_start)
-        testflow.add_edge(cluster_start, fcst_run)
-        testflow.add_edge(fcst_run, cluster_stop)
-
-        # If the fcst fails, then set the whole flow to fail
-        testflow.set_reference_tasks([fcst_run, cluster_stop])
+        # Copy the results to /com (liveocean)
+        cp2com = jtasks.ptmp2com(fcstjob)
 
     return testflow
 
@@ -368,11 +350,12 @@ if __name__ == '__main__':
 
     signal(SIGINT, handler)
 
-    postconf = f'./cluster/configs/local.config'
-    jobfile = f'./job/jobs/cbofs.00z.plots'
-    #jobflow = diff_plot_flow(postconf, jobfile)
-    #jobflow.run()
+    conf = f'./cluster/configs/nosofs.config'
+    jobfile = f'./job/jobs/liveocean.00z.fcst'
 
     # Test the notebook flow
-    nbflow = notebook_flow(postconf, jobfile)
-    nbflow.run()
+    #nbflow = notebook_flow(postconf, jobfile)
+    #nbflow.run()
+
+    testflow = test_flow(conf, jobfile)
+    testflow.run()

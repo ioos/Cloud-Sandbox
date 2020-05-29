@@ -166,7 +166,8 @@
 <dt id="AWSScratchDisk.AWSScratchDisk">
 <em class="property">class </em><code class="sig-prename descclassname">AWSScratchDisk.</code><code class="sig-name descname">AWSScratchDisk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.services.ScratchDisk.ScratchDisk</span></code></p>
-<p>AWS implementation of scratch disk.</p>
+<p>AWS implementation of scratch disk.
+Can only have one at a time. Assumes all jobs will use the same scratch disk and path</p>
 <dl class="py method">
 <dt id="AWSScratchDisk.AWSScratchDisk.create">
 <code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/ptmp'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#AWSScratchDisk.AWSScratchDisk.create" title="Permalink to this definition">¶</a></dt>
