@@ -9,7 +9,7 @@
   "TIME_REF"  : "20160101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "/nos/gomofs/output",
-  "NTIMES"    : "480",
+  "NTIMES"    : "5760",
   "ININAME"   : "",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
