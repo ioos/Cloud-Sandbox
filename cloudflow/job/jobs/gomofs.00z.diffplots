@@ -1,6 +1,6 @@
 {
   "JOBTYPE"   : "plotting_diff",
-  "OFS"       : "tbofs",
+  "OFS"       : "gomofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "INDIR"     : "auto",
@@ -8,6 +8,6 @@
   "VERIFDIR"  : "auto",
   "VARS"      : ["temp", "zeta", "w", "salt"],
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "public/nosofs/plots/tbofs",
-  "FSPEC"     : "nos.tbofs.fields.f*t00z.nc"
+  "BCKTFLDR"  : "public/nosofs/plots/gomofs",
+  "FSPEC"     : "nos.gomofs.fields.f*t00z.nc"
 }

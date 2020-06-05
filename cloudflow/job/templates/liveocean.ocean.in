@@ -101,6 +101,7 @@ GridsInLayer =  1
      NDTFAST == 20
 
 ! NHours * 3600 (seconds) / DT = NTIMES
+! NHOURS = NTIMES * DT / 3600
 
 ! Model iteration loops parameters.
 

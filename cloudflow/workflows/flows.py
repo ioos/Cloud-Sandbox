@@ -3,11 +3,14 @@
 
 import os
 import sys
+import time
 from signal import signal, SIGINT
 import logging
 from distributed import Client
+import prefect
 from prefect import Flow
 from prefect.engine import signals
+
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -22,15 +25,28 @@ __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
+provider = 'AWS'
+
+# Our workflow log
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcName)s | %(message)s')
+formatter.converter = time.localtime
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
-provider = 'AWS'
+# Fix the prefect logger to output local time instead of gmtime
+#formatter.converter = time.gmtime
+prelog = prefect.utilities.logging.get_logger()
+#prelog.handler.formatter.converter = time.localtime
+# Use the same handler for all of them
+for handler in prelog.handlers:
+    print('Setting the prefect log handler')
+    print(handler)
+    handler.setFormatter(formatter)
+
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.
@@ -210,8 +226,8 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         plots.set_upstream([daskclient, getbaseline])
 
         storage_service = tasks.storage_init(provider)
-        pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
-        pngtocloud.set_upstream(plots)
+        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
+        #pngtocloud.set_upstream(plots)
 
         # Make movies
         mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, diff=True, upstream_tasks=[plots])
@@ -325,6 +341,50 @@ def test_nbflow(pyfile: str):
     else:
         return "FAILED"
 
+def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
+
+    with Flow('debug workflow') as debugflow:
+        #####################################################################
+        # FORECAST
+        #####################################################################
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(fcstconf)
+
+        # Setup the job
+        fcstjob = tasks.job_init(cluster, fcstjobfile)
+
+        # Note: These do not run in parallel as hoped
+
+        # Get forcing data
+        forcing = jtasks.get_forcing(fcstjob, sshuser)
+
+        # scratch disk
+        # TODO: /ptmp should come from the fcstjob?
+        #scratch = tasks.create_scratch(provider,fcstconf,'/ptmp', upstream_tasks=[forcing])
+
+        # Start the cluster
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+
+        # Mount the scratch disk
+        #scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
+
+        # Run the forecast
+        fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+
+        # Terminate the cluster nodes
+        #cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+
+        # Copy the results to /com (liveocean)
+        cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
+
+        # Delete the scratch disk
+        #scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cp2com])
+
+        # If the fcst fails, then set the whole flow to fail
+        debugflow.set_reference_tasks([fcst_run])
+
+    return debugflow
 
 def inject_notebook() :
     ''' Convert the current notebook to python, test it, and upload it for the next forecast cycle.
@@ -346,16 +406,17 @@ def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     raise signals.FAIL()
 
+
 if __name__ == '__main__':
 
     signal(SIGINT, handler)
 
-    conf = f'./cluster/configs/nosofs.config'
-    jobfile = f'./job/jobs/liveocean.00z.fcst'
+    conf = f'./cluster/configs/debug.config'
+    jobfile = f'./job/jobs/ngofs.03z.fcst'
 
     # Test the notebook flow
     #nbflow = notebook_flow(postconf, jobfile)
     #nbflow.run()
 
-    testflow = test_flow(conf, jobfile)
+    testflow = debug_model(conf, jobfile, 'none')
     testflow.run()

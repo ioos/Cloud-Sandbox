@@ -122,9 +122,9 @@ def main():
                 mins = math.ceil(elapsed / 60.0)
                 hrs = mins / 60.0
                 if ntimes:
-                    log.info(f"Elapsed Time: {mins:.0f} minutes, ntimes:{ntimes}, {nodecnt}x {nodetype}, {OFS}")
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, ntimes:{ntimes}, {nodecnt}x {nodetype} - {OFS}")
                 else:
-                    log.info(f"Elapsed Time: {mins:.0f} minutes, nhours:{nhours}, {nodecnt}x {nodetype}, {OFS}")
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, nhours:{nhours}, {nodecnt}x {nodetype} - {OFS}")
             continue
         else:
             log.error(f"{aflow.name} failed - {OFS}")
