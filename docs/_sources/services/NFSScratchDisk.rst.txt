@@ -1,7 +1,7 @@
-AWSScratchDisk module
+NFSScratchDisk module
 =====================
 
-.. automodule:: AWSScratchDisk
+.. automodule:: NFSScratchDisk
    :members:
    :undoc-members:
    :show-inheritance:

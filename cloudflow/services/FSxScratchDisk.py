@@ -19,7 +19,7 @@ log.setLevel(logging.DEBUG)
 
 
 class FSxScratchDisk(ScratchDisk):
-    """ AWS implementation of scratch disk.
+    """ AWS FSx for Lustre implementation of scratch disk.
         Can only have one at a time. Assumes all jobs will use the same scratch disk and path
     """
 

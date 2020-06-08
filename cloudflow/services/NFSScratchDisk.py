@@ -19,15 +19,12 @@ log.setLevel(logging.DEBUG)
 
 
 class NFSScratchDisk(ScratchDisk):
-    """ NFS implementation of scratch disk. 
-        This isn't really needed but I needed a way to test without creating a new AMI
-        The currently used AMI has a directory at /ptmp and I want to symlink it to /mnt/efs/fs1/ptmp
-        
-        Assumes all jobs will use the same scratch disk and path
+    """ NFS implementation of scratch disk. Only manages the symbolic link to an already mounted NFS drive.
+        Assumes all jobs will use the same scratch disk and path.
     """
 
     def __init__(self, config: str):
-        """ Constructor """
+        """ Constructor: Currently has hardcoded paths. TODO: Refactor/parameterize settings."""
 
         self.mount: str = '/mnt/efs/fs1/ptmp'
         self.status: str = 'uninitialized'

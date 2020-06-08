@@ -88,7 +88,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # scratch disk
         # TODO: /ptmp should come from the fcstjob?
         scratch = tasks.create_scratch('NFS',fcstconf,'/ptmp', upstream_tasks=[forcing])
-        # 'NFS'
+        # Use 'FSx' for FSx scratch disk
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, scratch])

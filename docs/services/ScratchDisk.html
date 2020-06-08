@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="AWSScratchDisk module" href="AWSScratchDisk.html" />
+    <link rel="next" title="FSxScratchDisk module" href="FSxScratchDisk.html" />
     <link rel="prev" title="StorageService module" href="StorageService.html" /> 
 </head>
 
@@ -89,7 +89,8 @@
 <li class="toctree-l2"><a class="reference internal" href="S3Storage.html">S3Storage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="StorageService.html">StorageService module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ScratchDisk module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AWSScratchDisk.html">AWSScratchDisk module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSxScratchDisk.html">FSxScratchDisk module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NFSScratchDisk.html">NFSScratchDisk module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utils/modules.html">utils</a></li>
@@ -147,8 +148,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/services/ScratchDisk.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -193,6 +192,18 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="ScratchDisk.addlock">
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">addlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">uniqid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScratchDisk.addlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not yet implemented. Place a file on the disk to act as a lock to prevent disk unmounting/deletion.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ScratchDisk.haslocks">
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">haslocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#ScratchDisk.haslocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not yet implemented. Test if any locks exist on the disk.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="ScratchDisk.readConfig">
 <code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#ScratchDisk.readConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a JSON configuration file into a dictionary.</p>
@@ -209,6 +220,12 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt id="ScratchDisk.removelock">
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">removelock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">uniqid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScratchDisk.removelock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not yet implemented. Remove an existing lock file from the disk.</p>
+</dd></dl>
+
 </div>
 
 
@@ -219,7 +236,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="AWSScratchDisk.html" class="btn btn-neutral float-right" title="AWSScratchDisk module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="FSxScratchDisk.html" class="btn btn-neutral float-right" title="FSxScratchDisk module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="StorageService.html" class="btn btn-neutral float-left" title="StorageService module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

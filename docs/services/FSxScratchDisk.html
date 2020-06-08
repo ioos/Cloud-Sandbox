@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>S3Storage module &mdash; CloudFlow 1.1.0 documentation</title>
+  <title>FSxScratchDisk module &mdash; CloudFlow 1.1.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="StorageService module" href="StorageService.html" />
-    <link rel="prev" title="services" href="modules.html" /> 
+    <link rel="next" title="NFSScratchDisk module" href="NFSScratchDisk.html" />
+    <link rel="prev" title="ScratchDisk module" href="ScratchDisk.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,10 +86,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../job/modules.html">job</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plotting/modules.html">plotting</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">services</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">S3Storage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="S3Storage.html">S3Storage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="StorageService.html">StorageService module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ScratchDisk.html">ScratchDisk module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="FSxScratchDisk.html">FSxScratchDisk module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FSxScratchDisk module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="NFSScratchDisk.html">NFSScratchDisk module</a></li>
 </ul>
 </li>
@@ -142,7 +142,7 @@
         
           <li><a href="modules.html">services</a> &raquo;</li>
         
-      <li>S3Storage module</li>
+      <li>FSxScratchDisk module</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -159,67 +159,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-S3Storage">
-<span id="s3storage-module"></span><h1>S3Storage module<a class="headerlink" href="#module-S3Storage" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-FSxScratchDisk">
+<span id="fsxscratchdisk-module"></span><h1>FSxScratchDisk module<a class="headerlink" href="#module-FSxScratchDisk" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="S3Storage.S3Storage">
-<em class="property">class </em><code class="sig-prename descclassname">S3Storage.</code><code class="sig-name descname">S3Storage</code><a class="headerlink" href="#S3Storage.S3Storage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.services.StorageService.StorageService</span></code></p>
-<p>Concrete implementation of the StorageService class</p>
+<dt id="FSxScratchDisk.FSxScratchDisk">
+<em class="property">class </em><code class="sig-prename descclassname">FSxScratchDisk.</code><code class="sig-name descname">FSxScratchDisk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#FSxScratchDisk.FSxScratchDisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cloudflow.services.ScratchDisk.ScratchDisk</span></code></p>
+<p>AWS FSx for Lustre implementation of scratch disk.
+Can only have one at a time. Assumes all jobs will use the same scratch disk and path</p>
 <dl class="py method">
-<dt id="S3Storage.S3Storage.downloadFile">
-<code class="sig-name descname">downloadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#S3Storage.S3Storage.downloadFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a file from S3</p>
+<dt id="FSxScratchDisk.FSxScratchDisk.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/ptmp'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#FSxScratchDisk.FSxScratchDisk.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new FSx scratch disk and mount it locally</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
-<li><p><strong>key</strong> (<em>str</em>) – The key for the file</p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – The path and filename to save the file as</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ClientError if unable to download file</strong><strong> or </strong><strong>file does not exist</strong> – </p>
+<dd class="field-odd"><p><strong>mountpath</strong> (<em>str</em>) – The path where the disk will be mounted. Default = /ptmp” (optional)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="S3Storage.S3Storage.file_exists">
-<code class="sig-name descname">file_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#S3Storage.S3Storage.file_exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test if the specified file exists in the S3 bucket</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
-<li><p><strong>key</strong> (<em>str</em>) – The S3 key for the file to check</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if file exists
-False if file does not exist</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
+<dt id="FSxScratchDisk.FSxScratchDisk.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#FSxScratchDisk.FSxScratchDisk.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete this FSx disk</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="S3Storage.S3Storage.uploadFile">
-<code class="sig-name descname">uploadFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">public</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#S3Storage.S3Storage.uploadFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Upload a file to S3</p>
+<dt id="FSxScratchDisk.FSxScratchDisk.remote_mount">
+<code class="sig-name descname">remote_mount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hosts</span><span class="p">:</span> <span class="n">list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#FSxScratchDisk.FSxScratchDisk.remote_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mount this FSx disk on remote hosts</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – The path and filename to upload</p></li>
-<li><p><strong>bucket</strong> (<em>str</em>) – The S3 bucket to use</p></li>
-<li><p><strong>key</strong> (<em>str</em>) – The key to store the file as</p></li>
-<li><p><strong>public</strong> (<em>bool</em>) – If file should be made publicly accessible or not</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ClientError if unable to upload file</strong> – </p>
+<dd class="field-odd"><p><strong>hosts</strong> (<em>list of str</em>) – The list of remote hosts</p>
 </dd>
 </dl>
 </dd></dl>
@@ -236,10 +207,10 @@ False if file does not exist</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="StorageService.html" class="btn btn-neutral float-right" title="StorageService module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="NFSScratchDisk.html" class="btn btn-neutral float-right" title="NFSScratchDisk module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="modules.html" class="btn btn-neutral float-left" title="services" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ScratchDisk.html" class="btn btn-neutral float-left" title="ScratchDisk module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

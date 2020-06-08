@@ -8,11 +8,7 @@ __email__ = "patrick.tripp@rpsgroup.com"
 debug = False
 
 class ScratchDisk(ABC):
-    """ Abstract base class for scratch disk.
-
-    Abstract Methods
-    ----------------
-    """
+    """ Abstract base class for scratch disk. """
 
     def __init__(self):
         """ Constructor """
@@ -44,16 +40,17 @@ class ScratchDisk(ABC):
 
 ''' Protocol: lockfilename = f"lockfile.{uniqid}" '''
 def addlock(mountpath: str, uniqid: str):
-    """ Place a file on the disk to act as a lock to prevent disk unmounting/deletion """
+    """ Not yet implemented. Place a file on the disk to act as a lock to prevent disk unmounting/deletion. """
     return
 
 def removelock(mountpath: str, uniqid: str):
-    """ Remove an existing lock file from the disk """
+    """ Not yet implemented. Remove an existing lock file from the disk. """
     return
 
 def haslocks(mountpath: str) -> bool:
-    """ Test if any locks exist on the disk """
+    """ Not yet implemented. Test if any locks exist on the disk. """
     return False
+
 
 def readConfig(configfile) -> dict:
     """ Reads a JSON configuration file into a dictionary.
