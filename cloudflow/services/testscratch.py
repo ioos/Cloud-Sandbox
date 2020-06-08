@@ -14,7 +14,7 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
-from cloudflow.services.AWSScratchDisk import AWSScratchDisk
+from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -26,7 +26,7 @@ log.setLevel(logging.DEBUG)
 
 def create_delete():
     config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
-    fsx = AWSScratchDisk(config)
+    fsx = FSxScratchDisk(config)
     fsx.create('/ptmp')
     print("FSx disk was created and mounted locally")
     fsx.delete()
@@ -34,12 +34,12 @@ def create_delete():
 def main():
 
     config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
-    disk1 = AWSScratchDisk(config)
+    disk1 = FSxScratchDisk(config)
     disk1.users += 1
     print(f"Ptmp users is: {disk1.users}")
 
 
-    disk2 = AWSScratchDisk(config)
+    disk2 = FSxScratchDisk(config)
     print(f"Ptmp users is: {disk2.users}")
     disk2.users += 1
     print(f"Ptmp users is: {disk2.users}")

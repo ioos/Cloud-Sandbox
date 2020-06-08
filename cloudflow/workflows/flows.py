@@ -38,14 +38,16 @@ ch.setFormatter(formatter)
 log.addHandler(ch)
 
 # Fix the prefect logger to output local time instead of gmtime
-#formatter.converter = time.gmtime
+# Prefect uses this: formatter.converter = time.gmtime
 prelog = prefect.utilities.logging.get_logger()
 #prelog.handler.formatter.converter = time.localtime
 # Use the same handler for all of them
 for handler in prelog.handlers:
-    print('Setting the prefect log handler')
-    print(handler)
-    handler.setFormatter(formatter)
+    #print('Setting the prefect log handler')
+    #print(handler)
+    pformatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(module)s.%(funcName)s | %(message)s')
+    pformatter.converter = time.localtime
+    handler.setFormatter(pformatter)
 
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
@@ -85,7 +87,8 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
         # scratch disk
         # TODO: /ptmp should come from the fcstjob?
-        scratch = tasks.create_scratch(provider,fcstconf,'/ptmp', upstream_tasks=[forcing])
+        scratch = tasks.create_scratch('NFS',fcstconf,'/ptmp', upstream_tasks=[forcing])
+        # 'NFS'
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, scratch])
