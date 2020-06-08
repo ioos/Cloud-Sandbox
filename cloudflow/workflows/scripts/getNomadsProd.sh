@@ -43,7 +43,7 @@ case $OFS in
     ngofs)
     ehr=54
     ;;
-    leofs)
+    leofs | lmhofs)
     ehr=120
     ;;
 esac

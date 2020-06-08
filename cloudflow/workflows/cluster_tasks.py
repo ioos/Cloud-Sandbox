@@ -69,6 +69,7 @@ def cluster_start(cluster):
 
     """
     log.info('Starting ' + str(cluster.nodeCount) + ' instances ...')
+    log.info('Waiting for nodes to start ...')
     try:
         cluster.start()
     except Exception as e:

@@ -33,7 +33,8 @@ from cloudflow.services.StorageService import StorageService
 from cloudflow.services.S3Storage import S3Storage
 
 from cloudflow.services.ScratchDisk import ScratchDisk
-from cloudflow.services.AWSScratchDisk import AWSScratchDisk
+from cloudflow.services.FSxScratchDisk import FSxScratchDisk
+from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -68,9 +69,10 @@ def create_scratch(provider: str, configfile: str, mountpath: str = '/ptmp') -> 
 
     """
 
-    if provider == 'AWS':
-        scratch = AWSScratchDisk(configfile)
-
+    if provider == 'FSx':
+        scratch = FSxScratchDisk(configfile)
+    elif provider == 'NFS':
+        scratch = NFSScratchDisk(configfile)
     elif provider == 'Local':
         log.error('Coming soon ...')
         raise signals.FAIL()

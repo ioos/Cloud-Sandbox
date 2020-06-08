@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import time
+import math
 from pathlib import Path
 from signal import signal
 
@@ -40,7 +41,9 @@ ch = logging.FileHandler(f"{homedir}/qops_forecast.log")
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 ch.setFormatter(formatter)
-log.addHandler(ch)
+# Only add one handler.
+if not log.hasHandlers():
+    log.addHandler(ch)
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
@@ -71,6 +74,17 @@ def main():
             fcstdict = util.readConfig(fcstconf)
             nodetype = fcstdict["nodeType"]
             nodecnt = fcstdict["nodeCount"]
+
+            if 'NTIMES' in jobdict:
+                ntimes = jobdict['NTIMES']
+            else:
+                ntimes = None
+
+            if 'NHOURS' in jobdict:
+                nhours = jobdict['NHOURS']
+            else:
+                nhours = None
+            
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
@@ -105,9 +119,12 @@ def main():
             if re.search("fcst", aflow.name):
                 end_time = time.time()
                 elapsed = end_time - start_time
-                mins = elapsed / 60.0
+                mins = math.ceil(elapsed / 60.0)
                 hrs = mins / 60.0
-                log.info(f"Elapsed Time: {hrs:.3f} hours - {nodecnt} x {nodetype} - {OFS}")
+                if ntimes:
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, ntimes:{ntimes}, {nodecnt}x {nodetype} - {OFS}")
+                else:
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, nhours:{nhours}, {nodecnt}x {nodetype} - {OFS}")
             continue
         else:
             log.error(f"{aflow.name} failed - {OFS}")

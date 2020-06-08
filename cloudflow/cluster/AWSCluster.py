@@ -5,6 +5,8 @@ Cluster implementation for AWS EC2 clusters.
 import time
 import json
 import logging
+import math
+from pathlib import Path
 
 import boto3
 from botocore.exceptions import ClientError
@@ -21,11 +23,22 @@ debug = False
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 
-# ch = logging.StreamHandler()
-# ch.setLevel(logging.DEBUG)
-# formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcName)s | %(message)s')
-# ch.setFormatter(formatter)
-# log.addHandler(ch)
+homedir = Path.home()
+timelog = logging.getLogger('qops_timing')
+timelog.setLevel(logging.DEBUG)
+timelog.propagate = False
+
+fh = logging.FileHandler(f"{homedir}/qops_forecast.log")
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
+fh.setFormatter(formatter)
+
+# To avoid duplicate entries, only have one handler
+# This log might have a handler in one of their higher level scripts
+# This didn't work - still got duplicates, even when also added in main caller
+if not timelog.hasHandlers():
+    timelog.addHandler(fh)
+
 
 class AWSCluster(Cluster):
     """
@@ -89,8 +102,9 @@ class AWSCluster(Cluster):
 
         self.platform = 'AWS'
         self.__configfile = configfile
-        self.__state = "none"  # This could be an enumeration of none, running, stopped, error
+        self.__state = None  # This could be an enumeration of none, running, stopped, error
         self.__instances = []
+        self.__start_time = None
         self.region = ""
         self.nodeType = ''
         self.nodeCount = 0
@@ -224,6 +238,8 @@ class AWSCluster(Cluster):
             log.exception('ClientError exception in createCluster' + str(e))
             raise Exception() from e
 
+        self.__start_time = time.time()
+
         print('Waiting for nodes to enter running state ...')
         # Make sure the nodes are running before returning
 
@@ -284,6 +300,14 @@ class AWSCluster(Cluster):
         for instance in self.__instances:
             response = instance.terminate()['TerminatingInstances']
             responses.append(response)
+
+        end_time = time.time()
+        elapsed = end_time - self.__start_time
+        mins = math.ceil(elapsed / 60.0)
+        hrs = mins / 60.0
+        nodetype = self.nodeType
+        nodecnt = self.nodeCount
+        timelog.info(f"Cluster Run Time: {mins} minutes - {nodecnt} x {nodetype}")
 
         return responses
 

@@ -18,7 +18,7 @@ log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 
 
-class AWSScratchDisk(ScratchDisk):
+class FSxScratchDisk(ScratchDisk):
     """ AWS implementation of scratch disk.
         Can only have one at a time. Assumes all jobs will use the same scratch disk and path
     """
@@ -45,6 +45,7 @@ class AWSScratchDisk(ScratchDisk):
         self.filesystemid: str = None
         self.status: str = 'uninitialized'
         self.mountpath: str = '/ptmp'  # default can be reset in create()
+        self.__lockfile: str = "something_unique"
 
         self.provider: str = 'AWS'
         self.capacity: int = 1200   # The smallest is 1.2 TB
@@ -80,7 +81,6 @@ class AWSScratchDisk(ScratchDisk):
                 SecurityGroupIds=self.sg_ids,
                 Tags=self.tags,
                 LustreConfiguration={
-                    #'WeeklyMaintenanceStartTime': '',
                     'DeploymentType': 'SCRATCH_2'
                 }
             )
@@ -100,18 +100,12 @@ class AWSScratchDisk(ScratchDisk):
         '''
 
         log.info("FSx drive creation in progress...")
-        #print('Status: ', self.status)
-        #print(json.dumps(response, indent=4))
-        #print(response)
         self.filesystemid = response['FileSystem']['FileSystemId']
         self.dnsname = response['FileSystem']['DNSName']
         self.mountname = response['FileSystem']['LustreConfiguration']['MountName']
 
         # Now mount it
         self.__mount()
-        #print(self.filesystemid)
-        #print(self.dnsname)
-        #print(self.mountname)
 
 
     def __mount(self):
@@ -139,6 +133,11 @@ class AWSScratchDisk(ScratchDisk):
             # Mount it
             if status == 'AVAILABLE':
                 log.info("FSx scratch disk is ready.")
+
+                # TODO: Make sure we don't have another run using this. Finish implementing locks
+                subprocess.run(['sudo', 'rm', '-Rf', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                subprocess.run(['sudo', 'mkdir -p', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
                 try:
                     ''' sudo mount -t lustre -o noatime,flock fs-0efe931e2cc043a6d.fsx.us-east-1.amazonaws.com@tcp:/6i6xxbmv  /ptmp '''
                     log.info("Attempting to mount it locally...")
@@ -153,7 +152,6 @@ class AWSScratchDisk(ScratchDisk):
 
                     # Chmod to make it writeable by all
                     log.info("Attempting to chmod FSx disk ...")
-                    # TODO: Maybe use os.chmod instead
                     result = subprocess.run(['sudo', 'chmod', '777', self.mountpath ],
                                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 

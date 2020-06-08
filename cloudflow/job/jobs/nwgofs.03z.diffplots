@@ -1,6 +1,6 @@
 {
   "JOBTYPE"   : "plotting_diff",
-  "OFS"       : "negofs",
+  "OFS"       : "nwgofs",
   "CDATE"     : "today",
   "HH"        : "03",
   "INDIR"     : "auto",
@@ -8,6 +8,6 @@
   "VERIFDIR"  : "auto",
   "VARS"      : ["zeta", "temp", "salinity"],
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "public/nosofs/plots/negofs",
-  "FSPEC"     : "nos.negofs.fields.f*t03z.nc"
+  "BCKTFLDR"  : "public/nosofs/plots/nwgofs",
+  "FSPEC"     : "nos.nwgofs.fields.f*t03z.nc"
 }
