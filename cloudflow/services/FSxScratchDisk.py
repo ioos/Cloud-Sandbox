@@ -135,8 +135,8 @@ class FSxScratchDisk(ScratchDisk):
                 log.info("FSx scratch disk is ready.")
 
                 # TODO: Make sure we don't have another run using this. Finish implementing locks
-                subprocess.run(['sudo', 'rm', '-Rf', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                subprocess.run(['sudo', 'mkdir -p', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                subprocess.run(['sudo', 'rm', '-Rf', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                subprocess.run(['sudo', 'mkdir','-p', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
                 try:
                     ''' sudo mount -t lustre -o noatime,flock fs-0efe931e2cc043a6d.fsx.us-east-1.amazonaws.com@tcp:/6i6xxbmv  /ptmp '''

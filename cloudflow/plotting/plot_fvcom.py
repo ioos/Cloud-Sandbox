@@ -127,7 +127,7 @@ def get_projection(ncfile: str):
         nv = nc.variables['nv'][:].T
         nv = nv - 1
 
-        # project to EPSG:3857 for map
+    # project to EPSG:3857 for map
     lo,la   = EPSG3857(lon,lat)
     loc,lac = EPSG3857(lonc,latc)
 

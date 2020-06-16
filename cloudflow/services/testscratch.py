@@ -31,20 +31,17 @@ def create_delete():
     print("FSx disk was created and mounted locally")
     fsx.delete()
 
+
 def main():
+    #create_delete()
+    mountpath = '/ptmp'
+    result = subprocess.run(['sudo', 'rm', '-Rf', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    #if result.returncode != 0:
+    print(result.stdout)
 
-    config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
-    disk1 = FSxScratchDisk(config)
-    disk1.users += 1
-    print(f"Ptmp users is: {disk1.users}")
+    result = subprocess.run(['sudo', 'mkdir', '-p', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(result.stdout)
 
-
-    disk2 = FSxScratchDisk(config)
-    print(f"Ptmp users is: {disk2.users}")
-    disk2.users += 1
-    print(f"Ptmp users is: {disk2.users}")
-    print(f"Ptmp users is: {disk1.users}")
-    time.sleep(60)
 
     return
 
