@@ -106,6 +106,11 @@ class ROMSForecast(Job):
         self.parseConfig(cfDict)
         self.make_oceanin()
 
+        if self.OFS == 'wrfroms':
+            self.__make_couplerin()
+            self.__make_wrfinout()
+        return
+
 
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
@@ -135,9 +140,31 @@ class ROMSForecast(Job):
             today = datetime.date.today().strftime("%Y%m%d")
             self.CDATE = today
 
+        # Coupled models have additional input files 
+        if 'CPLINTMPL' in cfDict:
+            self.CPLINTMPL = cfDict['CPLINTMPL']
+            if self.CPLINTMPL == "auto":
+                self.CPLINTMPL = f"{self.TEMPLPATH}/{self.OFS}.coupling.in"
+        else:
+            self.CPLINTMPL = None
+
+        if 'WRFINTMPL' in cfDict:
+            self.WRFINTMPL = cfDict['WRFINTMPL']
+            if self.WRFINTMPL == "auto":
+                self.WRFINTMPL = f"{self.TEMPLPATH}/wrf.namelist.input"
+        else:
+            self.WRFINTMPL = None
+
+        if 'WRFOUTTMPL' in cfDict:
+            self.WRFOUTTMPL = cfDict['WRFOUTTMPL']
+            if self.WRFOUTTMPL == "auto":
+                self.WRFOUTTMPL = f"{self.TEMPLPATH}/wrf.namelist.output"
+        else:
+            self.WRFOUTTMPL = None
+
         if self.OCNINTMPL == "auto":
             self.OCNINTMPL = f"{self.TEMPLPATH}/{self.OFS}.ocean.in"
-
+    
         return
 
 
@@ -152,11 +179,12 @@ class ROMSForecast(Job):
             self.__make_oceanin_adnoc()
         elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs"):
             self.__make_oceanin_nosofs()
+        elif OFS == 'wrfroms':
+            self.__make_oceanin_wrfroms()
         else:
             raise Exception(f"{OFS} is not a supported forecast")
 
         return
-
 
 
     def __make_oceanin_lo(self):
@@ -253,9 +281,7 @@ class ROMSForecast(Job):
             else:
                 ratio = 1.0
             util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=ratio)
-
         return
-
 
 
     def __make_oceanin_adnoc(self):
@@ -282,7 +308,87 @@ class ROMSForecast(Job):
         if self.OCEANIN == "auto":
             outfile = f"{self.OUTDIR}/ocean.in"
             util.makeOceanin(self.NPROCS, settings, template, outfile)
+        return
 
+
+    def __make_oceanin_wrfroms(self):
+        """ Create the ocean.in file for wrfroms forecasts """
+
+        CDATE = self.CDATE
+        OFS = self.OFS
+        COMROT = self.COMROT
+
+        if self.OUTDIR == "auto":
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+
+        if not os.path.exists(self.OUTDIR):
+            os.makedirs(self.OUTDIR)
+
+        settings = {
+            #"__NTIMES__": self.NTIMES,
+        }
+
+        template = self.OCNINTMPL
+
+        # Create the ocean.in
+        if self.OCEANIN == "auto":
+            outfile = f"{self.OUTDIR}/roms_doppio_coupling.in"
+            util.makeOceanin(self.NPROCS, settings, template, outfile)
+        return
+
+
+    def __make_couplerin(self):
+        """ Create the .in file for coupled wrfroms forecasts """
+
+        #coupling_esmf_atm_sbl.in
+        CDATE = self.CDATE
+        OFS = self.OFS
+        COMROT = self.COMROT
+
+        if self.OUTDIR == "auto":
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+
+        if not os.path.exists(self.OUTDIR):
+            os.makedirs(self.OUTDIR)
+
+        settings = {
+            #"__NTIMES__": self.NTIMES,
+        }
+
+        template = self.CPLINTMPL
+
+        # Create the coupler input file
+        outfile = f"{self.OUTDIR}/coupling_esmf_atm_sbl.in"
+        util.makeOceanin(self.NPROCS, settings, template, outfile)
+        return
+
+
+
+    def __make_wrfinout(self):
+        """ Create the namelist input and output files for coupled wrfroms forecasts """
+
+        CDATE = self.CDATE
+        OFS = self.OFS
+        COMROT = self.COMROT
+
+
+        if self.OUTDIR == "auto":
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+
+        if not os.path.exists(self.OUTDIR):
+            os.makedirs(self.OUTDIR)
+
+        settings = {
+            #"__NTIMES__": self.NTIMES,
+        }
+
+        template = self.WRFINTMPL
+        outfile = f"{self.OUTDIR}/namelist.input"
+        util.makeOceanin(self.NPROCS, settings, template, outfile)
+
+        template = self.WRFOUTTMPL
+        outfile = f"{self.OUTDIR}/namelist.output"
+        util.makeOceanin(self.NPROCS, settings, template, outfile)
         return
 
 

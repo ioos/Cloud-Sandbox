@@ -220,6 +220,9 @@ def get_forcing(job: Job, sshuser=None):
         if result.returncode != 0:
             log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
             raise signals.FAIL()
+
+    elif ofs == 'wrfroms':
+        print("get_forcing wrfroms stub")
     else:
         log.error("Unsupported forecast: ", ofs)
         raise signals.FAIL()
