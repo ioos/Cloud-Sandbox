@@ -1,7 +1,7 @@
 # Cloud-Sandbox
 
 ## CloudFlow API Specification
-https://asascience.github.io/Cloud-Sandbox
+https://ioos.github.io/Cloud-Sandbox/
 
 ### Directory structure
 
