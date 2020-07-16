@@ -106,8 +106,8 @@ GridsInLayer =  1
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-      NtileI == 4                               ! I-direction partition
-      NtileJ == 6                               ! J-direction partition
+      NtileI == __NTILEI__                      ! I-direction partition
+      NtileJ == __NTILEJ__                      ! J-direction partition
 
 !      NtileI == 2                               ! I-direction partition
 !      NtileJ == 4                               ! J-direction partition
@@ -227,15 +227,16 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-      NTIMES == 2520             !42 hours
+!      NTIMES == 2520             !42 hours
+      NTIMES == __NTIMES__
           DT == 60.0d0           !1440 timesteps per day
      NDTFAST == 30
 
 ! Number of timesteps for computing observation impacts during the
 ! analysis-forecast cycle.
 
-  NTIMES_ANA == 2520                                 ! analysis interval
-  NTIMES_FCT == 2520                                 ! forecast interval
+  NTIMES_ANA == __NTIMES__                                 ! analysis interval
+  NTIMES_FCT == __NTIMES__                                 ! forecast interval
 
 ! Model iteration loops parameters.
 
@@ -420,9 +421,13 @@ LtracerSponge == F F                            ! temperature, salinity, inert
 ! origin for tidal forcing, and model reference time for output
 ! NetCDF units attribute.
 
-      DSTART =  2064.25d0                      ! days
-  TIDE_START =  0.0d0                      ! days
-    TIME_REF =  20060101.0d0                      ! yyyymmdd.dd
+!      DSTART =  2064.25d0                      ! days
+!  TIDE_START =  0.0d0                      ! days
+!    TIME_REF =  20060101.0d0                      ! yyyymmdd.dd
+
+     DSTART     = __DSTART__       ! days
+     TIDE_START = __TIDE_START__   ! days
+     TIME_REF   = __TIME_REF__     ! yyyymmdd.dd
 
 ! Nudging/relaxation time scales, inverse scales will be computed
 ! internally, [1:Ngrids].

@@ -142,8 +142,11 @@
 
 ! Data Model parallel distributed-memory domain decomposition.
 
-            ItileD = 4                      ! I-direction partition
-            JtileD = 6                      ! J-direction partition
+            ItileD = __NTILEI__                      ! I-direction partition
+            JtileD = __NTILEJ__                      ! J-direction partition
+
+!            ItileD = 4                      ! I-direction partition
+!            JtileD = 6                      ! J-direction partition
 
 !            ItileD = 2                      ! I-direction partition
 !            JtileD = 4                      ! J-direction partition
@@ -156,8 +159,8 @@
 ! layout, the number of PETs needed is the sum of all coupled model components.
 ! Only the PET values for IsActive(...)=T are processed and considered.
 
-  Nthreads(roms)   == 24                    ! ocean model PETs
-  Nthreads(atmos)  == 24                    ! atmosphere model PETs
+  Nthreads(roms)   == __NPROCS__                    ! ocean model PETs
+  Nthreads(atmos)  == __NPROCS__                    ! atmosphere model PETs
   Nthreads(seaice) =  1                     ! sea-ice model PETs
   Nthreads(waves)  =  1                     ! wave model PETs
 
@@ -169,9 +172,13 @@
 !                     YYYY MM DD hh mm ss
 
      ReferenceTime =  2006 01 01 00 00 00   ! Simulation reference time
-         StartTime =  2011 08 27 06 00 00   ! Simulation start time
+!         StartTime =  2011 08 27 06 00 00   ! Simulation start time
+          StartTime =  __STARTYEAR__ __STARTMO__ __STARTDY__ __STARTHR__ 00 00   ! Simulation start time
+
        RestartTime =  2011 08 27 06 00 00   ! Simulation restart time
-          StopTime =  2011 08 29 00 00 00   ! Simulation stop time
+!          StopTime =  2011 08 29 00 00 00   ! Simulation stop time
+          StopTime =  __STOPYEAR__ __STOPMO__ __STOPDY__ __STOPHR__ 00 00   ! Simulation stop time
+
           TimeStep =  0000 00 00 00 01 00   ! Coupler driver interval (60 sec ROMS DT)
 
           Calendar =  gregorian

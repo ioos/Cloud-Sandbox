@@ -108,7 +108,7 @@ class ROMSForecast(Job):
 
         if self.OFS == 'wrfroms':
             self.__make_couplerin()
-            self.__make_wrfinout()
+            self.__make_wrfin()
         return
 
 
@@ -154,13 +154,6 @@ class ROMSForecast(Job):
                 self.WRFINTMPL = f"{self.TEMPLPATH}/wrf.namelist.input"
         else:
             self.WRFINTMPL = None
-
-        if 'WRFOUTTMPL' in cfDict:
-            self.WRFOUTTMPL = cfDict['WRFOUTTMPL']
-            if self.WRFOUTTMPL == "auto":
-                self.WRFOUTTMPL = f"{self.TEMPLPATH}/wrf.namelist.output"
-        else:
-            self.WRFOUTTMPL = None
 
         if self.OCNINTMPL == "auto":
             self.OCNINTMPL = f"{self.TEMPLPATH}/{self.OFS}.ocean.in"
@@ -213,7 +206,8 @@ class ROMSForecast(Job):
             self.ININAME = f"{COMROT}/{OFS}/{fprevdate}/ocean_his_0025.nc"
 
         DSTART = util.ndays(CDATE, self.TIME_REF)
-        # DSTART = days from TIME_REF to start of forecast day larger minus smaller date
+        # DSTART = days from TIME_REF to start of forecast day
+        # ndays returns arg1 - arg2
 
         settings = {
             "__NTIMES__": self.NTIMES,
@@ -250,7 +244,9 @@ class ROMSForecast(Job):
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
 
-        # The restart date is 6 hours prior to CDATE, DSTART is hours since TIME_REF
+        # The restart date is 6 hours prior to CDATE
+        # DSTART = days from TIME_REF to start of forecast day
+        # ndays returns arg1 - arg2
         prev6hr = util.ndate_hrs(f"{CDATE}{HH}", -6)
         DSTART = util.ndays(prev6hr, self.TIME_REF)
         # Reformat the date
@@ -299,7 +295,7 @@ class ROMSForecast(Job):
 
         settings = {
             "__NTIMES__": self.NTIMES,
-            "__TIME_REF__": self.TIME_REF,
+            "__TIME_REF__": self.TIME_REF
         }
 
         template = self.OCNINTMPL
@@ -315,6 +311,7 @@ class ROMSForecast(Job):
         """ Create the ocean.in file for wrfroms forecasts """
 
         CDATE = self.CDATE
+        HH = self.HH
         OFS = self.OFS
         COMROT = self.COMROT
 
@@ -324,8 +321,33 @@ class ROMSForecast(Job):
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
 
+        # TODO - generalize this better, also need to calculate end year, mo, day, etc. 
+        # Hardcoded for DT=60
+        # TODO Set END DAY, HR, etc.
+        DT=60
+        self.NHOURS = int(int(self.NTIMES)/DT)
+
+        # TODO: FIX THIS. It does not come out right for wrfroms
+        #       DSTART =  2064.25d0                      ! days
+        #       TIDE_START =  0.0d0                      ! days
+        #     "CDATE": "20110827",
+        #     "HH": "06",
+        #     "TIME_REF": "20060101.0d0",
+        # DSTART is days since TIME_REF
+        DSTART = util.ndays(f"{CDATE}{HH}", self.TIME_REF)
+        # Reformat the date
+        DSTART = f"{'{:.4f}'.format(float(DSTART))}d0"
+
+        JAN1CURYR = f"{CDATE[0:4]}010100"
+        TIDE_START = util.ndays(JAN1CURYR, self.TIME_REF)
+        TIDE_START = f"{'{:.4f}'.format(float(TIDE_START))}d0"
+
+        # These are the templated variables to replace via substitution
         settings = {
-            #"__NTIMES__": self.NTIMES,
+            "__NTIMES__": self.NTIMES,
+            "__DSTART__": DSTART,
+            "__TIDE_START__": TIDE_START,
+            "__TIME_REF__": self.TIME_REF
         }
 
         template = self.OCNINTMPL
@@ -342,6 +364,7 @@ class ROMSForecast(Job):
 
         #coupling_esmf_atm_sbl.in
         CDATE = self.CDATE
+        HH = self.HH
         OFS = self.OFS
         COMROT = self.COMROT
 
@@ -350,9 +373,35 @@ class ROMSForecast(Job):
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
+       
+        startdate = CDATE+HH
+        startyear = startdate[0:4]
+        startmo   = startdate[4:6]
+        startdy   = startdate[6:8]
+        starthr   = startdate[8:10]
+  
+        # TODO - generalize this better, also need to calculate end year, mo, day, etc. 
+        # Hardcoded for DT=60
+        DT=60
+        NHOURS = int(int(self.NTIMES)/DT)
+        
+        stopdate = util.ndate_hrs(f"{CDATE}{HH}", NHOURS)
+        stopyear = stopdate[0:4]
+        stopmo   = stopdate[4:6]
+        stopdy   = stopdate[6:8]
+        stophr   = stopdate[8:10]
 
+        # TODO - generalize ReferenceTime also
         settings = {
-            #"__NTIMES__": self.NTIMES,
+            "__NPROCS__": self.NPROCS,
+            "__STARTYEAR__": startyear,
+            "__STARTMO__": startmo,
+            "__STARTDY__": startdy,
+            "__STARTHR__": starthr,
+            "__STOPYEAR__": stopyear,
+            "__STOPMO__": stopmo,
+            "__STOPDY__": stopdy,
+	    "__STOPHR__": stophr
         }
 
         template = self.CPLINTMPL
@@ -364,10 +413,11 @@ class ROMSForecast(Job):
 
 
 
-    def __make_wrfinout(self):
+    def __make_wrfin(self):
         """ Create the namelist input and output files for coupled wrfroms forecasts """
 
         CDATE = self.CDATE
+        HH = self.HH
         OFS = self.OFS
         COMROT = self.COMROT
 
@@ -378,17 +428,40 @@ class ROMSForecast(Job):
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
 
+        startdate = CDATE+HH
+        startyear = startdate[0:4]
+        startmo   = startdate[4:6]
+        startdy   = startdate[6:8]
+        starthr   = startdate[8:10]
+
+        # TODO - generalize this better, also need to calculate end year, mo, day, etc. 
+        # Hardcoded for DT=60
+        DT=60
+        NHOURS = int(int(self.NTIMES)/DT)
+
+        stopdate = util.ndate_hrs(f"{CDATE}{HH}", NHOURS)
+        stopyear = stopdate[0:4]
+        stopmo   = stopdate[4:6]
+        stopdy   = stopdate[6:8]
+        stophr   = stopdate[8:10]
+
+        # TODO - generalize ReferenceTime also
         settings = {
-            #"__NTIMES__": self.NTIMES,
+            "__NHOURS__": self.NHOURS,
+            "__STARTYEAR__": startyear,
+            "__STARTMO__": startmo,
+            "__STARTDY__": startdy,
+            "__STARTHR__": starthr,
+            "__STOPYEAR__": stopyear,
+            "__STOPMO__": stopmo,
+            "__STOPDY__": stopdy,
+            "__STOPHR__": stophr
         }
 
         template = self.WRFINTMPL
         outfile = f"{self.OUTDIR}/namelist.input"
         util.makeOceanin(self.NPROCS, settings, template, outfile)
 
-        template = self.WRFOUTTMPL
-        outfile = f"{self.OUTDIR}/namelist.output"
-        util.makeOceanin(self.NPROCS, settings, template, outfile)
         return
 
 
