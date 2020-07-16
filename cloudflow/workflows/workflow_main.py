@@ -21,8 +21,8 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 #fcstconf = f'{curdir}/../cluster/configs/ioos.config'
 #postconf = f'{curdir}/../cluster/configs/post.config'
 
-fcstconf = f'{curdir}/../cluster/configs/local.config'
-postconf = f'{curdir}/../cluster/configs/local.config'
+fcstconf = f'{curdir}/../cluster/configs/wrfroms.config'
+postconf = f'{curdir}/../cluster/configs/wrfroms.config'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW

@@ -148,7 +148,7 @@ def ndays(cdate1, cdate2):
 
 
 def ndate_hrs(cdate :str, hours :int):
-    """ return the YYYYMMDD for CDATE +/- hours """
+    """ return the YYYYMMDDHH for CDATE +/- hours """
 
     y1 = int(cdate[0:4])
     m1 = int(cdate[4:6].lstrip("0"))

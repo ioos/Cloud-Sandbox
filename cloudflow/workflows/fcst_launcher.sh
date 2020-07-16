@@ -64,6 +64,7 @@ fi
 
 #TODO: Make this section a switch statement instead
 
+# MPIOPTS is used by the fcstrun.sh script for nosofs and wrfroms
 if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
   #export MPIOPTS="-launch-agent ssh -host $HOSTS -n $NPROCS -npernode $PPN"
@@ -98,6 +99,14 @@ case $OFS in
     export JOBARGS="$CDATE $HH"
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
+    result=$?
+    ;;
+  wrfroms)
+    export HOMEnos=/save/WRF-ROMS
+    export JOBDIR=$HOMEnos/jobs
+    export JOBSCRIPT=$JOBDIR/fcstrun.sh 
+    cd "$JOBDIR" || exit 1
+    $JOBSCRIPT
     result=$?
     ;;
   adnoc)
