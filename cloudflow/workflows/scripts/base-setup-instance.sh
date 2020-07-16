@@ -104,8 +104,8 @@ install_base_rpms () {
 
   home=$PWD
 
-  # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18
-  libstar=base_rpms.gcc.6.5.0.el7.20191212.tgz
+  # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
+  libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
   wrkdir=~/baserpms
   [ -e $wrkdir ] && rm -Rf $wrkdir
@@ -137,7 +137,7 @@ install_extra_rpms () {
   # g2/v3.1.0            sigio/v2.1.0
   # nemsio/v2.2.4        w3emc/v2.2.0 
 
-  libstar=extra_rpms.el7.20191205.tgz
+  libstar=extra_rpms.el7.20200716.tgz
 
   wrkdir=~/extrarpms
   [ -e $wrkdir ] && rm -Rf $wrkdir
