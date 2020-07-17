@@ -220,9 +220,15 @@ def get_forcing(job: Job, sshuser=None):
         if result.returncode != 0:
             log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
             raise signals.FAIL()
-
+    # Coupled WRF/ROMS
     elif ofs == 'wrfroms':
-        print("get_forcing wrfroms stub")
+        comdir = f"{comrot}/{ofs}/{cdate}"
+        script = f"{curdir}/scripts/getICsWRFROMS.sh"
+
+        result = subprocess.run([script, cdate, comdir], stderr=subprocess.STDOUT)
+        if result.returncode != 0:
+            log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
+            raise signals.FAIL()
     else:
         log.error("Unsupported forecast: ", ofs)
         raise signals.FAIL()
