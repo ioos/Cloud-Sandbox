@@ -26,6 +26,7 @@ class NFSScratchDisk(ScratchDisk):
     def __init__(self, config: str):
         """ Constructor: Currently has hardcoded paths. TODO: Refactor/parameterize settings."""
 
+        # TODO: parameterize self.mount
         self.mount: str = '/mnt/efs/fs1/ptmp'
         self.status: str = 'uninitialized'
         self.mountpath: str = '/ptmp'  # default can be reset in create()

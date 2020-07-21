@@ -13,7 +13,8 @@ from prefect.engine import signals
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
+from cloudflow.services import ScratchDisk
+#from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
 from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
@@ -32,20 +33,47 @@ def create_delete():
     fsx.delete()
 
 
-def main():
-    #create_delete()
+def test_locks():
     mountpath = '/ptmp'
-    result = subprocess.run(['sudo', 'rm', '-Rf', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    #if result.returncode != 0:
-    print(result.stdout)
 
-    result = subprocess.run(['sudo', 'mkdir', '-p', mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print(result.stdout)
+    print("creating lockfile")
+    mylock = ScratchDisk.addlock(mountpath)
+    os.scandir(mountpath)
+    print("sleeping 10 ... ")
+    time.sleep(10)
+
+    print("has locks ?")
+    print(ScratchDisk.haslocks(mountpath))
+
+    print("removing lockfile")
+    ScratchDisk.removelock(mountpath, mylock)
+    os.scandir(mountpath)
+    print("sleeping 10 ... ")
+    time.sleep(10)
+
+    print("has locks ?")
+    print(ScratchDisk.haslocks(mountpath))
 
 
-    return
 
+def test_locks2():
+    mountpath = '/ptmp'
 
+    print('acquiring lock')
+    ScratchDisk.__acquire(mountpath)
+
+    print('sleeping for 30 seconds with lock')
+    time.sleep(30)
+
+    print('releasing lock')
+    ScratchDisk.__release(mountpath)
+   
+
+def main():
+    test_locks()
+    
+    #test_locks2()
 
 if __name__ == '__main__':
     main()
+
