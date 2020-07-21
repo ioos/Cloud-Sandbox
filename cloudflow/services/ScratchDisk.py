@@ -23,6 +23,7 @@ class ScratchDisk(ABC):
         """ Constructor """
         provider: str = None
         status: str = None
+        lockid: str = None
         pass
 
     @abstractmethod
@@ -49,12 +50,13 @@ class ScratchDisk(ABC):
 
 # The lock acquire and release are to help prevent race conditions, only once running process at a time 
 # can access the locking mechansims
+# There is still potential for a race condition here.
+# If another process is blocking on entering the mutex to add a lock, another process that has the lock can still remove the disk
+# TODO: possibly make __acquire non-blocking
 def __acquire(mountpath: str):
     tries=0
     maxtries=3
-    #delay=0.1
-    delay=2 
-    timeout=1
+    delay=0.1
 
     lockfile=f'{mountpath}/.lockctl'
     while tries < maxtries :
@@ -86,7 +88,7 @@ def __release(mountpath: str):
         raise signals.FAIL()
     return
 
-
+# TODO: Should these be made class functions?
 def addlock(mountpath: str) -> str:
     """ Place a file on the disk to act as a lock to prevent disk unmounting/deletion. """
     __acquire(mountpath)

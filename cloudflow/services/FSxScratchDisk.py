@@ -3,6 +3,8 @@ import subprocess
 import time
 import traceback
 import json
+import os
+import re
 
 import boto3
 from botocore.exceptions import ClientError
@@ -31,6 +33,7 @@ class FSxScratchDisk(ScratchDisk):
     ''' TODO: Reuse the existing scratch disk if one exists 
         This will be needed if running multiple forecasts at once, otherwise make the ptmp parameter different
         Possible solution:
+q
             Create a unique identifier for this instance : use a class attribute to store this
             Also place a file at /ptmp of this unique id e.g. user.{self.id}
             When done, remove the user.{self.id} file 
@@ -45,7 +48,6 @@ class FSxScratchDisk(ScratchDisk):
         self.filesystemid: str = None
         self.status: str = 'uninitialized'
         self.mountpath: str = '/ptmp'  # default can be reset in create()
-        self.__lockfile: str = "something_unique"
 
         self.provider: str = 'AWS'
         self.capacity: int = 1200   # The smallest is 1.2 TB
@@ -59,6 +61,29 @@ class FSxScratchDisk(ScratchDisk):
         return
 
 
+    def _mountexists(self) -> bool:
+        """ Check to see if a disk is already mounted at mountpath """
+        # df /ptmp (EFS): fs-46891ac5.efs.us-east-1.amazonaws.com:/   /mnt/efs/fs1
+        # df /ptmp (FSx): 10.0.0.5@tcp:/2y2xnbmv 
+        if self._pathexists():
+            result = subprocess.run(['df', '--output=source', self.mountpath], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            source = result.stdout.split()[1]
+            if re.search(".efs.", source) or re.search("@tcp:/", source):
+                return True
+            else: return False 
+        else:
+            return False   
+
+    def _pathexists(self) -> bool:
+        return os.path.isdir(self.mountpath)
+ 
+    def _issymlink(self) -> bool:
+        return os.path.islink(self.mountpath)
+
+    def _isinuse(self) -> bool:
+        """ Is it in use by other processes? """
+        return ScratchDisk.haslocks(self.mountpath)
+
 
     def create(self, mountpath: str = '/ptmp'):
         """ Create a new FSx scratch disk and mount it locally 
@@ -69,10 +94,45 @@ class FSxScratchDisk(ScratchDisk):
             The path where the disk will be mounted. Default = /ptmp" (optional)
         """
 
+        # Check to see if an FSx scratch disk already exists on the system at mountpath
+
         self.mountpath = mountpath
 
         client = boto3.client('fsx', region_name=self.region)
 
+        if self._mountexists(): 
+            # Add an additional lock to it
+            self.lockid = ScratchDisk.addlock(self.mountpath)
+            log.info("Scratch disk already exists...")
+            # Assume it is an FSx disk and not an EFS disk. 
+            # Need to obtain the details, so we can delete it here if we are last 
+            #               Mountname
+            # 10.0.1.70@tcp:/gcuupbmv
+            # Need FileSystemId': 'string',
+            # we can get mountname from df
+            # search FileSystems list for mountname
+        
+            result = subprocess.run(['df', '--output=source', '/ptmp'], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            dfmountname = result.stdout.split()[1].split('/')[1]
+
+            filesystems = client.describe_file_systems()['FileSystems']
+            index = 0
+            for fs in filesystems:
+                mountname = fs['LustreConfiguration']['MountName']
+                if mountname == dfmountname:
+                    self.filesystemid = fs['FileSystemId']
+                    self.dnsname = fs['DNSName']
+                    self.mountname = mountname
+                    log.info(f'Found FSx disk at {self.mountpath}.')
+                    break
+                else:
+                    index += 1
+                    if index == len(filesystems):
+                        log.exception('ERROR: Unable to locate a matching FSx disk')
+                        raise signals.FAIL()
+                    continue
+            return  # scratch disk already exists, don't create a new one
+        
         try:
             response = client.create_file_system(
                 FileSystemType='LUSTRE',
@@ -85,10 +145,9 @@ class FSxScratchDisk(ScratchDisk):
                 }
             )
             self.status='creating'
-
         except ClientError as e:
             log.exception('ClientError exception in createCluster' + str(e))
-            raise Exception() from e
+            raise signals.FAIL()
         
         '''
               'FileSystem': {
@@ -110,6 +169,7 @@ class FSxScratchDisk(ScratchDisk):
 
     def __mount(self):
         """ Mount the disk when it is ready """
+        # sudo mount -t lustre -o 'noatime,flock' fs-037d74a7524d3e1d3.fsx.us-east-1.amazonaws.com@tcp:/gcuupbmv /ptmp
 
         client = boto3.client('fsx', region_name=self.region)
 
@@ -165,6 +225,8 @@ class FSxScratchDisk(ScratchDisk):
                     traceback.print_stack()
                     raise signals.FAIL()
 
+                # Now add a lock so other processes know this disk in use and won't unmount it
+                self.lockid = ScratchDisk.addlock(self.mountpath)
                 self.status='available'
                 log.info(f"FSx scratch is mounted locally at {self.mountpath}")
                 break
@@ -177,9 +239,16 @@ class FSxScratchDisk(ScratchDisk):
 
     def delete(self):
         """ Delete this FSx disk """
- 
-        client = boto3.client('fsx', region_name=self.region)
-        
+
+        ScratchDisk.removelock(self.mountpath, self.lockid)
+
+        # Is the disk in use by anyone else? There is a potential for a race condition here.
+        # If another process is blocking on entering the mutex to add a lock, this process will still remove the disk
+        # TODO: possibly make __acquire non-blocking
+        if ScratchDisk.haslocks(self.mountpath):
+            log.info(f'FSx disk is at {self.mountpath} is currently in use. Unable to remove it.')
+            return
+     
         log.info(f'Unmounting FSx disk at {self.mountpath} ...')
         try:
             result = subprocess.run(['sudo', 'umount', '-f', self.mountpath ],
@@ -190,6 +259,7 @@ class FSxScratchDisk(ScratchDisk):
         except Exception as e:
             log.exception('Exception while unmounting scratch disk at {self.mountpath} ...')
  
+        client = boto3.client('fsx', region_name=self.region)
         try:
             response = client.delete_file_system(FileSystemId=self.filesystemid)
             if response['Lifecycle'] == 'DELETING':
