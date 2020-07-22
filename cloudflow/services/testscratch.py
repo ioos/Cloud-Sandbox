@@ -5,6 +5,7 @@ import time
 import traceback
 import os
 import sys
+import uuid
 
 import boto3
 from botocore.exceptions import ClientError
@@ -107,12 +108,20 @@ def testbotofsx():
     print(filesystemid) 
     print(dnsname)
     print(mountname)
+
+
+def test_uuid():
+    uid = uuid.uuid4()
+    print(f'uid: {uid}')
+    print(f'uid.hex: {uid.hex}')
+    
     
 def main():
     #test_locks()
     #test_locks2()
     #test_utils()
-    testbotofsx()
+    #testbotofsx()
+    test_uuid()
 
 if __name__ == '__main__':
     main()

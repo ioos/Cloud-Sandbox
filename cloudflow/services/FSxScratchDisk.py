@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 from prefect.engine import signals
 
 from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
+import cloudflow.services.ScratchDisk as ScratchDiskModule
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
@@ -80,11 +81,6 @@ q
     def _issymlink(self) -> bool:
         return os.path.islink(self.mountpath)
 
-    def _isinuse(self) -> bool:
-        """ Is it in use by other processes? """
-        return ScratchDisk.haslocks(self.mountpath)
-
-
     def create(self, mountpath: str = '/ptmp'):
         """ Create a new FSx scratch disk and mount it locally 
 
@@ -100,9 +96,11 @@ q
 
         client = boto3.client('fsx', region_name=self.region)
 
+        # Add an additional lock to it
+        self.lockid = ScratchDiskModule.addlock(self.mountpath)
+
         if self._mountexists(): 
-            # Add an additional lock to it
-            self.lockid = ScratchDisk.addlock(self.mountpath)
+
             log.info("Scratch disk already exists...")
             # Assume it is an FSx disk and not an EFS disk. 
             # Need to obtain the details, so we can delete it here if we are last 
@@ -226,7 +224,7 @@ q
                     raise signals.FAIL()
 
                 # Now add a lock so other processes know this disk in use and won't unmount it
-                self.lockid = ScratchDisk.addlock(self.mountpath)
+                self.lockid = ScratchDiskModule.addlock(self.mountpath)
                 self.status='available'
                 log.info(f"FSx scratch is mounted locally at {self.mountpath}")
                 break
@@ -240,13 +238,16 @@ q
     def delete(self):
         """ Delete this FSx disk """
 
-        ScratchDisk.removelock(self.mountpath, self.lockid)
+        log.debug(f'Attempting to delete FSx disk at {self.mountpath}')
+        log.debug(f'This processes lockid: {self.lockid}')
+
+        ScratchDiskModule.removelock(self.mountpath, self.lockid)
 
         # Is the disk in use by anyone else? There is a potential for a race condition here.
         # If another process is blocking on entering the mutex to add a lock, this process will still remove the disk
         # TODO: possibly make __acquire non-blocking
-        if ScratchDisk.haslocks(self.mountpath):
-            log.info(f'FSx disk is at {self.mountpath} is currently in use. Unable to remove it.')
+        if ScratchDiskModule.haslocks(self.mountpath):
+            log.info(f'FSx disk at {self.mountpath} is currently in use. Unable to remove it.')
             return
      
         log.info(f'Unmounting FSx disk at {self.mountpath} ...')
@@ -290,7 +291,7 @@ q
                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 if result.returncode != 0:
                     print(result.stdout)
-                    log.exception('unable to mount scratch disk on host...', host)
+                    log.exception(f'unable to mount scratch disk on host: {host}')
                     raise signals.FAIL()
             except Exception as e:
                 log.exception('unable to mount scratch disk on host...', host)

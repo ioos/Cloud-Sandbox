@@ -239,7 +239,7 @@ class ROMSForecast(Job):
         template = self.OCNINTMPL
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
+            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -316,7 +316,7 @@ class ROMSForecast(Job):
         COMROT = self.COMROT
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -369,7 +369,7 @@ class ROMSForecast(Job):
         COMROT = self.COMROT
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -423,7 +423,7 @@ class ROMSForecast(Job):
 
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
