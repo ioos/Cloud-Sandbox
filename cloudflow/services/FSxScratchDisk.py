@@ -249,7 +249,8 @@ q
      
         log.info(f'Unmounting FSx disk at {self.mountpath} ...')
         try:
-            result = subprocess.run(['sudo', 'umount', '-f', self.mountpath ],
+            # umount -f = force, -l = lazy
+            result = subprocess.run(['sudo', 'umount', '-fl', self.mountpath ],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
                 print(result.stdout)

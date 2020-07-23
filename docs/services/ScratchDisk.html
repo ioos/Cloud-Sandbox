@@ -193,14 +193,20 @@
 
 <dl class="py function">
 <dt id="ScratchDisk.addlock">
-<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">addlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">uniqid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScratchDisk.addlock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Not yet implemented. Place a file on the disk to act as a lock to prevent disk unmounting/deletion.</p>
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">addlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#ScratchDisk.addlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place a file on the disk to act as a lock to prevent disk unmounting/deletion.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ScratchDisk.get_lockcount">
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">get_lockcount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#ScratchDisk.get_lockcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>How many processes are using this mount</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="ScratchDisk.haslocks">
 <code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">haslocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#ScratchDisk.haslocks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Not yet implemented. Test if any locks exist on the disk.</p>
+<dd><p>Test if any locks exist on the disk.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -222,8 +228,8 @@
 
 <dl class="py function">
 <dt id="ScratchDisk.removelock">
-<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">removelock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">uniqid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScratchDisk.removelock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Not yet implemented. Remove an existing lock file from the disk.</p>
+<code class="sig-prename descclassname">ScratchDisk.</code><code class="sig-name descname">removelock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mountpath</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">uid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScratchDisk.removelock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an existing lock file from the disk.</p>
 </dd></dl>
 
 </div>
