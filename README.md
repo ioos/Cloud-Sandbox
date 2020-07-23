@@ -3,6 +3,10 @@
 ## CloudFlow API Specification
 https://ioos.github.io/Cloud-Sandbox/
 
+## Cloud-Sandbox Setup and User Guide
+
+https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0.docx
+
 ### Directory structure
 
     .
