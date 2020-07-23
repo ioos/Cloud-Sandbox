@@ -80,21 +80,19 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Setup the job
         fcstjob = tasks.job_init(cluster, fcstjobfile)
        
-        # Note: These do not run in parallel as hoped
+        # scratch disk
+        # TODO: /ptmp should come from the fcstjob?
+        scratch = tasks.create_scratch('FSx',fcstconf,'/ptmp')
+        # Use 'FSx' for FSx scratch disk
  
         # Get forcing data
         forcing = jtasks.get_forcing(fcstjob, sshuser)
-
-        # scratch disk
-        # TODO: /ptmp should come from the fcstjob?
-        scratch = tasks.create_scratch('NFS',fcstconf,'/ptmp', upstream_tasks=[forcing])
-        # Use 'FSx' for FSx scratch disk
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, scratch])
 
         # Mount the scratch disk
-        scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
+        scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[scratch, cluster_start])
 
         # Run the forecast
         fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[scratch_mount])

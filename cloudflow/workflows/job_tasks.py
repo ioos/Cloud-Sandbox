@@ -193,8 +193,10 @@ def get_forcing(job: Job, sshuser=None):
     comrot = job.COMROT
     hh = job.HH
 
+    comdir = job.OUTDIR
+
     if ofs == 'liveocean':
-        comdir = f"{comrot}/{ofs}"
+        #comdir = f"{comrot}/{ofs}"
         try:
             util.get_ICs_lo(cdate, comdir, sshuser)
         except Exception as e:
@@ -203,7 +205,7 @@ def get_forcing(job: Job, sshuser=None):
 
     # ROMS models
     elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
-        comdir = f"{comrot}/{ofs}.{cdate}"
+        #comdir = f"{comrot}/{ofs}.{cdate}"
         script = f"{curdir}/scripts/getICsROMS.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
@@ -213,7 +215,7 @@ def get_forcing(job: Job, sshuser=None):
 
     # FVCOM models
     elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
-        comdir = f"{comrot}/{ofs}.{cdate}"
+        #comdir = f"{comrot}/{ofs}.{cdate}"
         script = f"{curdir}/scripts/getICsFVCOM.sh"
 
         result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
@@ -222,7 +224,7 @@ def get_forcing(job: Job, sshuser=None):
             raise signals.FAIL()
     # Coupled WRF/ROMS
     elif ofs == 'wrfroms':
-        comdir = f"{comrot}/{ofs}/{cdate}"
+        #comdir = f"{comrot}/{ofs}/{cdate}"
         script = f"{curdir}/scripts/getICsWRFROMS.sh"
 
         result = subprocess.run([script, cdate, comdir], stderr=subprocess.STDOUT)

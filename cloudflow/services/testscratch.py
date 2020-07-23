@@ -5,6 +5,7 @@ import time
 import traceback
 import os
 import sys
+import uuid
 
 import boto3
 from botocore.exceptions import ClientError
@@ -69,10 +70,58 @@ def test_locks2():
     ScratchDisk.__release(mountpath)
    
 
-def main():
-    test_locks()
+def test_utils():
+    config='/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/ioos.config'
+    scratch = FSxScratchDisk(config)
+    result = scratch._pathexists()
+    print(f'pathexists: {result}')
+    result = scratch._mountexists()
+    print(f'mountexists: {result}')
+
+
+def testbotofsx():
+
+    client = boto3.client('fsx', region_name='us-east-1')
+    filesystems = client.describe_file_systems()['FileSystems']
+    # we can get mountname from df
+    # search FileSystems list for mountname
+    #mountname = response['FileSystem']['LustreConfiguration']['MountName']
+      
+    result = subprocess.run(['df', '--output=source', '/ptmp'], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    dfmountname = result.stdout.split()[1].split('/')[1]
+    dfmountname = 'garbage'
+    index = 0
+    for fs in filesystems:
+        mountname = fs['LustreConfiguration']['MountName']
+        if mountname == dfmountname:
+            print('FOUND IT')
+            filesystemid = fs['FileSystemId']
+            dnsname = fs['DNSName']
+            break
+        else:
+            index += 1
+            if index == len(filesystems):
+                print('ERROR: Unable to locate a matching FSx disk')
+                raise Exception
+            continue
+
+    print(filesystemid) 
+    print(dnsname)
+    print(mountname)
+
+
+def test_uuid():
+    uid = uuid.uuid4()
+    print(f'uid: {uid}')
+    print(f'uid.hex: {uid.hex}')
     
+    
+def main():
+    #test_locks()
     #test_locks2()
+    #test_utils()
+    #testbotofsx()
+    test_uuid()
 
 if __name__ == '__main__':
     main()
