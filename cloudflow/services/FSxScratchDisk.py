@@ -66,7 +66,7 @@ q
         """ Check to see if a disk is already mounted at mountpath """
         # df /ptmp (EFS): fs-46891ac5.efs.us-east-1.amazonaws.com:/   /mnt/efs/fs1
         # df /ptmp (FSx): 10.0.0.5@tcp:/2y2xnbmv 
-        if self._pathexists():
+        if os.path.isdir(self.mountpath):
             result = subprocess.run(['df', '--output=source', self.mountpath], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             source = result.stdout.split()[1]
             if re.search(".efs.", source) or re.search("@tcp:/", source):
@@ -74,12 +74,7 @@ q
             else: return False 
         else:
             return False   
-
-    def _pathexists(self) -> bool:
-        return os.path.isdir(self.mountpath)
  
-    def _issymlink(self) -> bool:
-        return os.path.islink(self.mountpath)
 
     def create(self, mountpath: str = '/ptmp'):
         """ Create a new FSx scratch disk and mount it locally 
@@ -91,19 +86,19 @@ q
         """
 
         # Check to see if an FSx scratch disk already exists on the system at mountpath
+        # Add an additional lock to it
+        self.lockid = ScratchDiskModule.addlock(mountpath)
 
         self.mountpath = mountpath
 
         client = boto3.client('fsx', region_name=self.region)
 
-        # Add an additional lock to it
-        self.lockid = ScratchDiskModule.addlock(self.mountpath)
-
         if self._mountexists(): 
 
             log.info("Scratch disk already exists...")
+            # Need to obtain the details, so we can delete it here if we are last to use it
+
             # Assume it is an FSx disk and not an EFS disk. 
-            # Need to obtain the details, so we can delete it here if we are last 
             #               Mountname
             # 10.0.1.70@tcp:/gcuupbmv
             # Need FileSystemId': 'string',
@@ -130,39 +125,42 @@ q
                         raise signals.FAIL()
                     continue
             return  # scratch disk already exists, don't create a new one
-        
-        try:
-            response = client.create_file_system(
-                FileSystemType='LUSTRE',
-                StorageCapacity=self.capacity,
-                SubnetIds=[ self.subnet_id ],
-                SecurityGroupIds=self.sg_ids,
-                Tags=self.tags,
-                LustreConfiguration={
-                    'DeploymentType': 'SCRATCH_2'
-                }
-            )
-            self.status='creating'
-        except ClientError as e:
-            log.exception('ClientError exception in createCluster' + str(e))
-            raise signals.FAIL()
-        
-        '''
-              'FileSystem': {
-                  FileSystemId': 'string',
-                  'DNSName': 'string',
-                  'LustreConfiguration': {
-                       'MountName': 'string'
-        
-        '''
 
-        log.info("FSx drive creation in progress...")
-        self.filesystemid = response['FileSystem']['FileSystemId']
-        self.dnsname = response['FileSystem']['DNSName']
-        self.mountname = response['FileSystem']['LustreConfiguration']['MountName']
+        elif ScratchDiskModule.get_lockcount() == 1: 
+            # Mount does not exist, but another process might be creating it 
+            # We just created a lock for this, so lock count must be == 1 if we are the only one starting it
+            try:
+                response = client.create_file_system(
+                    FileSystemType='LUSTRE',
+                    StorageCapacity=self.capacity,
+                    SubnetIds=[ self.subnet_id ],
+                    SecurityGroupIds=self.sg_ids,
+                    Tags=self.tags,
+                    LustreConfiguration={
+                        'DeploymentType': 'SCRATCH_2'
+                    }
+                )
+                self.status='creating'
+            except ClientError as e:
+                log.exception('ClientError exception in createCluster' + str(e))
+                raise signals.FAIL()
+        
+                '''
+                  'FileSystem': {
+                      FileSystemId': 'string',
+                      'DNSName': 'string',
+                      'LustreConfiguration': {
+                           'MountName': 'string'
+            
+                '''
+            log.info("FSx drive creation in progress...")
+            self.filesystemid = response['FileSystem']['FileSystemId']
+            self.dnsname = response['FileSystem']['DNSName']
+            self.mountname = response['FileSystem']['LustreConfiguration']['MountName']
 
-        # Now mount it
-        self.__mount()
+            # Now mount it
+            self.__mount()
+        return
 
 
     def __mount(self):
@@ -192,7 +190,6 @@ q
             if status == 'AVAILABLE':
                 log.info("FSx scratch disk is ready.")
 
-                # TODO: Make sure we don't have another run using this. Finish implementing locks
                 subprocess.run(['sudo', 'rm', '-Rf', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 subprocess.run(['sudo', 'mkdir','-p', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -259,7 +256,8 @@ q
                 log.exception(f'error while unmounting scratch disk at {self.mountpath} ...')
         except Exception as e:
             log.exception('Exception while unmounting scratch disk at {self.mountpath} ...')
- 
+
+        # Remove the AWS FSx resource
         client = boto3.client('fsx', region_name=self.region)
         try:
             response = client.delete_file_system(FileSystemId=self.filesystemid)
@@ -284,6 +282,8 @@ q
           The list of remote hosts
         """
 
+        # TODO: synchronization issue if two new jobs are started at the same time
+        #       We need to make sure that the FSx disk is already spun up otherwise this will fail
         for host in hosts:
             try:
                 result = subprocess.run(['ssh', host, 'sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', 

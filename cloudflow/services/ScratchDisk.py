@@ -106,7 +106,7 @@ def addlock(mountpath: str) -> str:
 
     uid = uuid.uuid4()
     with open(f'{_LOCKROOT}{mountpath}/lock.{uid}','w') as lock:
-        lock.write(uid)
+        lock.write(str(uid))
 
     _release(mountpath)        
     return uid
@@ -136,6 +136,16 @@ def haslocks(mountpath: str) -> bool:
 
     _release(mountpath)
     return response
+
+
+def get_lockcount(mountpath: str) -> int:
+    """ How many processes are using this mount """
+    _acquire(mountpath)
+
+    count = len(glob.glob(f'{_LOCKROOT}{mountpath}/lock.*'))
+
+    _release(mountpath)
+    return count
 
 
 def readConfig(configfile) -> dict:
