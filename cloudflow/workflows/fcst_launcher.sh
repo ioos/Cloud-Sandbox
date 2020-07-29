@@ -102,7 +102,7 @@ case $OFS in
     result=$?
     ;;
   wrfroms)
-    export HOMEnos=/save/WRF-ROMS
+    export HOMEnos=/save/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
     cd "$JOBDIR" || exit 1

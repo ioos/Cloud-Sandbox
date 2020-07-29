@@ -103,11 +103,11 @@ q
             # 10.0.1.70@tcp:/gcuupbmv
             # Need FileSystemId': 'string',
             # we can get mountname from df
-            # search FileSystems list for mountname
         
             result = subprocess.run(['df', '--output=source', '/ptmp'], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             dfmountname = result.stdout.split()[1].split('/')[1]
 
+            # search existing FileSystems list for mountname
             filesystems = client.describe_file_systems()['FileSystems']
             index = 0
             for fs in filesystems:
@@ -126,7 +126,7 @@ q
                     continue
             return  # scratch disk already exists, don't create a new one
 
-        elif ScratchDiskModule.get_lockcount() == 1: 
+        elif ScratchDiskModule.get_lockcount(self.mountpath) == 1: 
             # Mount does not exist, but another process might be creating it 
             # We just created a lock for this, so lock count must be == 1 if we are the only one starting it
             try:
@@ -220,8 +220,6 @@ q
                     traceback.print_stack()
                     raise signals.FAIL()
 
-                # Now add a lock so other processes know this disk in use and won't unmount it
-                self.lockid = ScratchDiskModule.addlock(self.mountpath)
                 self.status='available'
                 log.info(f"FSx scratch is mounted locally at {self.mountpath}")
                 break

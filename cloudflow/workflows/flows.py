@@ -82,8 +82,9 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
        
         # scratch disk
         # TODO: /ptmp should come from the fcstjob?
-        scratch = tasks.create_scratch('FSx',fcstconf,'/ptmp')
+        scratch = tasks.create_scratch('NFS',fcstconf,'/ptmp')
         # Use 'FSx' for FSx scratch disk
+        # Use 'NFS' for an already mounted NFS scratch disk
  
         # Get forcing data
         forcing = jtasks.get_forcing(fcstjob, sshuser)
