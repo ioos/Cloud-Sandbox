@@ -13,6 +13,7 @@
 # In[1]:
 
 import sys
+import os
 import boto3
 import cmocean
 import cartopy.crs as ccrs
@@ -21,6 +22,36 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from xarray import open_mfdataset
+
+
+def make_indexhtml(indexfile : str, imagelist : list):
+
+    htmlhead = '<html xmlns="http://www.w3.org/1999/xhtml">
+
+            <head>
+                <title>Cloud-Sandbot</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+                <meta name="Robots" content="NOINDEX " />
+            </head>
+            <script type="text/javascript">
+                 var gearPage = document.getElementById('GearPage');
+                 if(null != gearPage)
+                 {
+                     gearPage.parentNode.removeChild(gearPage);
+                     document.title = "Error";
+                 }
+            </script>'
+
+    htmlbody = '<body>'
+    for image in imagelist:
+       imagehtml = f'<img src=\'{image}\'>'
+       htmlbody += imagehtml
+
+    htmlbody += '</body>'
+    html = '<html xmlns="http://www.w3.org/1999/xhtml">' + htmlhead + htmlbody + '</html>'
+
+    with open(indexfile) as index:
+        index.write(html) 
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -32,14 +63,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-def upload_to_s3(file, key, ExtraArgs):
-    bucket = 'ioos-cloud-www'
-    session = boto3.Session()
-    client = session.client('s3')
-    client.upload_file(file, bucket, key, ExtraArgs)
-
-
-def plot_rho(ds, variable, s3upload=False):
+def plot_rho(ds, variable, s3upload=False) -> imagename: str:
     
     if variable == 'zeta':
         da = ds[variable].isel(ocean_time=0)
@@ -84,18 +108,20 @@ def plot_rho(ds, variable, s3upload=False):
     
     indexfile = f'docs/index.html'
     outfile = f'docs/{variable}.png'
+    
+    if not os.path.exists('./docs'):
+        os.makedirs('./docs')
+
+    imagename = outfile.split('/')[-1]
+
     plt.savefig(outfile, bbox_inches='tight')
                  
     if s3upload:
-        upload_to_s3(indexfile, 'index.html', 
-                     ExtraArgs={
-                         'ACL': 'public-read',
-                         'ContentType':'text/html'
-                     })
-        upload_to_s3(outfile, f'{variable}.png',
-                     ExtraArgs={
-                         'ACL': 'public-read'
-                     })
+        s3 = cloudflow.services.S3Storage()
+        bucket = 'ioos-cloud-www'
+        s3.uploadFile(outfile, bucket, f'{variable}.png', public = True)
+
+    return imagename
 
 
 def main(argv):
@@ -109,14 +135,25 @@ def main(argv):
     # else if ofs in utils.fvcom_models then do fvcom
 
     ds_roms = roms_nosofs(COMDIR, OFS, HH)
+    indexfile = f'docs/index.html'
+    if not os.path.exists('./docs'):
+        os.makedirs('./docs')
+
+    bucket = 'ioos-cloud-www'
+
+    storageService = cloudflow.services.S3Storage()
 
     rho_vars = ['temp']
 
-    # Bad practice to use single letter variable names. They are extremely difficult to search for.
+    imagelist : list
+
     for var in rho_vars:
-        plot_rho(ds_roms, var, s3upload=True)
+        imagename = plot_rho(ds_roms, var, s3upload=True)
+        imagelist.append(imagename)
 
-
+    make_indexhtml(indexfile, imagelist)
+    storageService.uploadFile(indexfile, bucket, 'index.html', public = True, text = True)
+    
 if __name__ == '__main__':
     main(sys.argv)
 

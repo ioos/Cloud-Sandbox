@@ -22,7 +22,7 @@ class S3Storage(StorageService):
         return
 
 
-    def uploadFile(self, filename: str, bucket: str, key: str, public: bool = False):
+    def uploadFile(self, filename: str, bucket: str, key: str, public: bool = False, text: bool = False):
         """ Upload a file to S3
 
         Parameters
@@ -45,12 +45,17 @@ class S3Storage(StorageService):
 
         """
 
+        ExtraArgs : dict = {}
+
         s3 = boto3.client('s3')
+        if public:
+            ExtraArgs.update(ACL = 'public-read')
+        if text:
+            ExtraArgs.update(ContentType = 'text/html')
+
         try:
-            if public:
-                s3.upload_file(filename, bucket, key, ExtraArgs={'ACL': 'public-read'})
-            else:
-                s3.upload_file(filename, bucket, key)
+            s3.upload_file(filename, bucket, key, ExtraArgs=ExtraArgs)
+
         except ClientError as e:
             log.error(e)
             raise Exception from e
