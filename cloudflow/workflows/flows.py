@@ -240,8 +240,10 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
 
         #######################################################################
-        # This will add Kenny's HLFS if it is found on S3 - for demo
-        injected = tasks.fetchpy_and_run(plotjob, storage_service)
+        # This will add Kenny's script
+        # https://ioos-cloud-sandbox.s3.amazonaws.com/cloudflow/inject/kenny/cloud_sandbot.py
+        notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
     return diff_plotflow
 
@@ -387,6 +389,7 @@ def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
         debugflow.set_reference_tasks([fcst_run])
 
     return debugflow
+
 
 def inject_notebook() :
     ''' Convert the current notebook to python, test it, and upload it for the next forecast cycle.
