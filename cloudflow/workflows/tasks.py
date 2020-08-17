@@ -331,7 +331,7 @@ def run_pynotebook(pyfile: str):
 
 
 @task
-def fetchpy_and_run(job: Job, service: StorageService):
+def fetchpy_and_run(job: Job, service: StorageService, notebook = ''):
     """ Prototype for injecting user developed scripts into a workflow. This is currently implemented only for the
     hlfs example. Additional work is needed to generalize this process.
 
@@ -343,42 +343,26 @@ def fetchpy_and_run(job: Job, service: StorageService):
     service : StorageService
         The cloud or local storage service implementation
 
+    notebook : str
+        The S3 key of the Python script to run. 
+
     Notes
     -----
     WARNING!!!!! This could potentially allow arbitrary code execution!!!
+                 Only run scripts that have been reviewed.
     """
-
-    # Retrieve package to run from S3
-    # .py file
-    # and a config file
-
-    if job.OFS != 'cbofs':
-        log.info('This only works for cbofs currently ... skipping')
-        return
 
     bucket = job.BUCKET   # this is ioos-cloud-sandbox
 
     folder = 'cloudflow/inject'
-
     localtmp = f'/tmp/{folder}'
     if not os.path.exists(localtmp):
         os.makedirs(localtmp)
 
-    # Retrieve config/job file
-    configname = 'hlfs.config'
-    key = f'{folder}/{configname}'
-    configfile = f'{localtmp}/{configname}'
-
-    if service.file_exists(bucket, key):
-        service.downloadFile(bucket, key, configfile)
-    else:
-        log.info('No user supplied config file available ... skipping')
-        return
-
-    filename = 'hlfs.py'
-
-    key = f'{folder}/{filename}'
+    # Get last element of: cloudflow/inject/kenny/cloud_sandbot.py
+    filename = notebook.split('/')[-1]
     pyfile = f'{localtmp}/{filename}'
+    key = notebook
 
     if service.file_exists(bucket, key):
         service.downloadFile(bucket, key, pyfile)
@@ -386,11 +370,20 @@ def fetchpy_and_run(job: Job, service: StorageService):
         log.info('No user supplied python script available ... skipping')
         return
 
-    # retrieved the python and config files, run it
+    # retrieved the python file, use the current job object to set up parameters/arguments
+
+    COMDIR = job.OUTDIR
+    OFS = job.OFS
+    HH = job.HH
+   
+    arg1 = COMDIR
+    arg2 = OFS
+    arg3 = HH 
+ 
     curdir = os.getcwd()
     os.chdir(localtmp)
     try:
-        result = subprocess.run(['python3', pyfile], stderr=subprocess.STDOUT)
+        result = subprocess.run(['python3', pyfile, arg1, arg2, arg3], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'{pyfile} returned non zero exit ...')
             raise signals.FAIL()
