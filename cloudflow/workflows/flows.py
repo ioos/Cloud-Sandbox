@@ -271,18 +271,16 @@ def notebook_flow(postconf,jobfile) -> Flow:
         #####################################################################
         # POST Processing
         #####################################################################
-        # Start a machine
-        #postmach = ctasks.cluster_init(postconf)
-        #pmStarted = ctasks.cluster_start(postmach)
 
-        # Optionally inject a user supplied python script
         postmach = ctasks.cluster_init(postconf)
-        pmStarted = ctasks.cluster_start(postmach)
-
-        plotjob = tasks.job_init(postmach, jobfile, upstream_tasks=[pmStarted])
+        plotjob = tasks.job_init(postmach, jobfile)
 
         storage_service = tasks.storage_init(provider)
-        injected = tasks.fetchpy_and_run(plotjob, storage_service)
+        # Optionally inject a user supplied python script
+        #notebook = 'specify'
+        notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
+
     return nb_flow
 
 
@@ -344,6 +342,8 @@ def test_nbflow(pyfile: str):
         return "PASSED"
     else:
         return "FAILED"
+
+
 
 def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
 

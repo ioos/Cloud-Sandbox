@@ -372,7 +372,7 @@ def fetchpy_and_run(job: Job, service: StorageService, notebook = ''):
 
     # retrieved the python file, use the current job object to set up parameters/arguments
 
-    COMDIR = job.OUTDIR
+    COMDIR = job.INDIR
     OFS = job.OFS
     HH = job.HH
    

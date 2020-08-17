@@ -22,35 +22,22 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from xarray import open_mfdataset
+from cloudflow.services.S3Storage import S3Storage
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
 
-    htmlhead = '<html xmlns="http://www.w3.org/1999/xhtml">
-
-            <head>
-                <title>Cloud-Sandbot</title>
-                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-                <meta name="Robots" content="NOINDEX " />
-            </head>
-            <script type="text/javascript">
-                 var gearPage = document.getElementById('GearPage');
-                 if(null != gearPage)
-                 {
-                     gearPage.parentNode.removeChild(gearPage);
-                     document.title = "Error";
-                 }
-            </script>'
+    htmlhead = '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title>Cloud-Sandbot</title> <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"> <meta name="Robots" content="NOINDEX" /> </head> <script type="text/javascript"> var gearPage = document.getElementById("GearPage"); if(null != gearPage) { gearPage.parentNode.removeChild(gearPage); document.title = "Error"; } </script>'
 
     htmlbody = '<body>'
     for image in imagelist:
-       imagehtml = f'<img src=\'{image}\'>'
+       imagehtml = f'<img src="{image}">'
        htmlbody += imagehtml
 
     htmlbody += '</body>'
     html = '<html xmlns="http://www.w3.org/1999/xhtml">' + htmlhead + htmlbody + '</html>'
 
-    with open(indexfile) as index:
+    with open(indexfile, 'w') as index:
         index.write(html) 
 
 
@@ -60,10 +47,11 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     # Should not use single leterr variable names
     # Choose a name that describes what it is
     filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
+    print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-def plot_rho(ds, variable, s3upload=False) -> imagename: str:
+def plot_rho(ds, variable, s3upload=False) -> str:
     
     if variable == 'zeta':
         da = ds[variable].isel(ocean_time=0)
@@ -117,7 +105,7 @@ def plot_rho(ds, variable, s3upload=False) -> imagename: str:
     plt.savefig(outfile, bbox_inches='tight')
                  
     if s3upload:
-        s3 = cloudflow.services.S3Storage()
+        s3 = S3Storage()
         bucket = 'ioos-cloud-www'
         s3.uploadFile(outfile, bucket, f'{variable}.png', public = True)
 
@@ -130,6 +118,11 @@ def main(argv):
     OFS = argv[2]
     HH = argv[3]
 
+    print(f'COMDIR is: {COMDIR}')
+    print(f'OFS is: {OFS}')
+    print(f'HH is: {HH}')
+
+
     # could check that this is a roms model
     # if ofs in utils.roms_models then do roms
     # else if ofs in utils.fvcom_models then do fvcom
@@ -141,11 +134,11 @@ def main(argv):
 
     bucket = 'ioos-cloud-www'
 
-    storageService = cloudflow.services.S3Storage()
+    storageService = S3Storage()
 
-    rho_vars = ['temp']
+    rho_vars = ['temp',"zeta", "salt" ]
 
-    imagelist : list
+    imagelist = []
 
     for var in rho_vars:
         imagename = plot_rho(ds_roms, var, s3upload=True)
