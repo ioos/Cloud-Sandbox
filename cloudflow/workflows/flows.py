@@ -394,6 +394,8 @@ def inject_notebook() :
 
     from cloudflow.utils import notebook as nbutils
 
+    storage_provider = provider
+
     #pyfile = nbutils.convert_nb2inject()
     pyfile = nbutils.convert_notebook()
     result = test_nbflow(pyfile)

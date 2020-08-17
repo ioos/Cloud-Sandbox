@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 # setup cloud-workflow package
 setup(name="cloudflow",
-    version='1.1.0',
+    version='1.3.1',
     description='Workflows for cloud based numerical weather prediction',
     url='https://github.com/asascience/Cloud-Sandbox',
     author='RPS North America',
