@@ -391,6 +391,7 @@ def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
     return debugflow
 
 
+
 def inject_notebook() :
     ''' Convert the current notebook to python, test it, and upload it for the next forecast cycle.
     '''
@@ -399,9 +400,15 @@ def inject_notebook() :
 
     storage_provider = provider
 
-    #pyfile = nbutils.convert_nb2inject()
     pyfile = nbutils.convert_notebook()
-    result = test_nbflow(pyfile)
+
+    nbtest_flow = notebook_test(pyfile)
+    state = nbtest_flow.run()
+
+    if state.is_successful():
+        return "PASSED"
+    else:
+        return "FAILED"
 
     print(result)
 
