@@ -27,15 +27,19 @@ from cloudflow.services.S3Storage import S3Storage
 
 def make_indexhtml(indexfile : str, imagelist : list):
 
-    htmlhead = '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title>Cloud-Sandbot</title> <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"> <meta name="Robots" content="NOINDEX" /> </head> <script type="text/javascript"> var gearPage = document.getElementById("GearPage"); if(null != gearPage) { gearPage.parentNode.removeChild(gearPage); document.title = "Error"; } </script>'
+    htmlhead = '''<html xmlns="http://www.w3.org/1999/xhtml">
+                  <head>
+                  <title>Cloud-Sandbot</title>'''
 
-    htmlbody = '<body>'
+    htmlbody = '<body>\n'
     for image in imagelist:
-       imagehtml = f'<img src="{image}">'
+       imagehtml = f'<img src="{image}">\n'
        htmlbody += imagehtml
 
-    htmlbody += '</body>'
-    html = '<html xmlns="http://www.w3.org/1999/xhtml">' + htmlhead + htmlbody + '</html>'
+    htmlbody += '</body>\n'
+    html = f'''{htmlhead}
+               {htmlbody}
+               </html>'''
 
     with open(indexfile, 'w') as index:
         index.write(html) 
