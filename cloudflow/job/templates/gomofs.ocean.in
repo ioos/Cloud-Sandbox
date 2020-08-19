@@ -63,7 +63,9 @@
 !==============================================================================                                                                                                                         
 !                                                                                                                                                                                                       
 ! Application title.                                                                                                                                                                                    
-     TITLE = gomofs forecast RUN in operational mode
+     !TITLE = gomofs forecast RUN in operational mode
+     TITLE = Gulf of Maine Operational Forecast System (GoMOFS) - IOOS Cloud Sandbox
+
 ! C-preprocessing Flag.                                                                                                                                                                                 
      MyAppCPP = gomofs forecast RUN in operational mode
 ! Input variable information file name.  This file needs to be processed                                                                                                                                

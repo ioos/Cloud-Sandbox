@@ -63,7 +63,9 @@
 !==============================================================================                                                                                                                         
 !                                                                                                                                                                                                       
 ! Application title.                                                                                                                                                                                    
-     TITLE = ciofs forecast RUN in operational mode
+     !TITLE = ciofs forecast RUN in operational mode
+     TITLE = Cook Inlet Operational Forecast System (CIOFS) - IOOS Cloud Sandbox
+
 ! C-preprocessing Flag.                                                                                                                                                                                 
      MyAppCPP = ciofs forecast RUN in operational mode
 ! Input variable information file name.  This file needs to be processed                                                                                                                                
