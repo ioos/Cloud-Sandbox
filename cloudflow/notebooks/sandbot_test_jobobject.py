@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[ ]:
 
 
 import sys
@@ -18,7 +18,7 @@ from cloudflow.services.S3Storage import S3Storage
 from cloudflow.job.Plotting import Plotting
 
 
-# In[5]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -42,7 +42,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[6]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -55,7 +55,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[7]:
+# In[ ]:
 
 
 def plot_rho(ds, variable, s3upload=False) -> str:
@@ -91,6 +91,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     title = ds.attrs['title']
     history = ds.history
     now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+    print(now)
     ax.set_title(f"Image generated on {now}\n\n{title}\n{history}");
     
     cbar = fig.colorbar(im, ax=ax)
@@ -110,7 +111,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     imagename = outfile.split('/')[-1]
 
     plt.savefig(outfile, bbox_inches='tight')
-                 
+             
     if s3upload:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
@@ -119,7 +120,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[8]:
+# In[ ]:
 
 
 def main(job: Plotting):
@@ -160,19 +161,11 @@ def main(job: Plotting):
     storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
     
     print('Finished ...')
-
+    # return ds_roms
     
 
 
-# In[9]:
-
-
-COMDIR='/com/nos/cbofs.2020081800'
-OFS='cbofs'
-HH='00'
-
-
-# In[10]:
+# In[ ]:
 
 
 jobfile = 'cbofs_plotting_job.json'

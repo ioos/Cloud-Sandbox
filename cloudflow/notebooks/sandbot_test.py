@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[ ]:
 
 
 import sys
@@ -17,7 +17,7 @@ from xarray import open_mfdataset
 from cloudflow.services.S3Storage import S3Storage
 
 
-# In[8]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -41,20 +41,18 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[9]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     '''Load ROMS NOSOFS dataset'''
 
-    # Should not use single leterr variable names
-    # Choose a name that describes what it is
     filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[10]:
+# In[ ]:
 
 
 def plot_rho(ds, variable, s3upload=False) -> str:
@@ -118,7 +116,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[11]:
+# In[ ]:
 
 
 def main(argv):
@@ -130,6 +128,7 @@ def main(argv):
     print(f'COMDIR is: {COMDIR}')
     print(f'OFS is: {OFS}')
     print(f'HH is: {HH}')
+    print('Running ...')
 
 
     # could check that this is a roms model
@@ -154,11 +153,15 @@ def main(argv):
         imagelist.append(imagename)
 
     make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, 'index.html', public = True, text = True)
+    storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
+    
+    print('Finished ...')
+#    return ds_roms
+
     
 
 
-# In[12]:
+# In[ ]:
 
 
 COMDIR='/com/nos/cbofs.2020081800'
