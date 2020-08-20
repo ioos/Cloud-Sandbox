@@ -12,6 +12,7 @@
 # Scrub foreast data
 
 COMROT=/com/liveocean
+COMVERIF=/com/liveocean-uw
 
 today=`date -u +%Y%m%d`
 
@@ -31,6 +32,42 @@ echo "Deleting old plots"
 cd $COMROT/plots
 find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots
 find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots -exec rm -Rf {} \;
+
+
+
+##############################################################################
+# Delete forecast folders older than 1 week
+##############################################################################
+daysoldfcst=6
+
+echo "Deleting forecast directories older than $daysoldfcst days"
+cd $COMROT
+find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+#find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+
+
+##############################################################################
+# Delete forcing/ICs older than 1 day
+##############################################################################
+daysoldics=0
+
+echo "Deleting forcing/ICs directories older than $daysoldics days"
+cd $COMROT/forcing
+find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+#find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+
+
+##############################################################################
+# Delete verification data older than 1 day
+##############################################################################
+daysoldics=0
+
+echo "Deleting verification data older than $daysoldics days"
+cd $COMVERIF
+find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
 
 
 
@@ -71,29 +108,4 @@ do
     fhr=$((fhr+=1))
   done
 done
-
-
-##############################################################################
-# Delete forecast folders older than 1 week
-##############################################################################
-daysoldfcst=6
-
-echo "Deleting forecast directories older than $daysoldfcst days"
-cd $COMROT
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
-#find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
-
-
-##############################################################################
-# Delete forcing/ICs greater than 1 day
-##############################################################################
-daysoldics=0
-
-echo "Deleting forcing/ICs directories older than $daysoldics days"
-cd $COMROT/forcing
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
-#find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
-
 
