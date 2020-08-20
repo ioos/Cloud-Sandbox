@@ -24,6 +24,7 @@ from cloudflow.job.Plotting import Plotting
 def make_indexhtml(indexfile : str, imagelist : list):
 
     htmlhead = '''<html xmlns="http://www.w3.org/1999/xhtml">
+                  <meta http-equiv="Cache-control" content="no-cache">
                   <head>
                   <title>Cloud-Sandbot</title>'''
 
@@ -50,7 +51,10 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
 
     # Should not use single leterr variable names
     # Choose a name that describes what it is
-    filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
+    # Why load in the entire dataset when only plotting one time slice? 
+    # It is extremely slow!
+    #  nos.gomofs.fields.f006.20200819.t00z.nc
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
@@ -135,7 +139,6 @@ def main(job: Plotting):
     print(f'HH is: {HH}')
     print('Running ...')
 
-
     # could check that this is a roms model
     # if ofs in utils.roms_models then do roms
     # else if ofs in utils.fvcom_models then do fvcom
@@ -168,7 +171,10 @@ def main(job: Plotting):
 # In[ ]:
 
 
-jobfile = 'cbofs_plotting_job.json'
+''' We're still looking for a way to not have to do something like this.
+We really want this job to run without having to specify any parameters.
+'''
+jobfile = 'plotting_job.json'
 NPROCS = 1
 testjob = Plotting(jobfile, 1)
 main(testjob)
