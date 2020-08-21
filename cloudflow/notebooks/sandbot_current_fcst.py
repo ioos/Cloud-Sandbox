@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[33]:
+# In[ ]:
 
 
 import sys
@@ -23,7 +23,7 @@ from cloudflow.job.Plotting import Plotting
 DEBUG = True
 
 
-# In[34]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -48,7 +48,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[35]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -62,7 +62,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[36]:
+# In[ ]:
 
 
 def dsofs_latest(COMROT: str='/com/nos'):
@@ -116,14 +116,14 @@ def dsofs_latest(COMROT: str='/com/nos'):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[37]:
+# In[ ]:
 
 
 # Testing
 # dsofs_latest()
 
 
-# In[38]:
+# In[ ]:
 
 
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
@@ -156,14 +156,14 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     
 
 
-# In[39]:
+# In[ ]:
 
 
 # Testing
 # dsofs_curr_fcst()
 
 
-# In[40]:
+# In[ ]:
 
 
 def dsofs_curr_nowcst(COMROT: str='/com/nos'):
@@ -176,7 +176,7 @@ def dsofs_curr_nowcst(COMROT: str='/com/nos'):
     
 
 
-# In[41]:
+# In[ ]:
 
 
 def plot_rho(ds, variable, s3upload=False) -> str:
@@ -236,12 +236,14 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     if s3upload:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
-        s3.uploadFile(outfile, bucket, f'{variable}.png', public = True)
+        bucket_folder = 'sandbot'
+        key = f'{bucket_folder}/{variable}.png'
+        s3.uploadFile(outfile, bucket, key, public = True)
 
     return imagename
 
 
-# In[42]:
+# In[ ]:
 
 
 def main_with_jobobj(job: Plotting):
@@ -267,6 +269,7 @@ def main_with_jobobj(job: Plotting):
         os.makedirs('./docs')
 
     bucket = 'ioos-cloud-www'
+    bucket_folder = 'sandbot'
 
     storageService = S3Storage()
 
@@ -279,14 +282,14 @@ def main_with_jobobj(job: Plotting):
         imagelist.append(imagename)
 
     make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
+    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}/index.html', public=True, text=True)
     
     print('Finished ...')
     # return ds_roms
     
 
 
-# In[43]:
+# In[ ]:
 
 
 def run_with_jobobj():
@@ -298,7 +301,7 @@ def run_with_jobobj():
     main_with_jobonj(testjob)
 
 
-# In[44]:
+# In[ ]:
 
 
 def main():
@@ -312,7 +315,8 @@ def main():
         os.makedirs('./docs')
 
     bucket = 'ioos-cloud-www'
-
+    bucket_folder = 'sandbot'
+    
     storageService = S3Storage()
 
     rho_vars = ['temp',"zeta", "salt" ]
@@ -324,12 +328,12 @@ def main():
         imagelist.append(imagename)
 
     make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
+    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}/index.html', public=True, text=True)
     
     print('Finished ...')
 
 
-# In[45]:
+# In[ ]:
 
 
 # Testing
