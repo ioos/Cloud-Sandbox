@@ -1,35 +1,39 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Cloud-Sandbot
-# Bot that posts images from Cloud-Sandbox quasi-operational post-processing workflows. 
-# 
-# **Steps:**
-# 1. Plot something using an example dataset
-# 2. Upload output to s3
-# 3. Convert the notebook to a script
-# 4. Inject into cloudflow
+# In[ ]:
 
-# In[1]:
 
 import sys
 import os
+import glob
+from datetime import datetime
+
 import boto3
 import cmocean
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from xarray import open_mfdataset
+
 from cloudflow.services.S3Storage import S3Storage
+from cloudflow.job.Plotting import Plotting
+from cloudflow.utils import romsUtil as utils
+
+DEBUG = True
+
+
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
 
     htmlhead = '''<html xmlns="http://www.w3.org/1999/xhtml">
+                  <meta http-equiv="Cache-control" content="no-cache">
                   <head>
-                  <title>Cloud-Sandbot</title>'''
+                  <title>Cloud-Sandbot</title>
+                  </head>'''
 
     htmlbody = '<body>\n'
     for image in imagelist:
@@ -43,16 +47,103 @@ def make_indexhtml(indexfile : str, imagelist : list):
 
     with open(indexfile, 'w') as index:
         index.write(html) 
+        
+
+
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
-    '''Load ROMS NOSOFS dataset'''
+    """Load ROMS NOSOFS dataset"""
 
-    # Should not use single leterr variable names
-    # Choose a name that describes what it is
-    filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
+
+
+# In[ ]:
+
+
+def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
+    """Load FVCOM NOSOFS dataset"""
+
+    from netCDF4 import MFDataset
+
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
+    print(f'filespec is: {filespec}')
+    return MFDataset(filespec)
+
+
+# In[ ]:
+
+
+def dsofs_latest(COMROT: str='/com/nos'):
+    """ Load the most recent OFS forecast available on COMROT """
+    
+    # List the directories in COMROT that match [a-z]*ofs.YYYYMMDDHH
+    regex = "[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-9][0-9]"
+    dirs = glob.glob(f'{COMROT}/{regex}')
+    
+    if DEBUG: 
+        print ('dirs: ', dirs)
+    
+    # Find the one that has the most recent forecast date (do not use modification time?)
+    # But what if there are two different forecasts for the same date? (use modification time)
+    dates = []
+    newest='1900010100'
+    comdir=dirs[0]
+    
+    for path in dirs:
+        #print(path.split('.'))
+        date = path.split('.')[-1]
+        if date > newest:
+            newest = date
+            comdir = path          
+            
+        dates.append(date)
+
+    if DEBUG:
+        #print('dates : ', dates)
+        #print('newest: ', newest)
+        print('comdir: ', comdir)
+        
+    # Use the folder name to discover OFS, CDATE, HH
+    ofs = comdir.split('.')[0].split('/')[-1]
+    print(ofs)
+    CDATE = newest[0:8]
+    HH = newest[8:10]
+    print(CDATE)
+    print(HH)
+    
+    COMDIR = comdir
+    OFS = ofs
+    print(COMDIR)
+    
+    if DEBUG: # Only grab first 0-9 hours. Faster!
+        filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
+    else: # Grab all hours
+        filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
+        
+    print(f'filespec is: {filespec}')
+    
+    if OFS in utils.roms_models:
+        return open_mfdataset(filespec, decode_times=False, combine='by_coords')
+    elif OFS in utils.fvcom_models:
+        return MFDataset(filespec)
+    else:
+        print(f"ERROR: model not recognized: {OFS}")
+        return None
+    
+
+
+# In[ ]:
+
+
+# Testing
+#dsofs_latest()
+
+
+# In[ ]:
 
 
 def plot_rho(ds, variable, s3upload=False) -> str:
@@ -88,6 +179,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     title = ds.attrs['title']
     history = ds.history
     now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+    print(now)
     ax.set_title(f"Image generated on {now}\n\n{title}\n{history}");
     
     cbar = fig.colorbar(im, ax=ax)
@@ -107,7 +199,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     imagename = outfile.split('/')[-1]
 
     plt.savefig(outfile, bbox_inches='tight')
-                 
+             
     if s3upload:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
@@ -116,22 +208,13 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-def main(argv):
-
-    COMDIR = argv[1]
-    OFS = argv[2]
-    HH = argv[3]
-
-    print(f'COMDIR is: {COMDIR}')
-    print(f'OFS is: {OFS}')
-    print(f'HH is: {HH}')
+# In[ ]:
 
 
-    # could check that this is a roms model
-    # if ofs in utils.roms_models then do roms
-    # else if ofs in utils.fvcom_models then do fvcom
-
-    ds_roms = roms_nosofs(COMDIR, OFS, HH)
+def main():
+    
+    ds_ofs = dsofs_latest()
+    
     indexfile = f'docs/index.html'
     if not os.path.exists('./docs'):
         os.makedirs('./docs')
@@ -145,12 +228,17 @@ def main(argv):
     imagelist = []
 
     for var in rho_vars:
-        imagename = plot_rho(ds_roms, var, s3upload=True)
+        imagename = plot_rho(ds_ofs, var, s3upload=True)
         imagelist.append(imagename)
 
     make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, 'index.html', public = True, text = True)
+    storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
     
-if __name__ == '__main__':
-    main(sys.argv)
+    print('Finished ...')
+
+
+# In[ ]:
+
+
+main()
 

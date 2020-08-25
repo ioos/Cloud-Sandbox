@@ -49,8 +49,6 @@ def make_indexhtml(indexfile : str, imagelist : list):
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     '''Load ROMS NOSOFS dataset'''
 
-    # Should not use single leterr variable names
-    # Choose a name that describes what it is
     # Why load in the entire dataset when only plotting one time slice? 
     # It is extremely slow!
     #  nos.gomofs.fields.f006.20200819.t00z.nc

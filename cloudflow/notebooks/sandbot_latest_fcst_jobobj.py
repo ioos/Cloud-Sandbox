@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[55]:
+# In[ ]:
 
 
 import sys
@@ -19,11 +19,12 @@ from xarray import open_mfdataset
 
 from cloudflow.services.S3Storage import S3Storage
 from cloudflow.job.Plotting import Plotting
+from cloudflow.utils import romsUtil as utils
 
 DEBUG = True
 
 
-# In[56]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -48,21 +49,31 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[57]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     """Load ROMS NOSOFS dataset"""
 
-    # Why load in the entire dataset when only plotting one time slice? 
-    # It is extremely slow!
-    #  nos.gomofs.fields.f006.20200819.t00z.nc
     filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[58]:
+# In[ ]:
+
+
+def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
+    """Load FVCOM NOSOFS dataset"""
+
+    from netCDF4 import MFDataset
+
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
+    print(f'filespec is: {filespec}')
+    return MFDataset(filespec)
+
+
+# In[ ]:
 
 
 def dsofs_latest(COMROT: str='/com/nos'):
@@ -113,17 +124,25 @@ def dsofs_latest(COMROT: str='/com/nos'):
         filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
         
     print(f'filespec is: {filespec}')
-    return open_mfdataset(filespec, decode_times=False, combine='by_coords')
+    
+    if OFS in utils.roms_models:
+        return open_mfdataset(filespec, decode_times=False, combine='by_coords')
+    elif OFS in utils.fvcom_models:
+        return MFDataset(filespec)
+    else:
+        print(f"ERROR: model not recognized: {OFS}")
+        return None
+    
 
 
-# In[59]:
+# In[ ]:
 
 
 # Testing
-# dsofs_latest()
+#dsofs_latest()
 
 
-# In[60]:
+# In[ ]:
 
 
 def plot_rho(ds, variable, s3upload=False) -> str:
@@ -203,10 +222,6 @@ def main(job: Plotting):
     print(f'HH is: {HH}')
     print('Running ...')
 
-    # could check that this is a roms model
-    # if ofs in utils.roms_models then do roms
-    # else if ofs in utils.fvcom_models then do fvcom
-
     ds_roms = roms_nosofs(COMDIR, OFS, HH)
     
     indexfile = f'docs/index.html'
@@ -233,39 +248,10 @@ def main(job: Plotting):
     
 
 
-# In[61]:
-
-
-def main_no_jobobj():
-    
-    ds_ofs = dsofs_latest()
-    
-    indexfile = f'docs/index.html'
-    if not os.path.exists('./docs'):
-        os.makedirs('./docs')
-
-    bucket = 'ioos-cloud-www'
-
-    storageService = S3Storage()
-
-    rho_vars = ['temp',"zeta", "salt" ]
-
-    imagelist = []
-
-    for var in rho_vars:
-        imagename = plot_rho(ds_ofs, var, s3upload=True)
-        imagelist.append(imagename)
-
-    make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, 'index.html', public=True, text=True)
-    
-    print('Finished ...')
-
-
 # In[ ]:
 
 
-def run_with_jobobj():
+def run_jobobj():
     ''' We're still looking for a way to not have to do something like this. 
     We really want this job to run without having to specify any parameters. '''
     jobfile = 'plotting_job.json'
@@ -274,8 +260,8 @@ def run_with_jobobj():
     main(testjob)
 
 
-# In[62]:
+# In[ ]:
 
 
-main_no_jobobj()
+run_jobobj()
 

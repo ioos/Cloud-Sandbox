@@ -54,9 +54,6 @@ def make_indexhtml(indexfile : str, imagelist : list):
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     """Load ROMS NOSOFS dataset"""
 
-    # Why load in the entire dataset when only plotting one time slice? 
-    # It is extremely slow!
-    #  nos.gomofs.fields.f006.20200819.t00z.nc
     filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
@@ -65,62 +62,14 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
 # In[ ]:
 
 
-def dsofs_latest(COMROT: str='/com/nos'):
-    """ Load the most recent OFS forecast available on COMROT """
-    
-    # List the directories in COMROT that match [a-z]*ofs.YYYYMMDDHH
-    regex = "[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-9][0-9]"
-    dirs = glob.glob(f'{COMROT}/{regex}')
-    
-    if DEBUG: 
-        print ('dirs: ', dirs)
-    
-    # Find the one that has the most recent forecast date (do not use modification time?)
-    # But what if there are two different forecasts for the same date? (use modification time)
-    dates = []
-    newest='1900010100'
-    comdir=dirs[0]
-    
-    for path in dirs:
-        #print(path.split('.'))
-        date = path.split('.')[-1]
-        if date > newest:
-            newest = date
-            comdir = path          
-            
-        dates.append(date)
+def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
+    """Load FVCOM NOSOFS dataset"""
 
-    if DEBUG:
-        #print('dates : ', dates)
-        #print('newest: ', newest)
-        print('comdir: ', comdir)
-        
-    # Use the folder name to discover OFS, CDATE, HH
-    ofs = comdir.split('.')[0].split('/')[-1]
-    print(ofs)
-    CDATE = newest[0:8]
-    HH = newest[8:10]
-    print(CDATE)
-    print(HH)
-    
-    COMDIR = comdir
-    OFS = ofs
-    print(COMDIR)
-     
-    if DEBUG: # Only grab first 0-9 hours. Faster!
-        filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
-    else: # Grab all hours
-        filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
-        
+    from netCDF4 import MFDataset
+
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
-    return open_mfdataset(filespec, decode_times=False, combine='by_coords')
-
-
-# In[ ]:
-
-
-# Testing
-# dsofs_latest()
+    return MFDataset(filespec)
 
 
 # In[ ]:
@@ -161,19 +110,6 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
 
 # Testing
 # dsofs_curr_fcst()
-
-
-# In[ ]:
-
-
-def dsofs_curr_nowcst(COMROT: str='/com/nos'):
-    """ Load the currently run OFS nowcast on COMROT 
-    This is almost the same as dosfs_newest, but will work better
-    when running when injected in a workflow.
-    It depends on a file being present in COMROT 'current.nowcst'
-    """
-    print('dsofs_curr_nowcst stub')
-    
 
 
 # In[ ]:
@@ -236,8 +172,10 @@ def plot_rho(ds, variable, s3upload=False) -> str:
     if s3upload:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
-        bucket_folder = 'sandbot'
-        key = f'{bucket_folder}/{variable}.png'
+        bucket_folder = 'sandbot/'
+        bucket_folder = ''
+
+        key = f'{bucket_folder}{variable}.png'
         s3.uploadFile(outfile, bucket, key, public = True)
 
     return imagename
@@ -246,68 +184,8 @@ def plot_rho(ds, variable, s3upload=False) -> str:
 # In[ ]:
 
 
-def main_with_jobobj(job: Plotting):
-
-    COMDIR = job.INDIR
-    OFS = job.OFS
-    HH = job.HH
-    rho_vars = job.VARS
-
-    print(f'COMDIR is: {COMDIR}')
-    print(f'OFS is: {OFS}')
-    print(f'HH is: {HH}')
-    print('Running ...')
-
-    # could check that this is a roms model
-    # if ofs in utils.roms_models then do roms
-    # else if ofs in utils.fvcom_models then do fvcom
-
-    ds_roms = roms_nosofs(COMDIR, OFS, HH)
-    
-    indexfile = f'docs/index.html'
-    if not os.path.exists('./docs'):
-        os.makedirs('./docs')
-
-    bucket = 'ioos-cloud-www'
-    bucket_folder = 'sandbot'
-
-    storageService = S3Storage()
-
-    #rho_vars = ['temp',"zeta", "salt" ]
-
-    imagelist = []
-
-    for var in rho_vars:
-        imagename = plot_rho(ds_roms, var, s3upload=True)
-        imagelist.append(imagename)
-
-    make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}/index.html', public=True, text=True)
-    
-    print('Finished ...')
-    # return ds_roms
-    
-
-
-# In[ ]:
-
-
-def run_with_jobobj():
-    ''' We're still looking for a way to not have to do something like this. 
-    We really want this job to run without having to specify any parameters. '''
-    jobfile = 'plotting_job.json'
-    NPROCS = 1
-    testjob = Plotting(jobfile, 1)
-    main_with_jobonj(testjob)
-
-
-# In[ ]:
-
-
 def main():
-    
-    #ds_ofs = dsofs_latest()
-    
+       
     ds_ofs = dsofs_curr_fcst()
     
     indexfile = f'docs/index.html'
@@ -315,7 +193,9 @@ def main():
         os.makedirs('./docs')
 
     bucket = 'ioos-cloud-www'
-    bucket_folder = 'sandbot'
+    bucket_folder = ''
+    #bucket_folder = 'sandbot/'
+
     
     storageService = S3Storage()
 
@@ -328,16 +208,13 @@ def main():
         imagelist.append(imagename)
 
     make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}/index.html', public=True, text=True)
+    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}index.html', public=True, text=True)
     
     print('Finished ...')
 
 
 # In[ ]:
 
-
-# Testing
-# main_no_jobobj()
 
 main()
 
