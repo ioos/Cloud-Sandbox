@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[433]:
+# In[ ]:
 
 
 import sys
@@ -26,7 +26,7 @@ from cloudflow.utils import romsUtil as utils
 DEBUG = True
 
 
-# In[434]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -52,7 +52,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[435]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -63,7 +63,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[436]:
+# In[ ]:
 
 
 def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -76,7 +76,7 @@ def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
     return MFDataset(filespec)
 
 
-# In[437]:
+# In[ ]:
 
 
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
@@ -116,7 +116,7 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
         return None
 
 
-# In[438]:
+# In[ ]:
 
 
 def plot_roms(ds, variable, s3upload=False) -> str:
@@ -185,27 +185,34 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[448]:
+# In[ ]:
 
 
 def plot_fvcom(ds, variable, s3upload=False) -> str:
 
     time = 0
-        
+    siglay = 0
+    dims = 2
+    
     if variable == 'zeta':
         #zeta(time, node)
+        dims = 2
         da = ds[variable]
         cmap = cmocean.cm.phase
     if variable == 'temp':
         #temp(time, siglay, node)
-        da = ds[variable][0]
+        dims = 3
+        #da = ds[variable][:][siglay]
+        da = ds.variables[variable]
         cmap = cmocean.cm.thermal
     if variable == 'salt':
         #salinity(time, siglay, node)
-        da = ds['salinity'][0]
+        dims = 3
+        da = ds['salinity']
         cmap = cmocean.cm.haline
     if variable == 'Pair':
         #atmos_press(time, node)
+        dims = 2
         da = ds['atmos_press']
         cmap = cmocean.cm.diff
           
@@ -222,7 +229,11 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     nv = nv - 1
 
     #print(f"DEBUGGING: lon.len: {len(lon[:])}, da.len: {len(da[:])} ")
-    im = ax.tripcolor(lon, lat, nv, da[time], cmap=cmap)
+    if dims == 2:
+        im = ax.tripcolor(lon, lat, nv, da[time], cmap=cmap)
+    if dims == 3:
+        im = ax.tripcolor(lon, lat, nv, da[time][siglay], cmap=cmap)
+
 
     coast_10m = cfeature.NaturalEarthFeature(
         'physical', 'land', '10m',
@@ -238,7 +249,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     cbar = fig.colorbar(im, ax=ax)
     long_name = da.long_name
     
-    if variable != 'salinity':
+    if variable != 'salt':
         units = da.units
         cbar.set_label(f'{long_name} ({units})')
     else:
@@ -266,7 +277,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[449]:
+# In[ ]:
 
 
 def get_model_type(ds) -> str:
@@ -296,7 +307,7 @@ def get_model_type(ds) -> str:
     return 'unknown'
 
 
-# In[450]:
+# In[ ]:
 
 
 # Testing
@@ -314,6 +325,7 @@ variable = 'temp'
 da = ds.variables[variable][0]
 # da is a numpy array
 print(da)
+#print(da.long_name)
 
 da = ds.variables[variable]
 # da is a netcdf variable
@@ -348,7 +360,7 @@ print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 ds.close()
 
 
-# In[451]:
+# In[ ]:
 
 
 def plot_runner(ds, variable, s3upload=False) -> str:
@@ -365,7 +377,7 @@ def plot_runner(ds, variable, s3upload=False) -> str:
         print(f"ERROR: Unsupported model type - {modeltype}")
 
 
-# In[452]:
+# In[ ]:
 
 
 def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
@@ -380,7 +392,7 @@ def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
     return OFS
 
 
-# In[455]:
+# In[ ]:
 
 
 def main():
@@ -399,7 +411,7 @@ def main():
     storageService = S3Storage()
 
     plot_vars = ['temp',"zeta", "salt" ]
-    plot_vars = ['zeta']
+    #plot_vars = ['temp']
 
     imagelist = []
     
@@ -421,7 +433,7 @@ def main():
     print('Finished ...')
 
 
-# In[458]:
+# In[ ]:
 
 
 main()
