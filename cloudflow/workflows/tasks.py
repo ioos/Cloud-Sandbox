@@ -299,6 +299,11 @@ def forecast_run(cluster: Cluster, job: Job):
         raise signals.FAIL()
 
     log.info('Forecast finished successfully')
+
+    curfcst=f"{job.COMROT}/current.fcst"
+    with open(curfcst, 'w') as cf:
+        cf.write(f"{OFS}.{CDATE}{HH}\n")
+
     return
 
 #######################################################################
