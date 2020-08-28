@@ -30,6 +30,7 @@ DEBUG = True
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
+    """ Creates a basic index.html file for displaying the images in imagelist """
 
     htmlhead = '''<html xmlns="http://www.w3.org/1999/xhtml">
                   <meta http-equiv="Cache-control" content="no-cache">
@@ -69,8 +70,6 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
 def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
     """Load FVCOM NOSOFS dataset"""
 
-    from netCDF4 import MFDataset
-
     filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     print(f'filespec is: {filespec}')
     return MFDataset(filespec)
@@ -82,12 +81,11 @@ def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
     """ Load the currently run OFS forecast on COMROT 
     This is almost the same as dosfs_newest, but will work better
-    when running when injected in a workflow.
+    when running when injected in the regular workflow.
     It depends on a file being present in COMROT 'current.fcst'
     """
     
     cur_file = f'{COMROT}/current.fcst'
-    cur_file = f'{COMROT}/testing.fcst'
     
     with open(cur_file) as cf:
         fcst = cf.read().rstrip(' \n')
@@ -177,7 +175,6 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
         bucket_folder = 'sandbot/'
-        bucket_folder = ''
 
         key = f'{bucket_folder}{variable}.png'
         s3.uploadFile(outfile, bucket, key, public = True)
@@ -269,7 +266,6 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
         bucket_folder = 'sandbot/'
-        bucket_folder = ''
 
         key = f'{bucket_folder}{variable}.png'
         s3.uploadFile(outfile, bucket, key, public = True)
@@ -281,6 +277,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
 
 
 def get_model_type(ds) -> str:
+    """ Determines and returns the model used to create the dataset if known. """
     
     # ROMS
     # "type: ROMS/TOMS history file"
@@ -289,7 +286,7 @@ def get_model_type(ds) -> str:
         if re.search('ROMS', typestr):
             return 'roms'
     except Exception as e:
-        print('Not ROMS')
+        if DEBUG: print('Not ROMS data')
     
     # FVCOM
     # :source = "FVCOM_4.3"
@@ -299,11 +296,8 @@ def get_model_type(ds) -> str:
             return 'fvcom'
         print(f'sourcestr: {sourcestr}')
     except Exception as e:
-        print('Not FVCOM')
+        if DEBUG: print('Not FVCOM data')
         
-    #print(ds.ncattrs)
-    #print('Source: ', ds.source)
-    #print('------- END OF get_model_types -------')
     return 'unknown'
 
 
@@ -311,62 +305,49 @@ def get_model_type(ds) -> str:
 
 
 # Testing
+def testing():
 
-ds = dsofs_curr_fcst()
-#ds
-get_model_type(ds)
-#ofs = ofsname_curr()
-#print(f'OFS is: {ofs}')
-#ds
-variable = 'salinity'
-variable = 'temp'
-#da = ds[temp][0][0]
-    
-da = ds.variables[variable][0]
-# da is a numpy array
-print(da)
-#print(da.long_name)
+    ds = dsofs_curr_fcst()
+    #ds
+    get_model_type(ds)
 
-da = ds.variables[variable]
-# da is a netcdf variable
-print(da)
-print(da.long_name)
-print(da)
+    variable = 'salinity'
+    variable = 'temp'
+    #da = ds[temp][0][0]
 
-#lon = ds['lon']
-#print(lon)
+    da = ds.variables[variable][0]
+    # da is a numpy array
+    print(da)
 
-#lat = ds['lat']
-#print(lat)
-
-#nv = ds.variables['nv'][:].T
-#nv = nv - 1
-
-nv = ds.variables['nv'][0][:] 
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    da = ds.variables[variable]
+    # da is a netcdf variable
+    print(da)
+    #print(da.long_name)
 
 
-# THIS ONE DOESN'T CAUSE AN ERROR
-nv = ds.variables['nv'][:].T
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
-######################
+    nv = ds.variables['nv'][0][:] 
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
-nv = ds.variables['nv'][0][:].T
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
-ds.close()
+    # THIS ONE DOESN'T CAUSE AN ERROR
+    nv = ds.variables['nv'][:].T
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    ######################
+
+    nv = ds.variables['nv'][0][:].T
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+
+    ds.close()
 
 
 # In[ ]:
 
 
 def plot_runner(ds, variable, s3upload=False) -> str:
-
-    # OFS = 'cbofs'
-    #OFS = ofsname_curr()
+    """ Alternative implementation for running the appropriate plot routine based on the model type"""
 
     model_type = get_model_type(ds)
     if model_type == 'roms':
@@ -381,6 +362,7 @@ def plot_runner(ds, variable, s3upload=False) -> str:
 
 
 def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
+    """ Determines and returns the forecast type in the current.fcst file"""
 
     with open(cur_file) as cf:
         fcst = cf.read().rstrip(' \n')
@@ -405,8 +387,7 @@ def main():
         os.makedirs('./docs')
 
     bucket = 'ioos-cloud-www'
-    bucket_folder = ''
-    #bucket_folder = 'sandbot/'
+    bucket_folder = 'sandbot/'
 
     storageService = S3Storage()
 
