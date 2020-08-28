@@ -402,10 +402,12 @@ def inject_notebook() :
 
     pyfile = nbutils.convert_notebook()
 
+    # Run the converted notebook in a Prefect flow context
     nbtest_flow = notebook_test(pyfile)
     state = nbtest_flow.run()
 
     if state.is_successful():
+        nbutils.inject(pyfile, storage_provider)
         return "PASSED"
     else:
         return "FAILED"
