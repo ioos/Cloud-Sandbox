@@ -12,7 +12,7 @@
  !======Copyright 1998, Regents of University of Minnesota========!
  !                                                                !
  &NML_CASE
- CASE_TITLE      = 'San Francisco Bay Operational Forecast System (SFBOFS) - IOOS Cloud Sandbox',
+ CASE_TITLE      = 'San Francisco Bay OFS (SFBOFS) - IOOS Cloud Sandbox',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
  DATE_REFERENCE  = '__DATE_REFERENCE__',

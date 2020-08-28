@@ -64,7 +64,8 @@
 !                                                                                                                                                                                                       
 ! Application title.                                                                                                                                                                                    
      !TITLE = dbofs forecast RUN in operational mode
-     TITLE = Delaware Bay Operational Forecast System (DBOFS) - IOOS Cloud Sandbox
+     !TITLE = Delaware Bay Operational Forecast System (DBOFS) - IOOS Cloud Sandbox
+     TITLE = Delaware Bay OFS (DBOFS) - IOOS Cloud Sandbox
 
 ! C-preprocessing Flag.                                                                                                                                                                                 
      MyAppCPP = dbofs forecast RUN in operational mode

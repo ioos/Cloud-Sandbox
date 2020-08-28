@@ -12,7 +12,7 @@
  !======Copyright 1998, Regents of University of Minnesota========!
  !                                                                !
  &NML_CASE
- CASE_TITLE      = 'Northern Gulf of Mexico Operational Forecast System (NGOFS) - IOOS Cloud Sandbox',
+ CASE_TITLE      = 'N Gulf of Mexico OFS (NGOFS) - IOOS Cloud Sandbox',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
  DATE_REFERENCE  = '__DATE_REFERENCE__',
