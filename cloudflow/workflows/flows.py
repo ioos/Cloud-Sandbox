@@ -242,7 +242,8 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         #######################################################################
         # This will add Kenny's script
         # https://ioos-cloud-sandbox.s3.amazonaws.com/cloudflow/inject/kenny/cloud_sandbot.py
-        notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        #notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        notebook = 'cloudflow/inject/patrick/sandbot_current_fcst.py'
         injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
     return diff_plotflow
@@ -278,7 +279,7 @@ def notebook_flow(postconf,jobfile) -> Flow:
         storage_service = tasks.storage_init(provider)
         # Optionally inject a user supplied python script
         #notebook = 'specify'
-        notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        #notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
         injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
     return nb_flow
