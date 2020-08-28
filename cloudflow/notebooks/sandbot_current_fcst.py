@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import sys
@@ -17,7 +17,8 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 from xarray import open_mfdataset
-from netCDF4 import MFDataset
+from netCDF4 import MFDataset, num2date
+from matplotlib import image
 
 from cloudflow.services.S3Storage import S3Storage
 from cloudflow.job.Plotting import Plotting
@@ -26,7 +27,7 @@ from cloudflow.utils import romsUtil as utils
 DEBUG = True
 
 
-# In[ ]:
+# In[2]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -52,7 +53,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[ ]:
+# In[3]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -63,7 +64,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[ ]:
+# In[4]:
 
 
 def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -76,7 +77,7 @@ def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
     return MFDataset(filespec)
 
 
-# In[ ]:
+# In[5]:
 
 
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
@@ -86,11 +87,12 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     It depends on a file being present in COMROT 'current.fcst'
     """
     
-    cur_file = f'{COMROT}/current.fcst'
+#     cur_file = f'{COMROT}/current.fcst'
     cur_file = f'{COMROT}/testing.fcst'
     
     with open(cur_file) as cf:
         fcst = cf.read().rstrip(' \n')
+#     fcst = 'cbofs.2020082500'
     
     print('fcst: ', fcst)
     
@@ -116,7 +118,7 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
         return None
 
 
-# In[ ]:
+# In[6]:
 
 
 def plot_roms(ds, variable, s3upload=False) -> str:
@@ -137,8 +139,9 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         da = ds[variable].isel(ocean_time=1)
         cmap = cmocean.cm.diff
       
-    fig = plt.figure(figsize=(12,5))
-    ax = fig.add_axes([0,0,1,1], projection=ccrs.PlateCarree())
+    # fig = plt.figure(figsize=(12,5))
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0.1, 1, 1], projection=ccrs.PlateCarree())
     im = ax.contourf(da.lon_rho, da.lat_rho, da.values,
                      transform=ccrs.PlateCarree(), 
                      cmap=cmap)
@@ -148,12 +151,17 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         edgecolor='k', facecolor='0.8'
     )
     ax.add_feature(coast_10m);
+
+    init = ds.ocean_time.isel(ocean_time=0)
+    init_str = f"INIT: {num2date(init, init.units)}"
+    valid = da.ocean_time
+    valid_str = f"VALID: {num2date(valid, valid.units)}"
     
-    title = ds.attrs['title']
-    history = ds.history
-    now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-    print(now)
-    ax.set_title(f"Image generated on {now}\n\n{title}\n{history}");
+    datestrfmt = '%b %d, %Y %H:%M %Z' #'%Y-%m-%d %H:%M:%S'
+    now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
+    
+    title = ds.title
+    ax.set_title(f'{title}\n{init_str}\n{valid_str}')
     
     cbar = fig.colorbar(im, ax=ax)
     long_name = da.attrs['long_name']
@@ -165,6 +173,17 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     
     indexfile = f'docs/index.html'
     outfile = f'docs/{variable}.png'
+    
+    img = image.imread('docs/rps_small.png')
+    
+    bbox = ax.get_position().bounds
+    logo_axis = fig.add_axes([bbox[0], 0.0, 0.15, 0.075])
+    logo_axis.imshow(img, interpolation='hanning')
+    logo_axis.axis('off')
+    
+    datestrfmt = '%b %d, %Y %H:%M %Z' # https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
+    now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
+    fig.text(0.55, 0.0, f'{now_str}')
     
     if not os.path.exists('./docs'):
         os.makedirs('./docs')
@@ -180,17 +199,17 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         bucket_folder = ''
 
         key = f'{bucket_folder}{variable}.png'
-        s3.uploadFile(outfile, bucket, key, public = True)
+        s3.uploadFile(outfile, bucket, key, public=True)
 
     return imagename
 
 
-# In[ ]:
+# In[7]:
 
 
 def plot_fvcom(ds, variable, s3upload=False) -> str:
 
-    time = 0
+    time = 3
     siglay = 0
     dims = 2
     
@@ -216,9 +235,9 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         da = ds['atmos_press']
         cmap = cmocean.cm.diff
           
-   
-    fig = plt.figure(figsize=(12,5))
-    ax = fig.add_axes([0,0,1,1], projection=ccrs.PlateCarree())
+    fig = plt.figure()
+#     fig = plt.figure(figsize=(12,5))
+    ax = fig.add_axes([0, 0.1, 1, 1], projection=ccrs.PlateCarree())
     lon = ds['lon'][:]
     lon = np.where(lon > 180., lon-360., lon)
     lat = ds['lat'][:]
@@ -234,27 +253,41 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     if dims == 3:
         im = ax.tripcolor(lon, lat, nv, da[time][siglay], cmap=cmap)
 
-
     coast_10m = cfeature.NaturalEarthFeature(
         'physical', 'land', '10m',
         edgecolor='k', facecolor='0.8'
     )
     ax.add_feature(coast_10m);
     
+    
     title = ds.title
-    now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-    print(now)
-    ax.set_title(f"Image generated on {now}\n\n{title}");
-    
-    cbar = fig.colorbar(im, ax=ax)
+    time_array = ds.variables['time']
+    init = time_array[0]
+    init_str = f"INIT: {num2date(init, time_array.units)}"
+    valid = time_array[time]
+    valid_str = f"VALID: {num2date(valid, time_array.units)}"
+    ax.set_title(f'{title}\n{init_str}\n{valid_str}')
+
     long_name = da.long_name
-    
+    cbar = fig.colorbar(im, ax=ax)
     if variable != 'salt':
         units = da.units
         cbar.set_label(f'{long_name} ({units})')
     else:
         cbar.set_label(f'{long_name}')
+        
+    img = image.imread('docs/rps_small.png')
+    bbox = ax.get_position().bounds
+    logo_axis = fig.add_axes([bbox[0], 0.0, 0.15, 0.075])
+    logo_axis.imshow(img, interpolation='hanning')
+    logo_axis.axis('off')
+        
+        
+    datestrfmt = '%b %d, %Y %H:%M %Z' #'%Y-%m-%d %H:%M:%S'
+    now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
+    fig.text(0.55, 0.0, f'{now_str}')
     
+        
     indexfile = f'docs/index.html'
     outfile = f'docs/{variable}.png'
     
@@ -269,15 +302,20 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
         bucket_folder = 'sandbot/'
-        bucket_folder = ''
 
         key = f'{bucket_folder}{variable}.png'
-        s3.uploadFile(outfile, bucket, key, public = True)
+        s3.uploadFile(outfile, bucket, key, public=True)
 
     return imagename
 
 
 # In[ ]:
+
+
+
+
+
+# In[8]:
 
 
 def get_model_type(ds) -> str:
@@ -307,60 +345,61 @@ def get_model_type(ds) -> str:
     return 'unknown'
 
 
-# In[ ]:
+# In[9]:
 
 
 # Testing
-
-ds = dsofs_curr_fcst()
-#ds
-get_model_type(ds)
-#ofs = ofsname_curr()
-#print(f'OFS is: {ofs}')
-#ds
-variable = 'salinity'
-variable = 'temp'
-#da = ds[temp][0][0]
+def testing():
     
-da = ds.variables[variable][0]
-# da is a numpy array
-print(da)
-#print(da.long_name)
+    ds = dsofs_curr_fcst()
+    #ds
+    get_model_type(ds)
+    #ofs = ofsname_curr()
+    #print(f'OFS is: {ofs}')
+    #ds
+    variable = 'salinity'
+    variable = 'temp'
+    #da = ds[temp][0][0]
 
-da = ds.variables[variable]
-# da is a netcdf variable
-print(da)
-print(da.long_name)
-print(da)
+    da = ds.variables[variable][0]
+    # da is a numpy array
+    print(da)
+    #print(da.long_name)
 
-#lon = ds['lon']
-#print(lon)
+    da = ds.variables[variable]
+    # da is a netcdf variable
+    print(da)
+    print(da.long_name)
+    print(da)
 
-#lat = ds['lat']
-#print(lat)
+    #lon = ds['lon']
+    #print(lon)
 
-#nv = ds.variables['nv'][:].T
-#nv = nv - 1
+    #lat = ds['lat']
+    #print(lat)
 
-nv = ds.variables['nv'][0][:] 
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    #nv = ds.variables['nv'][:].T
+    #nv = nv - 1
 
-
-# THIS ONE DOESN'T CAUSE AN ERROR
-nv = ds.variables['nv'][:].T
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
-######################
-
-nv = ds.variables['nv'][0][:].T
-nv = nv - 1
-print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
-
-ds.close()
+    nv = ds.variables['nv'][0][:] 
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
 
-# In[ ]:
+    # THIS ONE DOESN'T CAUSE AN ERROR
+    nv = ds.variables['nv'][:].T
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    ######################
+
+    nv = ds.variables['nv'][0][:].T
+    nv = nv - 1
+    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+
+    ds.close()
+
+
+# In[10]:
 
 
 def plot_runner(ds, variable, s3upload=False) -> str:
@@ -377,7 +416,7 @@ def plot_runner(ds, variable, s3upload=False) -> str:
         print(f"ERROR: Unsupported model type - {modeltype}")
 
 
-# In[ ]:
+# In[11]:
 
 
 def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
@@ -392,48 +431,54 @@ def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
     return OFS
 
 
-# In[ ]:
+# In[15]:
 
 
 def main():
        
     ds_ofs = dsofs_curr_fcst()
     model = get_model_type(ds_ofs)
+    print(model)
     
     indexfile = f'docs/index.html'
     if not os.path.exists('./docs'):
         os.makedirs('./docs')
 
     bucket = 'ioos-cloud-www'
-    bucket_folder = ''
-    #bucket_folder = 'sandbot/'
+    bucket_folder = 'sandbot/'
 
     storageService = S3Storage()
 
-    plot_vars = ['temp',"zeta", "salt" ]
+    plot_vars = ['temp', 'zeta', 'salt']
     #plot_vars = ['temp']
 
     imagelist = []
     
+    if DEBUG:
+        upload = False
+    else:
+        upload = True
+        
     for var in plot_vars:
-        #imagename = plot_runner(ds_ofs, var, s3upload=True)
+        #imagename = plot_runner(ds_ofs, var, s3upload=upload)
         if model == 'roms':
-            imagename = plot_roms(ds_ofs, var, s3upload=True)
+            imagename = plot_roms(ds_ofs, var, s3upload=upload)
         elif model == 'fvcom':
-            imagename = plot_fvcom(ds_ofs, var, s3upload=True)
+            imagename = plot_fvcom(ds_ofs, var, s3upload=upload)
         else:
             print('ERROR: model not supported')
             raise Exception(e)
 
         imagelist.append(imagename)
 
-    make_indexhtml(indexfile, imagelist)
-    storageService.uploadFile(indexfile, bucket, f'{bucket_folder}index.html', public=True, text=True)
+    if upload:
+        make_indexhtml(indexfile, imagelist)
+        storageService.uploadFile(indexfile, bucket, f'{bucket_folder}index.html', public=True, text=True)
     
     print('Finished ...')
 
 
-# In[ ]:
+# In[16]:
 
 
 main()
