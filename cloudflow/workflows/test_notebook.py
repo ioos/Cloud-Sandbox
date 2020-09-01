@@ -13,13 +13,12 @@ __email__ = "patrick.tripp@rpsgroup.com"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-postconf = f'{curdir}/../cluster/configs/local.config'
+postconf = f'{curdir}/../cluster/configs/post.config'
 
 def main():
 
-    pyfile = os.path.abspath(sys.argv[1])
-
-    flow = flows.notebook_flow(postconf, pyfile)
+    jobfile = f'{curdir}/../job/jobs/dbofs.00z.diffplots'
+    flow = flows.notebook_flow(postconf, jobfile)
 
     state = flow.run()
     if state.is_successful():

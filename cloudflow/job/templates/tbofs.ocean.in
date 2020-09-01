@@ -63,7 +63,9 @@
 !==============================================================================                                                                                                                         
 !                                                                                                                                                                                                       
 ! Application title.                                                                                                                                                                                    
-     TITLE = tbofs forecast RUN in operational mode
+     !TITLE = tbofs forecast RUN in operational mode
+     !TITLE = Tampa Bay Operational Forecast System (TBOFS) - IOOS Cloud Sandbox
+     TITLE = Tampa Bay OFS (TBOFS) - IOOS Cloud Sandbox
 ! C-preprocessing Flag.                                                                                                                                                                                 
      MyAppCPP = tbofs forecast RUN in operational mode
 ! Input variable information file name.  This file needs to be processed                                                                                                                                

@@ -12,7 +12,7 @@
 !======Copyright 1998, Regents of University of Minnesota========!
 !                                                                !
  &NML_CASE
- CASE_TITLE      = 'LEOFS',
+ CASE_TITLE      = 'Lake Erie OFS (LEOFS) - IOOS Cloud Sandbox'
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
  DATE_REFERENCE  = '__DATE_REFERENCE__',

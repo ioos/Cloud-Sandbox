@@ -240,8 +240,11 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
 
         #######################################################################
-        # This will add Kenny's HLFS if it is found on S3 - for demo
-        injected = tasks.fetchpy_and_run(plotjob, storage_service)
+        # This will add Kenny's script
+        # https://ioos-cloud-sandbox.s3.amazonaws.com/cloudflow/inject/kenny/cloud_sandbot.py
+        #notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        notebook = 'cloudflow/inject/patrick/sandbot_current_fcst.py'
+        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
     return diff_plotflow
 
@@ -269,18 +272,16 @@ def notebook_flow(postconf,jobfile) -> Flow:
         #####################################################################
         # POST Processing
         #####################################################################
-        # Start a machine
-        #postmach = ctasks.cluster_init(postconf)
-        #pmStarted = ctasks.cluster_start(postmach)
 
-        # Optionally inject a user supplied python script
         postmach = ctasks.cluster_init(postconf)
-        pmStarted = ctasks.cluster_start(postmach)
-
-        plotjob = tasks.job_init(postmach, jobfile, upstream_tasks=[pmStarted])
+        plotjob = tasks.job_init(postmach, jobfile)
 
         storage_service = tasks.storage_init(provider)
-        injected = tasks.fetchpy_and_run(plotjob, storage_service)
+        # Optionally inject a user supplied python script
+        #notebook = 'specify'
+        #notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
+        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
+
     return nb_flow
 
 
@@ -343,6 +344,8 @@ def test_nbflow(pyfile: str):
     else:
         return "FAILED"
 
+
+
 def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
 
     with Flow('debug workflow') as debugflow:
@@ -388,15 +391,27 @@ def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
 
     return debugflow
 
+
+
 def inject_notebook() :
     ''' Convert the current notebook to python, test it, and upload it for the next forecast cycle.
     '''
 
     from cloudflow.utils import notebook as nbutils
 
-    #pyfile = nbutils.convert_nb2inject()
+    storage_provider = provider
+
     pyfile = nbutils.convert_notebook()
-    result = test_nbflow(pyfile)
+
+    # Run the converted notebook in a Prefect flow context
+    nbtest_flow = notebook_test(pyfile)
+    state = nbtest_flow.run()
+
+    if state.is_successful():
+        nbutils.inject(pyfile, storage_provider)
+        return "PASSED"
+    else:
+        return "FAILED"
 
     print(result)
 

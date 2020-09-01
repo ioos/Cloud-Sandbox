@@ -63,7 +63,10 @@
 !==============================================================================                                                                                                                         
 !                                                                                                                                                                                                       
 ! Application title.                                                                                                                                                                                    
-     TITLE = cbofs forecast RUN in operational mode
+     !TITLE = cbofs forecast RUN in operational mode
+     !TITLE = Chesapeake Bay Operational Forecast System (CBOFS) - IOOS Cloud Sandbox
+     TITLE = Chesapeake Bay OFS (CBOFS) - IOOS Cloud Sandbox
+
 ! C-preprocessing Flag.                                                                                                                                                                                 
      MyAppCPP = cbofs forecast RUN in operational mode
 ! Input variable information file name.  This file needs to be processed                                                                                                                                

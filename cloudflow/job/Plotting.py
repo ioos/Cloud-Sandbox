@@ -135,9 +135,9 @@ class Plotting(Job):
 
         elif self.OFS in util.nosofs_models:
             if self.INDIR == "auto":
-                self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}"
+                self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}{self.HH}"
             if self.OUTDIR == "auto":
-                self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}"
+                self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}{self.HH}"
             if self.VERIFDIR == "auto":
                 self.VERIFDIR = f"/com/nos-noaa/{self.OFS}.{self.CDATE}"
 

@@ -144,7 +144,8 @@ class FVCOMForecast(Job):
             self.INTMPL = f"{self.TEMPLPATH}/{self.OFS}.fcst.in"
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}"
+            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}{self.HH}"
+
 
         return
 

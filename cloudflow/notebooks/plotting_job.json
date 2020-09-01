@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "gomofs",
+  "CDATE"     : "20200819",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VERIFDIR"  : "auto",
+  "VARS"      : ["temp", "zeta", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/gomofs",
+  "FSPEC"     : "nos.gomofs.fields.f*t00z.nc"
+}

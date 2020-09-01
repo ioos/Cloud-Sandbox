@@ -124,9 +124,6 @@ def get_projection(ncfile: str):
         lonc = np.where(lonc > 180., lonc-360., lonc)
         latc = nc.variables['latc'][:]
 
-        nv = nc.variables['nv'][:].T
-        nv = nv - 1
-
     # project to EPSG:3857 for map
     lo,la   = EPSG3857(lon,lat)
     loc,lac = EPSG3857(lonc,latc)
