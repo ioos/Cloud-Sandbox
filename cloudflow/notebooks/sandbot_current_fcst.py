@@ -215,7 +215,7 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         bucket = 'ioos-cloud-www'
         bucket_folder = 'sandbot/'
 
-        key = f'{bucket_folder}{variable}.png'
+        key = f'{bucket_folder}{imagename}'
         s3.uploadFile(outfile, bucket, key, public=True)
 
     return imagename
@@ -339,7 +339,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         bucket = 'ioos-cloud-www'
         bucket_folder = 'sandbot/'
 
-        key = f'{bucket_folder}{variable}.png'
+        key = f'{bucket_folder}{imagename}'
         s3.uploadFile(outfile, bucket, key, public=True)
 
     return imagename
