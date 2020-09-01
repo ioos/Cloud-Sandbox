@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import sys
 import os
 import glob
+import time as timelib
 from datetime import datetime
 import re
 
@@ -24,10 +25,11 @@ from cloudflow.services.S3Storage import S3Storage
 from cloudflow.job.Plotting import Plotting
 from cloudflow.utils import romsUtil as utils
 
-DEBUG = True
+DEBUG = False
+#DEBUG = True
 
 
-# In[2]:
+# In[ ]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -54,7 +56,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[3]:
+# In[ ]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -65,7 +67,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[4]:
+# In[ ]:
 
 
 def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -76,7 +78,7 @@ def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
     return MFDataset(filespec)
 
 
-# In[5]:
+# In[ ]:
 
 
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
@@ -87,10 +89,10 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     """
     
     cur_file = f'{COMROT}/current.fcst'
-    
+    #cur_file = f'{COMROT}/testing.fcst'
+
     with open(cur_file) as cf:
         fcst = cf.read().rstrip(' \n')
-#     fcst = 'cbofs.2020082500'
     
     print('fcst: ', fcst)
     
@@ -100,7 +102,7 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     OFS = fcst.split('.')[0]
     fcstdate = fcst.split('.')[-1]
     HH = fcstdate[8:10]
-    
+          
     if DEBUG: # Only grab first 0-9 hours. Faster!
         filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
     else: # Grab all hours
@@ -116,7 +118,7 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
         return None
 
 
-# In[6]:
+# In[ ]:
 
 
 def plot_roms(ds, variable, s3upload=False) -> str:
@@ -137,8 +139,9 @@ def plot_roms(ds, variable, s3upload=False) -> str:
         da = ds[variable].isel(ocean_time=1)
         cmap = cmocean.cm.diff
       
-    # fig = plt.figure(figsize=(12,5))
-    fig = plt.figure()
+    #fig = plt.figure()
+    fig = plt.figure(figsize=(12,5))
+
     ax = fig.add_axes([0, 0.1, 1, 1], projection=ccrs.PlateCarree())
     im = ax.contourf(da.lon_rho, da.lat_rho, da.values,
                      transform=ccrs.PlateCarree(), 
@@ -150,27 +153,38 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     )
     ax.add_feature(coast_10m);
 
+    # TODO: FIX BUG in INIT time: This does not work for ciofs since the first history file is not at hour 00, but at hour 01
+    # maybe use this global attribute instead, use the t00z portion of the string
+    # :file = "nos.ciofs.fields.forecast.20200828.t00z_0008.nc" ;
     init = ds.ocean_time.isel(ocean_time=0)
-    init_str = f"INIT: {num2date(init, init.units)}"
+    init_str = f"INIT: {num2date(init, init.units)} UTC"
+    
     valid = da.ocean_time
-    valid_str = f"VALID: {num2date(valid, valid.units)}"
+    valid_str = f"VALID: {num2date(valid, valid.units)} UTC"
     
     datestrfmt = '%b %d, %Y %H:%M %Z' #'%Y-%m-%d %H:%M:%S'
     now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
     
     title = ds.title
-    ax.set_title(f'{title}\n{init_str}\n{valid_str}')
-    
-    cbar = fig.colorbar(im, ax=ax)
+    ax.set_title(f'{title}\n{init_str}    {valid_str}')
+
+    #cbar = fig.colorbar(im, ax=ax)
+    cbar = fig.colorbar(im, ax=ax, pad=0.02)  
+
     long_name = da.attrs['long_name']
     if variable != 'salt':
         units = da.attrs['units']
         cbar.set_label(f'{long_name} ({units})')
     else:
         cbar.set_label(f'{long_name}')
+        
+    # Add the forecast date and time to the filename
+    init_datetime = num2date(init, init.units)
+    fmt = '%Y%m%d_%HZ' #'%Y-%m-%d %H:%M:%S'
+    ini_str = f"{init_datetime.strftime(fmt)}"
     
     indexfile = f'docs/index.html'
-    outfile = f'docs/{variable}.png'
+    outfile = f'docs/{ini_str}_{variable}.png'
     
     img = image.imread('docs/rps_small.png')
     
@@ -179,9 +193,14 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     logo_axis.imshow(img, interpolation='hanning')
     logo_axis.axis('off')
     
-    datestrfmt = '%b %d, %Y %H:%M %Z' # https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
-    now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
-    fig.text(0.55, 0.0, f'{now_str}')
+    dst = timelib.localtime( ).tm_isdst > 0
+    if dst: tz = 'EDT'
+    else: tz = 'EST'   
+    
+    datestrfmt = '%b %d, %Y %H:%M %Z' #'%Y-%m-%d %H:%M:%S' 
+    #https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
+    now_str = f"image created at: {datetime.now().strftime(datestrfmt)} {tz}"
+    fig.text(0.55, 0.02, f'{now_str}')
     
     if not os.path.exists('./docs'):
         os.makedirs('./docs')
@@ -189,6 +208,7 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     imagename = outfile.split('/')[-1]
 
     plt.savefig(outfile, bbox_inches='tight')
+    #plt.close()
              
     if s3upload:
         s3 = S3Storage()
@@ -201,7 +221,7 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[7]:
+# In[ ]:
 
 
 def plot_fvcom(ds, variable, s3upload=False) -> str:
@@ -231,20 +251,21 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         dims = 2
         da = ds['atmos_press']
         cmap = cmocean.cm.diff
+    if variable == 'oxygen':
+        return "not supported"
           
-    fig = plt.figure()
-#     fig = plt.figure(figsize=(12,5))
-    ax = fig.add_axes([0, 0.1, 1, 1], projection=ccrs.PlateCarree())
+    #fig = plt.figure()
+    fig = plt.figure(figsize=(12,5))
+    #fig = plt.figure(figsize=(12,5), facecolor='black')
+    
+    ax = fig.add_axes([0, .085, 1, 1], projection=ccrs.PlateCarree())
     lon = ds['lon'][:]
     lon = np.where(lon > 180., lon-360., lon)
     lat = ds['lat'][:]
-    #im = ax.contourf(lon, lat, da, transform=ccrs.PlateCarree(), cmap=cmap)
-    #da needs to be 2 dimensional array x,y, but fvcom is single dimension node or nele
-    #im = ax.contourf(da, cmap=cmap)
-    nv = ds.variables['nv'][:].T
+
+    nv = ds.variables['nv'][:].T  
     nv = nv - 1
 
-    #print(f"DEBUGGING: lon.len: {len(lon[:])}, da.len: {len(da[:])} ")
     if dims == 2:
         im = ax.tripcolor(lon, lat, nv, da[time], cmap=cmap)
     if dims == 3:
@@ -254,19 +275,26 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
         'physical', 'land', '10m',
         edgecolor='k', facecolor='0.8'
     )
-    ax.add_feature(coast_10m);
-    
+    ax.add_feature(coast_10m);    
     
     title = ds.title
     time_array = ds.variables['time']
     init = time_array[0]
-    init_str = f"INIT: {num2date(init, time_array.units)}"
+    init_str = f"INIT: {num2date(init, time_array.units)} UTC"
     valid = time_array[time]
-    valid_str = f"VALID: {num2date(valid, time_array.units)}"
-    ax.set_title(f'{title}\n{init_str}\n{valid_str}')
+    valid_str = f"VALID: {num2date(valid, time_array.units)} UTC"
+    
+    ax.set_title(f'{title}\n{init_str}    {valid_str}')
 
-    long_name = da.long_name
-    cbar = fig.colorbar(im, ax=ax)
+    long_name = da.long_name  
+    
+    # COLOR BAR
+    # cbar = fig.colorbar(im, ax=ax, fraction=0.10, anchor=(0.5,1.0))
+    #cbar = fig.colorbar(im, ax=ax, fraction=0.05, pad=0.025, panchor=(0.9, 0.1))
+    #cbar = fig.colorbar(im, ax=ax, fraction=0.05, pad=0.025)
+    #cbar = fig.colorbar(im, ax=ax, shrink=0.825, pad=0.02)
+    cbar = fig.colorbar(im, ax=ax, pad=0.02)
+
     if variable != 'salt':
         units = da.units
         cbar.set_label(f'{long_name} ({units})')
@@ -278,23 +306,34 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     logo_axis = fig.add_axes([bbox[0], 0.0, 0.15, 0.075])
     logo_axis.imshow(img, interpolation='hanning')
     logo_axis.axis('off')
+    
+    # Not easy to get the local system timezone info using python
+    # https://stackoverflow.com/questions/35057968/get-system-local-timezone-in-python/35058346
         
-        
+    dst = timelib.localtime( ).tm_isdst > 0
+    if dst: tz = 'EDT'
+    else: tz = 'EST'   
+    
     datestrfmt = '%b %d, %Y %H:%M %Z' #'%Y-%m-%d %H:%M:%S'
-    now_str = f"Image generated:\n{datetime.now().strftime(datestrfmt)}"
-    fig.text(0.55, 0.0, f'{now_str}')
+    now_str = f"image created at: {datetime.now().strftime(datestrfmt)} {tz}"
+    fig.text(0.55, 0.02, f'{now_str}')
     
-        
+    # Add the forecast date and time to the filename
+    init_datetime = num2date(init, time_array.units)
+    fmt = '%Y%m%d_%HZ' #'%Y-%m-%d %H:%M:%S'
+    ini_str = f"{init_datetime.strftime(fmt)}"
+    
     indexfile = f'docs/index.html'
-    outfile = f'docs/{variable}.png'
-    
+    outfile = f'docs/{ini_str}_{variable}.png'
+
     if not os.path.exists('./docs'):
         os.makedirs('./docs')
 
     imagename = outfile.split('/')[-1]
 
-    plt.savefig(outfile, bbox_inches='tight')
-             
+    plt.savefig(outfile, bbox_inches='tight')            
+    #plt.close()
+
     if s3upload:
         s3 = S3Storage()
         bucket = 'ioos-cloud-www'
@@ -307,12 +346,6 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
 
 
 # In[ ]:
-
-
-
-
-
-# In[8]:
 
 
 def get_model_type(ds) -> str:
@@ -333,20 +366,33 @@ def get_model_type(ds) -> str:
         sourcestr = ds.source
         if re.search('FVCOM', sourcestr):
             return 'fvcom'
-        print(f'sourcestr: {sourcestr}')
     except Exception as e:
         if DEBUG: print('Not FVCOM data')
         
     return 'unknown'
 
 
-# In[9]:
+# In[ ]:
 
 
 # Testing
 def testing():
 
     ds = dsofs_curr_fcst()
+    init = ds.ocean_time.isel(ocean_time=0)
+    print(init)
+    # Either works fine for these cases
+    #init_datetime = num2date(init, init.units, only_use_cftime_datetimes=False)
+    init_datetime = num2date(init, init.units)
+
+    fmt = '%Y%m%d_%HZ' #'%Y-%m-%d %H:%M:%S'
+    # Aug28202001
+    ini_str = f"{init_datetime.strftime(fmt)}"
+    print(ini_str)
+    
+    print(init_datetime)
+    return
+
     #ds
     get_model_type(ds)
 
@@ -363,37 +409,25 @@ def testing():
     print(da)
     #print(da.long_name)
 
-    print(da.long_name)
-    print(da)
-
-    #lon = ds['lon']
-    #print(lon)
-
-    #lat = ds['lat']
-    #print(lat)
-
-    #nv = ds.variables['nv'][:].T
+    #nv = ds.variables['nv'][0][:] 
     #nv = nv - 1
-
-#    nv = ds.variables['nv'][0][:] 
-#    nv = nv - 1
-#    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    #print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
 
     # THIS ONE DOESN'T CAUSE AN ERROR
-#    nv = ds.variables['nv'][:].T
-#    nv = nv - 1
-#    print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
-    ######################
-
-    nv = ds.variables['nv'][0][:].T
+    nv = ds.variables['nv'][:].T
     nv = nv - 1
     print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
+    ######################
+
+    #nv = ds.variables['nv'][0][:].T
+    #nv = nv - 1
+    #print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
     ds.close()
 
 
-# In[10]:
+# In[ ]:
 
 
 def plot_runner(ds, variable, s3upload=False) -> str:
@@ -408,7 +442,7 @@ def plot_runner(ds, variable, s3upload=False) -> str:
         print(f"ERROR: Unsupported model type - {modeltype}")
 
 
-# In[11]:
+# In[ ]:
 
 
 def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
@@ -417,21 +451,20 @@ def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
     with open(cur_file) as cf:
         fcst = cf.read().rstrip(' \n')
     
-    print('fcst: ', fcst)
+    #print('fcst: ', fcst)
     
     OFS = fcst.split('.')[0]
    
     return OFS
 
 
-# In[15]:
+# In[ ]:
 
 
 def main():
        
     ds_ofs = dsofs_curr_fcst()
     model = get_model_type(ds_ofs)
-    print(model)
     
     indexfile = f'docs/index.html'
     if not os.path.exists('./docs'):
@@ -443,6 +476,7 @@ def main():
     storageService = S3Storage()
 
     plot_vars = ['temp', 'zeta', 'salt']
+    #plot_vars = ['temp', 'zeta', 'salt', 'oxygen']
     #plot_vars = ['temp']
 
     imagelist = []
@@ -471,7 +505,7 @@ def main():
     print('Finished ...')
 
 
-# In[16]:
+# In[ ]:
 
 
 main()
