@@ -20,6 +20,13 @@ fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
 nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
                   "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
 
+def nosofs_cyc0(ofs : str) -> str:
+    if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs" ]:
+        return "03"
+    else:
+        return "00"
+
+
 def scrub_liveocean():
     """ scrubs the disk - removes forcings/ICs and forecast data
         older than x days """
