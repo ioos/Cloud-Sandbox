@@ -1,12 +1,12 @@
 {
   "JOBTYPE"   : "plotting",
-  "OFS"       : "tbofs",
+  "OFS"       : "lmhofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "INDIR"     : "auto",
   "OUTDIR"    : "auto",
-  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "VARS"      : ["zeta", "temp", "salinity"],
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "public/nosofs/plots/tbofs",
-  "FSPEC"     : "nos.tbofs.fields.f*t00z.nc"
+  "BCKTFLDR"  : "public/nosofs/plots/lmhofs",
+  "FSPEC"     : "nos.lmhofs.fields.f*t00z.nc"
 }
