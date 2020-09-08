@@ -137,6 +137,11 @@ def plot_flow(postconf, postjobfile) -> Flow:
 
         # Start a machine
         postmach = ctasks.cluster_init(postconf)
+
+        # Setup the post job
+        plotjob = tasks.job_init(postmach, postjobfile)
+
+        # Start the machine
         pmStarted = ctasks.cluster_start(postmach)
 
         # Push the env, install required libs on post machine
@@ -146,19 +151,12 @@ def plot_flow(postconf, postjobfile) -> Flow:
         # Start a dask scheduler on the new post machine
         daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pmStarted])
 
-        # Setup the post job
-        plotjob = tasks.job_init(postmach, postjobfile, upstream_tasks=[pmStarted])
-
         # Get list of files from job specified directory
         FILES = jtasks.ncfiles_from_Job(plotjob)
 
         # Make plots
         plots = jtasks.daskmake_plots(daskclient, FILES, plotjob)
         plots.set_upstream([daskclient])
-
-        storage_service = tasks.storage_init(provider)
-        pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
-        pngtocloud.set_upstream(plots)
 
         # Make movies
         mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, upstream_tasks=[plots])
@@ -168,6 +166,9 @@ def plot_flow(postconf, postjobfile) -> Flow:
         closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[mpegs])
         pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
 
+        # Inject notebook
+        notebook = 'cloudflow/inject/patrick/sandbot_current_fcst.py'
+        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
         #######################################################################
 
