@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -x
 
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
@@ -56,8 +57,7 @@ daysoldics=0
 
 echo "Deleting verification data older than $daysoldics days"
 cd $COMVERIF
-# regex matches ./cbofs.2020081800, ./sfbofs.2020081803, etc.
-REGEX="./[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-9][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "$REGEX"
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "$REGEX" -exec rm -Rf {} \;
+REGEX="./[a-z]*ofs.*[0-1][0-9][0-3][0-9]"
+find . -depth -type d -daystart -mtime +$daysoldics -path "$REGEX"
+find . -depth -type d -daystart -mtime +$daysoldics -path "$REGEX" -exec rm -Rf {} \;
 
