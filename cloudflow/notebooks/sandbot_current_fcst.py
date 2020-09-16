@@ -209,7 +209,8 @@ def testvect():
 def plot_roms(ds, variable, s3upload=False) -> str:
         
     otime=1
-    srho=-1
+    srho = len(ds.s_rho) - 1
+    # print(f"DEBUG: srho is {srho}")
     vmin = None
     vmax = None
     
@@ -487,8 +488,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     #for record, geometry in zip(shp.records(), shp.geometries()):
     #    ax.add_geometries([geometry], ccrs.PlateCarree(), facecolor='lightgray',
     #                       edgecolor='black')
-    
-    
+     
     title = ds.title
     time_array = ds.variables['time']
     init = time_array[0]
@@ -709,14 +709,15 @@ def main():
 
     storageService = S3Storage()
 
-
+    plot_vars = ['temp', 'zeta', 'salt',  'wind', 'currents']
+    
     #plot_vars = ['temp', 'zeta']
     #plot_vars = ['temp', 'zeta', 'salt', 'wind', 'oxygen']
-    plot_vars = ['temp', 'zeta', 'salt',  'wind', 'currents']
     #plot_vars = ['temp']
     #plot_vars = ['wind']
     #plot_vars = ['zeta']
-    #plot_vars = ['currents']
+    
+    if DEBUG: plot_vars = ['currents']
 
     imagelist = []
     
@@ -758,4 +759,6 @@ def main():
 
 main()
 #testing()
+#ds_ofs = dsofs_curr_fcst()
+#ds_ofs
 
