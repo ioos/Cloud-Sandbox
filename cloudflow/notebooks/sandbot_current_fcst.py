@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[176]:
+# In[45]:
 
 
 import sys
@@ -39,7 +39,7 @@ rps_logo=b'iVBORw0KGgoAAAANSUhEUgAAAZQAAAB9CAMAAACyJ2VsAAAAnFBMVEX///9xA0r///1WW
 ioos_logo=b'iVBORw0KGgoAAAANSUhEUgAAAUAAAAB9CAMAAADk3UpfAAACiFBMVEX//////8z//5n//2b//zP//wD/zP//zMz/zJn/zGb/zDP/zAD/mf//mcz/mZn/mWb/mTP/mQD/Zv//Zsz/Zpn/Zmb/ZjP/ZgD/M///M8z/M5n/M2b/MzP/MwD/AP//AMz/AJn/AGb/ADP/AADM///M/8zM/5nM/2bM/zPM/wDMzP/MzMzMzJnMzGbMzDPMzADMmf/MmczMmZnMmWbMmTPMmQDMZv/MZszMZpnMZmbMZjPMZgDMM//MM8zMM5nMM2bMMzPMMwDMAP/MAMzMAJnMAGbMADPMAACZ//+Z/8yZ/5mZ/2aZ/zOZ/wCZzP+ZzMyZzJmZzGaZzDOZzACZmf+ZmcyZmZmZmWaZmTOZmQCZZv+ZZsyZZpmZZmaZZjOZZgCZM/+ZM8yZM5mZM2aZMzOZMwCZAP+ZAMyZAJmZAGaZADOZAABm//9m/8xm/5lm/2Zm/zNm/wBmzP9mzMxmzJlmzGZmzDNmzABmmf9mmcxmmZlmmWZmmTNmmQBmZv9mZsxmZplmZmZmZjNmZgBmM/9mM8xmM5lmM2ZmMzNmMwBmAP9mAMxmAJlmAGZmADNmAAAz//8z/8wz/5kz/2Yz/zMz/wAzzP8zzMwzzJkzzGYzzDMzzAAzmf8zmcwzmZkzmWYzmTMzmQAzZv8zZswzZpkzZmYzZjMzZgAzM/8zM8wzM5kzM2YzMzMzMwAzAP8zAMwzAJkzAGYzADMzAAAA//8A/8wA/5kA/2YA/zMA/wAAzP8AzMwAzJkAzGYAzDMAzAAAmf8AmcwAmZkAmWYAmTMAmQAAZv8AZswAZpkAZmYAZjMAZgAAM/8AM8wAM5kAM2YAMzMAMwAAAP8AAMwAAJkAAGYAADMAAAALihLaAAAACXBIWXMAAAsTAAALEwEAmpwYAAAMK2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczppbGx1c3RyYXRvcj0iaHR0cDovL25zLmFkb2JlLmNvbS9pbGx1c3RyYXRvci8xLjAvIiB4bWxuczpwZGY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGRmLzEuMy8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iIHhtbG5zOmV4aWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vZXhpZi8xLjAvIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMC0wOS0wMVQxODoxODowNy0wNDowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjAtMDktMDFUMTg6MTg6MDctMDQ6MDAiIHhtcDpDcmVhdGVEYXRlPSIyMDE1LTA1LTI5VDA5OjQ1OjEyLTA0OjAwIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIElsbHVzdHJhdG9yIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4YzgzYmVhMi1jOGNiLTQ2MDItOTU4Ny1hMWQ1ZTczMzY0ZmYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RUZBQ0FDMTQwMTM2NjgxMTgyMkFCNzkwQjczNjY4QTEiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0idXVpZDo1RDIwODkyNDkzQkZEQjExOTE0QTg1OTBEMzE1MDhDOCIgeG1wTU06UmVuZGl0aW9uQ2xhc3M9InByb29mOnBkZiIgaWxsdXN0cmF0b3I6U3RhcnR1cFByb2ZpbGU9IlByaW50IiBwZGY6UHJvZHVjZXI9IkFkb2JlIFBERiBsaWJyYXJ5IDEwLjAxIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIyIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHRpZmY6SW1hZ2VXaWR0aD0iNzAxIiB0aWZmOkltYWdlTGVuZ3RoPSIyNzQiIHRpZmY6UGhvdG9tZXRyaWNJbnRlcnByZXRhdGlvbj0iMiIgdGlmZjpTYW1wbGVzUGVyUGl4ZWw9IjMiIHRpZmY6WFJlc29sdXRpb249IjE0NC8xIiB0aWZmOllSZXNvbHV0aW9uPSIxNDQvMSIgdGlmZjpSZXNvbHV0aW9uVW5pdD0iMiIgZXhpZjpFeGlmVmVyc2lvbj0iMDIzMSIgZXhpZjpDb2xvclNwYWNlPSIxIiBleGlmOlBpeGVsWERpbWVuc2lvbj0iNzAxIiBleGlmOlBpeGVsWURpbWVuc2lvbj0iMjc0Ij4gPGRjOnRpdGxlPiA8cmRmOkFsdD4gPHJkZjpsaSB4bWw6bGFuZz0ieC1kZWZhdWx0Ij5JT09TX0VtYmxlbV9QcmltYXJ5X0FfUE1TPC9yZGY6bGk+IDwvcmRmOkFsdD4gPC9kYzp0aXRsZT4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RUZBQ0FDMTQwMTM2NjgxMTgyMkFCNzkwQjczNjY4QTEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RUZBQ0FDMTQwMTM2NjgxMTgyMkFCNzkwQjczNjY4QTEiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0idXVpZDo1RDIwODkyNDkzQkZEQjExOTE0QTg1OTBEMzE1MDhDOCIgc3RSZWY6cmVuZGl0aW9uQ2xhc3M9InByb29mOnBkZiIvPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpGQ0Q1QzgwQjc3MzQ2ODExODIyQUI3OTBCNzM2NjhBMSIgc3RFdnQ6d2hlbj0iMjAxNS0wNS0yOVQwODozNTowMi0wNDowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgSWxsdXN0cmF0b3IgQ1M2IChNYWNpbnRvc2gpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpFRkFDQUMxNDAxMzY2ODExODIyQUI3OTBCNzM2NjhBMSIgc3RFdnQ6d2hlbj0iMjAxNS0wNS0yOVQwOTo0NToxMi0wNDowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgSWxsdXN0cmF0b3IgQ1M2IChNYWNpbnRvc2gpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBpbWFnZS9qcGVnIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YjY2YWFlZjktYmVmNS00NzA4LTgwMWItODcxMmVkODk3N2I3IiBzdEV2dDp3aGVuPSIyMDIwLTA5LTAxVDE4OjE3OjE4LTA0OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoTWFjaW50b3NoKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6OGM4M2JlYTItYzhjYi00NjAyLTk1ODctYTFkNWU3MzM2NGZmIiBzdEV2dDp3aGVuPSIyMDIwLTA5LTAxVDE4OjE4OjA3LTA0OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoTWFjaW50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'
 
 
-# In[177]:
+# In[46]:
 
 
 def make_indexhtml(indexfile : str, imagelist : list):
@@ -70,7 +70,7 @@ def make_indexhtml(indexfile : str, imagelist : list):
         
 
 
-# In[ ]:
+# In[47]:
 
 
 def roms_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -81,7 +81,7 @@ def roms_nosofs(COMDIR: str, OFS: str, HH: str):
     return open_mfdataset(filespec, decode_times=False, combine='by_coords')
 
 
-# In[ ]:
+# In[48]:
 
 
 def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
@@ -92,7 +92,7 @@ def fvcom_nosofs(COMDIR: str, OFS: str, HH: str):
     return MFDataset(filespec)
 
 
-# In[ ]:
+# In[49]:
 
 
 def dsofs_curr_fcst(COMROT: str='/com/nos'):
@@ -102,9 +102,11 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     It depends on a file being present in COMROT 'current.fcst'
     """
     
+    #TODO: implement this so it only opens one file. Time is incoming argument.
+    
     if DEBUG:
-        cur_file = f'{COMROT}/current.fcst'        
-        #cur_file = f'{COMROT}/testing.fcst'
+        #cur_file = f'{COMROT}/current.fcst'        
+        cur_file = f'{COMROT}/testing.fcst'
     else:
         cur_file = f'{COMROT}/current.fcst'
     
@@ -120,10 +122,10 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
     fcstdate = fcst.split('.')[-1]
     HH = fcstdate[8:10]
           
-    if DEBUG: # Only grab first 0-9 hours. Faster!
-        filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
-    else: # Grab all hours
-        filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
+    #if DEBUG: # Only grab first 0-9 hours. Faster!
+    filespec = f'{COMDIR}/nos.{OFS}.fields.f00*.t{HH}z.nc'
+    #else: # Grab all hours
+    #    filespec = f'{COMDIR}/nos.{OFS}.fields.f*.t{HH}z.nc'
         
     print(f'filespec is: {filespec}')
     if OFS in utils.roms_models:
@@ -135,37 +137,103 @@ def dsofs_curr_fcst(COMROT: str='/com/nos'):
         return None
 
 
-# In[ ]:
+# In[50]:
+
+
+def testvect():
+    
+    otime=0
+    srho=0
+    ds = dsofs_curr_fcst()
+
+    #eta_u = 1044 ;
+    #xi_u = 723 ;
+    #eta_v = 1043 ;
+    #xi_v = 724 ;
+
+    # Get the dimensions of u/v
+    eta_u = ds['eta_u'].values[-1]
+    xi_u = ds['xi_u'].values[-1]
+    eta_v = ds['eta_v'].values[-1]
+    xi_v = ds['xi_v'].values[-1]
+
+    # Last indices
+    print(f"eta_u : {eta_u}") #1043
+    print(f"xi_u : {xi_u}")   # 722
+    print(f"eta_v : {eta_v}") # 1042
+    print(f"xi_v : {xi_v}")   #723
+
+
+    #u(ocean_time, s_rho, eta_u, xi_u) ; 0-1043 x 0-722
+    #v(ocean_time, s_rho, eta_v, xi_v) ; 0-1042 x 0-723
+    data_u = ds['u'].isel(ocean_time=otime)[srho,:,:]
+    data_v = ds['v'].isel(ocean_time=otime)[srho,:,:]
+
+    lons_u = ds['lon_u'][0:eta_u-1,:].values
+    lats_u = ds['lat_u'][0:eta_u-1,:].values
+    lons_v = ds['lon_v'][:,0:xi_v-1].values
+    lats_v = ds['lat_v'][:,0:xi_v-1].values
+
+    #1044x723 
+    #1043x724
+
+    #da = data_u[:,:,srho]
+    #da = data_u
+    #da
+    #lons
+
+    #u = ma.masked_invalid(data_u.values)
+    #v = ma.masked_invalid(data_v.values)
+
+
+    u = data_u[0:1042, 0:722].values
+    v = data_v[0:1042, 0:722].values
+    #data_u 1044x723
+    #data_v 1043x724
+    #ds['lon_u']
+    #u
+    #v
+    data=data_v[0:1042, 0:723]
+    print(data)
+    mag = np.sqrt(np.square(u) + np.square(v))
+    #[0:1042, 0:723]
+
+    #ds
+
+
+# In[61]:
 
 
 def plot_roms(ds, variable, s3upload=False) -> str:
         
+    otime=1
+    srho=-1
     vmin = None
     vmax = None
     
     if variable == 'zeta':
-        da = ds[variable].isel(ocean_time=1)
+        da = ds[variable].isel(ocean_time=otime)
         #cmap = cmocean.cm.balance
         cmap=plt.get_cmap('jet')
         vector = False
         vmin=-20.0
         vmax=20.0
     if variable == 'temp':
-        da = ds[variable].isel(ocean_time=1, s_rho=0) #s_rho=0 = surface
+        da = ds[variable].isel(ocean_time=otime, s_rho=srho) #s_rho=0 = surface
         cmap = cmocean.cm.thermal
         vector = False
     if variable == 'salt':
         #salt(ocean_time, s_rho, eta_rho, xi_rho)
-        da = ds[variable].isel(ocean_time=1, s_rho=0)
+        da = ds[variable].isel(ocean_time=otime, s_rho=srho)
         cmap = cmocean.cm.haline
         vector = False
     if variable == 'oxygen':
-        da = ds[variable].isel(ocean_time=1, s_rho=0)
+        da = ds[variable].isel(ocean_time=otime, s_rho=srho)
         cmap = cmocean.cm.oxy
         vector = False   
     if variable == 'Pair':
         # Pair(ocean_time, eta_rho, xi_rho)
-        da = ds[variable].isel(ocean_time=1)
+        da = ds[variable].isel(ocean_time=otime)
         cmap = cmocean.cm.diff
         vector = False
     if variable == 'wind':
@@ -173,8 +241,9 @@ def plot_roms(ds, variable, s3upload=False) -> str:
 
         # Uwind(ocean_time, eta_rho, xi_rho) ;
         # Vwind(ocean_time, eta_rho, xi_rho) 
-        data_u = ds['Uwind'].isel(ocean_time=1)
-        data_v = ds['Vwind'].isel(ocean_time=1)
+        data_u = ds['Uwind'].isel(ocean_time=otime)
+        data_v = ds['Vwind'].isel(ocean_time=otime)
+        
         
         lons = ds['lon_rho'].values
         lats = ds['lat_rho'].values
@@ -185,29 +254,55 @@ def plot_roms(ds, variable, s3upload=False) -> str:
               
         mag = np.sqrt(np.square(u) + np.square(v))
         vector = True
-    if variable == 'currents':
-        da = ''
+    if variable == 'currents':      
+        cmap = plt.get_cmap('YlOrBr')
+
+        # Select only the ocean time needed. 
+        # Select u/v data at layer srho (last index = water surface) 
+        u = ds.u.values[otime, srho, :, :]
+        v = ds.v.values[otime, srho, :, :]
+        #print(f'u before (ds.u.shape): {u.shape}')
+        #print(f'v before (ds.v.shape): {v.shape}')
+
+        # Interpolate u/v to rho coordinates
+        ds['u_rho'] = (('eta_rho', 'xi_rho'), np.ma.masked_values(np.zeros_like(ds.zeta.isel(ocean_time=otime)), 0.0))
+        ds['v_rho'] = (('eta_rho', 'xi_rho'), np.ma.masked_values(np.zeros_like(ds.zeta.isel(ocean_time=otime)), 0.0))
+        ds.u_rho[1:, 1:] = (u[0:-1, :] + u[1:, :]) * 0.5
+        ds.v_rho[1:, 1:] = (v[:, 0:-1] + v[:, 1:]) * 0.5
+        #print(f'u after (ds.u_rho.shape): {ds.u_rho.shape}')
+        #print(f'v after (ds.v_rho.shape): {ds.v_rho.shape}')       
+        
+        data_u = ds['u_rho']
+        data_v = ds['v_rho']
+        
+        da = ds['u'].isel(ocean_time=otime)[srho,:,:]
+        u = data_u.values
+        v = data_v.values       
+        lons = ds['lon_rho'].values
+        lats = ds['lat_rho'].values        
+        mag = np.sqrt(np.square(u) + np.square(v))
         vector = True
+    # end if currents
     
     fig = plt.figure(figsize=(12,5), dpi=72)
     ax = fig.add_axes([0, 0.1, 1, 1], projection=ccrs.PlateCarree())
     
     if not vector:
-        
+        # Normal plot
         im = ax.contourf(da.lon_rho, da.lat_rho, da.values,
                      transform=ccrs.PlateCarree(), levels=12,
                      vmin=vmin, vmax=vmax, cmap=cmap )
-        
     ## VECTORS!
     else:
         # Plot the magnitude
-        im = ax.contourf(da.lon_rho, da.lat_rho, mag,
+        im = ax.contourf(lons, lats, mag,
              transform=ccrs.PlateCarree(), levels=12,
              cmap=cmap)
     
+        # Plot the quivers
         im = ax.quiver(lons, lats, u, v, cmap=cmap,
                        transform=ccrs.PlateCarree(),
-                       regrid_shape=30)
+                       regrid_shape=32)
                 
     coast_10m = cfeature.NaturalEarthFeature(
         'physical', 'land', '10m',
@@ -227,7 +322,6 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     title = ds.title
     ax.set_title(f'{title}\n{init_str}    {valid_str}')
 
-    
     if vmin:
         cm = plt.cm.ScalarMappable(cmap=cmap)
         cm.set_clim(vmin, vmax)
@@ -297,7 +391,7 @@ def plot_roms(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[ ]:
+# In[62]:
 
 
 def plot_fvcom(ds, variable, s3upload=False) -> str:
@@ -369,11 +463,11 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     if not ( re.search("LEOFS", ds.title) or re.search("LMHOFS", ds.title)):
     # if not re.search("Lake", ds.title):
         # Obscures data
-        if variable == 'temp':
-            land = cfeature.NaturalEarthFeature(
-                'physical', 'land', '10m',
-                edgecolor='black', facecolor='0.75')
-            ax.add_feature(land)
+        #if variable == 'temp':
+        land = cfeature.NaturalEarthFeature(
+            'physical', 'land', '10m',
+            edgecolor='black', facecolor='0.75')
+        ax.add_feature(land)
     else:
         # We currently aren't running any saltwater lakes
         if variable == "salt": 
@@ -475,7 +569,7 @@ def plot_fvcom(ds, variable, s3upload=False) -> str:
     return imagename
 
 
-# In[ ]:
+# In[63]:
 
 
 def get_model_type(ds) -> str:
@@ -502,7 +596,7 @@ def get_model_type(ds) -> str:
     return 'unknown'
 
 
-# In[ ]:
+# In[64]:
 
 
 # Testing
@@ -555,9 +649,17 @@ def testing():
     #print(f"DEBUGGING - nv :  {nv}, len: {len(nv)}")
 
     ds.close()
+    
+    # TODO: Check where -140 value is in zeta for Cook Inlet
+    #da.values.min()
+    #-137.86069
+    # . was trying to read just the bad values
+    # Python will not execute the below code grabbed from a notebook.
+    # I understand what they were trying to do
+    # da[da.values == da.values.min()]
 
 
-# In[ ]:
+# In[65]:
 
 
 def plot_runner(ds, variable, s3upload=False) -> str:
@@ -572,7 +674,7 @@ def plot_runner(ds, variable, s3upload=False) -> str:
         print(f"ERROR: Unsupported model type - {modeltype}")
 
 
-# In[ ]:
+# In[66]:
 
 
 def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
@@ -588,10 +690,12 @@ def ofsname_curr(cur_file : str = '/com/nos/current.fcst') -> str:
     return OFS
 
 
-# In[ ]:
+# In[67]:
 
 
 def main():
+    
+    import traceback
        
     ds_ofs = dsofs_curr_fcst()
     model = get_model_type(ds_ofs)
@@ -607,11 +711,12 @@ def main():
 
 
     #plot_vars = ['temp', 'zeta']
-    #plot_vars = ['temp', 'zeta', 'salt', 'wind']
-    plot_vars = ['temp', 'zeta', 'salt', 'oxygen', 'wind']
+    #plot_vars = ['temp', 'zeta', 'salt', 'wind', 'oxygen']
+    plot_vars = ['temp', 'zeta', 'salt',  'wind', 'currents']
     #plot_vars = ['temp']
     #plot_vars = ['wind']
     #plot_vars = ['zeta']
+    #plot_vars = ['currents']
 
     imagelist = []
     
@@ -619,6 +724,8 @@ def main():
         upload = False
     else:
         upload = True
+        
+#    try:
         
     for var in plot_vars:
         #imagename = plot_runner(ds_ofs, var, s3upload=upload)
@@ -632,7 +739,11 @@ def main():
 
         if imagename:
             imagelist.append(imagename)
-
+            
+#    except Exception as e:
+#        print("Handling any exceptions cleanly")
+#        traceback.print_stack()
+        
     ds_ofs.close()
     
     if upload:
@@ -642,7 +753,7 @@ def main():
     print('Finished ...')
 
 
-# In[ ]:
+# In[68]:
 
 
 main()
