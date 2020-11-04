@@ -1,0 +1,12 @@
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "ngofs",
+  "CDATE"     : "today",
+  "HH"        : "03",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VARS"      : ["zeta", "temp", "salinity"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/ngofs",
+  "FSPEC"     : "nos.ngofs.fields.f*t03z.nc"
+}

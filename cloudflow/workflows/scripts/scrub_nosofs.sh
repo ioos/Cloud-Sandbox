@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #set -x
 
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
@@ -31,20 +32,22 @@ daysoldplots=1
 
 echo "Deleting old plots"
 cd $COMROT/plots
-find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots
-find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots -exec rm -Rf {} \;
+REGEX="[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-2][0-9]"
+find . -depth -name "$REGEX" -type d -daystart -mtime +$daysoldplots
+find . -depth -name "$REGEX" -type d -daystart -mtime +$daysoldplots -exec rm -Rf {} \;
 
 
 
 ##############################################################################
 # Delete forecast folders older than n days
 ##############################################################################
-daysoldfcst=14
+daysoldfcst=7
 
 echo "Deleting forecast directories older than $daysoldfcst days"
 cd $COMROT
 # regex matches ./cbofs.2020081800, ./sfbofs.2020081803, etc.
-REGEX="./[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-9][0-9]"
+#            cbofs.Y    MM        DD        HH 
+REGEX="./[a-z]*ofs.*[0-1][0-9][0-3][0-9][0-2][0-9]"
 find . -depth -type d -daystart -mtime +$daysoldfcst -path "$REGEX"
 find . -depth -type d -daystart -mtime +$daysoldfcst -path "$REGEX" -exec rm -Rf {} \;
 
@@ -57,6 +60,7 @@ daysoldics=0
 
 echo "Deleting verification data older than $daysoldics days"
 cd $COMVERIF
+
 REGEX="./[a-z]*ofs.*[0-1][0-9][0-3][0-9]"
 find . -depth -type d -daystart -mtime +$daysoldics -path "$REGEX"
 find . -depth -type d -daystart -mtime +$daysoldics -path "$REGEX" -exec rm -Rf {} \;

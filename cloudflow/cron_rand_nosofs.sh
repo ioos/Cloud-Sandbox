@@ -16,8 +16,11 @@ cyc=`echo $rand | awk '{print $2}'`
 echo "$ofs $cyc"
 
 fcst=job/jobs/${ofs}.${cyc}z.fcst
-plots=job/jobs/${ofs}.${cyc}z.diffplots
+#plots=job/jobs/${ofs}.${cyc}z.diffplots
+plots=job/jobs/${ofs}.${cyc}z.plots
 
+#echo "Testing, not running: "
+#echo "./workflows/nosofs_qops.py $fcst $plots > $HOME/${ofs}.log 2>&1"
 nohup ./workflows/nosofs_qops.py $fcst $plots > $HOME/${ofs}.log 2>&1
 
 #nohup ./workflows/nosofs_qops.py job/jobs/dbofs.00z.fcst < /dev/null > $HOME/dbofs.log &
