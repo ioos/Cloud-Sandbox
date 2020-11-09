@@ -8,7 +8,7 @@
   "EXEC"      : "",
   "TIME_REF"  : "20160101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "/nos/gomofs/output",
+  "BCKTFLDR"  : "nos/gomofs/output",
   "NTIMES"    : "5760",
   "ININAME"   : "",
   "OUTDIR"    : "auto",

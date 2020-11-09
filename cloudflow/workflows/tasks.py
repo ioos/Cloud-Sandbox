@@ -36,6 +36,8 @@ from cloudflow.services.ScratchDisk import ScratchDisk
 from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
+from cloudflow.utils import romsUtil as util
+
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
@@ -162,7 +164,63 @@ def storage_init(provider: str) -> StorageService:
 
 
 # Storage, Job
-# TODO: Parameterize filespecs?
+@task
+def save_history(job: Job, service: StorageService, filespecs: list, public=False):
+    """ Save forecast history files to cloud storage. 
+
+    Parameters
+    ----------
+    job : Job
+      A Job object that contains the required attributes.
+      BUCKET - bucket name
+      BCKTFOLDER - bucket folder
+      CDATE - simulation date
+      OUTDIR - source path
+
+    service : StorageService
+      An implemented service for your cloud provider.
+
+    filespecs : list of str
+      file specifications to match using glob.glob
+      Example: ["*.nc", "*.png"]
+
+    public : bool, optional
+      Whether the files should be made public. Default: False
+
+    """
+
+    BUCKET = job.BUCKET
+    BCKTFLDR = job.BCKTFLDR
+    CDATE = job.CDATE
+    path = job.OUTDIR
+
+    OFS = job.OFS
+
+    if OFS == "liveocean":
+        # If liveocean use fYYYY.MM.DD for folder ex. f2020.06.23
+        CDATE = util.lo_date(job.CDATE)
+    else:
+        # We are only saving liveocean forecast output currently
+        return
+
+    for spec in filespecs:
+
+        FILES = sorted(glob.glob(f"{path}/{spec}"))
+
+        log.info('Uploading the following files:')
+
+        for filename in FILES:
+            print(filename)
+            fhead, ftail = os.path.split(filename)
+
+            key = f"{BCKTFLDR}/{CDATE}/{ftail}"
+
+            service.uploadFile(filename, BUCKET, key, public)
+    return
+#######################################################################
+
+
+# Storage, Job
 @task
 def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=False):
     """ Save stuff to cloud storage.
@@ -192,6 +250,8 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
     CDATE = job.CDATE
     path = job.OUTDIR
 
+    OFS = job.OFS
+
     # Forecast output
     # ocean_his_0002.nc
     # folder = f"output/{job.CDATE}"
@@ -206,6 +266,8 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
         for filename in FILES:
             print(filename)
             fhead, ftail = os.path.split(filename)
+
+            # TODO If liveocean use fYYYY.MM.DD for folder ex. f2020.06.23
             key = f"{BCKTFLDR}/{CDATE}/{ftail}"
 
             service.uploadFile(filename, BUCKET, key, public)
