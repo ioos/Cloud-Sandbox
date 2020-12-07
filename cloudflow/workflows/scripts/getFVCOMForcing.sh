@@ -11,11 +11,12 @@ set -x
 SCRS=$PWD
 
 NOMADS=https://nomads.ncep.noaa.gov/pub/data/nccf/com
-COMDIR=/data/com
+COMDIR=/com/forcing
 
 # Get current cycle forcing data
-PDY=20191030
-cyc=09
+PDY=20201119
+cyc=06    # Only used for restart
+#lmhofs 00,06,12,18
 
 # Get previous cycle for init time, need some overlap
 #PDY=20190905
@@ -23,6 +24,27 @@ cyc=09
 # For full prep:
 # Need NAM previous cycle fhr 0-6, NAM current cycle fhr 0-60
 # RTOFS is once per day run, will need previous day if running 03z or 00z nowcast
+# LMHOFS Needs GFS25
+
+product=gfs
+# /com/forcing/gfs/gfs.20201116/*/gfs.t*.pgrb2.0p50.f???
+CYC='06'
+mkdir -p $COMDIR/$product/$product.$PDY/$CYC
+cd $COMDIR/$product/$product.$PDY/$CYC
+
+#gfs.t06z.pgrb2.0p50.f000
+#gfs.t06z.pgrb2.0p50.f003
+#gfs.t06z.pgrb2.0p50.f006
+
+# Get 60 hour forecast
+#FHList=`$SCRS/hhlist.sh 1 60`
+FHList=`$SCRS/hhlist.sh 3 72 000`
+for FH in $FHList
+do
+  fileurl="$NOMADS/$product/prod/${product}.$PDY/${CYC}/gfs.t${CYC}z.pgrb2.0p50.f${FH}"
+  echo $fileurl
+  wget -nc $fileurl
+done
 
 #RTOFS  v1.2
 product=rtofs
