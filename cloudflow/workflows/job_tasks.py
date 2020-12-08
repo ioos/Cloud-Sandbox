@@ -188,17 +188,19 @@ def get_forcing(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
+
     cdate = job.CDATE
     ofs = job.OFS
     comrot = job.COMROT
     hh = job.HH
 
-    comdir = job.OUTDIR
+    comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
     if ofs == 'liveocean':
-        #comdir = f"{comrot}/{ofs}"
+        
+        frcdir = job.COMROT + '/liveocean'
         try:
-            util.get_ICs_lo(cdate, comdir, sshuser)
+            util.get_ICs_lo(cdate, frcdir, sshuser)
         except Exception as e:
             log.exception('Problem encountered with downloading forcing data ...')
             raise signals.FAIL()

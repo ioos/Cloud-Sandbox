@@ -8,7 +8,7 @@
   "EXEC"      : "",
   "TIME_REF"  : "20060101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "/nos/wrfroms/output",
+  "BCKTFLDR"  : "nos/wrfroms/output",
   "NTIMES"    : "2520",
   "ININAME"   : "",
   "OUTDIR"    : "auto",

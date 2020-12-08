@@ -8,7 +8,7 @@
   "PTMP"      : "/ptmp",
   "DATE_REF"  : "2013-01-01 00:00:00",
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "/nos/sfbofs/output",
+  "BCKTFLDR"  : "nos/sfbofs/output",
   "OUTDIR"    : "auto",
   "INPUTFILE" : "auto",
   "INTMPL"    : "auto"

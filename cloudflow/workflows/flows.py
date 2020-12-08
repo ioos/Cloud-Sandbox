@@ -104,8 +104,20 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Copy the results to /com (liveocean)
         cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
 
+        # Copy the results to S3 (optionally)
+        #cp2s3 = jtasks.cp2s3(fcstjob, upstream_tasks=[fcst_run])
+        #storage_service = tasks.storage_init(provider)
+        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
+        #pngtocloud.set_upstream(plots)
+
         # Delete the scratch disk
         scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cp2com])
+
+        # Copy the results to S3 (optionally. currently only saves LiveOcean)
+        storage_service = tasks.storage_init(provider)
+        cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+
+        #pngtocloud.set_upstream(plots)
 
         # If the fcst fails, then set the whole flow to fail
         fcstflow.set_reference_tasks([fcst_run, cp2com])
@@ -328,8 +340,9 @@ def test_flow(fcstconf, fcstjobfile) -> Flow:
         # Setup the job
         fcstjob = tasks.job_init(cluster, fcstjobfile)
 
-        # Copy the results to /com (liveocean)
-        cp2com = jtasks.ptmp2com(fcstjob)
+        # Copy the results to S3 (optionally. currently only saves LiveOcean)
+        storage_service = tasks.storage_init(provider)
+        cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service, fcstjob])
 
     return testflow
 
