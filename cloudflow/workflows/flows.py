@@ -101,9 +101,6 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
         #pngtocloud.set_upstream(plots)
 
-        # Delete the scratch disk
-        scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cp2com])
-
         # Copy the results to S3 (optionally. currently only saves LiveOcean)
         storage_service = tasks.storage_init(provider)
         cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
