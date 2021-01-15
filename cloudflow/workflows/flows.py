@@ -158,6 +158,8 @@ def plot_flow(postconf, postjobfile) -> Flow:
         plots = jtasks.daskmake_plots(daskclient, FILES, plotjob)
         plots.set_upstream([daskclient])
 
+        storage_service = tasks.storage_init(provider)
+
         # Make movies
         mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, upstream_tasks=[plots])
         mp4tocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.mp4'], public=True)
