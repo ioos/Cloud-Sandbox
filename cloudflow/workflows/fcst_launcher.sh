@@ -117,7 +117,14 @@ case $OFS in
     mpirun $MPIOPTS $EXEC ocean.in > ocean.log
     result=$?
     ;;
-
+  adcircofs)
+    #export HOMEnos=/save/ADCIRC_Copied/
+    export JOBDIR=/home/mmonim/Cloud-Sandbox/cloudflow/workflows
+    export JOBSCRIPT=$JOBDIR/fcstrun_adcirc_cluster.sh
+    cd "$JOBDIR" || exit 1
+    $JOBSCRIPT
+    result=$?
+    ;;
   *)
     echo "Model not supported $OFS"
     exit 1

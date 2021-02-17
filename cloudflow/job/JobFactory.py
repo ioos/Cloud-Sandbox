@@ -4,8 +4,9 @@ from cloudflow.job.Job import Job
 from cloudflow.job.ROMSForecast import ROMSForecast
 from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
+from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
@@ -45,6 +46,8 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
+        elif jobtype == 'adcircforecast':
+            newjob = ADCIRCForecast(configfile, NPROCS)
         elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
             newjob = Plotting(configfile, NPROCS)
         else:
