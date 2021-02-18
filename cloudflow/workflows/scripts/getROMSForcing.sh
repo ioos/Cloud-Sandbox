@@ -15,10 +15,12 @@ OFS=cbofs
 NOMADS=https://nomads.ncep.noaa.gov/pub/data/nccf
 #cd $COMOUT
 COMROT=/com/forcing
+NOWCASTONLY=YES
 
 # Get current cycle forcing data
-PDY=20201116
+PDY=20210217
 PDATE=`$NDATE -24 ${PDY}00 | cut -c1-8`
+HH=00
 
 # Get previous cycle for init time, need some overlap
 #PDY=20190905
@@ -39,8 +41,6 @@ do
   wget -nc $NOMADS/com/$product/prod/${product}.$PDY/$product.t${FH}z.stormsurge.ala3km.grib2
 done
 
-exit
-
 
 #RTOFS  v1.2
 product=rtofs
@@ -51,7 +51,11 @@ cd $COM
 #rtofs.20190903/rtofs_glo_3dz_f*_6hrly_hvr_US_east.nc
 
 # FH - every 6 hours 006 to 192
-FHList='006 012 018 024 030 036 042 048 054 060 066 072 078 084 090'
+if [[ $NOWCASTONLY == "YES" ]]; then
+  FHList='006 012 018 024'
+else
+  FHList='006 012 018 024 030 036 042 048 054 060 066 072 078 084 090'
+fi
 for FH in $FHList
 do
   echo "$NOMADS/com/$product/prod/${product}.$PDY/rtofs_glo_3dz_f${FH}_6hrly_hvr_US_east.nc"
@@ -61,19 +65,24 @@ done
 # RTOFS v1.0.x
 #/com/forcing/rtofs/rtofs.20201115/rtofs_glo_3dz_f*_6hrly_hvr_reg3.nc
 
-# Get RTOFS for Alasks CIOFS
+# Get RTOFS for Alaska CIOFS
 product=rtofs
 COM=$COMROT/$product/$product.$PDATE
 mkdir -p $COM
 cd $COM
 
 # FH - every 6 hours 006 to 192
-FHList='006 012 018 024 030 036 042 048 054 060 066 072 078 084 090'
+# Why are we retrieving AK for previous cycle?
+if [[ $NOWCASTONLY == "YES" ]]; then
+  FHList='006 012 018 024'
+else
+  FHList='006 012 018 024 030 036 042 048 054 060 066 072 078 084 090'
+fi
 for FH in $FHList
 do
   #/com/forcing/rtofs/rtofs.20201115/rtofs_glo_3dz_f*_6hrly_hvr_alaska.nc
-  echo "$NOMADS/com/$product/prod/${product}.$PDY/rtofs_glo_3dz_f${FH}_6hrly_hvr_alaska.nc"
-  wget -nc $NOMADS/com/$product/prod/${product}.$PDY/rtofs_glo_3dz_f${FH}_6hrly_hvr_alaska.nc
+  echo "$NOMADS/com/$product/prod/${product}.$PDATE/rtofs_glo_3dz_f${FH}_6hrly_hvr_alaska.nc"
+  wget -nc $NOMADS/com/$product/prod/${product}.$PDATE/rtofs_glo_3dz_f${FH}_6hrly_hvr_alaska.nc
 
 done
 
@@ -125,13 +134,14 @@ done
 # Forecast cycle
 #HHList='00 06 12 18'  
 #HH='18'
-HH='00'
+#HH='00'
 
 ## FH 00-60 avail every 6 hours 00-18z
-FHList='00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 \
-        30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60'
-
-FHList=''
+if [[ $NOWCASTONLY == "YES" ]]; then
+  FHList='00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24'
+else
+  FHList='00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29'
+fi
 
 product=nam
 COM=$COMROT/$product/$product.$PDY
@@ -156,7 +166,11 @@ mkdir -p $COM
 cd $COM
 
 #FHList='00 03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84'
-FHList='00 03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84'
+if [[ $NOWCASTONLY == "YES" ]]; then
+  FHList='00 03 06 09 12 15 18 21 24'
+else
+  FHList='00 03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84'
+fi
 
 for FH in $FHList
 do
