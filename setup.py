@@ -34,6 +34,6 @@ setup(name="cloudflow",
         'matplotlib',
         'netCDF4',
         'numpy',
-        'pyproj',
+        'pyproj==2.6',
         'plotting']
      )
