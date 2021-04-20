@@ -11,23 +11,7 @@ setup_environment () {
 
   home=$PWD
 
-  cd /mnt/efs/fs1
-
-  sudo mkdir ptmp
-  sudo mkdir com
-  sudo mkdir save
-
-  sudo chgrp wheel ptmp
-  sudo chmod 775 ptmp
-  sudo chgrp wheel com
-  sudo chmod 775 com
-  sudo chgrp wheel save 
-  sudo chmod 775 save
-
-  sudo ln -s /mnt/efs/fs1/ptmp /ptmp
-  sudo ln -s /mnt/efs/fs1/com /com
-  sudo ln -s /mnt/efs/fs1/save /save
-
+  # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
   sudo yum -y install tcsh
@@ -41,17 +25,54 @@ setup_environment () {
   sudo yum -y install python3-devel
   sudo yum -y install awscli
 
-  echo . /usr/share/Modules/init/bash >> ~/.bashrc
-  echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-  . /usr/share/Modules/init/bash
+  # Only do this once
+  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+  if [ $? -eq 1 ] ; then
+    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+    . /usr/share/Modules/init/bash
+  fi
 
-  sudo mkdir -p /usrx/modulefiles
-  echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
-  echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-  echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+  # Only do this once
+  if [ ! -d /usrx/modulefiles ] ; then
+    sudo mkdir -p /usrx/modulefiles
+    echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
+    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+  fi
+}
+
+
+setup_paths () {
+
+  home=$PWD
+
+  if [ ! -d /mnt/efs/fs1 ]; then
+    echo "ERROR: EFS disk is not mounted"
+    exit 1
+  fi
+
+  cd /mnt/efs/fs1
+  if [ ! -d ptmp ] ; then
+    sudo mkdir ptmp
+    sudo mkdir com
+    sudo mkdir save
+
+    sudo chgrp wheel ptmp
+    sudo chmod 775 ptmp
+    sudo chgrp wheel com
+    sudo chmod 775 com
+    sudo chgrp wheel save
+    sudo chmod 775 save
+  fi
+
+  sudo ln -s /mnt/efs/fs1/ptmp /ptmp
+  sudo ln -s /mnt/efs/fs1/com  /com
+  sudo ln -s /mnt/efs/fs1/save /save
 
   cd $home
 }
+
 
 setup_environment_osx () {
   cd ~/.ssh
@@ -61,12 +82,39 @@ setup_environment_osx () {
 
 install_efa_driver() {
 
-  home=$PWD
- 
-  # This must be installed before the rest
+# This must be installed before the rest
 
-  # version=latest
-  version=1.8.3
+
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
+
+# Note this error:
+# No package kernel-devel-3.10.0-1062.12.1.el7.x86_64 available.
+# Error: Not tolerating missing names on install, stopping.
+# Error: Failed to install packages.
+# 
+# ==============================================================================
+# The kernel header of the current kernel version cannot be installed and is required
+# to build the EFA kernel module. Please install the kernel header package for your
+# distribution manually or build the EFA kernel driver manually and re-run the installer
+# with --skip-kmod.
+# ==============================================================================
+#
+# The kernel version might have been updated since last reboot, if so, reboot the machine, and rerun this step.
+# To see the current running kernel:
+# uname -a
+#
+# Available kernels are visible
+
+# sudo mv 3.10.0-1062.12.1.el7.x86_64 oldkernel/
+# /usr/lib/modules
+# 3.10.0-1160.24.1.el7.x86_64
+# oldkernel
+
+  home=$PWD
+
+  version=latest
+  #version=1.11.2 (April 20, 2021)
+  #version=1.8.3
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
@@ -74,12 +122,20 @@ install_efa_driver() {
   mkdir -p $wrkdir
   cd $wrkdir
 
-  # If this exists, efa driver intall fails, move it
-  sudo mkdir /usr/lib/oldkernel
-  sudo mv /usr/lib/modules/3.10.0-957.1.3.el7.x86_64 /usr/lib/oldkernel
+  # There may be old kernels laying around without available headers, temporarily move them
+  # otherwise the efa driver might fail
+
+#  sudo mkdir /usr/lib/oldkernel
+#  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
+#  do
+#    oldkrnl=`ls -1 /usr/lib/modules | head -1`
+#    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
+#  done
 
   # This will get upgraded when we install gcc 6.5
   # Default version is needed to build the kernel driver
+  # If gcc has already been upgraded, this will likely fail
+  # Should uninstall newer once and install the default 4.8
   sudo yum -y install gcc
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
@@ -91,12 +147,11 @@ install_efa_driver() {
   # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
   sudo ./efa_installer.sh -y --minimal
 
-  # Put this back in original location
-  sudo mv /usr/lib/oldkernel/3.10.0-957.1.3.el7.x86_64  /usr/lib/modules
-  sudo rmdir /usr/lib/oldkernel
+  # Put old kernels back in original location
+#  sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+#  sudo rmdir /usr/lib/oldkernel
 
   cd $home
-
 }
 
 
@@ -108,6 +163,15 @@ install_base_rpms () {
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
   libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
+  # GCC needs to be installed first
+  rpmlist='
+    gcc-6.5.0-1.el7.x86_64.rpm
+    hdf5-1.10.5-4.el7.x86_64.rpm
+    netcdf-4.5-3.el7.x86_64.rpm
+    esmf-8.0.0-1.el7.x86_64.rpm
+    produtil-1.0.18-2.el7.x86_64.rpm
+  '
+
   wrkdir=~/baserpms
   [ -e $wrkdir ] && rm -Rf $wrkdir
   mkdir -p $wrkdir
@@ -117,7 +181,7 @@ install_base_rpms () {
   tar -xvf $libstar
   rm $libstar
   
-  for file in `ls -1 *.rpm`
+  for file in $rpmlist
   do
     sudo yum -y install $file
   done
@@ -140,6 +204,17 @@ install_extra_rpms () {
 
   libstar=extra_rpms.el7.20200716.tgz
 
+  rpmlist=' 
+    bacio-v2.1.0-1.el7.x86_64.rpm
+    bufr-v11.0.2-1.el7.x86_64.rpm
+    g2-v3.1.0-1.el7.x86_64.rpm
+    nemsio-v2.2.4-1.el7.x86_64.rpm
+    sigio-v2.1.0-1.el7.x86_64.rpm
+    w3emc-v2.2.0-1.el7.x86_64.rpm
+    w3nco-v2.0.6-1.el7.x86_64.rpm
+    wgrib2-2.0.8-2.el7.x86_64.rpm
+  '
+
   wrkdir=~/extrarpms
   [ -e $wrkdir ] && rm -Rf $wrkdir
   mkdir -p $wrkdir
@@ -149,13 +224,14 @@ install_extra_rpms () {
   tar -xvf $libstar
   rm $libstar
 
-  for file in `ls -1 *.rpm`
+  for file in $rpmlist
   do
     sudo yum -y install $file
   done
 
-  # Force install newer libpng
-  sudo rpm --install --force libpng-1.5.30-1.el7.x86_64.rpm  
+  # Force install newer libpng leaving the existing one intact
+  # this one will be used for our model builds
+  sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
 
   rm -Rf $wrkdir
 
@@ -171,17 +247,23 @@ install_python_modules_user () {
 
   . /usr/share/Modules/init/bash
   module load gcc
-  pip3 install --user dask distributed
-  pip3 install --user paramiko   # needed for dask-ssh
-  pip3 install --user prefect
-  pip3 install --user boto3
+  python3 -m pip install --upgrade pip
+  python3 -m pip install --user wheel
+  python3 -m pip install --user dask distributed
+  python3 -m pip install --user setuptools_rust
+  python3 -m pip install --user paramiko   # needed for dask-ssh
+  python3 -m pip install --user prefect
+  python3 -m pip install --user boto3
 
 
+  exit
   # Build and install the plotting module
   # This will also install dependencies
-  cd ../workflow
+  cd ../..
+  # Should be in ~/Cloud-Sandbox/cloudflow
+  pwd
   python3 ./setup.py sdist
-  pip3 install --user dist/plotting-*.tar.gz
+  python3 -m pip install --user dist/plotting-*.tar.gz
  
   cd $home 
 }

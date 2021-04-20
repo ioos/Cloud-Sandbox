@@ -6,6 +6,7 @@
 . base-setup-instance.sh
 
 setup_environment
+setup_paths
 install_efa_driver
 install_base_rpms
 install_extra_rpms
