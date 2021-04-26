@@ -29,6 +29,6 @@ variable "public_key" {
 
 variable "managed_policies" {
   default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-             "arn:aws:iam::aws:policy/aws-service-role/AmazonFSxServiceRolePolicy",
-             "arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+             "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+             "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
 }

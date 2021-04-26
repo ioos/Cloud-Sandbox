@@ -89,39 +89,39 @@ resource "aws_security_group" "efs_ingress" {
 
 
 # TODO: fix these so that the managed policies attach properly
-#resource "aws_iam_role" "sandbox_iam_role" {
-#  name = "ioos_cloud_sandbox_terraform_role"
-#  assume_role_policy = <<EOF
-#{
-#  "Version": "2012-10-17",
-#  "Statement": [
-#    {
-#      "Action": "sts:AssumeRole",
-#      "Principal": {
-#        "Service": "ec2.amazonaws.com"
-#      },
-#      "Effect": "Allow",
-#      "Sid": ""
-#    }
-#  ]
-#}
-#EOF
-#  tags = {
-#    Name = var.instance_name
-#    Project = var.project_name
-#  }
-#}
-#
-#resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
-#   count = length(var.managed_policies)
-#   policy_arn = element(var.managed_policies, count.index)
-#   role = aws_iam_role.sandbox_iam_role.name
-#}
-#
-#resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
-#    name = "ioos_cloud_sandbox_terraform_role"
-#    role = aws_iam_role.sandbox_iam_role.name
-#}
+resource "aws_iam_role" "sandbox_iam_role" {
+  name = "ioos_cloud_sandbox_terraform_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+  tags = {
+    Name = var.instance_name
+    Project = var.project_name
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
+   count = length(var.managed_policies)
+   policy_arn = element(var.managed_policies, count.index)
+   role = aws_iam_role.sandbox_iam_role.name
+}
+
+resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
+    name = "ioos_cloud_sandbox_terraform_role"
+    role = aws_iam_role.sandbox_iam_role.name
+}
 
 resource "aws_security_group" "ssh_ingress" {
   vpc_id = aws_vpc.cloud_vpc.id
@@ -168,8 +168,7 @@ resource "aws_instance" "model_head_node" {
   #ami           = "ami-0c5fc45da5f63247b"
   # c5n.18xlarge is required for EFA support
   instance_type = "c5n.18xlarge"
-  # TODO: uncomment once IAM fixed
-  #iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
   # TODO: Terraform does not yet support enabling EFA.  Find some other means
   #       of doing so.
   associate_public_ip_address = true
