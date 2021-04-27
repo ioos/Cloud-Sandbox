@@ -13,6 +13,8 @@ provider "aws" {
 
 resource "aws_vpc" "cloud_vpc" {
    cidr_block = "10.0.0.0/16"
+   enable_dns_support = true
+   enable_dns_hostnames = true
    tags = {
       Name = "IOOS Cloud Sandbox VPC Terraform"
       Project = var.project_name
@@ -65,25 +67,24 @@ resource "aws_security_group" "base_sg" {
     }
 }
 
-resource "aws_security_group" "efs_ingress" {
+resource "aws_security_group" "efs_sg" {
    vpc_id = aws_vpc.cloud_vpc.id
    ingress {
-     security_groups = [aws_security_group.base_sg.id]
+     self = true
      from_port = 2049
      to_port = 2049
      protocol = "tcp"
    }
+   # allow all outgoing from NFS
+   egress {
+      from_port = 0
+      to_port = 0
+      protocol = -1
+      cidr_blocks = ["0.0.0.0/0"]
+   }
    tags = {
       Name = "IOOS Cloud Sandbox Base SG"
       Project = var.project_name
-   }
-
-   # allow all outgoing from NFS
-   egress {
-      security_groups = [aws_security_group.base_sg.id]
-      from_port = 0
-      to_port = 0
-      protocol = "all"
    }
 }
 
@@ -164,11 +165,10 @@ data "aws_ami" "centos_7_latest" {
 resource "aws_instance" "model_head_node" {
   # Base CentOS 7 AMI
   ami = data.aws_ami.centos_7_latest.id
-  # AMI for NOSOFS Setup
-  #ami           = "ami-0c5fc45da5f63247b"
   # c5n.18xlarge is required for EFA support
   instance_type = "c5n.18xlarge"
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
+  user_data = data.template_file.init_instance.rendered
   # TODO: Terraform does not yet support enabling EFA.  Find some other means
   #       of doing so.
   associate_public_ip_address = true
@@ -183,7 +183,7 @@ resource "aws_instance" "model_head_node" {
   vpc_security_group_ids = [
     aws_security_group.base_sg.id,
     aws_security_group.ssh_ingress.id,
-    aws_security_group.efs_ingress.id
+    aws_security_group.efs_sg.id
   ]
   tags = {
     Name = var.instance_name
@@ -211,5 +211,15 @@ resource "aws_efs_file_system" "main_efs" {
 
 resource "aws_efs_mount_target" "mount_target_main_efs" {
     subnet_id = aws_subnet.main.id
+    security_groups = [aws_security_group.efs_sg.id]
     file_system_id = aws_efs_file_system.main_efs.id
+}
+
+data "template_file" "init_instance" {
+   template = file("./init_template.tpl")
+   vars = {
+       efs_name = aws_efs_file_system.main_efs.dns_name
+   }
+   depends_on = [aws_efs_file_system.main_efs,
+                 aws_efs_mount_target.mount_target_main_efs]
 }
