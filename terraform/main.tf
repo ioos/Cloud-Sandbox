@@ -89,7 +89,6 @@ resource "aws_security_group" "efs_sg" {
 }
 
 
-# TODO: fix these so that the managed policies attach properly
 resource "aws_iam_role" "sandbox_iam_role" {
   name = "ioos_cloud_sandbox_terraform_role"
   assume_role_policy = <<EOF
@@ -140,8 +139,6 @@ resource "aws_key_pair" "default" {
    public_key = var.public_key
 }
 
-# uncomment to make CentOS 7 HVM AMI available for use.  Will need to also
-# be reflected in the instance's AMI id
 data "aws_ami" "centos_7_latest" {
   owners = ["679593333241"]
   most_recent = true
