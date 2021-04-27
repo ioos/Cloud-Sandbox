@@ -176,6 +176,10 @@ resource "aws_instance" "model_head_node" {
         delete_on_termination = true
         volume_size = 12
       }
+
+  # Seems to require both cpu_core_count = 36 and
+  # cpu_threads_per_core = 1 in order to have 36 vCPUs without hyperthreading
+  cpu_core_count = 36
   cpu_threads_per_core = 1
   depends_on = [aws_internet_gateway.gw]
   key_name = "main_key"
