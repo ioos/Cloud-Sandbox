@@ -14,6 +14,7 @@ setup_environment () {
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
+  sudo yum -y install epel-release
   sudo yum -y install tcsh
   sudo yum -y install ksh
   sudo yum -y install wget
@@ -118,9 +119,9 @@ install_efa_driver() {
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
-  [ -e $wrkdir ] && rm -Rf $wrkdir
-  mkdir -p $wrkdir
-  cd $wrkdir
+  [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
+  mkdir -p "$wrkdir"
+  cd "$wrkdir"
 
   # There may be old kernels laying around without available headers, temporarily move them
   # otherwise the efa driver might fail
@@ -163,6 +164,15 @@ install_base_rpms () {
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
   libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
+  wrkdir=~/baserpms
+  [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
+  mkdir -p "$wrkdir"
+  cd "$wrkdir"
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
+  tar -xvf $libstar
+  rm $libstar
+ 
   # GCC needs to be installed first
   rpmlist='
     gcc-6.5.0-1.el7.x86_64.rpm
@@ -171,22 +181,13 @@ install_base_rpms () {
     esmf-8.0.0-1.el7.x86_64.rpm
     produtil-1.0.18-2.el7.x86_64.rpm
   '
-
-  wrkdir=~/baserpms
-  [ -e $wrkdir ] && rm -Rf $wrkdir
-  mkdir -p $wrkdir
-  cd $wrkdir
-
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
-  tar -xvf $libstar
-  rm $libstar
-  
+ 
   for file in $rpmlist
   do
     sudo yum -y install $file
   done
 
-  rm -Rf $wrkdir
+  rm -Rf "$wrkdir"
 
   cd $home
 }
@@ -216,9 +217,9 @@ install_extra_rpms () {
   '
 
   wrkdir=~/extrarpms
-  [ -e $wrkdir ] && rm -Rf $wrkdir
-  mkdir -p $wrkdir
-  cd $wrkdir
+  [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
+  mkdir -p "$wrkdir"
+  cd "$wrkdir"
 
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
   tar -xvf $libstar
@@ -233,7 +234,7 @@ install_extra_rpms () {
   # this one will be used for our model builds
   sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
 
-  rm -Rf $wrkdir
+  rm -Rf "$wrkdir"
 
   sudo yum -y install jasper-devel
 
@@ -250,7 +251,7 @@ install_python_modules_user () {
   python3 -m pip install --upgrade pip
   python3 -m pip install --user wheel
   python3 -m pip install --user dask distributed
-  python3 -m pip install --user setuptools_rust
+  python3 -m pip install --user setuptools_rust  # needed for paramiko
   python3 -m pip install --user paramiko   # needed for dask-ssh
   python3 -m pip install --user prefect
   python3 -m pip install --user boto3
@@ -297,9 +298,9 @@ install_ffmpeg () {
   tarfile=ffmpeg-git-i686-static.tar.xz
 
   wrkdir=~/ffmpeg
-  [ -e $wrkdir ] && rm -Rf $wrkdir
-  mkdir -p $wrkdir
-  cd $wrkdir
+  [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
+  mkdir -p "$wrkdir"
+  cd "$wrkdir"
 
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$tarfile
   tar -xvf $tarfile
@@ -310,7 +311,7 @@ install_ffmpeg () {
 
   sudo ln -sf /usrx/ffmpeg/${version}/ffmpeg /usr/local/bin
 
-  rm -Rf $wrkdir
+  rm -Rf "$wrkdir"
 
   cd $home
 }
