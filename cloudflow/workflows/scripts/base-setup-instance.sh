@@ -14,6 +14,7 @@ setup_environment () {
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
+  sudo yum -y update
   sudo yum -y install epel-release
   sudo yum -y install tcsh
   sudo yum -y install ksh
@@ -85,7 +86,6 @@ install_efa_driver() {
 
 # This must be installed before the rest
 
-
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
 
 # Note this error:
@@ -105,11 +105,8 @@ install_efa_driver() {
 # uname -a
 #
 # Available kernels are visible
-
-# sudo mv 3.10.0-1062.12.1.el7.x86_64 oldkernel/
-# /usr/lib/modules
+# at /usr/lib/modules
 # 3.10.0-1160.24.1.el7.x86_64
-# oldkernel
 
   home=$PWD
 
@@ -126,17 +123,17 @@ install_efa_driver() {
   # There may be old kernels laying around without available headers, temporarily move them
   # otherwise the efa driver might fail
 
-#  sudo mkdir /usr/lib/oldkernel
-#  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
-#  do
-#    oldkrnl=`ls -1 /usr/lib/modules | head -1`
-#    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
-#  done
+  sudo mkdir /usr/lib/oldkernel
+  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
+  do
+    oldkrnl=`ls -1 /usr/lib/modules | head -1`
+    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
+  done
 
   # This will get upgraded when we install gcc 6.5
   # Default version is needed to build the kernel driver
   # If gcc has already been upgraded, this will likely fail
-  # Should uninstall newer once and install the default 4.8
+  # Should uninstall newer one and install the default 4.8
   sudo yum -y install gcc
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
@@ -149,8 +146,8 @@ install_efa_driver() {
   sudo ./efa_installer.sh -y --minimal
 
   # Put old kernels back in original location
-#  sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
-#  sudo rmdir /usr/lib/oldkernel
+  sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+  sudo rmdir /usr/lib/oldkernel
 
   cd $home
 }
@@ -248,7 +245,7 @@ install_python_modules_user () {
 
   . /usr/share/Modules/init/bash
   module load gcc
-  python3 -m pip install --upgrade pip
+  sudo python3 -m pip install --upgrade pip
   python3 -m pip install --user wheel
   python3 -m pip install --user dask distributed
   python3 -m pip install --user setuptools_rust  # needed for paramiko
