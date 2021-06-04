@@ -104,8 +104,10 @@ install_efa_driver() {
 # To see the current running kernel:
 # uname -a
 #
-# Available kernels are visible
-# at /usr/lib/modules
+# Available kernels are visible at /usr/lib/modules
+#
+# The AWS centos 7 is still at version 1062 and has to be updated and rebooted before this will work
+# since the standard yum registry only has the current 1160 kernel-devel package
 # 3.10.0-1160.24.1.el7.x86_64
 
   home=$PWD
@@ -129,6 +131,8 @@ install_efa_driver() {
     oldkrnl=`ls -1 /usr/lib/modules | head -1`
     sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
   done
+
+  sudo yum -y install kernel-devel
 
   # This will get upgraded when we install gcc 6.5
   # Default version is needed to build the kernel driver
@@ -355,10 +359,8 @@ setup_aliases () {
   echo alias cdns cd /noscrub/$user >> ~/.tcshrc
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
-
-  git config --global user.name "Patrick Tripp"
-  git config --global user.email patrick.tripp@rpsgroup.com
-
+  #git config --global user.name "Patrick Tripp"
+  #git config --global user.email patrick.tripp@rpsgroup.com
   #git commit --amend --reset-author
 
   cd $home
