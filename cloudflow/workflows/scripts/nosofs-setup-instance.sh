@@ -5,6 +5,9 @@
 
 . base-setup-instance.sh
 
+# calling sudo from cloud init adds 25 second delay for each sudo
+sudo setenforce 0
+
 setup_environment
 setup_paths
 install_efa_driver

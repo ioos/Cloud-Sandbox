@@ -132,8 +132,6 @@ install_efa_driver() {
     sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
   done
 
-  sudo yum -y install kernel-devel
-
   # This will get upgraded when we install gcc 6.5
   # Default version is needed to build the kernel driver
   # If gcc has already been upgraded, this will likely fail
@@ -170,7 +168,7 @@ install_base_rpms () {
   mkdir -p "$wrkdir"
   cd "$wrkdir"
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
   tar -xvf $libstar
   rm $libstar
  
@@ -222,7 +220,7 @@ install_extra_rpms () {
   mkdir -p "$wrkdir"
   cd "$wrkdir"
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
   tar -xvf $libstar
   rm $libstar
 
@@ -258,7 +256,6 @@ install_python_modules_user () {
   python3 -m pip install --user boto3
 
 
-  exit
   # Build and install the plotting module
   # This will also install dependencies
   cd ../..
@@ -303,7 +300,7 @@ install_ffmpeg () {
   mkdir -p "$wrkdir"
   cd "$wrkdir"
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$tarfile
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$tarfile
   tar -xvf $tarfile
   rm $tarfile
  
