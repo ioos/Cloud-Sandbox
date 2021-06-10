@@ -1,7 +1,7 @@
 
 # Spefify this file when running terraform.
 
-# Example:
+# Examples:
 # terraform plan -var-file="mysettings.tfvars"
 # terraform apply -var-file="mysettings.tfvars"
 # terraform destroy -var-file="mysettings.tfvars"

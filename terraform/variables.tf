@@ -21,7 +21,8 @@ variable "availability_zone" {
 variable "instance_type" {
   description = "EC2 Instance Type"
   type = string
-  default = "c5n.18xlarge"
+  #default = "c5n.18xlarge"
+  default = "t3.medium"
 }
 variable "key_name" {
   description = "The name of the key-pair used to access the EC2 instances"

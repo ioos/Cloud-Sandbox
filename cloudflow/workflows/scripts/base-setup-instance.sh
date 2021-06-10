@@ -29,7 +29,7 @@ setup_environment () {
   cliver="2.2.10"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
   #curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  unzip awscliv2.zip
+  /usr/bin/unzip awscliv2.zip
   sudo ./aws/install
   rm awscliv2.zip
   rm -Rf "./aws"

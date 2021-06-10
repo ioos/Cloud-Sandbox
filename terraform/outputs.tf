@@ -15,5 +15,5 @@ output "instance_id" {
 
 output "login_command" {
    description = "SSH Login"
-   value = "ssh -i ${var.key_name}.pem centos@${aws_instance.head_node.public_dns}"
+   value = "ssh -i <path-to-key>/${var.key_name}.pem centos@${aws_instance.head_node.public_dns}"
 }
