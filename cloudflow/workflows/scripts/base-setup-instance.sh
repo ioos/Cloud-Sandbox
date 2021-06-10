@@ -19,6 +19,7 @@ setup_environment () {
   sudo yum -y install tcsh
   sudo yum -y install ksh
   sudo yum -y install wget
+  sudo yum -y install unzip
   sudo yum -y install time.x86_64
   sudo yum -y install glibc-devel
   sudo yum -y install automake
