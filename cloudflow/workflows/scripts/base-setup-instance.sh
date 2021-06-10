@@ -25,7 +25,14 @@ setup_environment () {
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
   sudo yum -y install python3-devel
-  sudo yum -y install awscli
+
+  cliver="2.2.10"
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
+  #curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+  rm awscliv2.zip
+  rm -Rf "./aws"
 
   # Only do this once
   grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
