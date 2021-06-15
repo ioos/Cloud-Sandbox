@@ -105,7 +105,7 @@ resource "aws_security_group" "ssh_ingress" {
 }
 
 resource "aws_iam_role" "sandbox_iam_role" {
-  name = "ioos_cloud_sandbox_terraform_role"
+  name = "${var.nameprefix}_terraform_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -134,7 +134,7 @@ resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
 }
 
 resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
-    name = "ioos_cloud_sandbox_terraform_role"
+    name = "${var.nameprefix}_terraform_role"
     role = aws_iam_role.sandbox_iam_role.name
 }
 
@@ -242,7 +242,7 @@ resource "aws_instance" "head_node" {
 }
 
 resource "aws_placement_group" "cloud_sandbox_placement_group" {
-  name = "IOOS Cloud Sandbox Terraform Placement Group"
+  name = "${var.nameprefix}_Terraform_Placement_Group"
   strategy = "cluster"
   tags = {
     project = var.project_tag

@@ -26,6 +26,7 @@ public_key = "ssh-rsa AAOb69pkQ6yZn...redacted...Qil7geTk"
 #---------------------------------------------------------------
 # preferred_region = "us-east-1"
 # name_tag = "IOOS Cloud Sandbox - Testing Terraform"
+# nameprefix = "terraform_test"
 # project_tag = "IOOS-cloud-sandbox"
 # availability_zone = "us-east-1a"
 # instance_type = "t3.small" 
