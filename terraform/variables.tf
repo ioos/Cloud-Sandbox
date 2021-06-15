@@ -3,6 +3,11 @@ variable "preferred_region" {
   type        = string
   default     = "us-east-1"
 }
+variable "nameprefix" {
+  description = "Prefix to use for some resource names to avoid duplicates"
+  type        = string
+  default     = "ioos_cloud_sandbox"
+}
 variable "name_tag" {
   description = "Value of the Name tag for the EC2 instance"
   type        = string
