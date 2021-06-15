@@ -29,13 +29,11 @@ EOL
 # Create the AMI from this instance
 instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 
-aws --region ${aws_region} ec2 create-image --no-reboot --instance-id ${instance_id} --name "${ami_name}" \
-  --tag-specification "ResourceType=image,Tags=[{Key=\"Name\",Value=\"${ami_name}\"},{Key=\"Project\",Value=\"${project}\"}]"
+/usr/local/bin/aws --region ${aws_region} ec2 create-image --no-reboot --instance-id $instance_id --name "${ami_name}" \
+  --tag-specification "ResourceType=image,Tags=[{Key=\"Name\",Value=\"${ami_name}\"},{Key=\"Project\",Value=\"${project}\"}]" > /tmp/ami.log 2>&1
 
 # TODO: Check for errors returned from any step above
 
-imageID=`grep ImageId /tmp/setup.log`
+imageID=`grep ImageId /tmp/ami.log`
 echo "imageID to use for compute nodes is: $imageID" >> /tmp/setup.log 
 echo "Installation completed!" >> /tmp/setup.log
-
-
