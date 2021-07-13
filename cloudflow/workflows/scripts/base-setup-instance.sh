@@ -156,8 +156,10 @@ install_efa_driver() {
   sudo ./efa_installer.sh -y --minimal
 
   # Put old kernels back in original location
-  sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
-  sudo rmdir /usr/lib/oldkernel
+  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
+    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+    sudo rmdir /usr/lib/oldkernel
+  fi
 
   cd $home
 }
