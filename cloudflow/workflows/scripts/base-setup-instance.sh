@@ -14,7 +14,7 @@ setup_environment () {
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
-  sudo yum -y update
+  #sudo yum -y update
   sudo yum -y install epel-release
   sudo yum -y install tcsh
   sudo yum -y install ksh
