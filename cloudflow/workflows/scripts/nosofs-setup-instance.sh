@@ -11,9 +11,9 @@ sudo setenforce 0
 setup_environment
 setup_paths
 install_efa_driver
+install_impi
 install_base_rpms
 install_extra_rpms
-install_impi
 install_python_modules_user
 install_ffmpeg
 setup_aliases

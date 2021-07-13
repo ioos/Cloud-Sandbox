@@ -69,11 +69,11 @@ setup_paths () {
     sudo mkdir save
 
     sudo chgrp wheel ptmp
-    sudo chmod 775 ptmp
+    sudo chmod 777 ptmp
     sudo chgrp wheel com
-    sudo chmod 775 com
+    sudo chmod 777 com
     sudo chgrp wheel save
-    sudo chmod 775 save
+    sudo chmod 777 save
   fi
 
   sudo ln -s /mnt/efs/fs1/ptmp /ptmp
@@ -120,9 +120,9 @@ install_efa_driver() {
 
   home=$PWD
 
-  version=latest
+  #version=latest
   #version=1.11.2 (April 20, 2021)
-  #version=1.8.3
+  version=1.8.3
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver

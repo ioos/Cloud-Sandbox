@@ -29,6 +29,11 @@ variable "instance_type" {
   #default = "c5n.18xlarge"
   default = "t3.medium"
 }
+variable "use_efa" {
+  description = "Attach EFA Network"
+  type = bool
+  default = "true"
+}
 variable "key_name" {
   description = "The name of the key-pair used to access the EC2 instances"
   type        = string
@@ -49,3 +54,9 @@ variable "managed_policies" {
              "arn:aws:iam::aws:policy/AmazonS3FullAccess",
              "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
 }
+
+variable "efs_dns_name" {
+  description = "The dns name of the EFS drive created"
+  type = string
+  default="unknown value"
+} 
