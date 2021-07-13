@@ -7,7 +7,8 @@ mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
 
 cd /home/centos
-sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
+#sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
+sudo -u centos git clone -b updates-0721 https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 sudo -u centos ./nosofs-setup-instance.sh > /tmp/setup.log 2>&1
 
@@ -28,7 +29,9 @@ EOL
 
 # Create the AMI from this instance
 instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+echo "Current instance is: $instance_id"
 
+echo "Creating an AMI of this instance ... will reboot automatically"
 /usr/local/bin/aws --region ${aws_region} ec2 create-image --instance-id $instance_id --name "${ami_name}" \
   --tag-specification "ResourceType=image,Tags=[{Key=\"Name\",Value=\"${ami_name}\"},{Key=\"Project\",Value=\"${project}\"}]" > /tmp/ami.log 2>&1
 

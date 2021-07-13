@@ -1,15 +1,11 @@
-#security group IDs
-#subnet ID
-#name and project tags
-
 output "instance_public_ip" {
    description = "Public IP Address of the EC2 Instance"
-   value = aws_instance.head_node.public_ip
+   value = aws_eip.head_node.public_ip
 }
 
 output "instance_public_dns" {
    description = "Public DNS Address of the EC2 Instance"
-   value = aws_instance.head_node.public_dns
+   value = aws_eip.head_node.public_dns
 }
 
 output "instance_id" {

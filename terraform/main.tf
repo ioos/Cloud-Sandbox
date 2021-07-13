@@ -201,20 +201,24 @@ resource "aws_instance" "head_node" {
   }
 }
 
+# A random id to use when creating the AMI
+resource "random_id" "ami_id" {
+  byte_length = 8
+}
+resource "random_pet" "ami_id" {
+  length    = 2
+}
+
+# formatdate(spec, timestamp())
 
 data "template_file" "init_instance" {
    template = file("./init_template.tpl")
    vars = {
-       #efs_name = aws_efs_file_system.main_efs.dns_name
-       efs_name = var.efs_dns_name
-       ami_name = "${var.name_tag} AMI"
-       aws_region = var.preferred_region
-       project = var.project_tag
-       instance_id = ""
+      efs_name = var.efs_dns_name
+      ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
+      aws_region = var.preferred_region
+      project = var.project_tag
    }
-
-   #depends_on = [aws_efs_file_system.main_efs,
-   #              aws_efs_mount_target.mount_target_main_efs]
 }
 
 
@@ -232,10 +236,6 @@ resource "aws_network_interface" "efa_network_adapter" {
                      aws_security_group.efs_sg.id]
   
   interface_type = "efa"
-  #attachment {
-  #  instance     = aws_instance.head_node.id
-  #  device_index = 1
-  #}
   tags = {
       Name = "${var.name_tag} EFA Network Adapter"
       Project = var.project_tag

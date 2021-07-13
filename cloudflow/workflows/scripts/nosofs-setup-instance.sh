@@ -18,4 +18,6 @@ install_python_modules_user
 install_ffmpeg
 setup_aliases
 
+sudo yum -y clean all
+
 echo "Setup completed!"
