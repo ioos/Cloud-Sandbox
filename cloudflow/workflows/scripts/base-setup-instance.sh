@@ -342,14 +342,70 @@ install_impi () {
 
   sudo ./aws_impi.sh install -check_efa 0
 
-  version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
-
   sudo mkdir -p /usrx/modulefiles/mpi/intel
-  sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
+  
+  # The included module file does not work
+  # version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
+  # sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
 
-  cd $home
+  cd /opt/intel/impi
+  version=`ls -1 | grep 20??\.??\.*`
+  cat > /usrx/modulefiles/mpi/intel/$version << EOF
+
+#%Module1.0#####################################################################
+#
+# Copyright 2003-2019 Intel Corporation.
+# 
+# This software and the related documents are Intel copyrighted materials, and
+# your use of them is governed by the express license under which they were
+# provided to you (License). Unless the License provides otherwise, you may
+# not use, modify, copy, publish, distribute, disclose or transmit this
+# software or the related documents without Intel's prior written permission.
+# 
+# This software and the related documents are provided as is, with no express
+# or implied warranties, other than those that are expressly stated in the
+# License.
+#
+##
+## Intel(R) MPI Library modulefile
+##
+
+proc ModulesHelp { } {
+        global dotversion
+        puts stderr " Intel(R) MPI Library"
 }
 
+module-whatis       "Sets up the Intel(R) MPI Library environment"
+
+set                 topdir                 /opt/intel/compilers_and_libraries
+
+setenv              I_MPI_ROOT             $topdir/linux/mpi
+
+prepend-path        CLASSPATH              $topdir/linux/mpi/intel64/lib/mpi.jar
+prepend-path        PATH                   $topdir/linux/mpi/intel64/bin
+prepend-path        LD_LIBRARY_PATH        $topdir/linux/mpi/intel64/lib/release:$topdir/linux/mpi/intel64/lib
+prepend-path        MANPATH                $topdir/linux/mpi/man
+
+if { [info exists ::env(I_MPI_OFI_LIBRARY_INTERNAL) ] } {
+    set i_mpi_ofi_library_internal $::env(I_MPI_OFI_LIBRARY_INTERNAL)
+} else {
+    set i_mpi_ofi_library_internal "yes"
+}
+
+switch -regexp -- $i_mpi_ofi_library_internal {
+    0|no|off|disable {
+    }
+    default {
+        setenv              FI_PROVIDER_PATH       $topdir/linux/mpi/intel64/libfabric/lib/prov
+
+        prepend-path        PATH                   $topdir/linux/mpi/intel64/libfabric/bin
+        prepend-path        LD_LIBRARY_PATH        $topdir/linux/mpi/intel64/libfabric/lib
+        prepend-path        LIBRARY_PATH           $topdir/linux/mpi/intel64/libfabric/lib
+    }
+}
+  cd $home
+}
+EOF
 
 
 # Personal stuff here
