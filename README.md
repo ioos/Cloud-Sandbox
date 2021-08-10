@@ -142,8 +142,9 @@ Run terraform apply:
 ```
 terraform apply -var-file="mysettings.tfvars"
 ```
-
-
+### Verified the following works on July 14, 2021: 
+    Setup the node and build an AMI from an instance that does not support EFA
+    Use that AMI for an EFA supported instance and EFA will work
 
 [//]: # "terraform destroy -target=resource"
 

@@ -190,10 +190,11 @@ resource "aws_instance" "head_node" {
 
   network_interface {
     device_index = 0    # MUST be 0
-    network_interface_id = aws_network_interface.efa_network_adapter.id
+    #network_interface_id = aws_network_interface.efa_network_adapter.id
+    network_interface_id = var.use_efa == true ? aws_network_interface.efa_network_adapter.id : aws_network_interface.standard.id
   }
 
-
+  # This logic isn't perfect since some ena instance types can be in a placement group also
   placement_group = var.use_efa == true ? aws_placement_group.cloud_sandbox_placement_group.id : null
   tags = {
     Name = "${var.name_tag} EC2 Head Node"
@@ -202,25 +203,37 @@ resource "aws_instance" "head_node" {
 }
 
 # A random id to use when creating the AMI
-resource "random_id" "ami_id" {
-  byte_length = 8
-}
+# This needs a new id if the instance_id changes - otherwise it won't create a new AMI
 resource "random_pet" "ami_id" {
   length    = 2
 }
 
-# formatdate(spec, timestamp())
-
 data "template_file" "init_instance" {
-   template = file("./init_template.tpl")
-   vars = {
-      efs_name = var.efs_dns_name
-      ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
-      aws_region = var.preferred_region
-      project = var.project_tag
-   }
+  template = file("./init_template.tpl")
+  vars = {
+    efs_name = aws_efs_file_system.main_efs.dns_name
+    ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
+    aws_region = var.preferred_region
+    project = var.project_tag
+  }
+
+  #depends_on = [aws_efs_file_system.main_efs,
+  #              aws_efs_mount_target.mount_target_main_efs]
 }
 
+# Can only attach efa adaptor to a stopped instance!
+resource "aws_network_interface" "standard" {
+  
+  subnet_id   = aws_subnet.main.id
+  description = "The network adaptor to attach to the instance if EFA is not supported"
+  security_groups = [aws_security_group.base_sg.id,
+                     aws_security_group.ssh_ingress.id,
+                     aws_security_group.efs_sg.id]
+  tags = {
+      Name = "${var.name_tag} Standard Network Adapter"
+      Project = var.project_tag
+  }
+}
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "efa_network_adapter" {
