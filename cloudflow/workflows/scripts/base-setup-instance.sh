@@ -119,9 +119,9 @@ install_efa_driver() {
 
   home=$PWD
 
-  #version=latest
+  version=latest
   #version=1.11.2 (April 20, 2021)
-  version=1.8.3
+  #version=1.8.3
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
