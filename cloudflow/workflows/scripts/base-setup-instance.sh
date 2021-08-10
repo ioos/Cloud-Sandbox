@@ -350,8 +350,8 @@ install_impi () {
 
   cd /opt/intel/impi
   version=`ls -1 | grep 20??\.??\.*`
-  cat > /usrx/modulefiles/mpi/intel/$version << EOF
-
+ 
+  sudo tee /usrx/modulefiles/mpi/intel/$version << EOF
 #%Module1.0#####################################################################
 #
 # Copyright 2003-2019 Intel Corporation.
@@ -379,12 +379,12 @@ module-whatis       "Sets up the Intel(R) MPI Library environment"
 
 set                 topdir                 /opt/intel/compilers_and_libraries
 
-setenv              I_MPI_ROOT             $topdir/linux/mpi
+setenv              I_MPI_ROOT             \$topdir/linux/mpi
 
-prepend-path        CLASSPATH              $topdir/linux/mpi/intel64/lib/mpi.jar
-prepend-path        PATH                   $topdir/linux/mpi/intel64/bin
-prepend-path        LD_LIBRARY_PATH        $topdir/linux/mpi/intel64/lib/release:$topdir/linux/mpi/intel64/lib
-prepend-path        MANPATH                $topdir/linux/mpi/man
+prepend-path        CLASSPATH              \$topdir/linux/mpi/intel64/lib/mpi.jar
+prepend-path        PATH                   \$topdir/linux/mpi/intel64/bin
+prepend-path        LD_LIBRARY_PATH        \$topdir/linux/mpi/intel64/lib/release:\$topdir/linux/mpi/intel64/lib
+prepend-path        MANPATH                \$topdir/linux/mpi/man
 
 if { [info exists ::env(I_MPI_OFI_LIBRARY_INTERNAL) ] } {
     set i_mpi_ofi_library_internal $::env(I_MPI_OFI_LIBRARY_INTERNAL)
@@ -392,20 +392,21 @@ if { [info exists ::env(I_MPI_OFI_LIBRARY_INTERNAL) ] } {
     set i_mpi_ofi_library_internal "yes"
 }
 
-switch -regexp -- $i_mpi_ofi_library_internal {
+switch -regexp -- \$i_mpi_ofi_library_internal {
     0|no|off|disable {
     }
     default {
-        setenv              FI_PROVIDER_PATH       $topdir/linux/mpi/intel64/libfabric/lib/prov
+        setenv              FI_PROVIDER_PATH       \$topdir/linux/mpi/intel64/libfabric/lib/prov
 
-        prepend-path        PATH                   $topdir/linux/mpi/intel64/libfabric/bin
-        prepend-path        LD_LIBRARY_PATH        $topdir/linux/mpi/intel64/libfabric/lib
-        prepend-path        LIBRARY_PATH           $topdir/linux/mpi/intel64/libfabric/lib
+        prepend-path        PATH                   \$topdir/linux/mpi/intel64/libfabric/bin
+        prepend-path        LD_LIBRARY_PATH        \$topdir/linux/mpi/intel64/libfabric/lib
+        prepend-path        LIBRARY_PATH           \$topdir/linux/mpi/intel64/libfabric/lib
     }
 }
+EOF
   cd $home
 }
-EOF
+#####################################################################
 
 
 # Personal stuff here
