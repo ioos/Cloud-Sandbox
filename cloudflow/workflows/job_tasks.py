@@ -100,15 +100,15 @@ def ptmp2com(job: Job):
             print(f"ptmp: {ptmp}, comout: {comout}")
 
         try:
-            cmd = f'cp -pf {ptmp} {comout}'
+            cmd = f'mv {ptmp} {comout}'
             result = subprocess.run(cmd, universal_newlines=True, shell=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
                 log.error(result.stdout)
-                log.error(f'error copying data from {ptmp} to {comout}')
+                log.error(f'error moving data from {ptmp} to {comout}')
         except Exception as e:
             log.exception(result.stdout)
-            log.exception(f'exception copying data from {ptmp} to {comout}')
+            log.exception(f'exception moving data from {ptmp} to {comout}')
             raise signals.FAIL()
     else:
         log.info("Skipping ... NOSOFS does this in the forecast script")
