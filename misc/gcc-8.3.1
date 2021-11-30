@@ -1,0 +1,11 @@
+#%Module 1.0
+
+set prefix /opt/rh/devtoolset-8/root
+
+prepend-path 	 LD_LIBRARY_PATH 	 $prefix/usr/lib64:$prefix/usr/lib:$prefix/usr/lib64/dyninst:$prefix/usr/lib/dyninst
+prepend-path 	 MANPATH 		 $prefix/usr/share/man
+prepend-path 	 PATH 			 $prefix/usr/bin
+prepend-path 	 PKG_CONFIG_PATH 	 $prefix/usr/lib64/pkgconfig
+append-path 	 INFOPATH 		 $prefix/usr/share/info
+append-path 	 PERL5LIB 		 $prefix/usr/lib64/perl5/vendor_perl:$prefix/usr/lib/perl5:$prefix/usr/share/perl5/vendor_perl
+append-path 	 PYTHONPATH 		 $prefix/usr/lib64/python2.7/site-packages:$prefix/usr/lib/python2.7/site-packages

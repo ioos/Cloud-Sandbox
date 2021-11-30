@@ -22,6 +22,10 @@ setup_environment () {
   sudo yum -y install unzip
   sudo yum -y install time.x86_64
   sudo yum -y install glibc-devel
+  sudo yum -y install gcc-c++
+  sudo yum -y install patch
+  sudo yum -y install bzip2
+  sudo yum -y install bzip2-devel
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
@@ -139,11 +143,10 @@ install_efa_driver() {
     sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
   done
 
-  # This will get upgraded when we install gcc 6.5
   # Default version is needed to build the kernel driver
   # If gcc has already been upgraded, this will likely fail
   # Should uninstall newer one and install the default 4.8
-  sudo yum -y install gcc
+  # sudo yum -y install gcc
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xvf $tarfile
@@ -152,7 +155,7 @@ install_efa_driver() {
   cd aws-efa-installer
 
   # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-  sudo ./efa_installer.sh -y --minimal
+  sudo ./efa_installer.sh -y 
 
   # Put old kernels back in original location
   if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
@@ -181,15 +184,13 @@ install_base_rpms () {
   tar -xvf $libstar
   rm $libstar
  
-  # GCC needs to be installed first
   rpmlist='
-    gcc-6.5.0-1.el7.x86_64.rpm
     hdf5-1.10.5-4.el7.x86_64.rpm
     netcdf-4.5-3.el7.x86_64.rpm
-    esmf-8.0.0-1.el7.x86_64.rpm
     produtil-1.0.18-2.el7.x86_64.rpm
+    esmf-8.0.0-1.el7.x86_64.rpm
   '
- 
+
   for file in $rpmlist
   do
     sudo yum -y install $file
