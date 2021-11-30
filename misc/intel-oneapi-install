@@ -1,0 +1,10 @@
+
+Base Libraries
+
+wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17977/l_BaseKit_p_2021.3.0.3219_offline.sh
+sudo bash l_BaseKit_p_2021.3.0.3219_offline.sh
+
+Compilers
+
+wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17912/l_HPCKit_p_2021.3.0.3230_offline.sh
+sudo bash l_HPCKit_p_2021.3.0.3230_offline.sh
