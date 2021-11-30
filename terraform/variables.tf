@@ -55,8 +55,8 @@ variable "managed_policies" {
              "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
 }
 
-variable "efs_dns_name" {
-  description = "The dns name of the EFS drive created"
+variable "ami_id" {
+  description = "The random ID used for AMI creation"
   type = string
   default="unknown value"
-} 
+}

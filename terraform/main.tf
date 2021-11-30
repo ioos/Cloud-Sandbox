@@ -206,6 +206,10 @@ resource "aws_instance" "head_node" {
 # A random id to use when creating the AMI
 # This needs a new id if the instance_id changes - otherwise it won't create a new AMI
 resource "random_pet" "ami_id" {
+  keepers = {
+    #instance_id = aws_instance.head_node.id
+    ami_id = var.ami_id
+  }
   length    = 2
 }
 
@@ -255,14 +259,3 @@ resource "aws_network_interface" "efa_network_adapter" {
       Project = var.project_tag
   }
 }
-
-
-
-# This was a disaster - started to get way too complicated
-# module "head_node" {
-#  source = "./modules/head_node"
-#  public_key = var.public_key
-#  key_name = var.key_name
-#  allowed_ssh_cidr = var.allowed_ssh_cidr
-#  efs_dns_name = aws_efs_file_system.main_efs.dns_name
-#}

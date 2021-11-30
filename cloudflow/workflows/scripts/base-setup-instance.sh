@@ -257,15 +257,15 @@ install_python_modules_user () {
   . /usr/share/Modules/init/bash
   module load gcc
   sudo python3 -m pip install --upgrade pip
-  python3 -m pip install --user wheel
-  python3 -m pip install --user dask distributed
-  python3 -m pip install --user setuptools_rust  # needed for paramiko
-  python3 -m pip install --user paramiko   # needed for dask-ssh
-  python3 -m pip install --user prefect
-  python3 -m pip install --user boto3
+  python3 -m pip install --user --upgrade wheel
+  python3 -m pip install --user --upgrade dask
+  python3 -m pip install --user --upgrade distributed
+  python3 -m pip install --user --upgrade setuptools_rust  # needed for paramiko
+  python3 -m pip install --user --upgrade paramiko   # needed for dask-ssh
+  python3 -m pip install --user --upgrade prefect
+  python3 -m pip install --user --upgrade boto3
 
-
-  # Build and install the plotting module
+    # Build and install the plotting module
   # This will also install dependencies
   cd ../..
   # Should be in ~/Cloud-Sandbox/cloudflow
