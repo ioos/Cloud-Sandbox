@@ -29,9 +29,11 @@ DD=${today:6:2}
 daysoldplots=1
 
 echo "Deleting old plots"
-cd $COMROT/plots
-find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots
-find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots -exec rm -Rf {} \;
+if [ -d $COMROT/plots ]; then
+  cd $COMROT/plots
+  find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots
+  find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots -exec rm -Rf {} \;
+fi
 
 
 
@@ -41,10 +43,12 @@ find . -depth -name "[A-Za-z0-9]*" -type d -daystart -mtime +$daysoldplots -exec
 daysoldfcst=6
 
 echo "Deleting forecast directories older than $daysoldfcst days"
-cd $COMROT
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
-#find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+if [ -d $COMROT ]; then
+  cd $COMROT
+  find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+  find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+  #find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+fi
 
 
 ##############################################################################
@@ -53,10 +57,12 @@ find . -depth -type d -daystart -mtime +$daysoldfcst -path "./f${YYYY}.[0-1][0-9
 daysoldics=0
 
 echo "Deleting forcing/ICs directories older than $daysoldics days"
-cd $COMROT/forcing
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
-#find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+if [ -d $COMROT/forcing ]; then
+  cd $COMROT/forcing
+  find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+  find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+  #find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -delete
+fi
 
 
 ##############################################################################
@@ -65,9 +71,11 @@ find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9]
 daysoldics=0
 
 echo "Deleting verification data older than $daysoldics days"
-cd $COMVERIF
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
-find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+if [ -d $COMVERIF ]; then
+  cd $COMVERIF
+  find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"
+  find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]" -exec rm -Rf {} \;
+fi
 
 
 
@@ -77,35 +85,36 @@ find . -depth -type d -daystart -mtime +$daysoldics -path "./f${YYYY}.[0-1][0-9]
 daysoldfcst24=1
 
 echo "Deleting forecast data greater than forecast hour 25 older than $daysoldfcst24 days"
-cd $COMROT
-# f2020.02.03
-# ocean_his_0026.nc
-dirlist=`find . -type d -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"`
-fhrstart=26
-fhrend=73
-prfx="ocean_his_00"
-sufx=".nc"
+if [ -d $COMROT ]; then
+  cd $COMROT
+  # f2020.02.03
+  # ocean_his_0026.nc
+  dirlist=`find . -type d -path "./f${YYYY}.[0-1][0-9].[0-3][0-9]"`
+  fhrstart=26
+  fhrend=73
+  prfx="ocean_his_00"
+  sufx=".nc"
 
-secsinday=86400
-maxage=$((($daysoldfcst24 + 1) * $secsinday))
-now=`date +%s`
-
-for dir in $dirlist
-do
-  fhr=$fhrstart
-  while [ $fhr -le $fhrend ]
+  secsinday=86400
+  maxage=$((($daysoldfcst24 + 1) * $secsinday))
+  now=`date +%s`
+  
+  for dir in $dirlist
   do
-    file=$dir/${prfx}${fhr}${sufx}
-    if [ -f $file ]; then 
-      fdate=`stat --format="%Y" $file`
-      age=$((${now}-${fdate}))
-      if [ $age -gt $maxage ] ; then
-        ls $file
-        rm -f $file
+    fhr=$fhrstart
+    while [ $fhr -le $fhrend ]
+    do
+      file=$dir/${prfx}${fhr}${sufx}
+      if [ -f $file ]; then 
+        fdate=`stat --format="%Y" $file`
+        age=$((${now}-${fdate}))
+        if [ $age -gt $maxage ] ; then
+          ls $file
+          rm -f $file
+        fi
       fi
-    fi
-
-    fhr=$((fhr+=1))
+    
+      fhr=$((fhr+=1))
+    done
   done
-done
 
