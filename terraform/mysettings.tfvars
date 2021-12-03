@@ -23,7 +23,7 @@ public_key = ""
 #---------------------------------------------------------------
 # Optionally uncomment and change these to override the defaults
 #---------------------------------------------------------------
- preferred_region = "us-east-2"
+ preferred_region = "us-east-1"
  name_tag = "IOOS Cloud Sandbox - Terraform"
  project_tag = "IOOS-cloud-sandbox"
  availability_zone = "us-east-1a"
