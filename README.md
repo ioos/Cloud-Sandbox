@@ -17,16 +17,15 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#c
 Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
-Run the following command to finish installation: 
-```
-terraform init
-```
-
 Clone this repository: <br>
 (e.g. using the default path ./Cloud-Sandbox)
 ```
 git clone https://github.com/ioos/Cloud-Sandbox.git
 cd ./Cloud-Sandbox/terraform
+```
+Run the following command to finish installation: 
+```
+terraform init
 ```
 
 Terraform requires an existing key-pair to provide SSH access to the instance(s). The public key will be added to the created instance when it is created. Then the private key can be used to login it.
@@ -109,7 +108,7 @@ instance_public_ip = "3.219.217.151"
 login_command = "ssh -i <path-to-key>/my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws.
 
 ```
-To watch the progress:
+Log into the newly created EC2 instance. Watch the installation progress until installation is completed.
 ```
 ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
 tail -f /tmp/setup.log
@@ -143,18 +142,19 @@ Run terraform apply:
 terraform apply -var-file="mysettings.tfvars"
 ```
 
-
-
 [//]: # "terraform destroy -target=resource"
 
-### When done using the sandbox all of the AWS resources (including disks) can be destroyed with the following command:
+### Cleanup
+When done using the sandbox all of the AWS resources (including disks) can be destroyed with the following command:
 ```
 terraform destroy -var-file="mysettings.tfvars"
 ```
 
-### The following document contains some older instructions on building and running the models that is still valid.
+## Cloud Sandbox Setup
 
 ### Cloud-Sandbox Setup and User Guide
+The following document contains some older instructions on building and running the models that is still valid.
+
 https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0.docx
 
 ### CloudFlow API Specification
@@ -179,55 +179,39 @@ https://ioos.github.io/Cloud-Sandbox/
     ├── terraform    
     └── README.md
 
+### Setup the machine configuration files for the forecast and/or post processing
 
-### Workflows
+Update the configuration files to match your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-How to setup the workflows:
+`/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/cbofs.config`
 
-1. Setup the machine configuration files for the forecast and/or post processing.
+`/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/post.config`
 
-See: workflow_main.py - This is the main entry point. 
-
-There are two configuration files that need to be specified. These should be changed for your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
-
-Examples:
-
-fcstconf = f'{curdir}/../configs/cbofs.config'
-
-postconf = f'{curdir}/../configs/post.config'
-
-2. Setup the job configuration files. 
+### Setup the job configuration files
 
 These are provided as command line arguments to workflow_main.py or a copy of it.
 
-For examples:
+`/home/centos/Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst (forecast)`
 
-See:
+`/home/centos/Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots (plots)`
 
- jobs/cbofs.00z.fcst (forecast)
+### Run the Job
 
- and
-
- jobs/cbofs.00z.plots (plots)
+The main entry point is: `/home/centos/Cloud-Sandbox/cloudflow/workflows/workflow_main.py`
 
 To submit the job(s) (and to optionally log to an output file and run as a background process):
 
-./workflow_main.py jobs/yourjob1 [jobs/yourjob2] 2>&1 someoutfile &
+`./workflow_main.py jobs/yourjob1 [jobs/yourjob2] 2>&1 someoutfile &`
 
-Note: job2 will only run if job1 finishes without error.
+Note: *job2 will only run if job1 finishes without error.*
 
-If using the cloud, cloud resources will be provisioned for you, based on the configuration files specified in step 1. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
+Cloud resources will be provisioned for you based on the configuration files specified in step 1. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
 
-To customize the flows see: flows.py
-To add any additional tasks, see: workflow_tasks.py
-
-To add additional Job functionality or define new Job types:
-  See the classes in the ./job folder.
-
-To add additional Cluster functionality or define new Cluster implementations:
-  See the classes in the ./cluster folder.
-
-See the ./plotting folder for plotting jobs.
+- To customize the flows see `flows.py`
+- To add any additional tasks, see `workflow_tasks.py`
+- To add additional Job functionality or define new Job types, see the classes in the `./job folder`.
+- To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
+- See the `./plotting folder` for plotting jobs.
 
 ```
 Example: configs/cbofs.config
