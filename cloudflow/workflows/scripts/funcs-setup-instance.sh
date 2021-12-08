@@ -1,11 +1,16 @@
 #!/bin/bash
 
+GCC_VER=8.5.0
+INTEL_VER=2021.3.0
+
 # This script will setup the required system components, libraries
 # and tools needed for ROMS forecast models on CentOS 7
 
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
+
+SPACK_DIR=/save/environments/spack
 
 setup_environment () {
 
@@ -166,6 +171,74 @@ install_efa_driver() {
   cd $home
 }
 
+
+install_spack() {
+
+  home=$PWD
+
+  if [ ! -d /save ] ; then
+    echo "/save does not exst. Setup the paths first."
+    return
+  fi
+
+  mkdir -p $SPACK_DIR
+  git clone https://github.com/spack/spack.git $SPACK_DIR
+  cd $SPACK_DIR
+  git checkout releases/v0.17
+  echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
+  echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+ 
+  cd $home
+}
+
+
+install_gcc () {
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+  spack install gcc@$GCC_VER
+ 
+  modfile=`module -t avail >& /tmp/modules ; grep ^gcc-$GCC_VER /tmp/modules ; rm /tmp/modules`
+
+  module load $modfile
+  spack compiler add
+  module unload $modfile
+
+  cd $home
+}
+
+
+install_intel_oneapi () {
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh 
+  spack install intel-oneapi-compilers@${INTEL_VER}
+  spack install intel-oneapi-mpi@${INTEL_VER}
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+
+  cd $home
+}
+
+
+install_netcdf () {
+
+  COMPILER=intel@${INTEL_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # use diffutils@3.7 - intel compiler fails with 3.8
+  # use m4@1.4.17 - intel compiler fails with newer versions
+  # use intel-oneapi-mpi@2021.3.0%gcc@8.5.0 
+  spack install netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools \
+     ^intel-oneapi-mpi@2021.3.0%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  cd $home
+}
 
 
 install_base_rpms () {
