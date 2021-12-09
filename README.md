@@ -14,13 +14,12 @@ Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
 ## Sandbox Installation Instructions
-_Create the sandbox in AWS using Terraform_
 
 Terraform will create **all** of the AWS resources needed for the sandbox. 
 This includes the VPC, subnet, security groups, EFS networked disk volumes, and others. AWS has a default limit of 5 VPCs per region. You will have to request a quota increase from AWS if you are already at your limit.
 
 Clone this repository: <br>
-(e.g. using the default path ./Cloud-Sandbox)
+*(e.g. using the default path ./Cloud-Sandbox)*
 ```
 git clone https://github.com/ioos/Cloud-Sandbox.git
 cd ./Cloud-Sandbox/terraform
@@ -68,10 +67,10 @@ Edit the following file to specify custom values to use for the following:
 | Variable | Value | Description |
 | -------- | ----- | ----------- |
 | allowed_ssh_cidr | "your publicly visible IPv4 address/32" | You can find your IP at https://www.whatismyip.com/ |
-| key_name | "your-key-pair" | the key pair generated in the prior step |
-| public_key | "ssh-rsa your_public_key" | the public key obtained in the prior step. Must include "ssh-rsa", assuming it is an rsa key |
+| key_name | "your-key-pair" | The key pair generated in the prior step |
+| public_key | "ssh-rsa your_public_key" | The public key obtained in the prior step. Must include "ssh-rsa", assuming it is an rsa key |
 
-#### Optionally change these settings to override the defaults:
+Optionally change these settings to override the defaults:
 
 | Variable              | Default value                                | Description                    |
 |-----------------------|----------------------------------------------|--------------------------------|
@@ -94,12 +93,12 @@ terraform apply -var-file="mysettings.tfvars"
 Enter 'yes' to create the resources.
 
 ### Install all of the required software and libraries
-This is done automatically in init_template.tpl <br>
+This is done automatically in `init_template.tpl` <br>
 
 It takes about 15 minutes for the entire setup to complete.<br>
 Wait a few minutes before logging in.
 
-Details about the created instance and how to login will be output when completed:
+Details about the created instance and how to login will be output when completed.
 
 **Example output**
 ```
@@ -134,8 +133,7 @@ cd nosofs-NCO/sorc
 ### Optional: After setting everything up, you can change the instance type to something smaller:
 Edit mysettings.tfvars and change the following:
 
-Example: <br>
-instance_type = "t3.micro" <br>
+Example: `instance_type = "t3.micro"`
 
 Run terraform apply:
 ```
@@ -181,17 +179,21 @@ https://ioos.github.io/Cloud-Sandbox/
 
 ### Setup the machine configuration files for the forecast and/or post processing
 
+Log into the EC2 instance created in the previous section. <br>
+
+For example: `ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws`
+
 Update the configuration files to match your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-Edit the following file: `/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/cbofs.config`
+Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/cbofs.config`
 
 | Key | Description |
 | --- | ----- |
-| platform | The cloud provider being used. Current options are "AWS" or "Local" (runs on local machine) |
-| region | The AWS region to create your resources in |
+| platform | the cloud provider being used. Current options are "AWS" or "Local" (runs on local machine) |
+| region | the AWS region to create your resources in |
 | nodeType | EC2 instance type to run the model on |
 | nodeCount | number of EC2 nodes to run model on |
-| tags | The tags to add to these resources, used for tracking usage. |
+| tags | the tags to add to these resources, used for tracking usage |
 | image_id | the AMI ID that you got from setup.log |
 | key_name | the PEM key specified in mysettings.tfvars |
 | sg_ids | the [security groups](https://console.aws.amazon.com/ec2/#securityGroups) created by Terraform |
@@ -219,15 +221,15 @@ Edit the following file: `/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/c
 ```
 Copy the same values over for the post-processing. The nodeType and nodeCount may be different, but the other values should be the same.
 
-Edit this file: `/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/post.config`
+Edit this file: `./Cloud-Sandbox/cloudflow/cluster/configs/post.config`
 
 ### Setup the job configuration files
 
 These files contain parameters for running the models. These are provided as command line arguments to workflow_main.py.
 
-`/home/centos/Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst (forecast)`
+`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst (forecast)`
 
-`/home/centos/Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots (plots)`
+`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots (plots)`
 
 | Variable | Description |
 | -------- | ----------- |
@@ -268,13 +270,13 @@ These files contain parameters for running the models. These are provided as com
 
 ### Run the Job
 
-The main entry point is: `/home/centos/Cloud-Sandbox/cloudflow/workflows/workflow_main.py`
+The main entry point is: `./Cloud-Sandbox/cloudflow/workflows/workflow_main.py`
 
 The job should be run from the cloudflow directory. To capture output, create an empty file first. Multiple jobs may be specified.
 To submit the job(s) and to optionally log to an output file and run as a background process:
 
 ```
-cd /home/centos/Cloud-Sandbox/cloudflow
+cd ./Cloud-Sandbox/cloudflow
 touch /tmp/workflowlog.txt
 ./workflows/workflow_main.py job/jobs/yourjob1 [job/jobs/yourjob2] 2>&1 /tmp/workflowlog.txt &
 ```
@@ -282,6 +284,8 @@ touch /tmp/workflowlog.txt
 Note: *job2 will only run if job1 finishes without error.*
 
 Cloud resources will be provisioned for you based on the configuration files modified earlier. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
+
+### Additional Customization
 
 - To customize the flows see `flows.py`
 - To add any additional tasks, see `workflow_tasks.py`
