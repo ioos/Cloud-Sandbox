@@ -126,7 +126,7 @@ case $OFS in
     export JOBDIR=$COMOUT
     mkdir -p $JOBDIR
     cd $JOBDIR || exit 1
-    echo "mpirun $MPIOPTS $EXEC ocean.in > ocean.log"
+    echo "Run command: mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1"
     mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1
     result=$?
     ;;
