@@ -332,7 +332,6 @@ def forecast_run(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
-    #EXEC = job.EXEC
 
     runscript = f"{curdir}/fcst_launcher.sh"
 
@@ -349,7 +348,7 @@ def forecast_run(cluster: Cluster, job: Job):
             result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
                                     stderr=subprocess.STDOUT)
         else:
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS], \
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
                                     stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
