@@ -1,0 +1,9 @@
+spack gpg create --comment cloud-sandbox-spack --export ./gpgkey.pub --export-secret ./gpgkey.secret patrick-tripp patrick.tripp@rpsgroup.com
+
+spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
+
+spack buildcache create --mirror-name s3-mirror intel-oneapi-compilers@2021.3.0
+
+spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
+
+spack buildcache list

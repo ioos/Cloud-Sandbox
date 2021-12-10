@@ -19,7 +19,7 @@ lmhofs
 ciofs
 "
 
-#fixdirs='shared ciofs'
+#fixdirs='shared cbofs'
 #fixdirs='cbofs leofs'
 
 bucket=ioos-cloud-sandbox
