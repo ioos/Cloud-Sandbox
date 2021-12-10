@@ -29,6 +29,11 @@ variable "instance_type" {
   #default = "c5n.18xlarge"
   default = "t3.medium"
 }
+variable "use_efa" {
+  description = "Attach EFA Network"
+  type = bool
+  default = "true"
+}
 variable "key_name" {
   description = "The name of the key-pair used to access the EC2 instances"
   type        = string
@@ -48,4 +53,10 @@ variable "managed_policies" {
   default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
              "arn:aws:iam::aws:policy/AmazonS3FullAccess",
              "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
+}
+
+variable "ami_id" {
+  description = "The random ID used for AMI creation"
+  type = string
+  default="unknown value"
 }

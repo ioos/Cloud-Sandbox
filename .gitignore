@@ -26,3 +26,4 @@ terraform/terraform.tfstate.backup
 terraform/.terraform.tfstate.lock.info
 terraform/SAVE.mysettings.tfvars
 */.secret
+**/*nda*

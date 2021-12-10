@@ -1,0 +1,28 @@
+packages:
+  bison:
+    externals:
+    - spec: bison@3.0.4
+      prefix: /usr
+  cmake:
+    externals:
+    - spec: cmake@2.8.12.2
+      prefix: /usr
+  mpi:
+    externals:
+    - spec: intel-oneapi-mpi@2021.3.0
+      modules:
+      - mpi/2021.3.0
+      prefix: /save/intel/oneapi
+  mkl:
+    externals:
+    - spec: intel-oneapi-mkl@2021.3.0
+      modules:
+      - mkl/2021.3.0
+      prefix: /save/intel/oneapi
+  all:
+    compiler: [intel@2021.3.0]
+    providers:
+      mpi: [intel-oneapi-mpi@2021.3.0]
+      blas: [intel-oneapi-mkl@2021.3.0]
+      lapack: [intel-oneapi-mkl@2021.3.0]
+      scalapack: [intel-oneapi-mkl@2021.3.0]

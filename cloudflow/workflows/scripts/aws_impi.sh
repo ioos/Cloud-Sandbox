@@ -23,11 +23,9 @@
 
 #!/bin/bash
 
-#expected_impi_versions="2019.5"
-expected_impi_versions="2019.6"
-
+expected_impi_versions="2019.6 2019.12"
 impi_major_version=2019
-impi_minor_version=6
+impi_minor_version=12
 impi_symlink="/opt/intel/impi/latest"
 has_intel64_level=1
 
