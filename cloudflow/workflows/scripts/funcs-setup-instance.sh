@@ -285,11 +285,15 @@ install_base_rpms () {
   tar -xvf $libstar
   rm $libstar
  
+  #rpmlist='
+  #  hdf5-1.10.5-4.el7.x86_64.rpm
+  #  netcdf-4.5-3.el7.x86_64.rpm
+  #  produtil-1.0.18-2.el7.x86_64.rpm
+  #  esmf-8.0.0-1.el7.x86_64.rpm
+  #'
+
   rpmlist='
-    hdf5-1.10.5-4.el7.x86_64.rpm
-    netcdf-4.5-3.el7.x86_64.rpm
     produtil-1.0.18-2.el7.x86_64.rpm
-    esmf-8.0.0-1.el7.x86_64.rpm
   '
 
   for file in $rpmlist
