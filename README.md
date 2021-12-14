@@ -130,7 +130,7 @@ cd nosofs-NCO/sorc
 ./FVCOM_COMPILE.sh
 ```
 
-### Optional: After setting everything up, you can change the instance type to something smaller:
+### Optional: After setting everything up, you can change the instance type to something smaller
 Edit mysettings.tfvars and change the following:
 
 Example: `instance_type = "t3.micro"`
@@ -227,9 +227,9 @@ Edit this file: `./Cloud-Sandbox/cloudflow/cluster/configs/post.config`
 
 These files contain parameters for running the models. These are provided as command line arguments to workflow_main.py.
 
-`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst (forecast)`
+`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst` (forecast)
 
-`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots (plots)`
+`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots` (plots)
 
 | Variable | Description |
 | -------- | ----------- |
@@ -268,6 +268,16 @@ These files contain parameters for running the models. These are provided as com
 }
 ```
 
+### Obtain the Fixed Field Files
+These files are too large to easily store on github and need to be obtained elsewhere.
+You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
+Edit the script to only download a subset.
+```
+mkdir -p /save/nosofs-NCO/fix
+cd /save/nosofs-NCO/fix
+~/Cloud-Sandbox/scripts/get_fixfiles_s3.sh
+```
+
 ### Run the Job
 
 The main entry point is: `./Cloud-Sandbox/cloudflow/workflows/workflow_main.py`
@@ -284,6 +294,8 @@ touch /tmp/workflowlog.txt
 Note: *job2 will only run if job1 finishes without error.*
 
 Cloud resources will be provisioned for you based on the configuration files modified earlier. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
+
+The default output directory for NOSOFS is `/ptmp` while the forecast job is running. Results are copied to `/com` when the job is complete.
 
 ### Additional Customization
 
