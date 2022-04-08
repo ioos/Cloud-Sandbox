@@ -1,11 +1,23 @@
 #!/bin/bash
 
+GCC_VER=8.5.0
+INTEL_VER=2021.3.0
+
+SPACK_DIR=/save/environments/spack
+SPACK_CACHEONLY=0
+
+SPACKOPTS=''
+if [ $SPACK_CACHEONLY -eq 1 ]; then
+  SPACKOPTS='--cache-only'
+fi
+
 # This script will setup the required system components, libraries
 # and tools needed for ROMS forecast models on CentOS 7
 
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
+
 
 setup_environment () {
 
@@ -167,6 +179,95 @@ install_efa_driver() {
 }
 
 
+install_spack() {
+
+  home=$PWD
+
+  if [ ! -d /save ] ; then
+    echo "/save does not exst. Setup the paths first."
+    return
+  fi
+
+  mkdir -p $SPACK_DIR
+  git clone https://github.com/spack/spack.git $SPACK_DIR
+  cd $SPACK_DIR
+  git checkout releases/v0.17
+  echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
+  echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+
+  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror 
+  spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
+
+  cd $home
+}
+
+
+install_gcc () {
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  #spack install $SPACKOPTS gcc@$GCC_VER %gcc@4.8.5
+  #spack install $SPACKOPTS gcc@$GCC_VER
+
+  # Use a gcc 8.5.0 "bootstrapped" gcc 8.5.0
+  spack install $SPACKOPTS gcc@$GCC_VER %gcc@$GCC_VER
+  spack compiler add `spack location -i gcc@$GCC_VER`/bin
+ 
+  cd $home
+}
+
+
+install_intel_oneapi () {
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh 
+  spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
+
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+
+  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
+  spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
+
+  cd $home
+}
+
+
+install_netcdf () {
+
+  COMPILER=intel@${INTEL_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # use diffutils@3.7 - intel compiler fails with 3.8
+  # use m4@1.4.17     - intel compiler fails with newer versions
+
+  spack install $SPACKOPTS netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools \
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  cd $home
+}
+
+
+install_esmf () {
+
+  COMPILER=intel@${INTEL_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
+      ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
+
+  cd $home
+}
+
 
 install_base_rpms () {
 
@@ -184,11 +285,15 @@ install_base_rpms () {
   tar -xvf $libstar
   rm $libstar
  
+  #rpmlist='
+  #  hdf5-1.10.5-4.el7.x86_64.rpm
+  #  netcdf-4.5-3.el7.x86_64.rpm
+  #  produtil-1.0.18-2.el7.x86_64.rpm
+  #  esmf-8.0.0-1.el7.x86_64.rpm
+  #'
+
   rpmlist='
-    hdf5-1.10.5-4.el7.x86_64.rpm
-    netcdf-4.5-3.el7.x86_64.rpm
     produtil-1.0.18-2.el7.x86_64.rpm
-    esmf-8.0.0-1.el7.x86_64.rpm
   '
 
   for file in $rpmlist
@@ -207,6 +312,7 @@ install_extra_rpms () {
 
   home=$PWD
 
+  # tarball contents
   # bacio/v2.1.0         w3nco/v2.0.6
   # bufr/v11.0.2         libpng/1.5.30        wgrib2/2.0.8
   # g2/v3.1.0            sigio/v2.1.0
@@ -240,7 +346,7 @@ install_extra_rpms () {
   done
 
   # Force install newer libpng leaving the existing one intact
-  # this one will be used for our model builds
+  # this one will be used for our model builds via the module
   sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
 
   rm -Rf "$wrkdir"
