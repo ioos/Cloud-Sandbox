@@ -194,6 +194,7 @@ install_spack() {
   git checkout releases/v0.17
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+  source ~/.bashrc
 
   spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror 
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/

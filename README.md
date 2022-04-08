@@ -45,6 +45,10 @@ Select "Key Pairs" under "Network & Security", then select "Create key pair" _(s
 <pre>
 aws ec2 create-key-pair --key-name <b><i>your-key-pair</i></b> --query "KeyMaterial" --output text > <b><i>your-key-pair.pem</i></b> 
 </pre>
+Optionally specify the AWS region:  
+<pre>
+aws --region="us-east-2" ec2 create-key-pair --key-name <b><i>your-key-pair</i></b> --query "KeyMaterial" --output text > <b><i>your-key-pair.pem</i></b>  
+</pre>
 The private key file must have permissions that allows access only to you, e.g. if on Linux 
 
 <pre>
