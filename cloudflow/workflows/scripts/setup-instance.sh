@@ -12,7 +12,7 @@ setup_environment
 setup_paths
 setup_aliases
 install_efa_driver
-
+install_python_modules_user
 install_spack
 install_gcc
 install_intel_oneapi
@@ -21,7 +21,6 @@ install_esmf
 install_base_rpms
 install_extra_rpms
 install_ffmpeg
-install_python_modules_user
 
 #  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
 #  spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/

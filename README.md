@@ -117,6 +117,11 @@ ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
 tail -f /tmp/setup.log
 ```
 
+Output can be viewed any time by running the following command from the ./terraform directory:
+```
+terraform output
+```
+
 ### Create the AMI 
 This is done automatically.
 The AMI ID will be found at the end of the log at /tmp/setup.log

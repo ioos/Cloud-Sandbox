@@ -194,7 +194,8 @@ install_spack() {
   git checkout releases/v0.17
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
-  source ~/.bashrc
+
+  . $SPACK_DIR/share/spack/setup-env.sh
 
   spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror 
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
@@ -210,11 +211,12 @@ install_gcc () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   #spack install $SPACKOPTS gcc@$GCC_VER %gcc@4.8.5
-  #spack install $SPACKOPTS gcc@$GCC_VER
+  spack install $SPACKOPTS gcc@$GCC_VER
 
   # Use a gcc 8.5.0 "bootstrapped" gcc 8.5.0
-  spack install $SPACKOPTS gcc@$GCC_VER %gcc@$GCC_VER
-  spack compiler add `spack location -i gcc@$GCC_VER`/bin
+  # This currentl only works if head-node is haswell or zen
+  #spack install $SPACKOPTS gcc@$GCC_VER %gcc@$GCC_VER
+  #spack compiler add `spack location -i gcc@$GCC_VER`/bin
  
   cd $home
 }
