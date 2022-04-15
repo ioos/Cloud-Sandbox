@@ -21,7 +21,7 @@ fi
 
 setup_environment () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -47,7 +47,7 @@ setup_environment () {
 
   cliver="2.2.10"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
-  /usr/bin/unzip awscliv2.zip
+  /usr/bin/unzip -q awscliv2.zip
   sudo ./aws/install
   rm awscliv2.zip
   rm -Rf "./aws"
@@ -72,7 +72,7 @@ setup_environment () {
 
 setup_paths () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -111,7 +111,7 @@ setup_environment_osx () {
 
 install_efa_driver() {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
 # This must be installed before the rest
 
@@ -167,7 +167,7 @@ install_efa_driver() {
   # sudo yum -y install gcc
 
   curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
-  tar -xvf $tarfile
+  tar -xf $tarfile
   rm $tarfile
 
   cd aws-efa-installer
@@ -187,7 +187,7 @@ install_efa_driver() {
 
 install_spack() {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -212,7 +212,7 @@ install_spack() {
   spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub \
        -O /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub 
-  spack gpg trust https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub
+  spack gpg trust /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
 
   cd $home
@@ -221,7 +221,7 @@ install_spack() {
 
 install_gcc () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   # TODO: upgrade to current version of GCC
 
@@ -243,7 +243,7 @@ install_gcc () {
 
 install_intel_oneapi () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -262,7 +262,7 @@ install_intel_oneapi () {
 
 install_netcdf () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   COMPILER=intel@${INTEL_VER}
 
@@ -282,7 +282,7 @@ install_netcdf () {
 
 install_esmf () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   COMPILER=intel@${INTEL_VER}
 
@@ -299,7 +299,7 @@ install_esmf () {
 
 install_base_rpms () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -312,7 +312,7 @@ install_base_rpms () {
   cd "$wrkdir"
 
   wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
-  tar -xvf $libstar
+  tar -xf $libstar
   rm $libstar
  
   #rpmlist='
@@ -340,7 +340,7 @@ install_base_rpms () {
 
 install_extra_rpms () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -369,7 +369,7 @@ install_extra_rpms () {
   cd "$wrkdir"
 
   wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
-  tar -xvf $libstar
+  tar -xf $libstar
   rm $libstar
 
   for file in $rpmlist
@@ -391,13 +391,12 @@ install_extra_rpms () {
 
 install_python_modules_user () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
   . /usr/share/Modules/init/bash
-  module load gcc
-  python3 -m pip install --upgrade pip
+  sudo python3 -m pip install --upgrade pip
   python3 -m pip install --user --upgrade wheel
   python3 -m pip install --user --upgrade dask
   python3 -m pip install --user --upgrade distributed
@@ -409,10 +408,9 @@ install_python_modules_user () {
   # This is the most recent boto3 that is compatible with botocore above
   python3 -m pip install --user --upgrade boto3==1.20.46
 
-    # Build and install the plotting module
-  # This will also install dependencies
+  # Build and install the plotting module and its dependencies
+  # must install from ~/Cloud-Sandbox/cloudflow
   cd ../..
-  # Should be in ~/Cloud-Sandbox/cloudflow
   pwd
   python3 ./setup.py sdist
   python3 -m pip install --user dist/plotting-*.tar.gz
@@ -423,7 +421,7 @@ install_python_modules_user () {
 
 install_python_modules_osx () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -446,7 +444,7 @@ install_python_modules_osx () {
 
 install_ffmpeg () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -459,7 +457,7 @@ install_ffmpeg () {
   cd "$wrkdir"
 
   wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$tarfile
-  tar -xvf $tarfile
+  tar -xf $tarfile
   rm $tarfile
  
   sudo mkdir -p /usrx/ffmpeg/$version
@@ -474,7 +472,7 @@ install_ffmpeg () {
 
 install_ffmpeg_osx () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   which brew > /dev/null
   if [ $? -ne 0 ] ; then
@@ -489,7 +487,7 @@ install_ffmpeg_osx () {
 
 install_impi () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
@@ -565,7 +563,7 @@ EOF
 # Personal stuff here
 setup_aliases () {
 
-  echo "Running $0 ..."
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
