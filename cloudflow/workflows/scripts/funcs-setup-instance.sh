@@ -21,6 +21,8 @@ fi
 
 setup_environment () {
 
+  echo "Running $0 ..."
+
   home=$PWD
 
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
@@ -70,6 +72,8 @@ setup_environment () {
 
 setup_paths () {
 
+  echo "Running $0 ..."
+
   home=$PWD
 
   if [ ! -d /mnt/efs/fs1 ]; then
@@ -106,6 +110,8 @@ setup_environment_osx () {
 
 
 install_efa_driver() {
+
+  echo "Running $0 ..."
 
 # This must be installed before the rest
 
@@ -181,7 +187,11 @@ install_efa_driver() {
 
 install_spack() {
 
+  echo "Running $0 ..."
+
   home=$PWD
+
+  echo "Installing SPACK in $SPACK_DIR ..."
 
   if [ ! -d /save ] ; then
     echo "/save does not exst. Setup the paths first."
@@ -197,7 +207,12 @@ install_spack() {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror 
+  # Using an s3-mirror for previously built packages
+  echo "Using SPACK s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror for prebuild packages"
+  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub \
+       -O /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub 
+  spack gpg trust https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
 
   cd $home
@@ -206,23 +221,29 @@ install_spack() {
 
 install_gcc () {
 
+  echo "Running $0 ..."
+
+  # TODO: upgrade to current version of GCC
+
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  #spack install $SPACKOPTS gcc@$GCC_VER %gcc@4.8.5
   spack install $SPACKOPTS gcc@$GCC_VER
+  spack compiler add `spack location -i gcc@$GCC_VER`/bin
 
   # Use a gcc 8.5.0 "bootstrapped" gcc 8.5.0
-  # This currentl only works if head-node is haswell or zen
-  #spack install $SPACKOPTS gcc@$GCC_VER %gcc@$GCC_VER
-  #spack compiler add `spack location -i gcc@$GCC_VER`/bin
+  # This only works if gcc 8.5.0 is already installed
+  # spack install $SPACKOPTS gcc@$GCC_VER %gcc@$GCC_VER
+  # spack compiler add `spack location -i gcc@$GCC_VER`/bin
  
   cd $home
 }
 
 
 install_intel_oneapi () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 
@@ -240,6 +261,8 @@ install_intel_oneapi () {
 
 
 install_netcdf () {
+
+  echo "Running $0 ..."
 
   COMPILER=intel@${INTEL_VER}
 
@@ -259,6 +282,8 @@ install_netcdf () {
 
 install_esmf () {
 
+  echo "Running $0 ..."
+
   COMPILER=intel@${INTEL_VER}
 
   home=$PWD
@@ -273,6 +298,8 @@ install_esmf () {
 
 
 install_base_rpms () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 
@@ -312,6 +339,8 @@ install_base_rpms () {
 
 
 install_extra_rpms () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 
@@ -362,18 +391,23 @@ install_extra_rpms () {
 
 install_python_modules_user () {
 
+  echo "Running $0 ..."
+
   home=$PWD
 
   . /usr/share/Modules/init/bash
   module load gcc
-  sudo python3 -m pip install --upgrade pip
+  python3 -m pip install --upgrade pip
   python3 -m pip install --user --upgrade wheel
   python3 -m pip install --user --upgrade dask
   python3 -m pip install --user --upgrade distributed
   python3 -m pip install --user --upgrade setuptools_rust  # needed for paramiko
   python3 -m pip install --user --upgrade paramiko   # needed for dask-ssh
   python3 -m pip install --user --upgrade prefect
-  python3 -m pip install --user --upgrade boto3
+  # SPACK has problems with botocore newer than below
+  python3 -m pip install --user --upgrade botocore==1.23.46
+  # This is the most recent boto3 that is compatible with botocore above
+  python3 -m pip install --user --upgrade boto3==1.20.46
 
     # Build and install the plotting module
   # This will also install dependencies
@@ -388,6 +422,8 @@ install_python_modules_user () {
 
 
 install_python_modules_osx () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 
@@ -409,6 +445,9 @@ install_python_modules_osx () {
 
 
 install_ffmpeg () {
+
+  echo "Running $0 ..."
+
   home=$PWD
 
   version=20200127
@@ -435,6 +474,8 @@ install_ffmpeg () {
 
 install_ffmpeg_osx () {
 
+  echo "Running $0 ..."
+
   which brew > /dev/null
   if [ $? -ne 0 ] ; then
     echo "Homebrew is missing ... install Homebrew then retry ... exiting"
@@ -447,6 +488,8 @@ install_ffmpeg_osx () {
 
 
 install_impi () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 
@@ -521,6 +564,8 @@ EOF
 
 # Personal stuff here
 setup_aliases () {
+
+  echo "Running $0 ..."
 
   home=$PWD
 

@@ -99,7 +99,7 @@ Enter 'yes' to create the resources.
 ### Install all of the required software and libraries
 This is done automatically in `init_template.tpl` <br>
 
-It takes about ?? minutes for the entire setup to complete.<br>
+It takes about 30 minutes for the entire setup to complete.<br>
 Wait a few minutes before logging in, it takes a minute or two for the instance to boot up.
 
 Details about the created instance and how to login will be output when completed.
