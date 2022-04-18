@@ -99,10 +99,16 @@ Enter 'yes' to create the resources.
 ### Install all of the required software and libraries
 This is done automatically in `init_template.tpl` <br>
 
-It takes about 45 minutes for the entire setup to complete.<br>
+It takes about 45 minutes for the entire setup to complete,<br>
+and about another 10 minutes for the machine image/snapshot creation.<br>
 Wait a few minutes before logging in, it takes a minute or two for the instance to boot up.
 
-Details about the created instance and how to login will be output when completed.
+Details about the created instance and how to login will be output when completed.<br>
+
+Output can also be viewed any time by running the following command from the ./terraform directory:
+```
+terraform output
+```
 
 **Example output**
 ```
