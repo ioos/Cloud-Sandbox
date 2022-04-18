@@ -10,6 +10,7 @@ echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
 cd /home/centos
 sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
+
 sudo -u centos ./setup-instance.sh > /tmp/setup.log 2>&1
 
 # MPI needs key to ssh into cluster nodes
