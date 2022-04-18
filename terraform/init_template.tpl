@@ -8,10 +8,10 @@ mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
 
 cd /home/centos
-#sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
-sudo -u centos git clone -b updates-0721 https://github.com/ioos/Cloud-Sandbox.git
+sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
-sudo -u centos ./nosofs-setup-instance.sh > /tmp/setup.log 2>&1
+
+sudo -u centos ./setup-instance.sh > /tmp/setup.log 2>&1
 
 # MPI needs key to ssh into cluster nodes
 sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa

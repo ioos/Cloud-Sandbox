@@ -11,14 +11,10 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-
 install_efa_driver
 install_python_modules_user
+
 install_spack
-
-#  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
-#  spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
-
 install_gcc
 install_intel_oneapi
 install_netcdf

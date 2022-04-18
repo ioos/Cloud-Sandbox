@@ -45,6 +45,10 @@ Select "Key Pairs" under "Network & Security", then select "Create key pair" _(s
 <pre>
 aws ec2 create-key-pair --key-name <b><i>your-key-pair</i></b> --query "KeyMaterial" --output text > <b><i>your-key-pair.pem</i></b> 
 </pre>
+Optionally specify the AWS region:  
+<pre>
+aws --region="us-east-2" ec2 create-key-pair --key-name <b><i>your-key-pair</i></b> --query "KeyMaterial" --output text > <b><i>your-key-pair.pem</i></b>  
+</pre>
 The private key file must have permissions that allows access only to you, e.g. if on Linux 
 
 <pre>
@@ -95,10 +99,16 @@ Enter 'yes' to create the resources.
 ### Install all of the required software and libraries
 This is done automatically in `init_template.tpl` <br>
 
-It takes about ?? minutes for the entire setup to complete.<br>
+It takes about 45 minutes for the entire setup to complete,<br>
+and about another 10 minutes for the machine image/snapshot creation.<br>
 Wait a few minutes before logging in, it takes a minute or two for the instance to boot up.
 
-Details about the created instance and how to login will be output when completed.
+Details about the created instance and how to login will be output when completed.<br>
+
+Output can also be viewed any time by running the following command from the ./terraform directory:
+```
+terraform output
+```
 
 **Example output**
 ```
@@ -111,6 +121,11 @@ Log into the newly created EC2 instance. Watch the installation progress until i
 ```
 ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
 tail -f /tmp/setup.log
+```
+
+Output can be viewed any time by running the following command from the ./terraform directory:
+```
+terraform output
 ```
 
 ### Create the AMI 
@@ -139,7 +154,6 @@ Run terraform apply:
 ```
 terraform apply -var-file="mysettings.tfvars"
 ```
-
 [//]: # "terraform destroy -target=resource"
 
 ### Cleanup
@@ -290,7 +304,6 @@ cd ./Cloud-Sandbox/cloudflow
 touch /tmp/workflowlog.txt
 ./workflows/workflow_main.py job/jobs/yourjob1 [job/jobs/yourjob2] 2>&1 /tmp/workflowlog.txt &
 ```
-
 Note: *job2 will only run if job1 finishes without error.*
 
 Cloud resources will be provisioned for you based on the configuration files modified earlier. The cloud resources will be automatically terminated when each flow ends, whether successfully or not.
@@ -304,6 +317,5 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Job functionality or define new Job types, see the classes in the `./job folder`.
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
-
 
 Copyright © 2021 RPS Group, Inc. All rights reserved.

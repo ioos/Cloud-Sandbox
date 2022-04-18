@@ -11,6 +11,8 @@
 
 # (This should be the public IPv4 address of your workstation, 
 #  for SSH acceess)
+# This should be in the format ###.###.###.###/32
+# e.g. 72.245.67.89/32
 allowed_ssh_cidr = ""
 
 # (Key name is only used as a reminder here and in the instance metadata)
@@ -23,13 +25,10 @@ public_key = ""
 #---------------------------------------------------------------
 # Optionally uncomment and change these to override the defaults
 #---------------------------------------------------------------
- preferred_region = "us-east-1"
+ preferred_region = "us-east-2"
  name_tag = "IOOS Cloud Sandbox - Terraform"
- project_tag = "IOOS-cloud-sandbox"
- availability_zone = "us-east-1a"
- #instance_type = "c5n.18xlarge"
- #use_efa = true
- instance_type = "t3.small"
+ project_tag = "IOOS-Cloud-Sandbox"
+ availability_zone = "us-east-2a"
+ instance_type = "t3.medium"
  use_efa = false
 #---------------------------------------------------------------
-
