@@ -210,8 +210,11 @@ install_spack() {
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror for prebuild packages"
   spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
+
+  echo "Fetching public key for spack mirror"
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub \
        -O /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub 
+
   spack gpg trust /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
 
@@ -299,6 +302,7 @@ install_esmf () {
 
 install_base_rpms () {
 
+  # TODO: refactor into one "install_nco_libs" function
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -469,6 +473,7 @@ install_ffmpeg () {
 
   cd $home
 }
+
 
 install_ffmpeg_osx () {
 

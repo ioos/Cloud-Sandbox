@@ -13,6 +13,7 @@ setup_paths
 setup_aliases
 install_efa_driver
 install_python_modules_user
+
 install_spack
 install_gcc
 install_intel_oneapi
