@@ -3,10 +3,12 @@
 GCC_VER=8.5.0
 INTEL_VER=2021.3.0
 
-SPACK_DIR=/save/environments/spack
-SPACK_CACHEONLY=0
-
+SPACK_DIR='/save/environments/spack'
+SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 SPACKOPTS=''
+
+# Don't build any packages. Only use what is in cache/mirror.
+SPACK_CACHEONLY=0
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS='--cache-only'
 fi
@@ -207,16 +209,20 @@ install_spack() {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # Using an s3-mirror for previously built packages
-  echo "Using SPACK s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror for prebuild packages"
-  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
+ # Using an s3-mirror for previously built packages
+  echo "Using SPACK s3-mirror $SPACK_MIRROR"
+  spack mirror add s3-mirror $SPACK_MIRROR
 
+  set -ex
   echo "Fetching public key for spack mirror"
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub \
-       -O /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub 
+  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
+  mkdir -p $SPACK_DIR/opt/spack/gpg
+  wget $SPACK_KEY_URL -O $SPACK_KEY
 
-  spack gpg trust /save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.pub
+  spack gpg trust $SPACK_KEY
   spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
+  set +ex
 
   cd $home
 }
