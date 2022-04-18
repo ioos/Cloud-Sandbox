@@ -4,13 +4,12 @@ GCC_VER=8.5.0
 INTEL_VER=2021.3.0
 
 SPACK_DIR='/save/environments/spack'
-SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-SPACKOPTS=''
+SPACKOPTS='-v'
 
-# Don't build any packages. Only use what is in cache/mirror.
+# 1 = Don't build any packages. Only install packages from binary mirrors
 SPACK_CACHEONLY=0
 if [ $SPACK_CACHEONLY -eq 1 ]; then
-  SPACKOPTS='--cache-only'
+  SPACKOPTS="$SPACKOPS --cache-only"
 fi
 
 # This script will setup the required system components, libraries
@@ -29,6 +28,9 @@ setup_environment () {
 
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
+
+  # yum update might update the kernel. 
+  # This might cause some of the other installs to fail, e.g. efa driver 
 
   #sudo yum -y update
   sudo yum -y install epel-release
@@ -190,8 +192,12 @@ install_efa_driver() {
 install_spack() {
 
   echo "Running ${FUNCNAME[0]} ..."
-
   home=$PWD
+
+  SPACK_VERSION='releases/v0.17'
+  SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
@@ -203,7 +209,7 @@ install_spack() {
   mkdir -p $SPACK_DIR
   git clone https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
-  git checkout releases/v0.17
+  git checkout $SPACK_VERSION
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
 
@@ -213,16 +219,15 @@ install_spack() {
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
-  set -ex
   echo "Fetching public key for spack mirror"
-  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
-  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
   mkdir -p $SPACK_DIR/opt/spack/gpg
+  chmod 700 $SPACK_DIR/opt/spack/gpg
+
   wget $SPACK_KEY_URL -O $SPACK_KEY
+  chmod 600 $SPACK_KEY
 
   spack gpg trust $SPACK_KEY
-  spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
-  set +ex
+  spack buildcache update-index -d $SPACK_MIRROR
 
   cd $home
 }
@@ -413,6 +418,7 @@ install_python_modules_user () {
   python3 -m pip install --user --upgrade setuptools_rust  # needed for paramiko
   python3 -m pip install --user --upgrade paramiko   # needed for dask-ssh
   python3 -m pip install --user --upgrade prefect
+
   # SPACK has problems with botocore newer than below
   python3 -m pip install --user --upgrade botocore==1.23.46
   # This is the most recent boto3 that is compatible with botocore above
@@ -495,79 +501,6 @@ install_ffmpeg_osx () {
 }
 
 
-
-install_impi () {
-
-  echo "Running ${FUNCNAME[0]} ..."
-
-  home=$PWD
-
-  sudo ./aws_impi.sh install -check_efa 0
-
-  sudo mkdir -p /usrx/modulefiles/mpi/intel
-  
-  # The included module file does not work
-  # version=`cat /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi | grep " topdir" | awk '{print $3}' | awk -F_ '{print $4}'`
-  # sudo cp -p /opt/intel/compilers_and_libraries/linux/mpi/intel64/modulefiles/mpi /usrx/modulefiles/mpi/intel/$version
-
-  cd /opt/intel/impi
-  version=`ls -1 | grep 20??\.??\.*`
- 
-  sudo tee /usrx/modulefiles/mpi/intel/$version << EOF
-#%Module1.0#####################################################################
-#
-# Copyright 2003-2019 Intel Corporation.
-# 
-# This software and the related documents are Intel copyrighted materials, and
-# your use of them is governed by the express license under which they were
-# provided to you (License). Unless the License provides otherwise, you may
-# not use, modify, copy, publish, distribute, disclose or transmit this
-# software or the related documents without Intel's prior written permission.
-# 
-# This software and the related documents are provided as is, with no express
-# or implied warranties, other than those that are expressly stated in the
-# License.
-#
-##
-## Intel(R) MPI Library modulefile
-##
-
-proc ModulesHelp { } {
-        global dotversion
-        puts stderr " Intel(R) MPI Library"
-}
-
-module-whatis       "Sets up the Intel(R) MPI Library environment"
-
-set                 topdir                 /opt/intel/compilers_and_libraries
-
-setenv              I_MPI_ROOT             \$topdir/linux/mpi
-
-prepend-path        CLASSPATH              \$topdir/linux/mpi/intel64/lib/mpi.jar
-prepend-path        PATH                   \$topdir/linux/mpi/intel64/bin
-prepend-path        LD_LIBRARY_PATH        \$topdir/linux/mpi/intel64/lib/release:\$topdir/linux/mpi/intel64/lib
-prepend-path        MANPATH                \$topdir/linux/mpi/man
-
-if { [info exists ::env(I_MPI_OFI_LIBRARY_INTERNAL) ] } {
-    set i_mpi_ofi_library_internal $::env(I_MPI_OFI_LIBRARY_INTERNAL)
-} else {
-    set i_mpi_ofi_library_internal "yes"
-}
-
-switch -regexp -- \$i_mpi_ofi_library_internal {
-    0|no|off|disable {
-    }
-    default {
-        setenv              FI_PROVIDER_PATH       \$topdir/linux/mpi/intel64/libfabric/lib/prov
-
-        prepend-path        PATH                   \$topdir/linux/mpi/intel64/libfabric/bin
-        prepend-path        LD_LIBRARY_PATH        \$topdir/linux/mpi/intel64/libfabric/lib
-        prepend-path        LIBRARY_PATH           \$topdir/linux/mpi/intel64/libfabric/lib
-    }
-}
-EOF
-  cd $home
-}
 #####################################################################
 
 
