@@ -197,6 +197,7 @@ resource "aws_instance" "head_node" {
 
   # This logic isn't perfect since some ena instance types can be in a placement group also
   placement_group = var.use_efa == true ? aws_placement_group.cloud_sandbox_placement_group.id : null
+
   tags = {
     Name = "${var.name_tag} EC2 Head Node"
     Project = var.project_tag
