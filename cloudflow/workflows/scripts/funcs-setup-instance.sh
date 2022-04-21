@@ -293,6 +293,76 @@ install_netcdf () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
+install_hdf5 () {
+
+  # This installs the gcc built hdf5
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # use diffutils@3.7 - intel compiler fails with 3.8
+  # use m4@1.4.17     - intel compiler fails with newer versions
+
+  spack install $SPACKOPTS hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools \
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  # TODO add this to the s3 mirror
+  cd $home
+}
+
+
+#-----------------------------------------------------------------------------#
+install_slurm() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  mkdir /tmp/slurminstall
+  cd /tmp/slurminstall
+
+  # Install via spack
+  #spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb prefix=
+  spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb
+
+  # TODO add this to the s3 mirror
+  cd $home
+
+  # Install munge for user authentication
+  #sudo yum -y install libtool
+  #sudo yum -y install bzip2-devel
+
+  #wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
+  #tar -xzvf munge-0.5.14-rpms.tgz
+  #sudo yum -y localinstall munge-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm
+
+  # TODO - create munge user
+  # Create key
+  #sudo -u munge ${sbindir}/mungekey --verbose
+  #sudo /usr/sbin/mungekey --verbose
+
+  # Install SLURM
+
+  #spack load gcc@8.5.0
+  #spack load hdf5
+
+  # Install these to build new rpm
+  #sudo yum -y install readline-devel
+  #sudo yum -y install pam-devel
+  #sudo yum -y install perl-ExtUtils-MakeMaker
+
+}
+
+
 
 install_esmf () {
 
@@ -520,7 +590,7 @@ setup_aliases () {
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
   #git config --global user.name "Patrick Tripp"
-  #git config --global user.email patrick.tripp@rpsgroup.com
+  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
   #git commit --amend --reset-author
 
   cd $home
