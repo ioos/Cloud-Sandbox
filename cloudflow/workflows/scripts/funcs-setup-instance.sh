@@ -308,7 +308,7 @@ install_hdf5 () {
   # use diffutils@3.7 - intel compiler fails with 3.8
   # use m4@1.4.17     - intel compiler fails with newer versions
 
-  spack install $SPACKOPTS hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools \
+  spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
      ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   # TODO add this to the s3 mirror
@@ -330,35 +330,32 @@ install_slurm() {
   mkdir /tmp/slurminstall
   cd /tmp/slurminstall
 
+  sudo yum -y install man2html
+  sudo yum -y install libjwt
+  sudo yum -y install http-parser
+  sudo yum -y install libyaml-devel
+
   # Install via spack
-  #spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb prefix=
-  spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb
+  # The commented lines failed to build
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb prefix=
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb  # gtkplus fails build
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
+  #spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@develop-1.10 ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
 
-  # TODO add this to the s3 mirror
-  cd $home
+  spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hwloc+mariadb ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
 
-  # Install munge for user authentication
-  #sudo yum -y install libtool
-  #sudo yum -y install bzip2-devel
+  
+  spack load munge
 
-  #wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
-  #tar -xzvf munge-0.5.14-rpms.tgz
-  #sudo yum -y localinstall munge-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm
+  # Munge user is created when munge is installed.
+  # Munge is installed as a pre-req to slurm
 
-  # TODO - create munge user
   # Create key
+  # /etc/munge/munge.key
   #sudo -u munge ${sbindir}/mungekey --verbose
   #sudo /usr/sbin/mungekey --verbose
 
-  # Install SLURM
-
-  #spack load gcc@8.5.0
-  #spack load hdf5
-
-  # Install these to build new rpm
-  #sudo yum -y install readline-devel
-  #sudo yum -y install pam-devel
-  #sudo yum -y install perl-ExtUtils-MakeMaker
+  cd $home
 
 }
 
