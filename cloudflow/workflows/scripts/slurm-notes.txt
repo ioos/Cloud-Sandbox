@@ -1,0 +1,39 @@
+cd /usr/include
+
+# https://github.com/dun/munge/wiki/Installation-Guide
+
+rpmbuild munge
+sudo yum install bzip2-devel
+sudo yum install libtool
+tar --xz -cf munge-0.5.14.tar.xz munge-0.5.14/
+rpmbuild -ta --without verify munge-0.5.14.tar.xz
+
+(rpmbuild -tb --without verify munge-0.5.14.tar.xz)
+libtool: warning: remember to run 'libtool --finish /usr/lib64'
+
+libtool: warning: '../../src/libmunge/libmunge.la' has not been installed in '/usr/lib64'
+libtool: install: /usr/bin/install -c .libs/munge /home/centos/rpmbuild/BUILDROOT/munge-0.5.14-2.el7.x86_64/usr/bin/munge
+libtool: warning: '../../src/libmunge/libmunge.la' has not been installed in '/usr/lib64'
+libtool: install: /usr/bin/install -c .libs/remunge /home/centos/rpmbuild/BUILDROOT/munge-0.5.14-2.el7.x86_64/usr/bin/remunge
+libtool: warning: '../../src/libmunge/libmunge.la' has not been installed in '/usr/lib64'
+
+sudo rpm --install ./munge-0.5.14-2.el7.x86_64.rpm ./munge-libs-0.5.14-2.el7.x86_64.rpm ./munge-devel-0.5.14-2.el7.x86_64.rpm
+sudo /mnt/efs/fs1/save/downloads/slurm-20.11.5/libtool --finish /usr/lib64
+
+Build SLURM RPM
+https://slurm.schedmd.com/quickstart_admin.html
+
+sudo yum install perl-ExtUtils-MakeMaker
+rpmbuild -ta slurm-20.11.5.tar.bz2
+cd ~/rpmbuild/RPMS/x86_64
+
+sudo rpm --install slurm*
+error: Failed dependencies:
+	perl(Switch) is needed by slurm-openlava-20.11.5-1.el7.x86_64
+	perl(Switch) is needed by slurm-torque-20.11.5-1.el7.x86_64
+sudo yum install perl-Switch
+sudo rpm --install slurm*
+
+rpm -qi slurm-openlava-20.11.5-1.el7.x86_64
+
+

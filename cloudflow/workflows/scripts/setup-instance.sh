@@ -8,6 +8,7 @@
 # calling sudo from cloud init adds 25 second delay for each sudo
 sudo setenforce 0
 
+# DO NOT CHANGE THE ORDER!
 setup_environment
 setup_paths
 setup_aliases
@@ -18,6 +19,8 @@ install_spack
 install_gcc
 install_intel_oneapi
 install_netcdf
+#install_hdf5
+install_slurm
 install_esmf
 install_base_rpms
 install_extra_rpms

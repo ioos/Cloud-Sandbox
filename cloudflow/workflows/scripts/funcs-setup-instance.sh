@@ -293,6 +293,73 @@ install_netcdf () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
+install_hdf5 () {
+
+  # This installs the gcc built hdf5
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # use diffutils@3.7 - intel compiler fails with 3.8
+  # use m4@1.4.17     - intel compiler fails with newer versions
+
+  spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  # TODO add this to the s3 mirror
+  cd $home
+}
+
+
+#-----------------------------------------------------------------------------#
+install_slurm() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  mkdir /tmp/slurminstall
+  cd /tmp/slurminstall
+
+  sudo yum -y install man2html
+  sudo yum -y install libjwt
+  sudo yum -y install http-parser
+  sudo yum -y install libyaml-devel
+
+  # Install via spack
+  # The commented lines failed to build
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb prefix=
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb  # gtkplus fails build
+  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
+  #spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@develop-1.10 ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
+
+  spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hwloc+mariadb ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
+
+  
+  spack load munge
+
+  # Munge user is created when munge is installed.
+  # Munge is installed as a pre-req to slurm
+
+  # Create key
+  # /etc/munge/munge.key
+  #sudo -u munge ${sbindir}/mungekey --verbose
+  #sudo /usr/sbin/mungekey --verbose
+
+  cd $home
+
+}
+
+
 
 install_esmf () {
 
@@ -520,7 +587,7 @@ setup_aliases () {
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
   #git config --global user.name "Patrick Tripp"
-  #git config --global user.email patrick.tripp@rpsgroup.com
+  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
   #git commit --amend --reset-author
 
   cd $home
