@@ -12,21 +12,22 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-#install_efa_driver
-#install_python_modules_user
+install_efa_driver
+install_python_modules_user
 
-#install_spack
-#install_gcc
-#install_intel_oneapi
-#install_netcdf
-#install_hdf5
+install_spack
+install_gcc
+install_intel_oneapi
+install_netcdf
+#install_hdf5-gcc8
 
-#install_munge
-#install_slurm
-#install_esmf
-#install_base_rpms
-# install_extra_rpms
-#install_ffmpeg
+install_munge
+install_slurm
+
+install_esmf
+install_base_rpms
+install_extra_rpms
+install_ffmpeg
 
 sudo yum -y clean all
 

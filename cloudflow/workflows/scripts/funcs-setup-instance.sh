@@ -7,7 +7,7 @@ SPACK_DIR='/save/environments/spack'
 SPACKOPTS='-v'
 
 # 1 = Don't build any packages. Only install packages from binary mirrors
-SPACK_CACHEONLY=0
+SPACK_CACHEONLY=1
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS="$SPACKOPS --cache-only"
 fi
@@ -295,7 +295,7 @@ install_netcdf () {
 }
 
 #-----------------------------------------------------------------------------#
-install_hdf5 () {
+install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
   echo "Running ${FUNCNAME[0]} ..."
@@ -309,13 +309,10 @@ install_hdf5 () {
   # use diffutils@3.7 - intel compiler fails with 3.8
   # use m4@1.4.17     - intel compiler fails with newer versions
 
-  spack install $SPACKOPTS cmake %gcc@$GCC_VER
-
-  #spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
-  #   ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  # spack install $SPACKOPTS cmake %gcc@$GCC_VER
 
   spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
-     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} %${COMPILER}
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   cd $home
 }
@@ -332,8 +329,8 @@ install_munge() {
 
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
   tar -xvzf munge-0.5.14-rpms.tgz
-  #sudo rpm -ivh munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
-  sudo yum -y localinstall  munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
+  sudo yum -y localinstall munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm \
+     munge-libs-0.5.14-2.el7.x86_64.rpm
 
   sudo -u munge /usr/sbin/mungekey --verbose 
 
@@ -345,25 +342,40 @@ install_munge() {
 
 
 #-----------------------------------------------------------------------------#
-install_munge() {
-  echo "Running ${FUNCNAME[0]} ..."
+install_slurm() {
 
-  COMPILER=gcc@${GCC_VER}
+  echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
-  mkdir /tmp/munge
-  cd /tmp/munge
+  . $SPACK_DIR/share/spack/setup-env.sh
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
-  tar -xvzf munge-0.5.14-rpms.tgz  
-  sudo rpm -ivh munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
+  spack load gcc@8.5.0
+
+  mkdir /tmp/slurminstall
+  cd /tmp/slurminstall
+
+  # https://koji.fedoraproject.org/koji/search?terms=slurm-20.11.8-2.el7&type=build&match=glob
+  # Fedora project repo is the epel yum repo already enabled
+  # wget https://kojipkgs.fedoraproject.org//packages/slurm/20.11.8/2.el7/x86_64/slurm-20.11.8-2.el7.x86_64.rpm
+
+  sudo yum -y install slurm-20.11.8 slurm-libs-20.11.8 
+  
+  # on head node only
+  sudo yum -y install slurm-slurmctld-20.11.8
+
+  sudo yum -y install slurm-slurmdbd-20.11.8
+  sudo yum -y install slurm-pam_slurm-20.11.8
+  sudo yum -y install slurm-pmi-20.11.8
+  sudo yum -y install slurm-slurmrestd-20.11.8
+
+  # on compute nodes only
+  sudo yum -y install slurm-slurmd-20.11.8
+
 }
 
-
-
 #-----------------------------------------------------------------------------#
-install_slurm() {
+install_slurm_s3() {
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -373,68 +385,8 @@ install_slurm() {
 
   wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/slurm-20.11.5-rpms.tgz
   tar -xzvf slurm-20.11.5-rpms.tgz
-
-  #sudo yum install perl-Switch
   sudo yum -y localinstall slurm-20.11.5-1.el7.x86_64.rpm
-
 }
-
-
-#-----------------------------------------------------------------------------#
-install_slurm_spack() {
-
-  echo "Running ${FUNCNAME[0]} ..."
-
-  COMPILER=gcc@${GCC_VER}
-
-  home=$PWD
-
-  . $SPACK_DIR/share/spack/setup-env.sh
-
-  mkdir /tmp/slurminstall
-  cd /tmp/slurminstall
-
-  sudo yum -y install man2html
-  sudo yum -y install libjwt
-  sudo yum -y install http-parser
-  sudo yum -y install libyaml-devel
-
-  # Install via spack
-  # The commented lines failed to build
-  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb prefix=
-  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+gtk+hdf5+hwloc+mariadb  # gtkplus fails build
-  # spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
-  #spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hdf5+hwloc+mariadb ^hdf5@develop-1.10 ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
-
-  spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hwloc+mariadb ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
-
-#  # Configure munge 
-#  spack load munge
-#
-#  # Create munge user
-#  sudo useradd --system --no-create-home --shell=/sbin/nologin munge
-#
-#  # TODO: Secure the installation
-#  # See: https://github.com/dun/munge/wiki/Installation-Guide#securing-the-installation
-#  
-#
-#  # Create key
-#  # difficult to get to sbin path
-#  mungemodule=`module avail munge >& /tmp/mungeout; grep munge /tmp/mungeout`
-#  mungepath=`module show $mungemodule >& /tmp/mungeout; grep " PATH " /tmp/mungeout | awk '{print $3}'`
-#  mungesbin=`dirname $mungepath`/sbin
-#  mungeetc=`dirname $mungepath`/etc
-#
-#  sudo chown munge $mungeetc
-# 
-#  sudo -u munge ${mungesbin}/mungekey --verbose
-#
-#  sudo systemctl enable munge
-
-  cd $home
-
-}
-
 
 
 install_esmf () {
@@ -555,7 +507,6 @@ install_python_modules_user () {
 
   home=$PWD
 
-  . /usr/share/Modules/init/bash
   sudo python3 -m pip install --upgrade pip
   python3 -m pip install --user --upgrade wheel
   python3 -m pip install --user --upgrade dask
@@ -569,14 +520,24 @@ install_python_modules_user () {
   # This is the most recent boto3 that is compatible with botocore above
   python3 -m pip install --user --upgrade boto3==1.20.46
 
+  cd $home 
+}
+
+
+install_plotting_modules () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
   # Build and install the plotting module and its dependencies
   # must install from ~/Cloud-Sandbox/cloudflow
   cd ../..
   pwd
   python3 ./setup.py sdist
   python3 -m pip install --user dist/plotting-*.tar.gz
- 
-  cd $home 
+
+  cd $home
 }
 
 
