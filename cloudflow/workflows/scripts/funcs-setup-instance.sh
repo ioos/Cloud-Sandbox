@@ -317,6 +317,24 @@ install_hdf5 () {
 
 
 #-----------------------------------------------------------------------------#
+install_munge() {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  mkdir /tmp/munge
+  cd /tmp/munge
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
+  tar -xvzf munge-0.5.14-rpms.tgz  
+  sudo rpm -ivh munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
+}
+
+
+
+#-----------------------------------------------------------------------------#
 install_slurm() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -344,16 +362,28 @@ install_slurm() {
 
   spack install $SPACKOPTS slurm@21-08-1-1%${COMPILER}+hwloc+mariadb ^hwloc+cuda+netloc+opencl+rocm ^intel-oneapi-mpi@2021.3.0
 
-  
-  spack load munge
-
-  # Munge user is created when munge is installed.
-  # Munge is installed as a pre-req to slurm
-
-  # Create key
-  # /etc/munge/munge.key
-  #sudo -u munge ${sbindir}/mungekey --verbose
-  #sudo /usr/sbin/mungekey --verbose
+#  # Configure munge 
+#  spack load munge
+#
+#  # Create munge user
+#  sudo useradd --system --no-create-home --shell=/sbin/nologin munge
+#
+#  # TODO: Secure the installation
+#  # See: https://github.com/dun/munge/wiki/Installation-Guide#securing-the-installation
+#  
+#
+#  # Create key
+#  # difficult to get to sbin path
+#  mungemodule=`module avail munge >& /tmp/mungeout; grep munge /tmp/mungeout`
+#  mungepath=`module show $mungemodule >& /tmp/mungeout; grep " PATH " /tmp/mungeout | awk '{print $3}'`
+#  mungesbin=`dirname $mungepath`/sbin
+#  mungeetc=`dirname $mungepath`/etc
+#
+#  sudo chown munge $mungeetc
+# 
+#  sudo -u munge ${mungesbin}/mungekey --verbose
+#
+#  sudo systemctl enable munge
 
   cd $home
 
