@@ -9,9 +9,9 @@
 sudo setenforce 0
 
 # DO NOT CHANGE THE ORDER!
-#setup_environment
-#setup_paths
-#setup_aliases
+setup_environment
+setup_paths
+setup_aliases
 #install_efa_driver
 #install_python_modules_user
 
@@ -19,7 +19,7 @@ sudo setenforce 0
 #install_gcc
 #install_intel_oneapi
 #install_netcdf
-install_hdf5
+#install_hdf5
 
 #install_munge
 #install_slurm
