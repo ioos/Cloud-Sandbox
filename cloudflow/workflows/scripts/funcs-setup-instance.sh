@@ -237,13 +237,14 @@ install_gcc () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
-  # TODO: upgrade to current version of GCC
+  # TODO: upgrade to newer version of GCC perhaps
 
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
   spack install $SPACKOPTS gcc@$GCC_VER
+
   spack compiler add `spack location -i gcc@$GCC_VER`/bin
 
   # Use a gcc 8.5.0 "bootstrapped" gcc 8.5.0
@@ -308,10 +309,37 @@ install_hdf5 () {
   # use diffutils@3.7 - intel compiler fails with 3.8
   # use m4@1.4.17     - intel compiler fails with newer versions
 
-  spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
-     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  spack install $SPACKOPTS cmake %gcc@$GCC_VER
 
-  # TODO add this to the s3 mirror
+  #spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
+  #   ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} %${COMPILER}
+
+  cd $home
+}
+
+
+#-----------------------------------------------------------------------------#
+install_munge() {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  mkdir /tmp/munge
+  cd /tmp/munge
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
+  tar -xvzf munge-0.5.14-rpms.tgz
+  #sudo rpm -ivh munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
+  sudo yum -y localinstall  munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm munge-libs-0.5.14-2.el7.x86_64.rpm
+
+  sudo -u munge /usr/sbin/mungekey --verbose 
+
+  sudo systemctl enable munge
+  sudo systemctl start munge
+
   cd $home
 }
 
@@ -336,6 +364,24 @@ install_munge() {
 
 #-----------------------------------------------------------------------------#
 install_slurm() {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  mkdir /tmp/slurminstall
+  cd /tmp/slurminstall
+
+  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/slurm-20.11.5-rpms.tgz
+  tar -xzvf slurm-20.11.5-rpms.tgz
+
+  #sudo yum install perl-Switch
+  sudo yum -y localinstall slurm-20.11.5-1.el7.x86_64.rpm
+
+}
+
+
+#-----------------------------------------------------------------------------#
+install_slurm_spack() {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -475,7 +521,7 @@ install_extra_rpms () {
     wgrib2-2.0.8-2.el7.x86_64.rpm
   '
 
-  wrkdir=~/extrarpms
+  wrkdir=/tmp/extrarpms
   [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
   mkdir -p "$wrkdir"
   cd "$wrkdir"
@@ -486,14 +532,16 @@ install_extra_rpms () {
 
   for file in $rpmlist
   do
-    sudo yum -y install $file
+    sudo yum -y localinstall $file
   done
 
   # Force install newer libpng leaving the existing one intact
   # this one will be used for our model builds via the module
-  sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
+  #sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
+  # refuses to upgrade #  sudo yum -y localinstall  libpng-1.5.30-2.el7.x86_64.rpm  
+  # sudo yum -y downgrade  libpng-1.5.30-2.el7.x86_64.rpm  # WORKS - use spack instead
 
-  rm -Rf "$wrkdir"
+  # rm -Rf "$wrkdir"
 
   sudo yum -y install jasper-devel
 
@@ -619,6 +667,9 @@ setup_aliases () {
   #git config --global user.name "Patrick Tripp"
   #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
   #git commit --amend --reset-author
+
+  #git config user.name "Patrick Tripp"
+  #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
 
   cd $home
 }
