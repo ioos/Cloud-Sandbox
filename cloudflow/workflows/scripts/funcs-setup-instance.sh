@@ -359,18 +359,19 @@ install_slurm() {
   # Fedora project repo is the epel yum repo already enabled
   # wget https://kojipkgs.fedoraproject.org//packages/slurm/20.11.8/2.el7/x86_64/slurm-20.11.8-2.el7.x86_64.rpm
 
-  sudo yum -y install slurm-20.11.8 slurm-libs-20.11.8 
+  sudo yum -y install slurm-20.11.8 slurm-libs-20.11.8 --installroot=/opt/slurm
   
   # needed on compute nodes
-  sudo yum -y install slurm-slurmctld-20.11.8
+  sudo yum -y install slurm-slurmctld-20.11.8 --installroot=/opt/slurm
+  sudo yum -y install slurm-openlava-20.11.8 --installroot=/opt/slurm
+  sudo yum -y install slurm-slurmdbd-20.11.8 --installroot=/opt/slurm
 
-  sudo yum -y install slurm-slurmdbd-20.11.8
-  sudo yum -y install slurm-pam_slurm-20.11.8
-  sudo yum -y install slurm-pmi-20.11.8
-  sudo yum -y install slurm-slurmrestd-20.11.8
+  sudo yum -y install slurm-pam_slurm-20.11.8 --installroot=/opt/slurm
+  sudo yum -y install slurm-pmi-20.11.8 --installroot=/opt/slurm
+  sudo yum -y install slurm-slurmrestd-20.11.8 --installroot=/opt/slurm
 
   # on compute nodes only
-  sudo yum -y install slurm-slurmd-20.11.8
+  sudo yum -y install slurm-slurmd-20.11.8 --installroot=/opt/slurm
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
