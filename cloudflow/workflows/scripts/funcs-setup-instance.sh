@@ -361,7 +361,7 @@ install_slurm() {
 
   sudo yum -y install slurm-20.11.8 slurm-libs-20.11.8 
   
-  # on head node only
+  # needed on compute nodes
   sudo yum -y install slurm-slurmctld-20.11.8
 
   sudo yum -y install slurm-slurmdbd-20.11.8
@@ -372,7 +372,19 @@ install_slurm() {
   # on compute nodes only
   sudo yum -y install slurm-slurmd-20.11.8
 
+  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
+
+  sudo chown -R slurm /var/spool/slur 
+  sudo chown -R slurm /var/run/slurm
+
+  sudo systemctl enable slurmctld
+  sudo systemctl start slurmctld
+
+  sudo systemctl enable slurmd
+  sudo systemctl start slurmd
+
 }
+
 
 #-----------------------------------------------------------------------------#
 install_slurm_s3() {
