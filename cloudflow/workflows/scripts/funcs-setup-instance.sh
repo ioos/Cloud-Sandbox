@@ -215,7 +215,7 @@ install_spack() {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  spack config add "config:install_tree:padded_length:128"
+  # spack config add "config:install_tree:padded_length:128"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
@@ -246,6 +246,9 @@ install_gcc () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
+  # Will use skylake-512 on t3.xlarge
+  # Will use haswell on t3.medium
+  # TODO: Rebuild all using x86_64
   spack install $SPACKOPTS gcc@$GCC_VER
 
   spack compiler add `spack location -i gcc@$GCC_VER`/bin

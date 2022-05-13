@@ -31,4 +31,7 @@ public_key = ""
  availability_zone = "us-east-2a"
  instance_type = "t3.medium"
  use_efa = false
+
+ # You can give your AWS resources a unique name
+ #nameprefix="ioos-cloud-sandbox"
 #---------------------------------------------------------------
