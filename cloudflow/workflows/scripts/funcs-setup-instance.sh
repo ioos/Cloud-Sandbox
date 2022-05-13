@@ -363,7 +363,7 @@ install_munge() {
 
 
 #-----------------------------------------------------------------------------#
-install_slurm() {
+install_slurm_from_s3() {
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo `date` > /tmp/setup.log
+
 mkdir -p /mnt/efs/fs1
 yum -y -q install git amazon-efs-utils
 
@@ -11,7 +13,10 @@ cd /home/centos
 sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
-sudo -u centos ./setup-instance.sh > /tmp/setup.log 2>&1
+# Testing branch
+#sudo -u centos git checkout updates-0422
+
+sudo -u centos ./setup-instance.sh >> /tmp/setup.log 2>&1
 
 # MPI needs key to ssh into cluster nodes
 sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
@@ -44,3 +49,4 @@ echo "Creating an AMI of this instance ... will reboot automatically" >> /tmp/se
 imageID=`grep ImageId /tmp/ami.log`
 echo "imageID to use for compute nodes is: $imageID" >> /tmp/setup.log 
 echo "Installation completed!" >> /tmp/setup.log
+echo `date` >> /tmp/setup.log
