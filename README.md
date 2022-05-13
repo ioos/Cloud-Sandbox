@@ -94,7 +94,22 @@ Run 'terraform apply' to create the AWS resources.
 terraform apply -var-file="mysettings.tfvars"
 ```
 
-Enter 'yes' to create the resources.
+Enter 'yes' to create the resources.  
+
+---
+**NOTE**
+
+You may run into the following error if applying Terraform on an AWS account where several Cloud Sandbox instances have been created:  
+```
+Error: error creating IAM Role (ioos_cloud_sandbox_terraform_role): EntityAlreadyExists: Role with name ioos_cloud_sandbox_terraform_role already exists.
+```
+
+To resolve a resource conflict, use `terraform import` to point terraform to the existing resource instead of creating a new one. For example, in this case `ioos_cloud_sandbox_terraform_role` already exists, so it can be associated to the role using the following command:  
+```
+terraform import aws_iam_role.sandbox_iam_role ioos_cloud_sandbox_terraform_role
+```
+
+---
 
 ### Install all of the required software and libraries
 This is done automatically in `init_template.tpl` <br>
