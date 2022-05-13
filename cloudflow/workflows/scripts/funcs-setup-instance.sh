@@ -215,18 +215,21 @@ install_spack() {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
- # Using an s3-mirror for previously built packages
+  spack config add "config:install_tree:padded_length:128"
+
+  # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
-  echo "Fetching public key for spack mirror"
-  mkdir -p $SPACK_DIR/opt/spack/gpg
-  chmod 700 $SPACK_DIR/opt/spack/gpg
 
-  wget $SPACK_KEY_URL -O $SPACK_KEY
-  chmod 600 $SPACK_KEY
+  # echo "Fetching public key for spack mirror"
+  # mkdir -p $SPACK_DIR/opt/spack/gpg
+  # chmod 700 $SPACK_DIR/opt/spack/gpg
+  # wget $SPACK_KEY_URL -O $SPACK_KEY
+  # chmod 600 $SPACK_KEY
+  # spack gpg trust $SPACK_KEY
 
-  spack gpg trust $SPACK_KEY
+  spack buildcache keys --install --trust --force
   spack buildcache update-index -d $SPACK_MIRROR
 
   cd $home
@@ -355,18 +358,18 @@ install_slurm() {
 
   spack load gcc@8.5.0
 
-  sudo yum -y install slurm-20.11.8 slurm-libs-20.11.8 --installroot=/opt/slurm
+  sudo yum -y --installroot=/opt/slurm install slurm-20.11.8 slurm-libs-20.11.8 --installroot=/opt/slurm
   
   # needed on compute nodes
-  sudo yum -y install slurm-slurmctld-20.11.8 --installroot=/opt/slurm
-  sudo yum -y install slurm-openlava-20.11.8 --installroot=/opt/slurm
-  sudo yum -y install slurm-slurmdbd-20.11.8 --installroot=/opt/slurm
-  sudo yum -y install slurm-pam_slurm-20.11.8 --installroot=/opt/slurm
-  sudo yum -y install slurm-pmi-20.11.8 --installroot=/opt/slurm
-  sudo yum -y install slurm-slurmrestd-20.11.8 --installroot=/opt/slurm
+  sudo yum -y --installroot=/opt install slurm-slurmctld-20.11.8
+  sudo yum -y --installroot=/opt install slurm-openlava-20.11.8
+  sudo yum -y --installroot=/opt install slurm-slurmdbd-20.11.8
+  sudo yum -y --installroot=/opt install slurm-pam_slurm-20.11.8
+  sudo yum -y --installroot=/opt install slurm-pmi-20.11.8
+  sudo yum -y --installroot=/opt install slurm-slurmrestd-20.11.8
 
   # on compute nodes only
-  sudo yum -y install slurm-slurmd-20.11.8 --installroot=/opt/slurm
+  sudo yum -y --installroot=/opt install slurm-slurmd-20.11.8
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 

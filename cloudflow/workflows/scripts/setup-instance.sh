@@ -22,6 +22,8 @@ install_netcdf
 #install_hdf5-gcc8
 
 install_munge
+exit
+
 install_slurm
 
 install_esmf
