@@ -333,7 +333,7 @@ install_munge() {
   mkdir /tmp/munge
   cd /tmp/munge
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
   tar -xvzf munge-0.5.14-rpms.tgz
   sudo yum -y localinstall munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm \
      munge-libs-0.5.14-2.el7.x86_64.rpm
@@ -347,9 +347,9 @@ install_munge() {
 }
 
 
-# https://koji.fedoraproject.org/koji/search?terms=slurm-20.11.8-2.el7&type=build&match=glob
+# https://koji.fedoraproject.org/koji/search?terms=slurm-$SLURM_VER-2.el7&type=build&match=glob
 # Fedora project repo is the epel yum repo already enabled
-# wget https://kojipkgs.fedoraproject.org//packages/slurm/20.11.8/2.el7/x86_64/slurm-20.11.8-2.el7.x86_64.rpm
+# wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
 
 #-----------------------------------------------------------------------------#
 install_slurm() {
@@ -357,26 +357,28 @@ install_slurm() {
 
   home=$PWD
 
+  SLURM_VER=20
+
   . $SPACK_DIR/share/spack/setup-env.sh
 
   spack load gcc@8.5.0
 
-  sudo yum -y --installroot=/opt/slurm install slurm-20.11.8 slurm-libs-20.11.8 --installroot=/opt/slurm
+  sudo yum -y install slurm-$SLURM_VER slurm-libs-$SLURM_VER
   
   # needed on compute nodes
-  sudo yum -y --installroot=/opt install slurm-slurmctld-20.11.8
-  sudo yum -y --installroot=/opt install slurm-openlava-20.11.8
-  sudo yum -y --installroot=/opt install slurm-slurmdbd-20.11.8
-  sudo yum -y --installroot=/opt install slurm-pam_slurm-20.11.8
-  sudo yum -y --installroot=/opt install slurm-pmi-20.11.8
-  sudo yum -y --installroot=/opt install slurm-slurmrestd-20.11.8
+  sudo yum -y install slurm-slurmctld-$SLURM_VER
+  sudo yum -y install slurm-openlava-$SLURM_VER
+  sudo yum -y install slurm-slurmdbd-$SLURM_VER
+  sudo yum -y install slurm-pam_slurm-$SLURM_VER
+  sudo yum -y install slurm-pmi-$SLURM_VER
+  sudo yum -y install slurm-slurmrestd-$SLURM_VER
 
   # on compute nodes only
-  sudo yum -y --installroot=/opt install slurm-slurmd-20.11.8
+  sudo yum -y install slurm-slurmd-$SLURM_VER
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
-  sudo cp $home/slurm.conf /opt/slurm/etc/slurm.conf
+  sudo cp $home/slurm.conf /etc/slurm.conf
 
   sudo chown -R slurm /var/spool/slur 
   sudo chown -R slurm /var/run/slurm
@@ -399,7 +401,7 @@ install_slurm_s3() {
   mkdir /tmp/slurminstall
   cd /tmp/slurminstall
 
-  wget https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/slurm-20.11.5-rpms.tgz
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/slurm-20.11.5-rpms.tgz
   tar -xzvf slurm-20.11.5-rpms.tgz
   sudo yum -y localinstall slurm-20.11.5-1.el7.x86_64.rpm
 }
