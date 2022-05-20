@@ -1,0 +1,2 @@
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+#instance ID does not change if able to change instance type without destroying the old one
