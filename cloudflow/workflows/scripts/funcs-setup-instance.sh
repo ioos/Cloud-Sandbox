@@ -221,14 +221,6 @@ install_spack() {
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
-
-  # echo "Fetching public key for spack mirror"
-  # mkdir -p $SPACK_DIR/opt/spack/gpg
-  # chmod 700 $SPACK_DIR/opt/spack/gpg
-  # wget $SPACK_KEY_URL -O $SPACK_KEY
-  # chmod 600 $SPACK_KEY
-  # spack gpg trust $SPACK_KEY
-
   spack buildcache keys --install --trust --force
   spack buildcache update-index -d $SPACK_MIRROR
 
@@ -246,8 +238,6 @@ install_gcc () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # Will use skylake-512 on t3.xlarge
-  # Will use haswell on t3.medium
   # TODO: Rebuild all using x86_64
   spack install $SPACKOPTS gcc@$GCC_VER
 
@@ -355,39 +345,55 @@ install_munge() {
 install_slurm() {
   echo "Running ${FUNCNAME[0]} ..."
 
+  nodetype="head"
+  if [ $# -gt 1 ]; then 
+    if [[ $1 == "compute"]]; then
+      nodetype="compute"
+    fi
+  fi
+
   home=$PWD
 
-  SLURM_VER=20
+  #SLURM_VER=20
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
   spack load gcc@8.5.0
 
-  sudo yum -y install slurm-$SLURM_VER slurm-libs-$SLURM_VER
-  
-  # needed on compute nodes
-  sudo yum -y install slurm-slurmctld-$SLURM_VER
-  sudo yum -y install slurm-openlava-$SLURM_VER
-  sudo yum -y install slurm-slurmdbd-$SLURM_VER
-  sudo yum -y install slurm-pam_slurm-$SLURM_VER
-  sudo yum -y install slurm-pmi-$SLURM_VER
-  sudo yum -y install slurm-slurmrestd-$SLURM_VER
+  # install on all nodes
+  sudo yum -y install slurm slurm-libs
+  sudo yum -y install slurm-perlapi
 
-  # on compute nodes only
-  sudo yum -y install slurm-slurmd-$SLURM_VER
+  #sudo yum -y install slurm-openlava
+  #sudo yum -y install slurm-slurmdbd
+  #sudo yum -y install slurm-pam_slurm
+  #sudo yum -y install slurm-pmi
+  #sudo yum -y install slurm-slurmrestd
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
-  sudo cp $home/slurm.conf /etc/slurm.conf
+  sudo mkdir -p /var/spool/slurm
+  sudo mkdir -p /var/run/slurm
 
-  sudo chown -R slurm /var/spool/slur 
+  sudo chown -R slurm /var/spool/slurm
   sudo chown -R slurm /var/run/slurm
 
-  sudo systemctl enable slurmctld
-  sudo systemctl start slurmctld
+  sudo mkdir    /etc/slurm
+  sudo cp -pf slurm.conf /etc/slurm/slurm.conf
 
-  sudo systemctl enable slurmd
-  sudo systemctl start slurmd
+  if [[ $nodetype == "head" ]]; then 
+    # needed on head node only
+    sudo yum -y install slurm-slurmctld
+
+    sudo systemctl enable slurmctld
+    sudo systemctl start slurmctld
+  else
+    # on compute nodes only
+    sudo yum -y install slurm-slurmd
+
+    sudo systemctl enable slurmd
+    sudo systemctl start slurmd
+  fi
 
 }
 

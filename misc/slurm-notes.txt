@@ -37,3 +37,4 @@ sudo rpm --install slurm*
 rpm -qi slurm-openlava-20.11.5-1.el7.x86_64
 
 
+
