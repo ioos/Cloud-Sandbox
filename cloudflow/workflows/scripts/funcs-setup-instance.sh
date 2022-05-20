@@ -315,7 +315,7 @@ install_hdf5-gcc8 () {
 
 
 #-----------------------------------------------------------------------------#
-install_munge() {
+install_munge () {
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -342,7 +342,7 @@ install_munge() {
 # wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
 
 #-----------------------------------------------------------------------------#
-install_slurm() {
+install_slurm-epel7 () {
   echo "Running ${FUNCNAME[0]} ..."
 
   nodetype="head"
@@ -353,8 +353,6 @@ install_slurm() {
   fi
 
   home=$PWD
-
-  #SLURM_VER=20
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
@@ -381,15 +379,29 @@ install_slurm() {
   sudo mkdir    /etc/slurm
   sudo cp -pf slurm.conf /etc/slurm/slurm.conf
 
+  # Head node or Compute node?
+  # Although it is possible to use the head node as a compute node also,
+  # we are making sure we only have one or the other setup here 
+  # to help ensure the image/snapshot taken is only for one or the other
+  # The snapshot can be taken after running either setup
+
   if [[ $nodetype == "head" ]]; then 
+
     # needed on head node only
     sudo yum -y install slurm-slurmctld
+
+    [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
+    [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
 
     sudo systemctl enable slurmctld
     sudo systemctl start slurmctld
   else
+
     # on compute nodes only
     sudo yum -y install slurm-slurmd
+
+    [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
+    [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
 
     sudo systemctl enable slurmd
     sudo systemctl start slurmd
@@ -671,6 +683,16 @@ create_ami_reboot () {
 #####################################################################
 
 
+create_snapshot () {
+
+  # AWS
+  aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
+  instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+
+  /usr/local/bin/aws --region ${aws_region} ec2 create-snapshots \
+    --instance-specification "InstanceId=$instance_id,ExcludeBootVolume=false" \
+    --copy-tags-from-source volume
+}
 
 #####################################################################
 #####################################################################

@@ -29,13 +29,16 @@ install_extra_rpms
 install_ffmpeg
 
 install_munge
-install_slurm compute
+install_slurm-epel7 compute
 
 # Take a snapshot
+create_snapshot
+
 # Create AMI for compute nodes
 # output and save the image id
 
-install_slurm head
+install_slurm-epel7 head
+create snapshot
 
 sudo yum -y clean all
 
