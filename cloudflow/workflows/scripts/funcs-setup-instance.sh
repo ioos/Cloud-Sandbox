@@ -170,7 +170,7 @@ install_efa_driver() {
   # Should uninstall newer one and install the default 4.8
   # sudo yum -y install gcc
 
-  curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
+  curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
   rm $tarfile
 
@@ -207,9 +207,9 @@ install_spack() {
   fi
 
   mkdir -p $SPACK_DIR
-  git clone https://github.com/spack/spack.git $SPACK_DIR
+  git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
-  git checkout $SPACK_VERSION
+  git checkout -q $SPACK_VERSION
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
 
@@ -347,7 +347,7 @@ install_slurm-epel7 () {
 
   nodetype="head"
   if [ $# -gt 1 ]; then 
-    if [[ $1 == "compute"]]; then
+    if [[ $1 == "compute" ]]; then
       nodetype="compute"
     fi
   fi
@@ -646,6 +646,10 @@ install_ffmpeg_osx () {
 
 setup_ssh_mpi () {
 
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
   # MPI needs key to ssh into cluster nodes
   sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
   sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
@@ -659,6 +663,8 @@ Host 10.0.*
    CheckHostIP no 
    StrictHostKeyChecking no
 EOL
+
+  cd $home
 }
 #####################################################################
 
@@ -685,13 +691,33 @@ create_ami_reboot () {
 
 create_snapshot () {
 
+  # inputs: string - used for tagging
+  # outputs:
+  #   "returns" the snapshotID to be used in other functions
+
+  home=$PWD
+
+  # TODO: add check
+  message=$1
+
   # AWS
   aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
   instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 
-  /usr/local/bin/aws --region ${aws_region} ec2 create-snapshots \
+  # TODO: remove hardcoded values
+  name_tag="$message snapshot - $instance_id"
+  project="IOOS-Cloud-Sandbox"
+
+  response=`/usr/local/bin/aws --region ${aws_region} ec2 create-snapshots \
     --instance-specification "InstanceId=$instance_id,ExcludeBootVolume=false" \
-    --copy-tags-from-source volume
+    --copy-tags-from-source volume \
+    --tag-specifications "ResourceType=snapshot,Tags=[{Key=\"Name\",Value=\"${name_tag}\"},{Key=\"Project\",Value=\"${project}\"}]"`
+
+  snapshotId=`echo $response | jq '.Snapshots[].SnapshotId'`
+
+  echo $snapshotId | awk -F\" '{print $2}'
+
+  cd $home
 }
 
 #####################################################################
