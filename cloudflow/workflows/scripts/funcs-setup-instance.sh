@@ -691,14 +691,18 @@ create_ami_reboot () {
 
 create_snapshot () {
 
-  # inputs: string - used for tagging
-  # outputs:
-  #   "returns" the snapshotID to be used in other functions
+  # inputs: 
+  #   message: string used for tagging
+  #
+  # outputs: the snapshotID to be used in other functions
 
   home=$PWD
 
-  # TODO: add check
-  message=$1
+  message=""
+  if [ $# -eq 2 ];
+    message=$1
+  fi
+  
 
   # AWS
   aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
