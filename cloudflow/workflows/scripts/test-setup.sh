@@ -1,31 +1,66 @@
 #!/bin/bash
+set -x
+
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
+# source include the functions 
 . funcs-setup-instance.sh
 
 # calling sudo from cloud init adds 25 second delay for each sudo
 sudo setenforce 0
 
-#setup_environment
-#setup_paths
-#setup_aliases
+# Use caution when changing the order of the following
 
-#install_efa_driver
-#install_python_modules_user
-#install_spack
+# System stuff
+# setup_environment
+# setup_paths
+# setup_aliases
+# setup_ssh_mpi
+# install_efa_driver
+# 
+# # Compilers and libraries
+# install_python_modules_user
+# install_spack
+# install_gcc
+# install_intel_oneapi
+# install_netcdf
+# #install_hdf5-gcc8   # Not needed?
+# install_esmf
+# install_base_rpms
+# install_extra_rpms
+# install_ffmpeg
+# 
+# # Job scheduler, resource manager
+# install_munge
 
-#  spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
-#  spack buildcache update-index -d s3://ioos-cloud-sandbox/public/spack/mirror/
+# # Compute node config
+# install_slurm-epel7 compute
+# sudo yum -y clean all
 
-#install_gcc
-install_intel_oneapi
-#install_netcdf
-#install_esmf
-#install_extra_rpms
-#install_ffmpeg
+# Take a snapshot for compute nodes
+# snapshotId=`create_snapshot "Compute Node"`
+snapshotId="snap-0c2a6c02c26defee6"
+# Create AMI for compute nodes
 
-#sudo yum -y clean all
+# ami_name is provided by Terraform if called via the init_template
+# otherwise it is undefined
+
+# ami_name=${ami_name:='IOOS cloud sandbox'}
+imageName="${ami_name:='IOOS cloud sandbox'} 'Compute Node'"
+
+imageId=`python3 create_image.py $snapshotId "$imageName"`
+
+# output and save the image id
+echo "Compute node image: $imageId"
+
+# Head node 
+# install_slurm-epel7 head
+# sudo yum -y clean all
+
+# create snapshot for potential re-use
+# snapshotId=`create_snapshot "Head Node"`
+# echo "Snapshot taken: $snapshotId"
 
 echo "Setup completed!"

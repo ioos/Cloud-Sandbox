@@ -699,10 +699,9 @@ create_snapshot () {
   home=$PWD
 
   message=""
-  if [ $# -eq 2 ];
+  if [ $# -eq 2 ]; then
     message=$1
   fi
-  
 
   # AWS
   aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
@@ -710,6 +709,8 @@ create_snapshot () {
 
   # TODO: remove hardcoded values
   name_tag="$message snapshot - $instance_id"
+
+  # TODO: migrate project_tag in from Terraform
   project="IOOS-Cloud-Sandbox"
 
   response=`/usr/local/bin/aws --region ${aws_region} ec2 create-snapshots \

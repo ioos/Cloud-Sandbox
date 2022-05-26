@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
-nodetype=head
-
+# source include the functions 
 . funcs-setup-instance.sh
 
 # calling sudo from cloud init adds 25 second delay for each sudo
@@ -25,7 +25,7 @@ install_spack
 install_gcc
 install_intel_oneapi
 install_netcdf
-#install_hdf5-gcc8
+#install_hdf5-gcc8   # Not needed?
 install_esmf
 install_base_rpms
 install_extra_rpms
@@ -38,19 +38,27 @@ install_munge
 install_slurm-epel7 compute
 sudo yum -y clean all
 
-# Take a snapshot for compute node
+# Take a snapshot for compute nodes
 snapshotId=`create_snapshot "Compute Node"`
-echo "Snapshot taken: $snapshotId"
 
 # Create AMI for compute nodes
+
+# ami_name is provided by Terraform if called via the init_template
+# otherwise it will use the default
+
+imageName="${ami_name:='IOOS cloud sandbox'} Compute Node"
+
+imageId=`python3 create_image.py $snapshotId "$imageName"`
+
 # output and save the image id
+echo "Compute node image: $imageId"
 
 # Head node 
 install_slurm-epel7 head
 sudo yum -y clean all
 
 # create snapshot for potential re-use
-snapshotId=`create_snapshot "Head Node"`
-echo "Snapshot taken: $snapshotId"
+# snapshotId=`create_snapshot "Head Node"`
+# echo "Snapshot taken: $snapshotId"
 
 echo "Setup completed!"
