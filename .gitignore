@@ -31,3 +31,4 @@ terraform/SAVE.mysettings.tfvars
 **/*nda*
 dev.tfvars
 my.tfvars
+my.plan

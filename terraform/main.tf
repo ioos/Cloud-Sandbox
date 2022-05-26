@@ -218,7 +218,7 @@ data "template_file" "init_instance" {
   template = file("./init_template.tpl")
   vars = {
     efs_name = aws_efs_file_system.main_efs.dns_name
-    ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
+    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
     aws_region = var.preferred_region
     project = var.project_tag
   }
