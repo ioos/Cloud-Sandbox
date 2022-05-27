@@ -48,6 +48,7 @@ setup_environment () {
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
   sudo yum -y install python3-devel
+  sudo yum -y install jq
 
   cliver="2.2.10"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -385,23 +386,32 @@ install_slurm-epel7 () {
   # to help ensure the image/snapshot taken is only for one or the other
   # The snapshot can be taken after running either setup
 
+  # Exclusive or 
   if [[ $nodetype == "head" ]]; then 
 
     # needed on head node only
     sudo yum -y install slurm-slurmctld
 
-    [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
-    [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+    # First check if slurmd is installed
+    resp=`which slurmd > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
+      [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+    fi
 
     sudo systemctl enable slurmctld
     sudo systemctl start slurmctld
   else
 
-    # on compute nodes only
+    # needed on compute nodes
     sudo yum -y install slurm-slurmd
 
-    [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
-    [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+    # First check if slurmctld is installed
+    resp=`which slurmctld > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
+      [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+    fi
 
     sudo systemctl enable slurmd
     sudo systemctl start slurmd

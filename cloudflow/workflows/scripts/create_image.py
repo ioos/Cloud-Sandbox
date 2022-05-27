@@ -25,7 +25,8 @@ def main():
 def create_image_from_snapshot(snapshotId: str, imageName: str):
 
   # imagename needs to be unique
-
+ 
+  # TODO: Don't hardcode region 
   region_name = 'us-east-2'
   ec2 = boto3.client('ec2', region_name=region_name )
 
@@ -41,6 +42,17 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
     }
   }
 
+  # Wait for snapshot to be created - will throw an exception after 10 minutes
+  resrc = boto3.resource('ec2',region_name=region_name)
+  snapshot = resrc.Snapshot(snapshotId)
+
+  print(f"... waiting for snapshot ... : snapshotId: {snapshot}")
+  try:
+    snapshot.wait_until_completed()
+  except Exception as e:
+    print("Exception: " + str(e))
+    sys.exit(1)
+ 
   response=''
 
   try:

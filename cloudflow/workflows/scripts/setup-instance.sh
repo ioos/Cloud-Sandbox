@@ -45,12 +45,10 @@ snapshotId=`create_snapshot "Compute Node"`
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
+# TODO: make sure imageName is unique
 
 imageName="${ami_name:='IOOS cloud sandbox'} Compute Node"
-
 imageId=`python3 create_image.py $snapshotId "$imageName"`
-
-# output and save the image id
 echo "Compute node image: $imageId"
 
 # Head node 
@@ -60,5 +58,8 @@ sudo yum -y clean all
 # create snapshot for potential re-use
 # snapshotId=`create_snapshot "Head Node"`
 # echo "Snapshot taken: $snapshotId"
+
+# imageName="${ami_name:='IOOS cloud sandbox'} Head Node"
+# imageId=`python3 create_image.py $snapshotId "$imageName"`
 
 echo "Setup completed!"
