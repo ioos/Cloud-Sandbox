@@ -83,13 +83,14 @@ Optionally change these settings to override the defaults:
 | project_tag      | "IOOS-cloud-sandbox"           | The "Project" tag for the resources created |
 | availability_zone | "us-east-1a"                   | The AWS Availability zone  |
 | instance_type     | "t3.medium"                    | EC2 Instance type to use for setup |
+| use_efa           | true                           | Whether or not to use [AWS Elastic Fabric Adapter](https://aws.amazon.com/hpc/efa/) |
 
-Run 'terrform plan' to check for errors and see what resources will be created: 
+Run `terrform plan` to check for errors and see what resources will be created: 
 ```
 terraform plan -var-file="mysettings.tfvars"
 ```
 
-Run 'terraform apply' to create the AWS resources.
+Run `terraform apply` to create the AWS resources.
 ```
 terraform apply -var-file="mysettings.tfvars"
 ```
@@ -109,6 +110,7 @@ To resolve a resource conflict, use `terraform import` to point terraform to the
 terraform import aws_iam_role.sandbox_iam_role ioos_cloud_sandbox_terraform_role
 ```
 
+After resolving any existing resource conflicts, run `terraform apply` again.
 ---
 
 ### Install all of the required software and libraries
