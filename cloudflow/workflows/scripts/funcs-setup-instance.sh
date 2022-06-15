@@ -7,7 +7,7 @@ SPACK_DIR='/save/environments/spack'
 SPACKOPTS='-v'
 
 # 1 = Don't build any packages. Only install packages from binary mirrors
-SPACK_CACHEONLY=0
+SPACK_CACHEONLY=1
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS="$SPACKOPS --cache-only"
 fi
@@ -48,6 +48,7 @@ setup_environment () {
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
   sudo yum -y install python3-devel
+  sudo yum -y install jq
 
   cliver="2.2.10"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -170,7 +171,7 @@ install_efa_driver() {
   # Should uninstall newer one and install the default 4.8
   # sudo yum -y install gcc
 
-  curl -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
+  curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
   rm $tarfile
 
@@ -207,26 +208,21 @@ install_spack() {
   fi
 
   mkdir -p $SPACK_DIR
-  git clone https://github.com/spack/spack.git $SPACK_DIR
+  git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
-  git checkout $SPACK_VERSION
+  git checkout -q $SPACK_VERSION
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
- # Using an s3-mirror for previously built packages
+  # spack config add "config:install_tree:padded_length:128"
+
+  # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
-  echo "Fetching public key for spack mirror"
-  mkdir -p $SPACK_DIR/opt/spack/gpg
-  chmod 700 $SPACK_DIR/opt/spack/gpg
-
-  wget $SPACK_KEY_URL -O $SPACK_KEY
-  chmod 600 $SPACK_KEY
-
-  spack gpg trust $SPACK_KEY
+  spack buildcache keys --install --trust --force
   spack buildcache update-index -d $SPACK_MIRROR
 
   cd $home
@@ -237,13 +233,15 @@ install_gcc () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
-  # TODO: upgrade to current version of GCC
+  # TODO: upgrade to newer version of GCC perhaps
 
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
+  # TODO: Rebuild all using x86_64
   spack install $SPACKOPTS gcc@$GCC_VER
+
   spack compiler add `spack location -i gcc@$GCC_VER`/bin
 
   # Use a gcc 8.5.0 "bootstrapped" gcc 8.5.0
@@ -291,6 +289,149 @@ install_netcdf () {
      ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   cd $home
+}
+
+#-----------------------------------------------------------------------------#
+install_hdf5-gcc8 () {
+
+  # This installs the gcc built hdf5
+  echo "Running ${FUNCNAME[0]} ..."
+
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # use diffutils@3.7 - intel compiler fails with 3.8
+  # use m4@1.4.17     - intel compiler fails with newer versions
+
+  # spack install $SPACKOPTS cmake %gcc@$GCC_VER
+
+  spack install $SPACKOPTS hdf5@1.10.7+cxx+fortran+hl+ipo~java+shared+tools \
+     ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  cd $home
+}
+
+
+#-----------------------------------------------------------------------------#
+install_munge () {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  mkdir /tmp/munge
+  cd /tmp/munge
+
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/munge-0.5.14-rpms.tgz
+  tar -xvzf munge-0.5.14-rpms.tgz
+  sudo yum -y localinstall munge-0.5.14-2.el7.x86_64.rpm munge-devel-0.5.14-2.el7.x86_64.rpm \
+     munge-libs-0.5.14-2.el7.x86_64.rpm
+
+  sudo -u munge /usr/sbin/mungekey --verbose 
+
+  sudo systemctl enable munge
+  sudo systemctl start munge
+
+  cd $home
+}
+
+
+# https://koji.fedoraproject.org/koji/search?terms=slurm-$SLURM_VER-2.el7&type=build&match=glob
+# Fedora project repo is the epel yum repo already enabled
+# wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
+
+#-----------------------------------------------------------------------------#
+install_slurm-epel7 () {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  nodetype="head"
+  if [ $# -gt 1 ]; then 
+    if [[ $1 == "compute" ]]; then
+      nodetype="compute"
+    fi
+  fi
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  spack load gcc@8.5.0
+
+  # install on all nodes
+  sudo yum -y install slurm slurm-libs
+  sudo yum -y install slurm-perlapi
+
+  #sudo yum -y install slurm-openlava
+  #sudo yum -y install slurm-slurmdbd
+  #sudo yum -y install slurm-pam_slurm
+  #sudo yum -y install slurm-pmi
+  #sudo yum -y install slurm-slurmrestd
+
+  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
+
+  sudo mkdir -p /var/spool/slurm
+  sudo mkdir -p /var/run/slurm
+
+  sudo chown -R slurm /var/spool/slurm
+  sudo chown -R slurm /var/run/slurm
+
+  sudo mkdir    /etc/slurm
+  sudo cp -pf slurm.conf /etc/slurm/slurm.conf
+
+  # Head node or Compute node?
+  # Although it is possible to use the head node as a compute node also,
+  # we are making sure we only have one or the other setup here 
+  # to help ensure the image/snapshot taken is only for one or the other
+  # The snapshot can be taken after running either setup
+
+  # Exclusive or 
+  if [[ $nodetype == "head" ]]; then 
+
+    # needed on head node only
+    sudo yum -y install slurm-slurmctld
+
+    # First check if slurmd is installed
+    resp=`which slurmd > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
+      [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+    fi
+
+    sudo systemctl enable slurmctld
+    sudo systemctl start slurmctld
+  else
+
+    # needed on compute nodes
+    sudo yum -y install slurm-slurmd
+
+    # First check if slurmctld is installed
+    resp=`which slurmctld > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
+      [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+    fi
+
+    sudo systemctl enable slurmd
+    sudo systemctl start slurmd
+  fi
+
+}
+
+
+#-----------------------------------------------------------------------------#
+install_slurm_s3() {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  mkdir /tmp/slurminstall
+  cd /tmp/slurminstall
+
+  wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/slurm-20.11.5-rpms.tgz
+  tar -xzvf slurm-20.11.5-rpms.tgz
+  sudo yum -y localinstall slurm-20.11.5-1.el7.x86_64.rpm
 }
 
 
@@ -378,7 +519,7 @@ install_extra_rpms () {
     wgrib2-2.0.8-2.el7.x86_64.rpm
   '
 
-  wrkdir=~/extrarpms
+  wrkdir=/tmp/extrarpms
   [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
   mkdir -p "$wrkdir"
   cd "$wrkdir"
@@ -389,14 +530,16 @@ install_extra_rpms () {
 
   for file in $rpmlist
   do
-    sudo yum -y install $file
+    sudo yum -y localinstall $file
   done
 
   # Force install newer libpng leaving the existing one intact
   # this one will be used for our model builds via the module
-  sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
+  #sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
+  # refuses to upgrade #  sudo yum -y localinstall  libpng-1.5.30-2.el7.x86_64.rpm  
+  # sudo yum -y downgrade  libpng-1.5.30-2.el7.x86_64.rpm  # WORKS - use spack instead
 
-  rm -Rf "$wrkdir"
+  # rm -Rf "$wrkdir"
 
   sudo yum -y install jasper-devel
 
@@ -410,7 +553,6 @@ install_python_modules_user () {
 
   home=$PWD
 
-  . /usr/share/Modules/init/bash
   sudo python3 -m pip install --upgrade pip
   python3 -m pip install --user --upgrade wheel
   python3 -m pip install --user --upgrade dask
@@ -424,14 +566,24 @@ install_python_modules_user () {
   # This is the most recent boto3 that is compatible with botocore above
   python3 -m pip install --user --upgrade boto3==1.20.46
 
+  cd $home 
+}
+
+
+install_plotting_modules () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
   # Build and install the plotting module and its dependencies
   # must install from ~/Cloud-Sandbox/cloudflow
   cd ../..
   pwd
   python3 ./setup.py sdist
   python3 -m pip install --user dist/plotting-*.tar.gz
- 
-  cd $home 
+
+  cd $home
 }
 
 
@@ -499,8 +651,93 @@ install_ffmpeg_osx () {
 
   brew install ffmpeg
 }
+#####################################################################
 
 
+setup_ssh_mpi () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  # MPI needs key to ssh into cluster nodes
+  sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
+  sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
+
+  cat >> /etc/ssh/ssh_config <<EOL
+Host ip-10-0-* 
+   CheckHostIP no 
+   StrictHostKeyChecking no 
+
+Host 10.0.* 
+   CheckHostIP no 
+   StrictHostKeyChecking no
+EOL
+
+  cd $home
+}
+#####################################################################
+
+
+create_ami_reboot () {
+
+  # Create the AMI from this instance
+  instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+
+  # echo "Current instance is: $instance_id"
+
+  echo "Creating an AMI of this instance ... will reboot automatically" >> /tmp/setup.log
+  /usr/local/bin/aws --region ${aws_region} ec2 create-image --instance-id $instance_id --name "${ami_name}" \
+    --tag-specification "ResourceType=image,Tags=[{Key=\"Name\",Value=\"${ami_name}\"},{Key=\"Project\",Value=\"${project}\"}]" \
+    > /tmp/ami.log 2>&1
+
+  # TODO: Check for errors returned from any step above
+
+  imageID=`grep ImageId /tmp/ami.log`
+  echo "imageID to use for compute nodes is: $imageID"
+}
+#####################################################################
+
+
+create_snapshot () {
+
+  # inputs: 
+  #   message: string used for tagging
+  #
+  # outputs: the snapshotID to be used in other functions
+
+  home=$PWD
+
+  message=""
+  if [ $# -eq 2 ]; then
+    message=$1
+  fi
+
+  # AWS
+  aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
+  instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+
+  # TODO: remove hardcoded values
+  name_tag="$message snapshot - $instance_id"
+
+  # TODO: migrate project_tag in from Terraform
+  project="IOOS-Cloud-Sandbox"
+
+  response=`/usr/local/bin/aws --region ${aws_region} ec2 create-snapshots \
+    --instance-specification "InstanceId=$instance_id,ExcludeBootVolume=false" \
+    --copy-tags-from-source volume \
+    --tag-specifications "ResourceType=snapshot,Tags=[{Key=\"Name\",Value=\"${name_tag}\"},{Key=\"Project\",Value=\"${project}\"}]"`
+
+  snapshotId=`echo $response | jq '.Snapshots[].SnapshotId'`
+
+  echo $snapshotId | awk -F\" '{print $2}'
+
+  cd $home
+}
+
+#####################################################################
+#####################################################################
+#####################################################################
 #####################################################################
 
 
@@ -520,8 +757,11 @@ setup_aliases () {
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
   #git config --global user.name "Patrick Tripp"
-  #git config --global user.email patrick.tripp@rpsgroup.com
+  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
   #git commit --amend --reset-author
+
+  #git config user.name "Patrick Tripp"
+  #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
 
   cd $home
 }

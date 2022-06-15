@@ -15,10 +15,9 @@
 # e.g. 72.245.67.89/32
 allowed_ssh_cidr = ""
 
-# (Key name is only used as a reminder here and in the instance metadata)
-# This is the name of the SSL key that matches the public_key
-key_name = ""
-public_key = ""
+
+key_name = ""       # the filename of the private SSL key 
+public_key = ""     # the matching public key (ssh-keygen -y -f your-key-pair.pem)
 #------------------------------------------------------------
 
 
@@ -31,4 +30,7 @@ public_key = ""
  availability_zone = "us-east-2a"
  instance_type = "t3.medium"
  use_efa = false
+
+ # You can give your AWS resources a unique name
+ # nameprefix="ioos-cloud-sandbox"
 #---------------------------------------------------------------
