@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "ciofs",
+  "CDATE"     : "today",
+  "HH"        : "06",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/ciofs/output",
+  "NTIMES"    : "43200",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

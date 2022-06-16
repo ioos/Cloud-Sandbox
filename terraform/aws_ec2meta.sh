@@ -10,15 +10,19 @@ SGIDS=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/
 
 AMIID=`tail /tmp/setup.log | grep ImageId`
 
-echo "INSTANCEID: $INSTANCEID"
-echo "IFACE: $IFACE"
-echo "SUBNET_ID: $SUBNET_ID"
-echo "VPC_ID: $VPC_ID"
-echo "REGION: $REGION"
-echo "SGIDS: "
-echo "$SGIDS"
+PLACEMENT_GROUP=`aws ec2 describe-placement-groups | grep GroupId | awk -F\" '{print $4}'`
 
-tail /tmp/setup.log | grep ImageId
+#echo "instanceid: $INSTANCEID"
+#echo "iface: $IFACE"
+echo "region: $REGION"
+echo "vpc_id: $VPC_ID"
+echo "image_id: $AMIID"
+echo "sg_ids: "
+echo "$SGIDS"
+echo "subnet_id: $SUBNET_ID"
+echo "placement_group: $PLACEMENT_GROUP"
+
+#tail /tmp/setup.log | grep ImageId
 
 # Can manually create an AMI here
 # ami_name="IOOS Cloud Sandbox AMI"

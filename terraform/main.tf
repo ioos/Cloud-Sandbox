@@ -55,7 +55,7 @@ resource "aws_placement_group" "cloud_sandbox_placement_group" {
 
 
 resource "aws_vpc" "cloud_vpc" {
-  # This is a large vpc, 256 x 256 IPs available
+   # This is a large vpc, 256 x 256 IPs available
    cidr_block = "10.0.0.0/16"
    enable_dns_support = true
    enable_dns_hostnames = true
@@ -197,6 +197,7 @@ resource "aws_instance" "head_node" {
 
   # This logic isn't perfect since some ena instance types can be in a placement group also
   placement_group = var.use_efa == true ? aws_placement_group.cloud_sandbox_placement_group.id : null
+
   tags = {
     Name = "${var.name_tag} EC2 Head Node"
     Project = var.project_tag
@@ -206,6 +207,10 @@ resource "aws_instance" "head_node" {
 # A random id to use when creating the AMI
 # This needs a new id if the instance_id changes - otherwise it won't create a new AMI
 resource "random_pet" "ami_id" {
+  keepers = {
+    #instance_id = aws_instance.head_node.id
+    ami_id = var.ami_id
+  }
   length    = 2
 }
 
@@ -213,7 +218,7 @@ data "template_file" "init_instance" {
   template = file("./init_template.tpl")
   vars = {
     efs_name = aws_efs_file_system.main_efs.dns_name
-    ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
+    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
     aws_region = var.preferred_region
     project = var.project_tag
   }
@@ -255,14 +260,3 @@ resource "aws_network_interface" "efa_network_adapter" {
       Project = var.project_tag
   }
 }
-
-
-
-# This was a disaster - started to get way too complicated
-# module "head_node" {
-#  source = "./modules/head_node"
-#  public_key = var.public_key
-#  key_name = var.key_name
-#  allowed_ssh_cidr = var.allowed_ssh_cidr
-#  efs_dns_name = aws_efs_file_system.main_efs.dns_name
-#}

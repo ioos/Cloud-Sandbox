@@ -19,8 +19,6 @@ lmhofs
 ciofs
 "
 
-fixdirs='shared ciofs'
-
 bucket=ioos-cloud-sandbox
 version=v3.2.1
 
