@@ -501,6 +501,23 @@ install_ffmpeg_osx () {
 }
 
 
+install_jupyterhub() {
+  # install npm
+  curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+  sudo yum clean all && sudo yum makecache fast
+  sudo yum install -y gcc-c++ make # this is already installed in the image
+  sudo yum install -y nodejs
+
+  # install JupyterHub (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
+  python3 -m pip install jupyterhub
+  sudo -E env "PATH=$PATH" npm install -g configurable-http-proxy
+  python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
+
+  #TODO: Upload config to S3 for download
+  #TODO: Add section to copy config over
+}
+
+
 #####################################################################
 
 

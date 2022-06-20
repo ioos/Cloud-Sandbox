@@ -22,6 +22,7 @@ install_esmf
 install_base_rpms
 install_extra_rpms
 install_ffmpeg
+install_jupyterhub
 
 sudo yum -y clean all
 
