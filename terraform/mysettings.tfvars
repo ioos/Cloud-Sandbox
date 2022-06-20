@@ -33,8 +33,8 @@ public_key = ""     # the matching public key (ssh-keygen -y -f your-key-pair.pe
 
 # preferred_region = "us-east-2"
 # name_tag = "IOOS Cloud Sandbox - Terraform"
-# project_tag = "IOOS-Cloud-Sandbox"
 # availability_zone = "us-east-2a"
+# project_tag = "IOOS-Cloud-Sandbox"
 # instance_type = "t3.medium"
 # use_efa = false 
 

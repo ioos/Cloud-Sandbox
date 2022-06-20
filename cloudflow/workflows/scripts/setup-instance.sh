@@ -16,27 +16,27 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-setup_ssh_mpi
-install_efa_driver
+# setup_ssh_mpi
+# install_efa_driver
 
 # Compilers and libraries
-install_python_modules_user
-install_spack
-install_gcc
-install_intel_oneapi
-install_netcdf
+# install_python_modules_user
+# install_spack
+# install_gcc
+# install_intel_oneapi
+# install_netcdf
 #install_hdf5-gcc8   # Not needed?
-install_esmf
-install_base_rpms
-install_extra_rpms
-install_ffmpeg
+# install_esmf
+# install_base_rpms
+# install_extra_rpms
+# install_ffmpeg
 
 # Job scheduler, resource manager
-install_munge
+# install_munge
 
 # Compute node config
-install_slurm-epel7 compute
-sudo yum -y clean all
+# install_slurm-epel7 compute
+# sudo yum -y clean all
 
 # Take a snapshot for compute nodes
 snapshotId=`create_snapshot "Compute Node"`
@@ -52,8 +52,8 @@ imageId=`python3 create_image.py $snapshotId "$imageName"`
 echo "Compute node image: $imageId"
 
 # Head node 
-install_slurm-epel7 head
-sudo yum -y clean all
+# install_slurm-epel7 head
+# sudo yum -y clean all
 
 # create snapshot for potential re-use
 # snapshotId=`create_snapshot "Head Node"`
@@ -62,4 +62,4 @@ sudo yum -y clean all
 # imageName="${ami_name:='IOOS cloud sandbox'} Head Node"
 # imageId=`python3 create_image.py $snapshotId "$imageName"`
 
-echo "Setup completed!"
+# echo "Setup completed!"
