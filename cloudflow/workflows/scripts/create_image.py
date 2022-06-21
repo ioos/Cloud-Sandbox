@@ -50,14 +50,22 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
   snapshot = resrc.Snapshot(snapshotId)
 
   print(f"... waiting for snapshot ... : snapshotId: {snapshot}")
-  try:
-    snapshot.wait_until_completed()
-  except Exception as e:
-    print("Exception: " + str(e))
-    sys.exit(1)
+
+  maxtries=2
+  tries=0
+  while tries < maxtries:
+    try:
+      snapshot.wait_until_completed()
+      break
+    except Exception as e:
+      print("Exception: " + str(e))
+      tries += 1
+      if tries == maxtries:
+        print("ERROR: maxtries reached. something went wrong")
+        sys.exit(2)
+  
  
   response=''
-
   try:
     response = ec2.register_image(
       Architecture='x86_64',

@@ -383,7 +383,7 @@ install_slurm-epel7 () {
   # Head node or Compute node?
   # Although it is possible to use the head node as a compute node also,
   # we are making sure we only have one or the other setup here 
-  # to help ensure the image/snapshot taken is only for one or the other
+  # to help ensure the image taken is only for one or the other
   # The snapshot can be taken after running either setup
 
   # Exclusive or 
@@ -713,12 +713,15 @@ create_snapshot () {
     message=$1
   fi
 
+  echo "create_snapshot: message is: $message"
+
   # AWS
   aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
   instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 
   # TODO: remove hardcoded values
-  name_tag="$message snapshot - $instance_id"
+  name_tag="$message snapshot of $instance_id"
+  echo "create_snapshot: name_tag is: $name_tag"
 
   # TODO: migrate project_tag in from Terraform
   project="IOOS-Cloud-Sandbox"
