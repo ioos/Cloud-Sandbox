@@ -49,7 +49,10 @@ snapshotId=`create_snapshot "Compute Node"`
 
 echo "$0 ami_name: $ami_name"
 printenv
-imageName="${ami_name:=IOOS cloud sandbox} Compute Node"
+
+ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
+
+imageName="${ami_name}-Compute-Node"
 echo "$0 imageName: $imageName"
 
 imageId=`python3 create_image.py $snapshotId "$imageName"`
