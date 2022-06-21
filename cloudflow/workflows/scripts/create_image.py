@@ -11,18 +11,54 @@ DEBUG=False
 def main():
 
     lenargs = len(sys.argv) - 1
-    if lenargs == 2:
-      snapshotid = sys.argv[1]
-      imagename = sys.argv[2]
+    if lenargs == 3:
+      instance_id = sys.argv[1]
+      image_name = sys.argv[2]
+      project_tag = sys.argv[3]
     else:
-      print(f"{sys.argv[0]} <snapshot id> <image name>")
+      print(f"{sys.argv[0]} <instance_id> <image_name> <project_tag>")
       sys.exit(1)
 
-    imageid = create_image_from_snapshot(snapshotid, imagename)
-    print(imageid)
+    snapshot_id = create_snapshot(instance_id, image_name)
+    image_id = create_image_from_snapshot(snapshot_id, image_name)
+    return image_id
 
 
-def create_image_from_snapshot(snapshotId: str, imageName: str):
+def create_snapshot(instance_id: str, name_tag: str, project_tag: str)
+
+  ''' NOTE: Run 'sync' on filesystem to flush the disk cache before running this ''' 
+  ec2 = boto3.client('ec2')
+
+  try: 
+    response = ec2.create_snapshots(
+      # Description='string',
+      InstanceSpecification={
+          'InstanceId': instance_id,
+          'ExcludeBootVolume': False
+      },
+      OutpostArn='string',
+      TagSpecifications=[
+          {
+              'ResourceType': 'snapshot'
+              'Tags': [
+                  { 'Key': 'Name', 'Value': name_tag },
+                  { 'Key': 'Project', 'Value': project_tag }
+              ]
+          },
+      ],
+      DryRun=False,
+      CopyTagsFromSource='volume'
+    )
+  except Exception as e:
+    print(str(e))
+    if DEBUG: traceback.print_stack()
+    return None
+
+  snapshot_id = response['Snapshots'][0]['SnapshotId']
+  return snapshot_id
+
+
+def create_image_from_snapshot(snapshot_id: str, image_name: str):
 
   # imagename needs to be unique
  
@@ -39,7 +75,7 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
     'DeviceName': '/dev/sda1',
     'Ebs': {
       'DeleteOnTermination': True,
-      'SnapshotId': snapshotId,
+      'SnapshotId': snapshot_id,
       'VolumeType': 'gp2'
     }
   }
@@ -47,9 +83,9 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
   # Wait for snapshot to be created - will throw an exception after 10 minutes
   #resrc = boto3.resource('ec2',region_name=region_name)
   resrc = boto3.resource('ec2')
-  snapshot = resrc.Snapshot(snapshotId)
+  snapshot = resrc.Snapshot(snapshot_id)
 
-  print(f"... waiting for snapshot ... : snapshotId: {snapshot}")
+  print(f"... waiting for snapshot ... : snapshot_id: {snapshot}")
 
   maxtries=2
   tries=0
