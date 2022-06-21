@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 GCC_VER=8.5.0
 INTEL_VER=2021.3.0

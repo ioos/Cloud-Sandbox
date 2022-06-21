@@ -40,6 +40,7 @@ sudo yum -y clean all
 
 # TODO: create an output file to contain all of this state info - json
 # TODO: re-write in Python ?
+# TODO: make the next section cleaner, more abstracted away
 
 export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
 
@@ -52,10 +53,9 @@ snapshotId=`create_snapshot "Compute Node"`
 # otherwise it will use the default
 
 ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
-# echo "$0 ami_name: $ami_name"
 
 imageName="${ami_name}-Compute-Node"
-echo "$0 imageName: $imageName"
+echo "Compute node imageName: $imageName"
 
 imageId=`python3 create_image.py $snapshotId "$imageName"`
 echo "Compute node imageId: $imageId"
