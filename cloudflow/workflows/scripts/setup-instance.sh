@@ -20,7 +20,7 @@ setup_aliases
 # install_efa_driver
 
 # Compilers and libraries
-# install_python_modules_user
+install_python_modules_user
 # install_spack
 # install_gcc
 # install_intel_oneapi
