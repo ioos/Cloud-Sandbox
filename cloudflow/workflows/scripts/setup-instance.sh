@@ -47,7 +47,11 @@ snapshotId=`create_snapshot "Compute Node"`
 # otherwise it will use the default
 # TODO: make sure imageName is unique
 
-imageName="${ami_name:='IOOS cloud sandbox'} Compute Node"
+echo "$0 ami_name: $ami_name"
+printenv
+imageName="${ami_name:=IOOS cloud sandbox} Compute Node"
+echo "$0 imageName: $imageName"
+
 imageId=`python3 create_image.py $snapshotId "$imageName"`
 echo "Compute node image: $imageId"
 
