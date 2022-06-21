@@ -24,7 +24,7 @@ export ami_name=${ami_name}
 
 echo "ami_name: ${ami_name}" >>  /tmp/setup.log 2>&1
 
-sudo -u centos ./setup-instance.sh >> /tmp/setup.log 2>&1
+sudo -E -u centos ./setup-instance.sh >> /tmp/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 
