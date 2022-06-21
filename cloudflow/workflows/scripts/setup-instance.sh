@@ -16,29 +16,32 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-# setup_ssh_mpi
-# install_efa_driver
+setup_ssh_mpi
+install_efa_driver
 
 # Compilers and libraries
 install_python_modules_user
-# install_spack
-# install_gcc
-# install_intel_oneapi
-# install_netcdf
+install_spack
+install_gcc
+install_intel_oneapi
+install_netcdf
 #install_hdf5-gcc8   # Not needed?
-# install_esmf
-# install_base_rpms
-# install_extra_rpms
-# install_ffmpeg
+install_esmf
+install_base_rpms
+install_extra_rpms
+install_ffmpeg
 
 # Job scheduler, resource manager
-# install_munge
+install_munge
 
 # Compute node config
-# install_slurm-epel7 compute
-# sudo yum -y clean all
+install_slurm-epel7 compute
+sudo yum -y clean all
 
-export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+# TODO: create an output file to contain all of this state info - json
+# TODO: re-write in Python ?
+
+export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
 
 # Take a snapshot for compute nodes
 snapshotId=`create_snapshot "Compute Node"`
@@ -47,18 +50,15 @@ snapshotId=`create_snapshot "Compute Node"`
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
-# TODO: make sure imageName is unique
-
-echo "$0 ami_name: $ami_name"
-printenv
 
 ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
+# echo "$0 ami_name: $ami_name"
 
 imageName="${ami_name}-Compute-Node"
 echo "$0 imageName: $imageName"
 
 imageId=`python3 create_image.py $snapshotId "$imageName"`
-echo "Compute node image: $imageId"
+echo "Compute node imageId: $imageId"
 
 # Head node 
 # install_slurm-epel7 head
@@ -68,7 +68,7 @@ echo "Compute node image: $imageId"
 # snapshotId=`create_snapshot "Head Node"`
 # echo "Snapshot taken: $snapshotId"
 
-# imageName="${ami_name:='IOOS cloud sandbox'} Head Node"
+# imageName="${ami_name}-Head-Node"
 # imageId=`python3 create_image.py $snapshotId "$imageName"`
 
-# echo "Setup completed!"
+echo "Setup completed!"

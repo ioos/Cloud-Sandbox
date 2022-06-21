@@ -26,7 +26,7 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
 
   # imagename needs to be unique
  
-  # Region must be defined in AWS_REGION env var
+  # Region must be defined in AWS_DEFAULT_REGION env var
   # region_name = 'us-east-2'
   #ec2 = boto3.client('ec2', region_name=region_name )
 
@@ -74,7 +74,8 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
     if DEBUG: traceback.print_stack()
     return None
 
-  client.create_tags(
+  # Give it a Name tag also
+  ec2.create_tags(
     Resources=[ response['ImageId'] ],
     Tags=[ { 'Key': 'Name',
              'Value': imageName } ])
