@@ -38,6 +38,8 @@ install_python_modules_user
 # install_slurm-epel7 compute
 # sudo yum -y clean all
 
+export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+
 # Take a snapshot for compute nodes
 snapshotId=`create_snapshot "Compute Node"`
 

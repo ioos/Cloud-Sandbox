@@ -26,9 +26,11 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
 
   # imagename needs to be unique
  
-  # TODO: Don't hardcode region 
-  region_name = 'us-east-2'
-  ec2 = boto3.client('ec2', region_name=region_name )
+  # Region must be defined in AWS_REGION env var
+  # region_name = 'us-east-2'
+  #ec2 = boto3.client('ec2', region_name=region_name )
+
+  ec2 = boto3.client('ec2')
 
   description='sandbox image from snapshot'
   imagename = imageName
@@ -43,7 +45,8 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
   }
 
   # Wait for snapshot to be created - will throw an exception after 10 minutes
-  resrc = boto3.resource('ec2',region_name=region_name)
+  #resrc = boto3.resource('ec2',region_name=region_name)
+  resrc = boto3.resource('ec2')
   snapshot = resrc.Snapshot(snapshotId)
 
   print(f"... waiting for snapshot ... : snapshotId: {snapshot}")
@@ -70,6 +73,11 @@ def create_image_from_snapshot(snapshotId: str, imageName: str):
     print(str(e))
     if DEBUG: traceback.print_stack()
     return None
+
+  client.create_tags(
+    Resources=[ response['ImageId'] ],
+    Tags=[ { 'Key': 'Name',
+             'Value': imageName } ])
 
   return response['ImageId']
 
