@@ -71,11 +71,11 @@ sudo yum -y clean all
 # Optionally create Head node image
 ###################################
 
-# image_name="${ami_name}-Head-Node"
-# echo "Head node image_name: $image_name"
+image_name="${ami_name}-Head-Node"
+echo "Head node image_name: $image_name"
 
-# sudo sync
-# image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-# echo "Head node image_id: $image_id"
+sudo sync
+image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
+echo "Head node image_id: $image_id"
 
 echo "Setup completed!"

@@ -12,17 +12,12 @@ cd /home/centos
 sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
-#BRANCH=master
-BRANCH=updates-2206
+BRANCH=master
 
 sudo -u centos git checkout $BRANCH
 
 # Need to pass ami_name
-# alternatively export it as an environment variable
-
 export ami_name=${ami_name}
-
-echo "ami_name: ${ami_name}" >>  /tmp/setup.log 2>&1
 
 sudo -E -u centos ./setup-instance.sh >> /tmp/setup.log 2>&1
 

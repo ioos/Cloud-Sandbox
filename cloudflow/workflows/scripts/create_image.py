@@ -55,7 +55,7 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
       CopyTagsFromSource='volume'
     )
   except Exception as e:
-    print(str(e))
+    # print(str(e))
     if DEBUG: traceback.print_stack()
     return None
 
@@ -85,10 +85,11 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     }
   }
 
-  # Wait for snapshot to be created - will throw an exception after 10 minutes
   resrc = boto3.resource('ec2')
   snapshot = resrc.Snapshot(snapshot_id)
 
+  # Wait for snapshot to be created 
+  # wait_until will throw an exception after 10 minutes
   maxtries=2
   tries=0
   while tries < maxtries:
@@ -96,11 +97,11 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
       snapshot.wait_until_completed()
       break
     except Exception as e:
-      print("Exception: " + str(e))
+      #print("Exception: " + str(e))
       tries += 1
       if tries == maxtries:
-        print("ERROR: maxtries reached. something went wrong")
-        # TODO: raise an exception ?
+        # print("ERROR: maxtries reached. something went wrong")
+        if DEBUG: traceback.print_stack()
         return None
   
  
