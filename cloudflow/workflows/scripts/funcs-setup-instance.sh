@@ -515,17 +515,16 @@ install_jupyterhub() {
   sudo -E env "PATH=$PATH" npm install -g configurable-http-proxy
   /opt/jupyterhub/bin/python -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
-  #TODO: Upload config to S3 for download
-  #TODO: Add section to copy config over
+  # Copy config over
+  curl "s3://ioos-cloud-sandbox/public/jupyterhub/jupyterhub_config.py" -o /opt/jupyterhub/jupyterhub_config.py
 
   # created systemd service
   sudo mkdir -p /opt/jupyterhub/etc/systemd
-  #TODO: Copy system service from S3
+  curl "s3://ioos-cloud-sandbox/public/jupyterhub/jupyterhub.service" -o /opt/jupyterhub/etc/systemd/jupyterhub.service
   sudo ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/jupyterhub.service
   sudo systemctl daemon-reload
   sudo systemctl enable jupyterhub.service
   sudo systemctl start jupyterhub.service
-  
 }
 
 
