@@ -508,13 +508,24 @@ install_jupyterhub() {
   sudo yum install -y gcc-c++ make # this is already installed in the image
   sudo yum install -y nodejs
 
-  # install JupyterHub (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
-  python3 -m pip install jupyterhub
+  # install JupyterHub (https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md)
+  # create virtual python environment
+  sudo python3 -m venv /opt/jupyterhub/
+  /opt/jupyterhub/bin/python -m pip install jupyterhub
   sudo -E env "PATH=$PATH" npm install -g configurable-http-proxy
-  python3 -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
+  /opt/jupyterhub/bin/python -m pip install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
   #TODO: Upload config to S3 for download
   #TODO: Add section to copy config over
+
+  # created systemd service
+  sudo mkdir -p /opt/jupyterhub/etc/systemd
+  #TODO: Copy system service from S3
+  sudo ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/jupyterhub.service
+  sudo systemctl daemon-reload
+  sudo systemctl enable jupyterhub.service
+  sudo systemctl start jupyterhub.service
+  
 }
 
 
