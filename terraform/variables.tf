@@ -13,13 +13,13 @@ variable "nameprefix" {
 variable "name_tag" {
   description = "Value of the Name tag for the EC2 instance"
   type        = string
-  default     = "IOOS Cloud Sandbox - Terraform"
+  default     = "IOOS-Cloud-Sandbox-Terraform"
 }
 
 variable "project_tag" {
   description = "Value of the Project tag for the EC2 instance"
   type        = string
-  default     = "IOOS-cloud-sandbox"
+  default     = "IOOS-Cloud-Sandbox"
 }
 
 variable "availability_zone" {

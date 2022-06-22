@@ -25,7 +25,7 @@ install_spack
 install_gcc
 install_intel_oneapi
 install_netcdf
-#install_hdf5-gcc8   # Not needed?
+# #install_hdf5-gcc8   # Not needed?
 install_esmf
 install_base_rpms
 install_extra_rpms
@@ -38,28 +38,44 @@ install_munge
 install_slurm-epel7 compute
 sudo yum -y clean all
 
-# Take a snapshot for compute nodes
-snapshotId=`create_snapshot "Compute Node"`
+# TODO: create an output file to contain all of this state info - json
+# TODO: re-write in Python ?
 
-# Create AMI for compute nodes
+## Create the AMI to be used for the compute nodes
+# TODO: make the next section cleaner, more abstracted away
+
+export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+instance_id=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
-# TODO: make sure imageName is unique
 
-imageName="${ami_name:='IOOS cloud sandbox'} Compute Node"
-imageId=`python3 create_image.py $snapshotId "$imageName"`
-echo "Compute node image: $imageId"
+ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
 
-# Head node 
+# TODO: pass this in via Terraform init template
+project_tag="IOOS-Cloud-Sandbox"
+
+image_name="${ami_name}-Compute-Node"
+echo "Compute node image_name: '$image_name'"
+
+# Flush the disk cache
+sudo sync
+
+image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
+echo "Compute node image_id: $image_id"
+
+# Configure this machine as a head node
 install_slurm-epel7 head
 sudo yum -y clean all
 
-# create snapshot for potential re-use
-# snapshotId=`create_snapshot "Head Node"`
-# echo "Snapshot taken: $snapshotId"
+# Optionally create Head node image
+###################################
 
-# imageName="${ami_name:='IOOS cloud sandbox'} Head Node"
-# imageId=`python3 create_image.py $snapshotId "$imageName"`
+image_name="${ami_name}-Head-Node"
+echo "Head node image_name: $image_name"
+
+sudo sync
+image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
+echo "Head node image_id: $image_id"
 
 echo "Setup completed!"

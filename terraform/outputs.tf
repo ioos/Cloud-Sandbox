@@ -18,6 +18,11 @@ output "key_name" {
    value = var.key_name
 }
 
+output "ami_name" {
+    description = "Used for AMI creation"
+    value = "${var.name_tag}-${random_pet.ami_id.id}"
+}
+
 output "aws_security_groups" {
     description = "AWS Security Groups"
     value = [aws_security_group.base_sg.id,
