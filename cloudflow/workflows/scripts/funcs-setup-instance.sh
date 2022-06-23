@@ -321,7 +321,7 @@ install_hdf5-gcc8 () {
 
 
 #-----------------------------------------------------------------------------#
-install_munge () {
+install_munge_s3 () {
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -341,6 +341,7 @@ install_munge () {
 
   cd $home
 }
+
 
 
 install_slurm_spack () {
@@ -388,6 +389,17 @@ install_slurm_spack () {
   cd $home
 }
 
+
+configure_slurm () { 
+  echo "stub"    
+
+# /etc/systemd/system/multi-user.target.wants
+# lrwxrwxrwx.  1 root root   41 Jun 23 01:15 slurmctld.service -> /usr/lib/systemd/system/slurmctld.service
+# lrwxrwxrwx.  1 root root   38 Jun 23 01:29 slurmd.service -> /usr/lib/systemd/system/slurmd.service
+
+# Created symlink from /etc/systemd/system/multi-user.target.wants/munge.service to /usr/lib/systemd/system/munge.service
+# Created symlink from /etc/systemd/system/multi-user.target.wants/slurmdbd.service to /usr/lib/systemd/system/slurmdbd.service
+}
 
 # https://koji.fedoraproject.org/koji/search?terms=slurm-$SLURM_VER-2.el7&type=build&match=glob
 # Fedora project repo is the epel yum repo already enabled
