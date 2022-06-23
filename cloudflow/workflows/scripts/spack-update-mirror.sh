@@ -7,8 +7,8 @@ SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 SPEC='%gcc@8.5'
 
 ### MAKE SURE TO IMPORT THE PRIVATE KEY FIRST!
-
-spack config add "config:install_tree:padded_length:128"
+# SECRET=~/spack.mirror.gpgkey.secret
+# spack gpg trust $SECRET
 
 # Rebuild
 PKGLIST=`spack find --format "{name}@{version}%{compiler}/{hash}" $SPEC`

@@ -221,7 +221,7 @@ install_spack() {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # spack config add "config:install_tree:padded_length:128"
+  spack config add "config:install_tree:padded_length:128"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
@@ -502,6 +502,8 @@ install_slurm_s3() {
 }
 
 
+
+#-----------------------------------------------------------------------------#
 install_esmf () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -519,6 +521,7 @@ install_esmf () {
 }
 
 
+#-----------------------------------------------------------------------------#
 install_base_rpms () {
 
   # TODO: refactor into one "install_nco_libs" function
@@ -561,6 +564,7 @@ install_base_rpms () {
 
 
 
+#-----------------------------------------------------------------------------#
 install_extra_rpms () {
 
   echo "Running ${FUNCNAME[0]} ..."
