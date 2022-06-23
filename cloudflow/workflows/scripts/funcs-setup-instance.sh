@@ -343,6 +343,10 @@ install_munge () {
 # wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
 
 #-----------------------------------------------------------------------------#
+# NOTE: In the beginning of 2021, a version of Slurm was added to the EPEL repository. This version is not supported or maintained by SchedMD, and is not currently recommend for customer use. Unfortunately, this inclusion could cause Slurm to be updated to a newer version outside of a planned maintenance period. In order to prevent Slurm from being updated unintentionally, we recommend you modify the EPEL Repository configuration to exclude all Slurm packages from automatic updates.
+
+# exclude=slurm*
+
 install_slurm-epel7 () {
   echo "Running ${FUNCNAME[0]} ..."
 
