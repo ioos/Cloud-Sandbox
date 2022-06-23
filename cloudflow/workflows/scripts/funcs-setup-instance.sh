@@ -3,11 +3,17 @@
 GCC_VER=8.5.0
 INTEL_VER=2021.3.0
 
+SPACK_VER='releases/v0.18'
 SPACK_DIR='/save/environments/spack'
-SPACKOPTS='-v'
+SPACKOPTS='-v -y'
+
+#HDF5_VER='1.13.1'
+# HDF5_VER='1.12.2'
+SLURM_VER='22-05-2-1'
+#SLURM_VER='21-08-8-2'  # doesn't build
 
 # 1 = Don't build any packages. Only install packages from binary mirrors
-SPACK_CACHEONLY=1
+SPACK_CACHEONLY=0
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS="$SPACKOPS --cache-only"
 fi
@@ -195,7 +201,6 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  SPACK_VERSION='releases/v0.17'
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
@@ -210,7 +215,7 @@ install_spack() {
   mkdir -p $SPACK_DIR
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
-  git checkout -q $SPACK_VERSION
+  git checkout -q $SPACK_VER
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
 
@@ -285,7 +290,7 @@ install_netcdf () {
   # use diffutils@3.7 - intel compiler fails with 3.8
   # use m4@1.4.17     - intel compiler fails with newer versions
 
-  spack install $SPACKOPTS netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools \
+  spack install $SPACKOPTS netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe \
      ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   cd $home
@@ -333,6 +338,52 @@ install_munge () {
 
   sudo systemctl enable munge
   sudo systemctl start munge
+
+  cd $home
+}
+
+
+install_slurm_spack () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  # COMPILER=intel@${INTEL_VER}
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  # This one built a new hdf5 for some reason
+  # Error installing: ==> Installing tar-1.34-c4ptcf7gpvsm63e3jjfuxpssihnpzzqt
+  # 
+  # spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^diffutils@3.7 ^m4@1.4.17 ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+
+  # Try this one instead
+  #spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  # Pre-reqs build but not slurm
+  # spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  # slurm fails disable-dependency-tracking
+
+  #spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  #spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER}  \
+  #               ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+                ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+
+  # This works using version 22-05-2-1, no hdf5 whatever that is used for
+  # spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  #  gtk [off]                  --      on, off                 Enable GTK+ support
+  #  hdf5 [off]                 --      on, off                 Enable hdf5 support
+  #  hwloc [off]                --      on, off                 Enable hwloc support
+  #  mariadb [off]              --      on, off                 Use MariaDB instead of MySQL
+  #  pmix [off]                 --      on, off                 Enable PMIx support
+  #  readline [on]              --      on, off                 Enable readline support
+  #  restd [off]                --      on, off                 Enable the slurmrestd server
+  #  sysconfdir [PREFIX/etc]    --      Return True if          Set system configuration path (possibly /etc/slurm)
 
   cd $home
 }

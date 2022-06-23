@@ -35,7 +35,9 @@ install_ffmpeg
 install_munge
 
 # Compute node config
-install_slurm-epel7 compute
+#install_slurm-epel7 compute
+install_slurm_spack
+# configure_slurm compute
 sudo yum -y clean all
 
 # TODO: create an output file to contain all of this state info - json
@@ -65,17 +67,17 @@ image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
 echo "Compute node image_id: $image_id"
 
 # Configure this machine as a head node
-install_slurm-epel7 head
-sudo yum -y clean all
+# install_slurm-epel7 head
+# sudo yum -y clean all
 
 # Optionally create Head node image
 ###################################
 
-image_name="${ami_name}-Head-Node"
-echo "Head node image_name: $image_name"
+# image_name="${ami_name}-Head-Node"
+# echo "Head node image_name: $image_name"
 
-sudo sync
-image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-echo "Head node image_id: $image_id"
+# sudo sync
+# image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
+# echo "Head node image_id: $image_id"
 
 echo "Setup completed!"
