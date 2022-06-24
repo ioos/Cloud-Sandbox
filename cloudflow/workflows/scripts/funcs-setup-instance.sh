@@ -525,6 +525,11 @@ install_jupyterhub() {
   sudo systemctl daemon-reload
   sudo systemctl enable jupyterhub.service
   sudo systemctl start jupyterhub.service
+
+
+  # Work in progress
+  sudo /opt/jupyterhub/bin/python -m pip install sudospawner
+  
 }
 
 
