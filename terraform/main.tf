@@ -54,7 +54,7 @@ resource "aws_placement_group" "cloud_sandbox_placement_group" {
 
 
 resource "aws_vpc" "cloud_vpc" {
-  # This is a large vpc, 256 x 256 IPs available
+   # This is a large vpc, 256 x 256 IPs available
    cidr_block = "10.0.0.0/16"
    enable_dns_support = true
    enable_dns_hostnames = true
@@ -176,7 +176,7 @@ resource "aws_instance" "head_node" {
   # Choosing direct from CentOS as it is more recent
   ami = data.aws_ami.centos_7.id
   instance_type = var.instance_type
-  cpu_threads_per_core = 1
+  cpu_threads_per_core = 2
   root_block_device {
         delete_on_termination = true
         volume_size = 12
@@ -187,15 +187,15 @@ resource "aws_instance" "head_node" {
   key_name = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
   user_data = data.template_file.init_instance.rendered
-
+  # associate_public_ip_address = true
   network_interface {
     device_index = 0    # MUST be 0
-    #network_interface_id = aws_network_interface.efa_network_adapter.id
     network_interface_id = var.use_efa == true ? aws_network_interface.efa_network_adapter.id : aws_network_interface.standard.id
   }
 
   # This logic isn't perfect since some ena instance types can be in a placement group also
   placement_group = var.use_efa == true ? aws_placement_group.cloud_sandbox_placement_group.id : null
+
   tags = {
     Name = "${var.name_tag} EC2 Head Node"
     Project = var.project_tag
@@ -216,7 +216,7 @@ data "template_file" "init_instance" {
   template = file("./init_template.tpl")
   vars = {
     efs_name = aws_efs_file_system.main_efs.dns_name
-    ami_name = "${var.name_tag}-${random_pet.ami_id.id} AMI"
+    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
     aws_region = var.preferred_region
     project = var.project_tag
   }
