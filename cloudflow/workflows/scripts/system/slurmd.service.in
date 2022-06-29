@@ -7,15 +7,18 @@ Wants=network-online.target
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/slurmd
-EnvironmentFile=-/etc/default/slurmd
-ExecStart=@sbindir@/slurmd -D -s $SLURMD_OPTIONS
+# EnvironmentFile=-/etc/default/slurmd
+#ExecStart=@sbindir@/slurmd -D -s $SLURMD_OPTIONS
+ExecStart=@sbindir@/slurmd -D $SLURMD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 LimitNOFILE=131072
 LimitMEMLOCK=infinity
 LimitSTACK=infinity
 Delegate=yes
-@SYSTEMD_TASKSMAX_OPTION@
+
+# PT - I don't know what this option does
+# @SYSTEMD_TASKSMAX_OPTION@
 
 # Uncomment the following lines to disable logging through journald.
 # NOTE: It may be preferable to set these through an override file instead.

@@ -398,7 +398,7 @@ get_module_path () {
       return 1
     fi
   else
-    echo "ERROR! No module was found for $mod_name"
+    echo "ERROR: No module was found for $mod_name"
     return 2
   fi
 
@@ -426,7 +426,7 @@ add_module_sbin_path () {
     echo "export PATH=${ADDPATH}sbin:\$PATH" >> ~/.bashrc
     export PATH=${ADDPATH}sbin:$PATH
   else
-    echo "ERROR! No module was found for $mod_name"
+    echo "ERROR: No module was found for $mod_name"
     return 2
   fi
 
@@ -447,7 +447,7 @@ install_slurm () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # Munge is a prerequisite for slurm, custom options being used here 
-  install_munge
+  _install_munge
   result=$?
   if [ $result -ne 0 ]; then
     return $result
@@ -465,11 +465,18 @@ install_slurm () {
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
-  sudo mkdir -p /var/spool/slurm
-  sudo mkdir -p /var/run/slurm
+  #(null): _log_init: Unable to open logfile `/var/log/slurm/slurmctld.log': Permission denied
+  #slurmctld: error: Unable to open pidfile `/var/run/slurmctld.pid': Permission denied
 
-  sudo chown -R slurm /var/spool/slurm
-  sudo chown -R slurm /var/run/slurm
+  sudo mkdir -p /var/spool/slurmd
+
+  sudo mkdir -p /var/spool/slurm
+  sudo chgrp -R slurm /var/spool/slurm
+  sudo chmod g+rw /var/spool/slurm
+
+  sudo mkdir -p /var/log/slurm
+  sudo chgrp -R slurm /var/log/slurm
+  sudo chmod g+rw /var/log/slurm
 
   sudo mkdir  /etc/slurm
   sudo cp -pf slurm.conf /etc/slurm/slurm.conf
@@ -479,7 +486,7 @@ install_slurm () {
 
 #-----------------------------------------------------------------------------#
 
-install_munge () {
+_install_munge () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -508,16 +515,17 @@ install_munge () {
     return $result
   fi
 
-  add_module_sbin_path munge
-  result=$?
-  if [ $result != 0 ]; then
-    return $result
-  fi
-
+  
   spack load munge
   result=$?
   if [ $result -ne 0 ]; then
-    echo "ERROR! No package found for munge"
+    echo "ERROR: No package found for munge"
+    return $result
+  fi
+
+  add_module_sbin_path munge
+  result=$?
+  if [ $result != 0 ]; then
     return $result
   fi
 
@@ -525,7 +533,7 @@ install_munge () {
 
   sudo -u munge ${sbindir}/mungekey --create --keyfile=/etc/munge/munge.key  --verbose
 
-  sed -e "s|@sbindir[@]|$sbindir|g" system/munge.service.in | sudo tee /usr/lib/systemd/system/munge.service
+  sed -e "s|@sbindir[@]|$sbindir|g" system/munge.service.in | sudo tee /usr/lib/systemd/system/munge.service 1>& /dev/null
 
   sudo systemctl enable munge
   sudo systemctl start munge
@@ -535,30 +543,85 @@ install_munge () {
 
 configure_slurm () { 
 
-  echo "Running ${FUNCNAME[0]} ..."
+  if [ $# -ne 1 ]; then
+    echo "ERROR: ${FUNCNAME[0]} <compute | head>"
+    return 1
+  fi
 
+  if [[ $1 == "compute" ]]; then
+    nodetype="compute"
+  elif [[ $1 == "head" ]]; then
+    nodetype="head"
+  else
+    echo "ERROR: $1 is unknown. Usage: ${FUNCNAME[0]} <compute | head>"
+    return 2
+  fi
 
-# /etc/systemd/system/multi-user.target.wants
-# lrwxrwxrwx.  1 root root   41 Jun 23 01:15 slurmctld.service -> /usr/lib/systemd/system/slurmctld.service
-# lrwxrwxrwx.  1 root root   38 Jun 23 01:29 slurmd.service -> /usr/lib/systemd/system/slurmd.service
+  echo "Running ${FUNCNAME[0]} $1 ..."
 
-# Created symlink from /etc/systemd/system/multi-user.target.wants/munge.service to /usr/lib/systemd/system/munge.service
-# Created symlink from /etc/systemd/system/multi-user.target.wants/slurmdbd.service to /usr/lib/systemd/system/slurmdbd.service
+  spack load slurm
+  result=$?
+  if [ $result -ne 0 ]; then
+    echo "ERROR: No package found for slurm"
+    return $result
+  fi
+
+  add_module_sbin_path slurm
+  result=$?
+  if [ $result != 0 ]; then
+    return $result
+  fi
+
+  sbindir=$(get_module_path slurm sbin)
+  echo "sbindir: $sbindir"
+ 
+  # Exclusive or 
+  if [[ $nodetype == "head" ]]; then
+
+    # slurmctld runs as slurm user
+
+    # sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
+    sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
+
+    # First check if slurmd is installed
+    resp=`which slurmd > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
+      [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+    fi
+
+    sudo systemctl enable slurmctld
+    sudo systemctl start slurmctld
+
+    # slurmctld: error: power_save program /opt/parallelcluster/scripts/slurm/slurm_suspend not executable
+    # slurmctld: error: power_save module disabled, invalid SuspendProgram /opt/parallelcluster/scripts/slurm/slurm_suspend
+
+  else   # compute node
+
+    # slurmd runs as root
+    sed -e "s|@sbindir[@]|$sbindir|g" system/slurmd.service.in | sudo tee /usr/lib/systemd/system/slurmd.service 1>& /dev/null
+
+    # First check if slurmctld is installed
+    resp=`which slurmctld > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
+      [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+    fi
+    sudo systemctl enable slurmd
+    sudo systemctl start slurmd
+  fi
+
 }
 
-# https://koji.fedoraproject.org/koji/search?terms=slurm-$SLURM_VER-2.el7&type=build&match=glob
-# Fedora project repo is the epel yum repo already enabled
-# wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
+#-----------------------------------------------------------------------------#
 
+
+install_slurm-epel7 () {
 #-----------------------------------------------------------------------------#
 # NOTE: In the beginning of 2021, a version of Slurm was added to the EPEL repository. This version is not supported or maintained by SchedMD, and is not currently recommend for customer use. Unfortunately, this inclusion could cause Slurm to be updated to a newer version outside of a planned maintenance period. In order to prevent Slurm from being updated unintentionally, we recommend you modify the EPEL Repository configuration to exclude all Slurm packages from automatic updates.
 
 # exclude=slurm*
 #-----------------------------------------------------------------------------#
-
-#-----------------------------------------------------------------------------#
-
-install_slurm-epel7 () {
   echo "Running ${FUNCNAME[0]} ..."
 
   nodetype="head"

@@ -31,18 +31,13 @@ sudo setenforce 0
 # install_extra_rpms
 # install_ffmpeg
 
-# Job scheduler, resource manager
-install_munge
-
-# Compute node config
-#install_slurm-epel7 compute
-
 # Using sudo to install in root owned prefix
 # install_slurm_spack
 
-# test_munge
+# _install_munge
+configure_slurm compute
+# configure_slurm head
 
-# configure_slurm compute
 # sudo yum -y clean all
 
 # TODO: create an output file to contain all of this state info - json
