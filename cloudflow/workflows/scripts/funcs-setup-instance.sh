@@ -573,7 +573,7 @@ configure_slurm () {
   fi
 
   sbindir=$(get_module_path slurm sbin)
-  echo "sbindir: $sbindir"
+  # echo "sbindir: $sbindir"
  
   # Exclusive or 
   if [[ $nodetype == "head" ]]; then

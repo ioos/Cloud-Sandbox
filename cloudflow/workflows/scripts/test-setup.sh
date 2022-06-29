@@ -35,8 +35,8 @@ sudo setenforce 0
 # install_slurm_spack
 
 # _install_munge
-configure_slurm compute
-# configure_slurm head
+# configure_slurm compute
+configure_slurm head
 
 # sudo yum -y clean all
 
