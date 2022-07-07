@@ -16,6 +16,7 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
+install_jupyterhub
 setup_ssh_mpi
 install_efa_driver
 
@@ -30,7 +31,6 @@ install_esmf
 install_base_rpms
 install_extra_rpms
 install_ffmpeg
-install_jupyterhub
 
 # Job scheduler, resource manager
 install_munge

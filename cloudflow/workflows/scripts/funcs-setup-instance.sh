@@ -664,7 +664,7 @@ setup_ssh_mpi () {
   sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
   sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
 
-  cat >> /etc/ssh/ssh_config <<EOL
+  sudo cat >> /etc/ssh/ssh_config <<EOL
 Host ip-10-0-* 
    CheckHostIP no 
    StrictHostKeyChecking no 
@@ -700,6 +700,14 @@ install_jupyterhub() {
   sudo systemctl daemon-reload
   sudo systemctl enable jupyterhub.service
   sudo systemctl start jupyterhub.service
+
+  # install conda
+  curl "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh"
+  sudo echo "yes /opt/conda" |./Anaconda3-2022.05-Linux-x86_64.sh # surpress -y and change default path 
+
+  # setup Python environment for users
+  sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python ipykernel
+  sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
 
 
   # Work in progress
