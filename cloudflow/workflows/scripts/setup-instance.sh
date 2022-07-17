@@ -16,17 +16,17 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-# setup_ssh_mpi
-# install_efa_driver
+setup_ssh_mpi
+install_efa_driver
 
 # Compilers and libraries
-install_python_modules_user
-install_spack
-install_gcc
-install_intel_oneapi
-install_netcdf
+#install_python_modules_user
+#install_spack
+#install_gcc
+#install_intel_oneapi
+#install_netcdf
 # #install_hdf5-gcc8   # Not needed?
-install_esmf
+#install_esmf
 # install_base_rpms
 # install_extra_rpms
 # install_ffmpeg
@@ -36,9 +36,9 @@ install_esmf
 
 # Compute node config
 #install_slurm-epel7 compute
-install_slurm_spack
+#install_slurm_spack
 # configure_slurm compute
-sudo yum -y clean all
+#sudo yum -y clean all
 
 # TODO: create an output file to contain all of this state info - json
 # TODO: re-write in Python ?

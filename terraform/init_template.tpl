@@ -12,8 +12,7 @@ cd /home/centos
 sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
-#BRANCH=master
-BRANCH=slurm-install
+BRANCH=ufs-apps
 
 sudo -u centos git checkout $BRANCH
 
