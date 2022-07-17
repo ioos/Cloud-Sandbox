@@ -13,6 +13,7 @@ sudo -u centos git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
 BRANCH=ufs-apps
+#BRANCH=master
 
 sudo -u centos git checkout $BRANCH
 

@@ -8,7 +8,8 @@
 #ARCH='linux-centos7-core2'
 ARCH='linux-centos7-skylake_avx512'
 #COMP='intel@2021.3.0'
-COMP=' gcc@8.5.0'
+#COMP='gcc@8.5.0'
+COMP='gcc@4.8.5'
 
 TARGET='skylake_avx512'
 # TARGET='haswell'

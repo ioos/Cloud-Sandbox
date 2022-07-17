@@ -1,4 +1,3 @@
-#!/bin/env bash
 
 GCC_VER=8.5.0
 INTEL_VER=2021.3.0
@@ -12,10 +11,16 @@ SPACKOPTS='-v -y'
 SLURM_VER='22-05-2-1'
 #SLURM_VER='21-08-8-2'  # doesn't build
 
-# 1 = Don't build any packages. Only install packages from binary mirrors
+#  1 = Don't build any packages. Only install packages from binary mirrors
+#  0 = Will build if not found in mirror/cache
+# -1 = Don't check pre-built binary cache
+
 SPACK_CACHEONLY=0
+
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS="$SPACKOPS --cache-only"
+elif [ $SPACK_CACHEONLY -eq -1 ]; then
+  SPACKOPTS="$SPACKOPS --no-cache"
 fi
 
 # This script will setup the required system components, libraries
@@ -114,11 +119,14 @@ setup_paths () {
 }
 
 
+#-----------------------------------------------------------------------------#
+
 setup_environment_osx () {
   cd ~/.ssh
   cat id_rsa.pub >> authorized_keys
 }
 
+#-----------------------------------------------------------------------------#
 
 install_efa_driver() {
 
@@ -195,6 +203,7 @@ install_efa_driver() {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_spack() {
 
@@ -219,9 +228,13 @@ install_spack() {
   echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
   echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
 
+  # Location for overriding default configurations
+  sudo mkdir /etc/spack
+ 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  spack config add "config:install_tree:padded_length:128"
+  # TODO: Rebuild everything using this, and push to mirror
+  # spack config add "config:install_tree:padded_length:128"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
@@ -233,6 +246,7 @@ install_spack() {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_gcc () {
 
@@ -257,6 +271,7 @@ install_gcc () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_intel_oneapi () {
 
@@ -276,6 +291,7 @@ install_intel_oneapi () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_netcdf () {
 
@@ -290,13 +306,19 @@ install_netcdf () {
   # use diffutils@3.7 - intel compiler fails with 3.8
   # use m4@1.4.17     - intel compiler fails with newer versions
 
-  spack install $SPACKOPTS netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe \
+  # netcdf not built by intel ??
+  # spack install $SPACKOPTS netcdf-fortran ^netcdf-c@4.8.0 ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe \
+  #    ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  # Overriding some defaults for hdf5
+  spack install $SPACKOPTS netcdf-fortran%${COMPILER} ^netcdf-c@4.8.0%${COMPILER} ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe%${COMPILER} \
      ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   cd $home
 }
 
 #-----------------------------------------------------------------------------#
+
 install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
@@ -319,8 +341,8 @@ install_hdf5-gcc8 () {
   cd $home
 }
 
-
 #-----------------------------------------------------------------------------#
+
 install_munge_s3 () {
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -344,7 +366,76 @@ install_munge_s3 () {
 
 
 
-install_slurm_spack () {
+#-----------------------------------------------------------------------------#
+
+get_module_path () {
+
+  # Need to include at least a partial hash if multiple packages with the 
+  # same name are installed
+
+  . /usr/share/Modules/init/bash
+
+  
+  if [ $# -ne 2 ]; then
+    echo "Usage: get_module_path <module name> <end path>"
+    return 1
+  fi
+
+  mod_name=$1
+  end_path=$2
+
+  module=`module avail $mod_name 2>&1 | grep $mod_name`
+
+  if [ $? -eq 0 ]; then
+    if [[ $end_path == 'bin' ]]; then
+       path=`module show $module 2>&1 | grep 'PATH' | awk '{print $3}'`
+       echo ${path}
+    elif [[ $end_path == 'sbin' ]]; then
+       path=`module show $module 2>&1 | grep CMAKE_PREFIX_PATH | awk '{print $3}'`
+       echo ${path}sbin
+    else 
+      echo "ERROR: un-supported path $end_path"
+      return 1
+    fi
+  else
+    echo "ERROR: No module was found for $mod_name"
+    return 2
+  fi
+
+  return 0
+}
+
+#-----------------------------------------------------------------------------#
+
+add_module_sbin_path () {
+
+  . /usr/share/Modules/init/bash
+
+  if [ $# -ne 1 ]; then
+    echo "Usage: ${FUNCNAME[0]} <module name>"
+    return 1
+  fi
+
+  mod_name=$1
+
+  module=`module avail $mod_name 2>&1 | grep $mod_name`
+
+  if [ $? -eq 0 ]; then
+    echo "$mod_name module found, adding sbin to PATH"
+    ADDPATH=`module show $module 2>&1 | grep CMAKE_PREFIX_PATH | awk '{print $3}'`
+    echo "export PATH=${ADDPATH}sbin:\$PATH" >> ~/.bashrc
+    export PATH=${ADDPATH}sbin:$PATH
+  else
+    echo "ERROR: No module was found for $mod_name"
+    return 2
+  fi
+
+  return 0
+}
+
+#-----------------------------------------------------------------------------#
+
+install_slurm () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -355,62 +446,182 @@ install_slurm_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # This one built a new hdf5 for some reason
-  # Error installing: ==> Installing tar-1.34-c4ptcf7gpvsm63e3jjfuxpssihnpzzqt
-  # 
-  # spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^diffutils@3.7 ^m4@1.4.17 ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+  # Munge is a prerequisite for slurm, custom options being used here 
+  _install_munge
+  result=$?
+  if [ $result -ne 0 ]; then
+    return $result
+  fi
 
-  # Try this one instead
-  #spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+     ^munge localstatedir=/var ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
 
-  # Pre-reqs build but not slurm
-  # spack install $SPACKOPTS slurm+hdf5+hwloc+pmix ^hdf5@1.10.7~cxx+fortran+hl~ipo~java+shared+tools ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
-  # slurm fails disable-dependency-tracking
+  add_module_sbin_path slurm
+  result=$?
 
-  #spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
-  #spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER}  \
-  #               ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  if [ $result != 0 ]; then
+    return $result
+  fi
 
-  spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
-                ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
-  # This works using version 22-05-2-1, no hdf5 whatever that is used for
-  # spack install $SPACKOPTS slurm@${SLURM_VER}+hwloc+pmix ^tar@1.34%gcc@${GCC_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  #(null): _log_init: Unable to open logfile `/var/log/slurm/slurmctld.log': Permission denied
+  #slurmctld: error: Unable to open pidfile `/var/run/slurmctld.pid': Permission denied
 
-  #  gtk [off]                  --      on, off                 Enable GTK+ support
-  #  hdf5 [off]                 --      on, off                 Enable hdf5 support
-  #  hwloc [off]                --      on, off                 Enable hwloc support
-  #  mariadb [off]              --      on, off                 Use MariaDB instead of MySQL
-  #  pmix [off]                 --      on, off                 Enable PMIx support
-  #  readline [on]              --      on, off                 Enable readline support
-  #  restd [off]                --      on, off                 Enable the slurmrestd server
-  #  sysconfdir [PREFIX/etc]    --      Return True if          Set system configuration path (possibly /etc/slurm)
+  sudo mkdir -p /var/spool/slurmd
 
+  sudo mkdir -p /var/spool/slurm
+  sudo chgrp -R slurm /var/spool/slurm
+  sudo chmod g+rw /var/spool/slurm
+
+  sudo mkdir -p /var/log/slurm
+  sudo chgrp -R slurm /var/log/slurm
+  sudo chmod g+rw /var/log/slurm
+
+  sudo mkdir  /etc/slurm
+  sudo cp -pf slurm.conf /etc/slurm/slurm.conf
+ 
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
-configure_slurm () { 
-  echo "stub"    
+_install_munge () {
 
-# /etc/systemd/system/multi-user.target.wants
-# lrwxrwxrwx.  1 root root   41 Jun 23 01:15 slurmctld.service -> /usr/lib/systemd/system/slurmctld.service
-# lrwxrwxrwx.  1 root root   38 Jun 23 01:29 slurmd.service -> /usr/lib/systemd/system/slurmd.service
+  echo "Running ${FUNCNAME[0]} ..."
 
-# Created symlink from /etc/systemd/system/multi-user.target.wants/munge.service to /usr/lib/systemd/system/munge.service
-# Created symlink from /etc/systemd/system/multi-user.target.wants/slurmdbd.service to /usr/lib/systemd/system/slurmdbd.service
+  # COMPILER=intel@${INTEL_VER}
+  COMPILER=gcc@${GCC_VER}
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/munge" --comment "Munge system user" munge
+
+  sudo mkdir    /etc/munge
+  sudo mkdir -p /var/log/munge
+  sudo mkdir -p /var/lib/munge
+  sudo mkdir -p /run/munge
+
+  sudo chown -R munge:munge /etc/munge
+  sudo chown -R munge:munge /var/log/munge
+  sudo chown -R munge:munge /var/lib/munge
+  sudo chown -R munge:munge /run/munge
+
+  spack install $SPACKOPTS munge localstatedir=/var %${COMPILER}
+  result=$?
+  if [ $result -ne 0 ]; then
+    return $result
+  fi
+
+  
+  spack load munge
+  result=$?
+  if [ $result -ne 0 ]; then
+    echo "ERROR: No package found for munge"
+    return $result
+  fi
+
+  add_module_sbin_path munge
+  result=$?
+  if [ $result != 0 ]; then
+    return $result
+  fi
+
+  sbindir=$(get_module_path munge sbin)
+
+  sudo -u munge ${sbindir}/mungekey --create --keyfile=/etc/munge/munge.key  --verbose
+
+  sed -e "s|@sbindir[@]|$sbindir|g" system/munge.service.in | sudo tee /usr/lib/systemd/system/munge.service 1>& /dev/null
+
+  sudo systemctl enable munge
+  sudo systemctl start munge
 }
 
-# https://koji.fedoraproject.org/koji/search?terms=slurm-$SLURM_VER-2.el7&type=build&match=glob
-# Fedora project repo is the epel yum repo already enabled
-# wget https://kojipkgs.fedoraproject.org//packages/slurm/$SLURM_VER/2.el7/x86_64/slurm-$SLURM_VER-2.el7.x86_64.rpm
+#-----------------------------------------------------------------------------#
 
+configure_slurm () { 
+
+  if [ $# -ne 1 ]; then
+    echo "ERROR: ${FUNCNAME[0]} <compute | head>"
+    return 1
+  fi
+
+  if [[ $1 == "compute" ]]; then
+    nodetype="compute"
+  elif [[ $1 == "head" ]]; then
+    nodetype="head"
+  else
+    echo "ERROR: $1 is unknown. Usage: ${FUNCNAME[0]} <compute | head>"
+    return 2
+  fi
+
+  echo "Running ${FUNCNAME[0]} $1 ..."
+
+  spack load slurm
+  result=$?
+  if [ $result -ne 0 ]; then
+    echo "ERROR: No package found for slurm"
+    return $result
+  fi
+
+  add_module_sbin_path slurm
+  result=$?
+  if [ $result != 0 ]; then
+    return $result
+  fi
+
+  sbindir=$(get_module_path slurm sbin)
+  # echo "sbindir: $sbindir"
+ 
+  # Exclusive or 
+  if [[ $nodetype == "head" ]]; then
+
+    # slurmctld runs as slurm user
+
+    # sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
+    sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
+
+    # First check if slurmd is installed
+    resp=`which slurmd > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
+      [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+    fi
+
+    sudo systemctl enable slurmctld
+    sudo systemctl start slurmctld
+
+    # slurmctld: error: power_save program /opt/parallelcluster/scripts/slurm/slurm_suspend not executable
+    # slurmctld: error: power_save module disabled, invalid SuspendProgram /opt/parallelcluster/scripts/slurm/slurm_suspend
+
+  else   # compute node
+
+    # slurmd runs as root
+    sed -e "s|@sbindir[@]|$sbindir|g" system/slurmd.service.in | sudo tee /usr/lib/systemd/system/slurmd.service 1>& /dev/null
+
+    # First check if slurmctld is installed
+    resp=`which slurmctld > /dev/null 2>&1; echo $?`
+    if [ $resp -eq 0 ]; then
+      [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
+      [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+    fi
+    sudo systemctl enable slurmd
+    sudo systemctl start slurmd
+  fi
+
+}
+
+#-----------------------------------------------------------------------------#
+
+
+install_slurm-epel7 () {
 #-----------------------------------------------------------------------------#
 # NOTE: In the beginning of 2021, a version of Slurm was added to the EPEL repository. This version is not supported or maintained by SchedMD, and is not currently recommend for customer use. Unfortunately, this inclusion could cause Slurm to be updated to a newer version outside of a planned maintenance period. In order to prevent Slurm from being updated unintentionally, we recommend you modify the EPEL Repository configuration to exclude all Slurm packages from automatic updates.
 
 # exclude=slurm*
-
-install_slurm-epel7 () {
+#-----------------------------------------------------------------------------#
   echo "Running ${FUNCNAME[0]} ..."
 
   nodetype="head"
@@ -486,9 +697,9 @@ install_slurm-epel7 () {
 
 }
 
-
 #-----------------------------------------------------------------------------#
-install_slurm_s3() {
+
+install_slurm-s3() {
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -501,9 +712,8 @@ install_slurm_s3() {
   sudo yum -y localinstall slurm-20.11.5-1.el7.x86_64.rpm
 }
 
-
-
 #-----------------------------------------------------------------------------#
+
 install_esmf () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -514,14 +724,21 @@ install_esmf () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
-      ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
+  # ^netcdf-c@4.8.0
+  # ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe
+
+  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
+     ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
+
+
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
+  #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
 
   cd $home
 }
 
-
 #-----------------------------------------------------------------------------#
+
 install_base_rpms () {
 
   # TODO: refactor into one "install_nco_libs" function
@@ -562,9 +779,8 @@ install_base_rpms () {
   cd $home
 }
 
-
-
 #-----------------------------------------------------------------------------#
+
 install_extra_rpms () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -617,6 +833,7 @@ install_extra_rpms () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_python_modules_user () {
 
@@ -640,6 +857,7 @@ install_python_modules_user () {
   cd $home 
 }
 
+#-----------------------------------------------------------------------------#
 
 install_plotting_modules () {
 
@@ -657,6 +875,7 @@ install_plotting_modules () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_python_modules_osx () {
 
@@ -679,7 +898,7 @@ install_python_modules_osx () {
   cd $home
 }
 
-
+#-----------------------------------------------------------------------------#
 
 install_ffmpeg () {
 
@@ -709,6 +928,7 @@ install_ffmpeg () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
 install_ffmpeg_osx () {
 
@@ -722,8 +942,8 @@ install_ffmpeg_osx () {
 
   brew install ffmpeg
 }
-#####################################################################
 
+#-----------------------------------------------------------------------------#
 
 setup_ssh_mpi () {
 
@@ -747,8 +967,8 @@ EOL
 
   cd $home
 }
-#####################################################################
 
+#-----------------------------------------------------------------------------#
 
 create_ami_reboot () {
 
@@ -767,8 +987,8 @@ create_ami_reboot () {
   imageID=`grep ImageId /tmp/ami.log`
   echo "imageID to use for compute nodes is: $imageID"
 }
-#####################################################################
 
+#-----------------------------------------------------------------------------#
 
 create_snapshot () {
 
@@ -810,10 +1030,6 @@ create_snapshot () {
 }
 
 #####################################################################
-#####################################################################
-#####################################################################
-#####################################################################
-
 
 # Personal stuff here
 setup_aliases () {
@@ -830,9 +1046,9 @@ setup_aliases () {
   echo alias cdns cd /noscrub/$user >> ~/.tcshrc
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
-  #git config --global user.name "Patrick Tripp"
-  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
-  #git commit --amend --reset-author
+  git config --global user.name "Patrick Tripp"
+  git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
+  git commit --amend --reset-author
 
   #git config user.name "Patrick Tripp"
   #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
