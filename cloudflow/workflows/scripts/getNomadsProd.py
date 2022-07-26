@@ -12,10 +12,9 @@ def getNomadsProd(ofs, cdate, cyc, vdir):
         dest = '{}.{}'.format(ofs,cdate)
 
     err = 0
-    
     os.makedirs(dest)
     os.chdir(dest)
-    
+
     nomads='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/{}.{}'.format(ofs,cdate)
 
     # Download every hour forecast
@@ -35,30 +34,31 @@ def getNomadsProd(ofs, cdate, cyc, vdir):
     for hh in hlist:
         hhFile = 'nos.{}.fields.f0{}.{}.t{}z.nc'.format(ofs,hh,cdate,cyc)
         try:
-            urllib.request.urlretrieve('{}/{}'.format(nomads,hhFile))
+            urllib.request.urlretrieve('{}/{}'.format(nomads,hhFile),hhFile)
         except:
             print('ERROR: Unable to retrieve {} from \n {}'.format(hhFile,nomads))
-            exit()
+            continue
 
     hh = 10
-    while hh < ehr:
+    while hh <= ehr:
         if hh < 100:
             hhstr = '0{}'.format(hh)
         else:
             hhstr = str(hh)
         file = 'nos.{}.fields.f{}.{}.t{}z.nc'.format(ofs,hhstr,cdate,cyc)
         try:
-            urllib.request.urlretrieve('{}/{}'.format(nomads,file))
+            urllib.request.urlretrieve('{}/{}'.format(nomads,file),file)
         except:
             print('ERROR: Unable to retrieve {} from \n {}'.format(file,nomads))
-            exit()
+            hh+=1
+            continue
         hh+=1
     ###############################################################
 
     # Get the nestnode files if ngofs 
-    # Not neccessary for Ngofs2??
+    # No longer necessary for Ngofs2??
 
-    #if ofs == 'ngofs' or ofs == 'ngofs2':
+    #if ofs == 'ngofs':
     #    file1 = 'nos.{}.obc.{}.t{}z.nc'.format(ofs,cdate,cyc)
     #    try:
     #        urllib.request.urlretrieve('{}/{}'.format(nomads,file1))
@@ -77,15 +77,12 @@ def getNomadsProd(ofs, cdate, cyc, vdir):
     inFile = 'nos.{}.forecast.{}.t{}z.in'.format(ofs,cdate,cyc)
     logFile = 'nos.{}.forecast.{}.t{}z.log'.format(ofs,cdate,cyc)
     try:
-        urllib.request.urlretrieve('{}/{}'.format(nomads,inFile))
+        urllib.request.urlretrieve('{}/{}'.format(nomads,inFile),inFile)
     except:
         print('ERROR: Unable to retrieve {} from \n {}'.format(inFile,nomads))
         exit()
     try:
-        urllib.request.urlretrieve('{}/{}'.format(nomads,logFile))
+        urllib.request.urlretrieve('{}/{}'.format(nomads,logFile),logFile)
     except:
         print('ERROR: Unable to retrieve {} from \n {}'.format(logFile,nomads))
         exit()
-
-if __name__ == '__main__':
-    getNomadsProd('leofs', '20220725', '00', '../../../../test_file_store/nomads_leofs_py/')

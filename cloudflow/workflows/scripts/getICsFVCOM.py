@@ -1,5 +1,7 @@
 import os
 import urllib.request
+from datetime import datetime
+from datetime import timedelta
 
 def getICsFVCOM(cdate, hh, ofs, comdir):
 
@@ -37,7 +39,8 @@ def getICsFVCOM(cdate, hh, ofs, comdir):
             exit()
     
     # Get cdate cyc +6 hours init file, rename it to cdate cyc restart file
-    next =  '{}{:02d}'.format(cdate,int(hh)+6)
+    datetimeObj = datetime.strptime(cdate+hh, '%Y%m%d%H')+timedelta(hours=6)
+    next = datetimeObj.strftime('%Y%m%d%H')
     ncdate = list(next)[0:8]
     ncdate = ''.join(ncdate)
     print(ncdate)
@@ -46,7 +49,7 @@ def getICsFVCOM(cdate, hh, ofs, comdir):
     
     nsfx = '{}.t{:02d}z.nc'.format(ncdate,int(ncyc[0]))
 
-    if hh == 21 or hh == 18:
+    if hh == str(21) or hh == str(18):
         nomads='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/{}.{}'.format(ofs,ncdate)
 
     ifile = '{}.init.nowcast.{}'.format(pfx,nsfx)
@@ -58,4 +61,3 @@ def getICsFVCOM(cdate, hh, ofs, comdir):
         exit()
     
     os.rename(ifile,rfile)
-
