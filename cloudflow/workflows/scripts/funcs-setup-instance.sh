@@ -995,13 +995,13 @@ install_jupyterhub() {
   # install conda
   curl "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh"
   sudo echo "yes /opt/conda" |./Anaconda3-2022.05-Linux-x86_64.sh # surpress -y and change default path 
+  sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
   # setup Python environment for users
   sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python ipykernel
   sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
-
-
-  # Work in progress
+  
+  # ************** Work in progress ******************
   sudo /opt/jupyterhub/bin/python -m pip install sudospawner
   
 }
