@@ -13,19 +13,20 @@
 #c.Application.log_format = '[%(name)s]%(highlevel)s %(message)s'
 
 ## Set the log level by value or name.
-c.Application.log_level = 'DEBUG'
+# c.Application.log_level = 'DEBUG'
 
 #------------------------------------------------------------------------------
 # OAuth config
 #------------------------------------------------------------------------------
 from oauthenticator.google import GoogleOAuthenticator
 c.JupyterHub.authenticator_class = GoogleOAuthenticator
-c.GoogleOAuthenticator.oauth_callback_url = ''
+c.GoogleOAuthenticator.oauth_callback_url = 'https://jupyterhub.rpsgroup.com/hub/oauth_callback'
 c.GoogleOAuthenticator.client_id = ''
 c.GoogleOAuthenticator.client_secret = ''
-
 c.LocalAuthenticator.create_system_users = True
-c.Authenticator.delete_invalid_users = True
+c.Authenticator.delete_invalid_users = False
+c.Authenticator.admin_users = {'jonmjoyce@gmail.com', 'patrick.tripp.rps@gmail.com'}
+c.Authenticator.username_map = { "jonmjoyce@gmail.com": "jonmjoyce", "patrick.tripp.rps@gmail.com": "patrick.tripp" }
 
 ## Fill this out to make users administrators
 #c.Authenticator.admin_users = {'example_user@gmail.com'}
@@ -205,9 +206,6 @@ c.JupyterHub.bind_url = 'http://:8000'
 ## The config file to load
 #c.JupyterHub.config_file = 'jupyterhub_config.py'
 
-## DEPRECATED: does nothing
-#c.JupyterHub.confirm_no_ssl = False
-
 ## Number of days for a login cookie to be valid. Default is two weeks.
 #c.JupyterHub.cookie_max_age_days = 14
 
@@ -219,7 +217,7 @@ c.JupyterHub.bind_url = 'http://:8000'
 #c.JupyterHub.cookie_secret = traitlets.Undefined
 
 ## File in which to store the cookie secret.
-#c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
+c.JupyterHub.cookie_secret_file = '/opt/jupyterhub/jupyterhub_cookie_secret'
 
 ## The location of jupyterhub data files (e.g. /usr/local/share/jupyterhub)
 #c.JupyterHub.data_files_path = '/home/centos/.local/share/jupyterhub'
@@ -229,7 +227,7 @@ c.JupyterHub.bind_url = 'http://:8000'
 #c.JupyterHub.db_kwargs = {}
 
 ## url for the database. e.g. `sqlite:///jupyterhub.sqlite`
-#c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+c.JupyterHub.db_url = 'sqlite:///opt/jupyterhub/jupyterhub.sqlite'
 
 ## log all database transactions. This has A LOT of output
 #c.JupyterHub.debug_db = False
@@ -442,9 +440,7 @@ c.JupyterHub.bind_url = 'http://:8000'
 #  on all interfaces. This is the only address through which JupyterHub should be
 #  accessed by users.
 #  
-#  .. deprecated: 0.9
-#      Use JupyterHub.bind_url
-#c.JupyterHub.ip = ''
+#   Use JupyterHub.bind_url
 
 ## Supply extra arguments that will be passed to Jinja environment.
 #c.JupyterHub.jinja_environment_options = {}
@@ -517,28 +513,15 @@ c.JupyterHub.bind_url = 'http://:8000'
 #c.JupyterHub.oauth_token_expires_in = 0
 
 ## File to write PID Useful for daemonizing JupyterHub.
-c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub-proxy-pid'
+c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub.pid'
+c.ConfigurableHTTPProxy.pid_file = '/opt/jupyterhub/jupyterhub-proxy.pid'
 
 ## The public facing port of the proxy.
 #  
 #  This is the port on which the proxy will listen. This is the only port through
 #  which JupyterHub should be accessed by users.
 #  
-#  .. deprecated: 0.9
 #      Use JupyterHub.bind_url
-#c.JupyterHub.port = 8000
-
-## DEPRECATED since version 0.8 : Use ConfigurableHTTPProxy.api_url
-#c.JupyterHub.proxy_api_ip = ''
-
-## DEPRECATED since version 0.8 : Use ConfigurableHTTPProxy.api_url
-#c.JupyterHub.proxy_api_port = 0
-
-## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.auth_token
-#c.JupyterHub.proxy_auth_token = ''
-
-## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.check_running_interval
-#c.JupyterHub.proxy_check_interval = 5
 
 ## The class to use for configuring the JupyterHub proxy.
 #  
@@ -551,10 +534,9 @@ c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub-proxy-pid'
 #  Currently installed: 
 #    - configurable-http-proxy: jupyterhub.proxy.ConfigurableHTTPProxy
 #    - default: jupyterhub.proxy.ConfigurableHTTPProxy
-#c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
+# c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
 
-## DEPRECATED since version 0.8. Use ConfigurableHTTPProxy.command
-#c.JupyterHub.proxy_cmd = []
+# c.ConfigurableHTTPProxy.should_start = False
 
 ## Recreate all certificates used within JupyterHub on restart.
 #  
@@ -826,7 +808,7 @@ c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub-proxy-pid'
 #    navigate the whole filesystem from their notebook server, but still start in their home directory.
 #  - Start with `/notebooks` instead of `/tree` if `default_url` points to a notebook instead of a directory.
 #  - You can set this to `/lab` to have JupyterLab start by default, rather than Jupyter Notebook.
-#c.Spawner.default_url = ''
+c.Spawner.default_url = '/lab'
 
 ## Disable per-user configuration of single-user servers.
 #  
@@ -1246,9 +1228,6 @@ c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub-proxy-pid'
 #  
 #  If not set, allow any username.
 #c.Authenticator.username_pattern = ''
-
-## Deprecated, use `Authenticator.allowed_users`
-#c.Authenticator.whitelist = set()
 
 #------------------------------------------------------------------------------
 # CryptKeeper(SingletonConfigurable) configuration

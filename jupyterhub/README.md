@@ -4,7 +4,7 @@ The Cloud Sandbox setup will automatically install the JupyterHub dependencies. 
 
 - JupyterHub install path: `/opt/jupyterhub`
 - JupyterHub config: `/opt/jupyterhub/jupyterhub_config.py`
-- Nginx config: `/etc/nginx/conf.d/default.conf`
+- Nginx config: `/etc/nginx/conf.d/jupyterhub.conf`
 
 ## Helpful References
 
@@ -28,6 +28,7 @@ First, create the Linux user account if it doesn't already exist on the system.
 
 ```
 sudo useradd example_user
+sudo usermod -aG wheel example_user
 ```
 
 Next, fill out the username mapping to map the Google user to a local Unix user. For example:
@@ -44,7 +45,9 @@ c.Authenticator.admin_users = {'example_user@gmail.com'}
 
 ## Setting up SSL/HTTPS
 
-It is recommended to run Nginx as a reverse proxy to your JupyterHub instance. Nginx has already been installed as part of the Cloud Sandbox. Follow [these instructions](https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md#using-nginx) to configure Nginx. 
+It is recommended to run Nginx as a reverse proxy to your JupyterHub instance. 
+Nginx is installed as part of the Cloud Sandbox installation but additional configuration is likely needed for custom deployments. 
+Follow [these instructions](https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md#using-nginx) to configure Nginx. 
 
 If you are planning on running SSL/HTTPS, you will need to generate your own certificates and point the Nginx configuration to those.
 
