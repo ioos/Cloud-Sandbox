@@ -16,7 +16,7 @@ sudo setenforce 0
 setup_environment
 setup_paths
 setup_aliases
-install_jupyterhub
+# install_jupyterhub # Not fully tested yet
 setup_ssh_mpi
 install_efa_driver
 
