@@ -1046,9 +1046,9 @@ setup_aliases () {
   echo alias cdns cd /noscrub/$user >> ~/.tcshrc
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
-  git config --global user.name "Patrick Tripp"
-  git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
-  git commit --amend --reset-author
+  #git config --global user.name "Patrick Tripp"
+  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
+  #git commit --amend --reset-author
 
   #git config user.name "Patrick Tripp"
   #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
