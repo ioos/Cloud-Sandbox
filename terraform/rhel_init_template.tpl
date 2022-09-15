@@ -2,29 +2,19 @@
 
 echo `date` > /tmp/setup.log
 
-# AMZ linux and some other AMIs use ec2-user. CentOS 7 usese centos
+USER="ec2-user"
 
-# USER="ec2-user"
-USER="centos"
+#USER="centos"
 
 mkdir -p /mnt/efs/fs1
-sudo yum -y -q install git 
 
-sudo yum -y install amazon-efs-utils
-
-if [ $? -ne 0 ]; then
-  # Error: Unable to find a match: amazon-efs-utils
-  # Alternate method
-  sudo yum -y install rpm-build
-  cd /tmp
-  git clone https://github.com/aws/efs-utils
-  cd efs-utils
-  sudo yum -y install make
-  sudo yum -y install rpm-build
-  sudo make rpm
-  sudo yum -y install ./build/amazon-efs-utils*rpm
-  cd /tmp
-fi
+sudo yum -y install git
+sudo yum -y install rpm-build
+sudo yum -y install make
+git clone https://github.com/aws/efs-utils
+cd efs-utils/
+sudo make rpm
+sudo yum -y install ./build/amazon-efs-utils*rpm
 
 mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab

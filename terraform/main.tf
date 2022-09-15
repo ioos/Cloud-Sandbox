@@ -125,8 +125,8 @@ data "aws_ami" "rh_ufs" {
 
   filter {
     name = "name"
-    #values = ["RHEL-8.6.0_HVM-20220503-x86_64-2-Hourly2-GP2"]
-    values = ["RHEL-8.2.0_HVM-20210907-x86_64-0-Hourly2-GP2"]
+    values = ["RHEL-8.4.*x86_64*"]
+    #values = ["RHEL-8.2.0_HVM-20210907-x86_64-0-Hourly2-GP2"]  # openSSL yum issues
   }
 
   filter {
@@ -140,6 +140,8 @@ data "aws_ami" "rh_ufs" {
   }
 }
 
+# Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
+# Choosing direct from CentOS as it is more recent
 
 data "aws_ami" "centos_7" {
   owners = ["125523088429"]   # CentOS "CentOS 7.9.2009 x86_64"
@@ -199,8 +201,10 @@ resource "aws_instance" "head_node" {
   # Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
   # Choosing direct from CentOS as it is more recent
 
-  # ami = data.aws_ami.centos_7.id
-  ami = data.aws_ami.rh_ufs.id
+  ami = data.aws_ami.centos_7.id
+
+  # Can optionally use redhat - use the parameterized
+  # ami = data.aws_ami.rh_ufs.id
 
   instance_type = var.instance_type
   cpu_threads_per_core = 2
@@ -271,10 +275,6 @@ resource "aws_network_interface" "standard" {
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "efa_network_adapter" {
-  # Only create and attach this if EFA is supported by the node type
-  # c5n.18xlarge supports EFA
-  #count = var.use_efa == true ? 1 : 0 
-  #count = data.aws_ec2_instance_type.head_node.efa_supported == true ? 1 : 0
 
   subnet_id   = aws_subnet.main.id
   description = "The Elastic Fabric Adapter to attach to instance if supported"
