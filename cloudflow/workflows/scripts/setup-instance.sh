@@ -25,14 +25,10 @@ install_spack
 install_gcc
 install_intel_oneapi
 install_netcdf
-# #install_hdf5-gcc8   # Not needed?
 install_esmf
 install_base_rpms
 install_extra_rpms
 install_ffmpeg
-
-# Job scheduler, resource manager
-install_munge
 
 # Compute node config
 install_slurm
@@ -66,7 +62,7 @@ image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
 echo "Compute node image_id: $image_id"
 
 # Configure this machine as a head node
-install_slurm-epel7 head
+configure_slurm head
 sudo yum -y clean all
 
 # Optionally create Head node image

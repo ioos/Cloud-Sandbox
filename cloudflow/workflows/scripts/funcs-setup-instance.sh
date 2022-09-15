@@ -955,7 +955,10 @@ setup_ssh_mpi () {
   sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
   sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
 
-  cat >> /etc/ssh/ssh_config <<EOL
+# This - assumes we are using 10.0.x.x subnet addresses
+#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+
+echo "
 Host ip-10-0-* 
    CheckHostIP no 
    StrictHostKeyChecking no 
@@ -963,7 +966,17 @@ Host ip-10-0-*
 Host 10.0.* 
    CheckHostIP no 
    StrictHostKeyChecking no
-EOL
+" | sudo tee -a /etc/ssh/ssh_config
+
+#  cat >> /etc/ssh/ssh_config <<EOL
+#Host ip-10-0-* 
+#   CheckHostIP no 
+#   StrictHostKeyChecking no 
+#
+#Host 10.0.* 
+#   CheckHostIP no 
+#   StrictHostKeyChecking no
+#EOL
 
   cd $home
 }
