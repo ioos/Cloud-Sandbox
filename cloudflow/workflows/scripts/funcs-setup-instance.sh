@@ -572,6 +572,9 @@ configure_slurm () {
     return $result
   fi
 
+  # Load the modified PATH 
+  . ~/.bashrc
+
   sbindir=$(get_module_path slurm sbin)
   # echo "sbindir: $sbindir"
  
