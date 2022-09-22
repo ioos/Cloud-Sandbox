@@ -24,7 +24,7 @@ install_python_modules_user
 install_spack
 install_gcc
 install_intel_oneapi
-install_netcdf
+
 install_esmf
 install_base_rpms
 install_extra_rpms

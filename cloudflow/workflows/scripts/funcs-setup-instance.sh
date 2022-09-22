@@ -447,12 +447,14 @@ install_slurm () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # Munge is a prerequisite for slurm, custom options being used here 
-  _install_munge
-  result=$?
-  if [ $result -ne 0 ]; then
-    return $result
-  fi
+  ## _install_munge
+  ## result=$?
+  ## if [ $result -ne 0 ]; then
+    ## return $result
+  ## fi
 
+  echo "DEBUGGING ... exiting"
+  exit 
   spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
      ^munge localstatedir=/var ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
 
@@ -730,9 +732,10 @@ install_esmf () {
   # ^netcdf-c@4.8.0
   # ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe
 
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
-     ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
+  #   ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
 
+  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
   #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
