@@ -56,6 +56,11 @@ project_tag="IOOS-Cloud-Sandbox"
 image_name="${ami_name}-Compute-Node"
 echo "Compute node image_name: '$image_name'"
 
+# For some reason these aren't being seen by create_image.py
+# Try installing them again in this shell
+python3 -m pip install --user --upgrade botocore==1.23.46
+python3 -m pip install --user --upgrade boto3==1.20.46
+
 # Flush the disk cache
 sudo sync
 
