@@ -33,6 +33,7 @@ cd /home/$RUNUSER
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
+
 BRANCH=master
 
 sudo -u $RUNUSER git checkout $BRANCH

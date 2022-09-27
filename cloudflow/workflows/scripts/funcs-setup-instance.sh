@@ -211,6 +211,7 @@ install_spack() {
   home=$PWD
 
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+  #SPACK_MIRROR='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
@@ -974,7 +975,6 @@ setup_ssh_mpi () {
   sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
 
 # This - assumes we are using 10.0.x.x subnet addresses
-#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
 
 echo "
 Host ip-10-0-* 
@@ -998,6 +998,9 @@ Host 10.0.*
 
   cd $home
 }
+
+
+#####################################################################
 
 #-----------------------------------------------------------------------------#
 
@@ -1077,9 +1080,9 @@ setup_aliases () {
   echo alias cdns cd /noscrub/$user >> ~/.tcshrc
   echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
 
-  #git config --global user.name "Patrick Tripp"
-  #git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
-  #git commit --amend --reset-author
+#  git config --global user.name "Patrick Tripp"
+#  git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
+#  git commit --amend --reset-author
 
   #git config user.name "Patrick Tripp"
   #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
