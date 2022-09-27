@@ -7,11 +7,12 @@ SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 #SPEC=%intel@2021.3.0
 #SPEC='%gcc@8.5'
 
-SPEC_LIST='%intel@2021.3.0 %gcc@8.5'
+SPEC_LIST='%intel@2021.3.0 %gcc@8.5 gcc@4.85'
 
 ### MAKE SURE TO IMPORT THE PRIVATE KEY FIRST!
-# SECRET=~/spack.mirror.gpgkey.secret
-# spack gpg trust $SECRET
+#SECRET=~/spack.mirror.gpgkey.secret
+#spack gpg trust $SECRET
+#exit
 
 # Rebuild
 PKGLIST=`spack find --format "{name}@{version}%{compiler}/{hash}" $SPEC`
