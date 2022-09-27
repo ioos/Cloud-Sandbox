@@ -1,0 +1,34 @@
+git clone https://github.com/NOAA-EMC/hpc-stack.git
+spack load cmake@3.23.1%intel@2021.3.0
+sudo yum install Lmod
+sudo yum install libtiff-devel
+spack load intel-oneapi-compilers@2021.3.0
+spack load intel-oneapi-mpi@2021.3.0%intel@2021.3.0
+
+spack install libjpeg
+spack install libpng
+spack install libszip
+spack install jasper
+spack install nccmp
+spack install nco
+spack install cdo
+spack install udunits
+spack install eigen
+
+# spack install boost # headers-only ??
+
+# Profiling ???
+# spack install gptl
+# spack install cgal
+
+spack install py-pybind11
+spack install ecbuild
+spack install eckit
+spack install geos
+
+spack install sqlite
+# spack install proj@7.1.0 # installed with CDO
+
+Errors:
+missing NetCDF_C_LIBRARY NetCDF_C_INCLUDE_DIR
+

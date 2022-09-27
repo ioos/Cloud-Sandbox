@@ -454,8 +454,19 @@ install_slurm () {
     return $result
   fi
 
-  spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
-     ^munge localstatedir=/var ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+  MUNGEDEP=`spack find --format "{name}/{hash}" munge`
+
+  echo "MUNGEDEP: $MUNGEDEP"
+
+  spack load intel-oneapi-mpi@${INTEL_VER}%${COMPILER}
+
+  #spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+  # hwloc build is failing, netloc_mpi_find_hosts.c:116: undefined reference to `MPI_Send' etc.
+     #^"$MUNGEDEP" localstatedir='/var' ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
+
+  # Build issues with hdf5, hwloc, and pmix .. will resolve later if needed
+  spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}~hdf5~hwloc~pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+       ^"$MUNGEDEP" ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
 
   add_module_sbin_path slurm
   result=$?
@@ -464,6 +475,7 @@ install_slurm () {
     return $result
   fi
 
+  echo "Adding slurm system user ..."
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/slurm" --comment "Slurm system user" slurm
 
   #(null): _log_init: Unable to open logfile `/var/log/slurm/slurmctld.log': Permission denied
@@ -479,6 +491,7 @@ install_slurm () {
   sudo chgrp -R slurm /var/log/slurm
   sudo chmod g+rw /var/log/slurm
 
+  echo "Copying slurm.conf to /etc/slurm ..."
   sudo mkdir  /etc/slurm
   sudo cp -pf slurm.conf /etc/slurm/slurm.conf
  
@@ -560,6 +573,8 @@ configure_slurm () {
 
   echo "Running ${FUNCNAME[0]} $1 ..."
 
+  . $SPACK_DIR/share/spack/setup-env.sh
+
   spack load slurm
   result=$?
   if [ $result -ne 0 ]; then
@@ -573,24 +588,25 @@ configure_slurm () {
     return $result
   fi
 
+  # Load the modified PATH 
+  . ~/.bashrc
+
   sbindir=$(get_module_path slurm sbin)
-  # echo "sbindir: $sbindir"
  
   # Exclusive or 
   if [[ $nodetype == "head" ]]; then
 
     # slurmctld runs as slurm user
 
-    # sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
     sed -e "s|@sbindir[@]|$sbindir|g" system/slurmctld.service.in | sudo tee /usr/lib/systemd/system/slurmctld.service 1>& /dev/null
 
-    # First check if slurmd is installed
+    # First check if slurmd is installed, slurmd only runs on compute nodes
     resp=`which slurmd > /dev/null 2>&1; echo $?`
     if [ $resp -eq 0 ]; then
-      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop    slurmd
-      [ `systemctl is-enabled slurmd` == 'enabled' ] && sudo systemctl disable slurmd
+      [ `systemctl is-active  slurmd` == 'active'  ] && sudo systemctl stop slurmd
+      slurmd_enabled=`systemctl is-enabled slurmd 2> /dev/null`
+      [ "$slurmd_enabled" == 'enabled' ] && sudo systemctl disable slurmd
     fi
-
     sudo systemctl enable slurmctld
     sudo systemctl start slurmctld
 
@@ -606,7 +622,8 @@ configure_slurm () {
     resp=`which slurmctld > /dev/null 2>&1; echo $?`
     if [ $resp -eq 0 ]; then
       [ `systemctl is-active  slurmctld` == 'active'  ] && sudo systemctl stop    slurmctld
-      [ `systemctl is-enabled slurmctld` == 'enabled' ] && sudo systemctl disable slurmctld
+      slurmctld_enabled=`systemctl is-enabled slurmctld 2> /dev/null`
+      [ "$slurmctld_enabled" == 'enabled' ] && sudo systemctl disable slurmctld
     fi
     sudo systemctl enable slurmd
     sudo systemctl start slurmd
@@ -728,9 +745,10 @@ install_esmf () {
   # ^netcdf-c@4.8.0
   # ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe
 
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
-     ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
+  #   ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
 
+  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
   # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
   #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
@@ -956,14 +974,27 @@ setup_ssh_mpi () {
   sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
   sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
 
-  sudo cat >> /etc/ssh/ssh_config <<EOL
+# This - assumes we are using 10.0.x.x subnet addresses
+
+echo "
 Host ip-10-0-* 
    CheckHostIP no 
    StrictHostKeyChecking no 
-Host 10.0.*
-   CheckHostIP no
+
+Host 10.0.* 
+   CheckHostIP no 
    StrictHostKeyChecking no
-EOL
+" | sudo tee -a /etc/ssh/ssh_config
+
+#  cat >> /etc/ssh/ssh_config <<EOL
+#Host ip-10-0-* 
+#   CheckHostIP no 
+#   StrictHostKeyChecking no 
+#
+#Host 10.0.* 
+#   CheckHostIP no 
+#   StrictHostKeyChecking no
+#EOL
 
   cd $home
 }

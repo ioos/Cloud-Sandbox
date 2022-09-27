@@ -1,0 +1,2 @@
+Test skylake-avx512 spack libs work on hpc6a with model compiled without avx-512 options.
+If not, haswell target should work.

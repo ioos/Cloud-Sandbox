@@ -117,6 +117,31 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
     file_system_id = aws_efs_file_system.main_efs.id
 }
 
+
+data "aws_ami" "rh_ufs" {
+  owners = ["309956199498"]
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = ["RHEL-8.4.*x86_64*"]
+    #values = ["RHEL-8.2.0_HVM-20210907-x86_64-0-Hourly2-GP2"]  # openSSL yum issues
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
+# Choosing direct from CentOS as it is more recent
+
 data "aws_ami" "centos_7" {
   owners = ["125523088429"]   # CentOS "CentOS 7.9.2009 x86_64"
   most_recent = true
@@ -174,19 +199,27 @@ resource "aws_eip" "head_node" {
 resource "aws_instance" "head_node" {
   # Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
   # Choosing direct from CentOS as it is more recent
+
   ami = data.aws_ami.centos_7.id
+
+  # Can optionally use redhat - use the parameterized
+  # ami = data.aws_ami.rh_ufs.id
+
   instance_type = var.instance_type
   cpu_threads_per_core = 2
   root_block_device {
         delete_on_termination = true
         volume_size = 12
   }
+
   depends_on = [aws_internet_gateway.gw, 
                 aws_efs_file_system.main_efs,
                 aws_efs_mount_target.mount_target_main_efs]
+
   key_name = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
   user_data = data.template_file.init_instance.rendered
+
   # associate_public_ip_address = true
   network_interface {
     device_index = 0    # MUST be 0
@@ -241,10 +274,6 @@ resource "aws_network_interface" "standard" {
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "efa_network_adapter" {
-  # Only create and attach this if EFA is supported by the node type
-  # c5n.18xlarge supports EFA
-  #count = var.use_efa == true ? 1 : 0 
-  #count = data.aws_ec2_instance_type.head_node.efa_supported == true ? 1 : 0
 
   subnet_id   = aws_subnet.main.id
   description = "The Elastic Fabric Adapter to attach to instance if supported"
