@@ -298,7 +298,7 @@ install_netcdf () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
-  COMPILER=intel@${INTEL_VER}
+  COMPILER=${COMPILER:-intel@${INTEL_VER}}
 
   home=$PWD
 
