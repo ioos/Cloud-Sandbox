@@ -4,6 +4,21 @@
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
+GCC_VER=8.5.0
+INTEL_VER=2021.3.0
+
+SPACK_VER='releases/v0.18'
+#SPACK_DIR='/mnt/efs/fs1/opt/spack'
+SPACK_DIR='/save/environments/spack'
+SPACKOPTS='-v -y'
+
+SLURM_VER='22-05-2-1'
+
+#  1 = Don't build any packages. Only install packages from binary mirrors
+#  0 = Will build if not found in mirror/cache
+# -1 = Don't check pre-built binary cache
+SPACK_CACHEONLY=0
+
 # source include the functions 
 . funcs-setup-instance.sh
 

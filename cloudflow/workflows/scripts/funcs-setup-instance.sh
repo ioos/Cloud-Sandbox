@@ -1,21 +1,6 @@
-
-GCC_VER=8.5.0
-INTEL_VER=2021.3.0
-
-SPACK_VER='releases/v0.18'
-SPACK_DIR='/save/environments/spack'
-SPACKOPTS='-v -y'
-
-#HDF5_VER='1.13.1'
-# HDF5_VER='1.12.2'
-SLURM_VER='22-05-2-1'
-#SLURM_VER='21-08-8-2'  # doesn't build
-
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-
-SPACK_CACHEONLY=0
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
   SPACKOPTS="$SPACKOPS --cache-only"
