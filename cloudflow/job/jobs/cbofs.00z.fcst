@@ -9,7 +9,7 @@
   "TIME_REF"  : "20160101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "nos/cbofs/output",
-  "NTIMES"    : "34560",
+  "NTIMES"    : "720",
   "ININAME"   : "",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",

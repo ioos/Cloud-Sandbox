@@ -12,8 +12,8 @@ import pyproj
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from plotting import tile
-from plotting import shared
+from cloudflow.plotting import tile
+from cloudflow.plotting import shared
 
 __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"

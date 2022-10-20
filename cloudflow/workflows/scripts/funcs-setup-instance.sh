@@ -315,6 +315,9 @@ install_netcdf () {
   spack install $SPACKOPTS netcdf-fortran%${COMPILER} ^netcdf-c@4.8.0%${COMPILER} ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe%${COMPILER} \
      ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
 
+  # HDF5 also needs szip lib
+  spack install libszip${COMPILER}
+
   cd $home
 }
 
@@ -872,6 +875,13 @@ install_python_modules_user () {
   python3 -m pip install --user --upgrade botocore==1.23.46
   # This is the most recent boto3 that is compatible with botocore above
   python3 -m pip install --user --upgrade boto3==1.20.46
+
+  # Install requirements for plotting module
+  cd ../..
+  python3 -m pip install --user -r requirements.txt
+
+  python3 setup.py sdist
+
 
   cd $home 
 }

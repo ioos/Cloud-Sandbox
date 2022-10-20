@@ -23,14 +23,10 @@ tbofs
 
 
 fixdirs='
-sfbofs
-lmhofs
-ciofs
+shared
+cbofs
 '
 
-notdone='
-wcofs
-'
 
 for dir in $fixdirs
 do
