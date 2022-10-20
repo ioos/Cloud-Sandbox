@@ -7,6 +7,8 @@ echo `date` > /tmp/setup.log
 # RUNUSER="ec2-user"
 RUNUSER="centos"
 
+# Mount the EFS volume
+
 mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 
@@ -29,10 +31,16 @@ fi
 mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
 
-cd /home/$RUNUSER
+cd /mnt/efs/fs1
+sudo mkdir save
+sudo chgrp wheel save
+sudo chmod 777 save
+
+# Clone the Cloud-Sandbox repository
+# Placing this in a common location
+cd /mnt/efs/fs1/save
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
-
 
 BRANCH=master
 
@@ -42,6 +50,7 @@ sudo -u $RUNUSER git checkout $BRANCH
 export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
+# Install all of the software and drivers
 sudo -E -u $RUNUSER ./setup-instance.sh >> /tmp/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
