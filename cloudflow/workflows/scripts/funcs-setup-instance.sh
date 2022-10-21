@@ -1075,9 +1075,11 @@ setup_aliases () {
   echo alias lst ls -altr >> ~/.tcshrc
   echo alias h history >> ~/.tcshrc
 
-  echo alias cds cd /save/$user >> ~/.tcshrc
-  echo alias cdns cd /noscrub/$user >> ~/.tcshrc
-  echo alias cdpt cd /ptmp/$user >> ~/.tcshrc
+  echo alias cds cd /save >> ~/.tcshrc
+  echo alias cdc cd /com >> ~/.tcshrc
+  echo alias cdpt cd /ptmp >> ~/.tcshrc
+
+  #echo alias cdns cd /noscrub >> ~/.tcshrc
 
 #  git config --global user.name "Patrick Tripp"
 #  git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
