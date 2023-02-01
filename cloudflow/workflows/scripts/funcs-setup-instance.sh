@@ -177,7 +177,10 @@ install_efa_driver() {
   cd aws-efa-installer
 
   # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-  sudo ./efa_installer.sh -y 
+  sudo ./efa_installer.sh -y --minimal
+
+  # If it installed openmpi 
+  # sudo yum erase openmpi40-aws-4.1.4-3.x86_64
 
   # Put old kernels back in original location
   if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
@@ -471,18 +474,18 @@ install_slurm () {
   #slurmctld: error: Unable to open pidfile `/var/run/slurmctld.pid': Permission denied
 
   sudo mkdir -p /var/spool/slurmd
-
   sudo mkdir -p /var/spool/slurm
-  sudo chgrp -R slurm /var/spool/slurm
-  sudo chmod g+rw /var/spool/slurm
 
-  sudo mkdir -p /var/log/slurm
-  sudo chgrp -R slurm /var/log/slurm
-  sudo chmod g+rw /var/log/slurm
+  #sudo chgrp -R slurm /var/spool/slurm
+  #sudo chmod g+rw /var/spool/slurm
+
+  #sudo mkdir -p /var/log/slurm
+  #sudo chgrp -R slurm /var/log/slurm
+  #sudo chmod g+rw /var/log/slurm
 
   echo "Copying slurm.conf to /etc/slurm ..."
   sudo mkdir  /etc/slurm
-  sudo cp -pf slurm.conf /etc/slurm/slurm.conf
+  sudo cp -pf system/slurm.conf /etc/slurm/slurm.conf
  
   cd $home
 }
@@ -505,12 +508,12 @@ _install_munge () {
   sudo mkdir    /etc/munge
   sudo mkdir -p /var/log/munge
   sudo mkdir -p /var/lib/munge
-  sudo mkdir -p /run/munge
+  sudo mkdir -p /var/run/munge
 
   sudo chown -R munge:munge /etc/munge
   sudo chown -R munge:munge /var/log/munge
   sudo chown -R munge:munge /var/lib/munge
-  sudo chown -R munge:munge /run/munge
+  sudo chown -R munge:munge /var/run/munge
 
   spack install $SPACKOPTS munge localstatedir=/var %${COMPILER}
   result=$?
