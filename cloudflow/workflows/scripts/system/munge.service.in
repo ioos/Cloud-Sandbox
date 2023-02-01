@@ -8,7 +8,6 @@ After=time-sync.target
 [Service]
 Type=forking
 ExecStart=@sbindir@/munged --key-file=/etc/munge/munge.key
-PIDFile=/var/run/munge/munged.pid
 User=munge
 Group=munge
 Restart=on-abort
