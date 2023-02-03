@@ -111,6 +111,7 @@ terraform import aws_iam_role.sandbox_iam_role ioos_cloud_sandbox_terraform_role
 ```
 
 After resolving any existing resource conflicts, run `terraform apply` again.
+
 ---
 
 ### Install all of the required software and libraries
@@ -150,18 +151,6 @@ This is done automatically.
 The AMI ID will be found at the end of the log at /tmp/setup.log
 It can also be found in the AWS console or via the AWS CLI. This AMI ID will be needed later.
 
-### Install the NOS OFS ROMS and FVCOM models
-```
-ssh -i <your-key.pem> centos@<your-ec2-instance>
-cd /save
-git clone https://github.com/ioos/nosofs-NCO.git
-cd nosofs-NCO/sorc
-
-# To build everything
-./ROMS_COMPILE.sh
-./FVCOM_COMPILE.sh
-```
-
 ### Optional: After setting everything up, you can change the instance type to something smaller
 Edit mysettings.tfvars and change the following:
 
@@ -179,12 +168,38 @@ When done using the sandbox all of the AWS resources (including disks) can be de
 terraform destroy -var-file="mysettings.tfvars"
 ```
 
-## Cloud Sandbox Setup
-
 ### Cloud-Sandbox Setup and User Guide
 The following document contains some older instructions on building and running the models that is still valid.
 
 https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0.docx
+
+## Install the NOS OFS ROMS and FVCOM models
+
+### NOSOFS 3.5 Source Code
+https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO
+
+```
+cd /save/ioos
+git clone https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO nosofs-NCO
+cd nosofs-NCO/sorc
+
+### To build everything
+./ROMS_COMPILE.sh
+./FVCOM_COMPILE.sh
+```
+The build scripts can be modified to only build specific models.
+
+### Obtain the Fixed Field Files
+These files are too large to easily store on github and need to be obtained elsewhere.
+You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
+Edit the script to only download a subset.
+```
+Example:
+mkdir -p /save/ioos/nosofs-NCO/fix
+cd /save/ioos/nosofs-NCO/fix
+~/Cloud-Sandbox/scripts/get_fixfiles_s3.sh
+```
+## Setup the run
 
 ### CloudFlow API Specification
 https://ioos.github.io/Cloud-Sandbox/
@@ -299,15 +314,6 @@ These files contain parameters for running the models. These are provided as com
 }
 ```
 
-### Obtain the Fixed Field Files
-These files are too large to easily store on github and need to be obtained elsewhere.
-You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
-Edit the script to only download a subset.
-```
-mkdir -p /save/nosofs-NCO/fix
-cd /save/nosofs-NCO/fix
-~/Cloud-Sandbox/scripts/get_fixfiles_s3.sh
-```
 
 ### Run the Job
 
@@ -335,4 +341,4 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
 
-Copyright © 2021 RPS Group, Inc. All rights reserved.
+Copyright © 2023 RPS Group, Inc. All rights reserved.
