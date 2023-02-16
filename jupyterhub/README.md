@@ -43,6 +43,20 @@ Optionally, you can assign administrators using the `c.Authenticator.admin_users
 c.Authenticator.admin_users = {'example_user@gmail.com'}
 ```
 
+## Setting up Conda environment
+
+Once the user account is created, that user will need to log in to the machine to set up their Conda environment.
+
+First, if you haven't already, set a password for the user account to login with:
+```
+sudo passwd example_user
+```
+Then login as that user: `su example_user`
+
+Run `conda init`
+
+
+
 ## Setting up SSL/HTTPS
 
 It is recommended to run Nginx as a reverse proxy to your JupyterHub instance. 
@@ -64,4 +78,3 @@ The JupyterHub service usually needs to be restarted for configuration changes t
 ```
 sudo systemctl restart jupyterhub.service
 ```
-
