@@ -180,7 +180,7 @@ https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO
 
 ```
 cd /save/<your personal work folder>
-git clone https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO nosofs-NCO
+git clone -b ioos-cloud https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO nosofs-NCO
 cd nosofs-NCO/sorc
 
 ### To build everything
