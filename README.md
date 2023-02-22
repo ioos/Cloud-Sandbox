@@ -198,7 +198,7 @@ Edit the script to only download a subset.
 Example:
 mkdir -p /save/ioos/nosofs-NCO/fix
 cd /save/ioos/nosofs-NCO/fix
-~/Cloud-Sandbox/scripts/get_fixfiles_s3.sh
+/save/ioos/Cloud-Sandbox/cloudflow/workflows/scripts/get_fixfiles_s3.sh
 ```
 ## Setup the run
 
