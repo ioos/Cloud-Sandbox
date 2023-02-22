@@ -179,7 +179,7 @@ https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0
 https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO
 
 ```
-cd /save/ioos
+cd /save/<your personal work folder>
 git clone https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO nosofs-NCO
 cd nosofs-NCO/sorc
 
