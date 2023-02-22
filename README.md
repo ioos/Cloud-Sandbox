@@ -2,7 +2,9 @@
 
 The IOOS Cloud Sandbox is a platform for running regional coastal models in the cloud. The cloud resources are configured using Terraform and installs all dependencies necessary to run the models.
 
-## Prerequisites
+## Sandbox Deployment Instructions (if deploying a new Sandbox)
+
+### Prerequisites
 
 Install the AWS CLI: <br>
 https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
@@ -13,8 +15,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#c
 Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
-## Sandbox Installation Instructions
-
+### Create the Cloud Resources
 Terraform will create **all** of the AWS resources needed for the sandbox. 
 This includes the VPC, subnet, security groups, EFS networked disk volumes, and others. AWS has a default limit of 5 VPCs per region. You will have to request a quota increase from AWS if you are already at your limit.
 
