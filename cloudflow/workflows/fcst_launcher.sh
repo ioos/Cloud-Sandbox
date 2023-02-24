@@ -2,6 +2,8 @@
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
+WRKDIR=/save/$GROUP/$USER
+
 set -xa
 ulimit -c unlimited
 ulimit -s unlimited
@@ -83,7 +85,7 @@ fi
 # Can put domain specific options here
 case $OFS in
   liveocean)
-    export HOMEnos=/save/LiveOcean
+    export HOMEnos=$WRKDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export JOBARGS="$CDATE"
@@ -92,7 +94,7 @@ case $OFS in
     result=$?
     ;;
   cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=/save/nosofs-NCO
+    export HOMEnos=$WRKDIR/nosofs-NCO
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export cyc=$HH
@@ -102,7 +104,7 @@ case $OFS in
     result=$?
     ;;
   wrfroms)
-    export HOMEnos=/save/WRF-ROMS-Coupled
+    export HOMEnos=$WRKDIR/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
     cd "$JOBDIR" || exit 1

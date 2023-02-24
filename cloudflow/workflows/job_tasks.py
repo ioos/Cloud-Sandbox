@@ -29,7 +29,7 @@ __copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
-debug = False
+debug = True
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)
 
