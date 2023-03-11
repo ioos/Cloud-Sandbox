@@ -3,10 +3,44 @@
   # install JupyterHub (https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md)
 
   # install npm 
-  curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-  sudo yum clean all && sudo yum makecache fast
-  sudo yum install -y gcc-c++ make
-  sudo yum install -y nodejs
+  #curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+  #sudo yum clean all && sudo yum makecache fast
+  #sudo yum install -y gcc-c++ make
+  #sudo yum install -y nodejs
+
+    # install conda
+  rm /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh
+  curl "Miniconda3-py310_23.1.0-1-Linux-x86_64.sh" -o /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh
+  sudo bash /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh -b -p /opt/conda
+  sudo ln -sf /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+
+  # allows all users to make changes to conda environments (alternatively could give permissions to each user)
+  sudo chmod -R a+rwX /opt/conda/envs
+  sudo chown -R ec2-user/ec2-user /opt/conda # allow user to install here; one should not use 'sudo conda' commands
+
+  # install JupyterHub under conda environment (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
+  conda activate base
+  conda install -c conda-forge jupyterhub  # installs jupyterhub and proxy
+  conda install jupyterlab notebook  # needed if running the notebook servers in the same environment
+
+  # good instruction source: https://medium.com/swlh/how-to-install-jupyterhub-using-conda-without-runing-as-root-and-make-it-a-service-59b843fead12
+  conda install -c conda-forge sudospawner # use sudospawner to elevate permissions
+
+  sudo useradd jupyter
+  sudo groupadd jupyterhub
+  sudo usermod jupyter -G jupyterhub
+
+  sudo cp system/jupytersudoers /etc/sudoers.d/jupytersudoers
+
+  sudo mkdir /etc/jupyterhub
+  sudo chown jupyter /etc/jupyterhub
+
+  ## TODO: Think about changing config
+  sudo cp system/jupyterhub_config.py /opt/jupyterhub/jupyterhub_config.py
+
+  ### ------------------------ OLD CODE ------------------------------------------------------ ##
+
+  # make kernel visible to JupyterHub
 
   # install nginx
   sudo yum install -y nginx
@@ -52,16 +86,7 @@
   sudo systemctl enable jupyterhub
   sudo systemctl start jupyterhub
 
-  # install conda
-  rm /tmp/Anaconda3-2022.05-Linux-x86_64.sh
-  curl "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh" -o /tmp/Anaconda3-2022.05-Linux-x86_64.sh
-  sudo bash /tmp/Anaconda3-2022.05-Linux-x86_64.sh -b -p /opt/conda
-  sudo ln -sf /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
-  # allows all users to make changes to conda environments (alternatively could give permissions to each user)
-  sudo chmod -R a+rwX /opt/conda/envs
-
-  # make kernel visible to JupyterHub
   sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/pangeo xarray zarr dask ipykernel --yes
   sudo /opt/jupyterhub/bin/jupyter kernelspec install /opt/conda/envs/python
 

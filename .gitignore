@@ -28,7 +28,7 @@ terraform/SAVE.mysettings.tfvars
 *.pem
 *.key
 */.secret
-**/*nda*
+*/*nda*
 dev.tfvars
 my.tfvars
 my.plan
