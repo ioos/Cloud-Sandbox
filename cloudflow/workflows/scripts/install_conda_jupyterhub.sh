@@ -1,14 +1,6 @@
 #!/bin/env bash
 
-  # install JupyterHub (https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md)
-
-  # install npm 
-  #curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-  #sudo yum clean all && sudo yum makecache fast
-  #sudo yum install -y gcc-c++ make
-  #sudo yum install -y nodejs
-
-    # install conda
+  # install conda
   rm /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh
   curl "Miniconda3-py310_23.1.0-1-Linux-x86_64.sh" -o /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh
   sudo bash /tmp/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh -b -p /opt/conda
@@ -20,22 +12,19 @@
 
   # install JupyterHub under conda environment (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
   conda activate base
-  conda install -c conda-forge jupyterhub oauthenticator  # installs jupyterhub and proxy
-  conda install jupyterlab notebook  # needed if running the notebook servers in the same environment
+  conda install -yc conda-forge jupyterhub oauthenticator sudospawner # installs jupyterhub and proxy
+  conda install -y jupyterlab notebook  # needed if running the notebook servers in the same environment
 
-  # good instruction source: https://medium.com/swlh/how-to-install-jupyterhub-using-conda-without-runing-as-root-and-make-it-a-service-59b843fead12
-  conda install -c conda-forge sudospawner # use sudospawner to elevate permissions
-
+  # create system account that will run jupyterhub
   sudo useradd jupyter
   sudo groupadd jupyterhub
   sudo usermod jupyter -G jupyterhub
 
   sudo cp system/jupytersudoers /etc/sudoers.d/jupytersudoers
 
+  # copy over configs
   sudo mkdir /etc/jupyterhub
   sudo chown jupyter /etc/jupyterhub
-
-  ## TODO: Think about changing config
   sudo cp system/jupyterhub_config.py /opt/jupyterhub/jupyterhub_config.py
 
   # create the systemd service

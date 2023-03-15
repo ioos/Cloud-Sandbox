@@ -1,13 +1,15 @@
 # JupyterHub Setup Instructions
 
-The Cloud Sandbox setup will automatically install the JupyterHub dependencies. However, additional configuration is required in order to enable user authentication.
+The Cloud Sandbox setup will automatically install the JupyterHub dependencies. However, additional configuration is required in order to enable user authentication. JupyterHub is installed in the `base` conda environment by default. 
 
-- JupyterHub install path: `/opt/jupyterhub`
-- JupyterHub config: `/opt/jupyterhub/jupyterhub_config.py`
+- Conda install: `/opt/conda`
+- JupyterHub config: `/etc/jupyterhub/jupyterhub_config.py`
+- JupyterHub run script: `/etc/jupyterhub/runJupyterhub.sh`
 - Nginx config: `/etc/nginx/conf.d/jupyterhub.conf`
 
 ## Helpful References
 
+- [How-to Install JupyterHub Using Conda Without Running as Root and Make It a Service](https://medium.com/swlh/how-to-install-jupyterhub-using-conda-without-runing-as-root-and-make-it-a-service-59b843fead12)
 - [JupyterHub The Hard Way](https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md): Manual installation guide
 - [JupyterHub Deployment Course](https://professorkazarinoff.github.io/jupyterhub-engr114/google_oauth/)
 
@@ -15,7 +17,7 @@ The Cloud Sandbox setup will automatically install the JupyterHub dependencies. 
 
 See [these instructions](https://oauthenticator.readthedocs.io/en/latest/getting-started.html#google-setup) for configuring your Google credentials with OAuthenticator. You will [create a key on the Google platform](https://developers.google.com/identity/protocols/oauth2) and modify the JupyterHub config to have the public key.
 
-Once you've created the key, modify `/opt/jupyterhub/jupyterhub_config.py` values:
+Once you've created the key, modify `/etc/jupyterhub/jupyterhub_config.py` values:
 
 ```
 c.GoogleOAuthenticator.client_id = "your_client_id"
@@ -55,6 +57,12 @@ Then login as that user: `su example_user`
 
 Run `conda init`
 
+After creating the new Conda environment, run these commands to make it visible to the base kernel:
+
+```
+conda install ipykernel
+ipython kernel install --user --name=<any_name_for_kernel>
+```
 
 
 ## Setting up SSL/HTTPS
