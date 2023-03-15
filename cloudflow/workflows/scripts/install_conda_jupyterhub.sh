@@ -20,7 +20,7 @@
 
   # install JupyterHub under conda environment (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
   conda activate base
-  conda install -c conda-forge jupyterhub  # installs jupyterhub and proxy
+  conda install -c conda-forge jupyterhub oauthenticator  # installs jupyterhub and proxy
   conda install jupyterlab notebook  # needed if running the notebook servers in the same environment
 
   # good instruction source: https://medium.com/swlh/how-to-install-jupyterhub-using-conda-without-runing-as-root-and-make-it-a-service-59b843fead12
@@ -37,6 +37,16 @@
 
   ## TODO: Think about changing config
   sudo cp system/jupyterhub_config.py /opt/jupyterhub/jupyterhub_config.py
+
+  # create the systemd service
+  sudo setenforce 0 # may or may not be needed, disables SELinux to prevent issues with these steps
+  sudo mkdir /etc/jupyterhub/service
+  sudo cp system/jupyterhub.service /etc/jupyterhub/service/jupyterhub.service
+  sudo chown -R jupyter /etc/jupyter/service
+  sudo ln -s /etc/jupyterhub/service/jupyterhub.service /etc/systemd/system/jupyterhub.service
+  sudo systemctl daemon-reload
+  sudo systemctl enable jupyterhub
+  sudo systemctl start jupyterhub
 
   ### ------------------------ OLD CODE ------------------------------------------------------ ##
 
@@ -75,7 +85,7 @@
   sudo cp system/jupyterhub_config.py /opt/jupyterhub/jupyterhub_config.py
 
   # create systemd service
-  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/jupyter" --comment "JupytherHub system user" jupyter
+  sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/jupyter" --comment "JupyterHub system user" jupyter
   sudo chown jupyter:jupyter /opt/jupyterhub
 
   sudo mkdir -p /opt/jupyterhub/etc/systemd
