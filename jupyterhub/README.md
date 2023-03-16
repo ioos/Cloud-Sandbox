@@ -73,6 +73,8 @@ Follow [these instructions](https://github.com/jupyterhub/jupyterhub-the-hard-wa
 
 If you are planning on running SSL/HTTPS, you will need to generate your own certificates and point the Nginx configuration to those.
 
+The Nginx configuration is located in `/etc/nginx/conf.d/`
+
 ## Debugging
 
 The JupyterHub logs are part of the `jupyterhub.service`. To inspect the logs:
