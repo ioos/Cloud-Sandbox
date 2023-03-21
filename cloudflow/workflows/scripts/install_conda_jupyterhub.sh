@@ -21,7 +21,8 @@
   # install JupyterHub under conda environment (https://jupyterhub.readthedocs.io/en/stable/quickstart.html)
   conda activate base
   conda install -yc conda-forge jupyterhub oauthenticator sudospawner # installs jupyterhub and proxy
-  conda install -y jupyterlab notebook  # needed if running the notebook servers in the same environment
+  # needed if running the notebook servers in the same environment; nb_conda_kernels makes other environments visible
+  conda install -y jupyterlab notebook nb_conda_kernels
 
   # create system account that will run jupyterhub
   sudo useradd jupyter

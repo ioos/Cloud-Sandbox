@@ -53,17 +53,18 @@ First, if you haven't already, set a password for the user account to login with
 ```
 sudo passwd example_user
 ```
-Then login as that user: `su example_user`
 
-Run `conda init`
-
-After creating the new Conda environment, run these commands to make it visible to the base kernel:
+Then login as that user, initialize Conda, and create a new environment.
 
 ```
-conda install ipykernel
-ipython kernel install --user --name=<any_name_for_kernel>
+su example_user
+conda init
+conda create -n environment_name ipykernel
 ```
 
+The package `nb_conda_kernels` is already installed and will make the environment visible as long as ipykernel is installed.
+
+The new kernel should now be listed in JupyterHub.
 
 ## Setting up SSL/HTTPS
 
