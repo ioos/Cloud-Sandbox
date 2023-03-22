@@ -26,11 +26,11 @@ c.GoogleOAuthenticator.client_secret = "your_client_secret"
 
 ## Adding Users
 
-First, create the Linux user account if it doesn't already exist on the system.
+First, create the Linux user account if it doesn't already exist on the system, and add it to the jupyterhub group.
 
 ```
 sudo useradd example_user
-sudo usermod -aG wheel example_user
+sudo usermod -aG jupyterhub example_user
 ```
 
 Next, fill out the username mapping to map the Google user to a local Unix user. For example:
