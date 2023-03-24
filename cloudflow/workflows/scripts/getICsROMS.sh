@@ -1,5 +1,6 @@
 #!/bin/bash
-#set -x
+set -x
+
 #__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
@@ -18,8 +19,9 @@ cyc=$2
 ofs=$3
 COMDIR=$4
 
+# --no-check-certificate
 WGOPTS='-nc -nv --no-check-certificate'
-url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$CDATE
+url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/${ofs}.$CDATE
 
 #COMDIR=/com/nos/${ofs}.$CDATE
 if [ -d $COMDIR ]; then
@@ -57,7 +59,7 @@ $pfx.forecast.${CDATE}.t${cyc}z.in
 
 for file in $icfiles
 do
-  wget $WGOPTS -nc -nv ${url}/$file
+  wget $WGOPTS ${url}/$file
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: Unable to retrieve $file from $url"
     exit -1
@@ -88,7 +90,7 @@ ncyc=`echo $NEXT | cut -c9-10`
 nsfx=${NCDATE}.t${ncyc}z.nc
 
 if [[ $cyc -eq 18 ]] ; then
-  url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$NCDATE 
+  url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/${ofs}.$NCDATE 
 fi
 
 ifile=${pfx}.init.nowcast.${nsfx}
