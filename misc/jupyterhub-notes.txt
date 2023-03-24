@@ -1,0 +1,77 @@
+JupyterHub Setup
+https://jupyterhub.readthedocs.io/en/stable/quickstart.html
+
+Install node
+https://nodejs.org/en/download/
+wget https://nodejs.org/dist/v14.16.1/node-v14.16.1-linux-x64.tar.xz
+
+Add
+sudo mkdir /usr/local/lib/nodejs
+sudo tar -xJvf node-v14.16.1-linux-x64.tar.xz -C /usr/local/lib/nodejs
+to ~/.bashrc or /etc and /root/.bashrc
+
+# Nodejs
+VERSION=v14.16.1
+DISTRO=linux-x64
+export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
+
+Install JupyterHub
+python3 -m pip install jupyterhub
+sudo npm install -g configurable-http-proxy
+python3 -m pip install notebook
+
+PAM is installed
+Installed Packages
+Name        : pam
+Arch        : x86_64
+Version     : 1.1.8
+Release     : 23.el7
+Size        : 2.5 M
+Repo        : installed
+From repo   : base
+Summary     : An extensible library which provides authentication for applications
+URL         : http://www.linux-pam.org/
+License     : BSD and GPLv2+
+Description : PAM (Pluggable Authentication Modules) is a system security tool that
+            : allows system administrators to set authentication policy without
+            : having to recompile programs that handle authentication.
+
+Run it
+sudo -i /usr/local/bin/jupyterhub
+
+/usr/local/bin/jupyterhub -f /etc/jupyterhub/jupyterhub_config.py >& /var/log/jupyterhub &
+
+Setup Google OAuth
+https://developers.google.com/identity/protocols/oauth2
+
+
+Setup GitHub OAuth
+https://oauthenticator.readthedocs.io/en/latest/getting-started.html#installation
+python3 -m pip install oauthenticator
+
+Setup JupyterHub config
+/etc/jupyterhub
+[centos@ip-10-0-0-209 jupyterhub]$ cat jupyterhub_config.py | grep '^[a-z]'
+
+from oauthenticator.github import GitHubOAuthenticator
+c.JupyterHub.authenticator_class = GitHubOAuthenticator
+c.GitHubOAuthenticator.oauth_callback_url = 'http://ec2-54-204-161-97.compute-1.amazonaws.com:8000/hub/oauth_callback'
+c.GitHubOAuthenticator.client_id = '4cee2a68314e7b2649b6'
+c.GitHubOAuthenticator.client_secret = '731851af505f7c4550357529e89e49039d191099'
+c.Authenticator.whitelist = {'patrick-tripp'}
+c.Authenticator.admin_users = {'patrick-tripp'}
+c.JupyterHub.config_file = '/etc/jupyterhub/jupyterhub_config.py'
+c.Spawner.cmd=["jupyter-labhub"]
+
+Oauth new user flow
+Can use GitHub or Cognito
+User must exist on system otherwise 
+Can set to automatically create a user
+Need to create SSH Keys maybe
+sudo adduser patrick-tripp
+Add to wheel group
+gpasswd -a patrick-tripp wheel
+
+Delete password so can sudo without it
+passwd -d patrick-tripp
+

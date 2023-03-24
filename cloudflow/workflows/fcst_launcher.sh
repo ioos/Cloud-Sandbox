@@ -128,6 +128,12 @@ case $OFS in
     cd $JOBDIR || exit 1
     echo "Run command: mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1"
     mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1
+  adcircofs)
+    #export HOMEnos=/save/ADCIRC_Copied/
+    export JOBDIR=/home/mmonim/Cloud-Sandbox/cloudflow/workflows
+    export JOBSCRIPT=$JOBDIR/fcstrun_adcirc_cluster.sh
+    cd "$JOBDIR" || exit 1
+    $JOBSCRIPT
     result=$?
     ;;
   *)

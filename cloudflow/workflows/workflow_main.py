@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 """ A driver to run workflows from provided job configuration files """
+
+''' Usage:
+
+    ./workflows/workflow_main.py fcst-job [post-job]
+
+    Examples: ./workflows/workflow_main.py job/jobs/cbofs.00z.fcst 
+
+'''
+
 import collections
 import os
 import sys
@@ -17,9 +26,6 @@ __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
-
-#fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-#postconf = f'{curdir}/../cluster/configs/post.config'
 
 fcstconf = f'{curdir}/../cluster/configs/ioos.config'
 postconf = f'{curdir}/../cluster/configs/post.config'

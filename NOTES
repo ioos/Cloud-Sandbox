@@ -1,0 +1,2 @@
+     9	20:28	scontrol update NodeName=ip-10-0-0-176 State=DOWN Reason=COMPLETING
+    10	20:28	scontrol update NodeName=ip-10-0-0-176 State=IDLE
