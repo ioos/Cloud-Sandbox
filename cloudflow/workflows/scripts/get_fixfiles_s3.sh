@@ -8,26 +8,23 @@
 
 fixdirs="
 shared
-leofs
 cbofs
-dbofs
-ngofs
-negofs
-nwgofs
-gomofs
-tbofs
-sfbofs
-lmhofs
 ciofs
-"
-
-fixdirs="
-shared
-cbofs
+creofs
+dbofs
+gomofs
+leofs
+lmhofs
+loofs
+lsofs
+ngofs2
+sfbofs
+tbofs
+wcofs
 "
 
 bucket=ioos-cloud-sandbox
-version=v3.2.1
+version="v3.5.4"
 
 url="https://${bucket}.s3.amazonaws.com/public/nosofs/fix"
 for model in $fixdirs

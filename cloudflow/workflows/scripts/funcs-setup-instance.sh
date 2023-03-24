@@ -494,6 +494,7 @@ install_slurm () {
 
 _install_munge () {
 
+  # https://github.com/dun/munge/wiki/Installation-Guide
   echo "Running ${FUNCNAME[0]} ..."
 
   # COMPILER=intel@${INTEL_VER}
@@ -505,23 +506,23 @@ _install_munge () {
 
   sudo useradd --system --shell "/sbin/nologin" --home-dir "/etc/munge" --comment "Munge system user" munge
 
-  sudo mkdir    /etc/munge
+  sudo mkdir -p /etc/munge
   sudo mkdir -p /var/log/munge
   sudo mkdir -p /var/lib/munge
-  sudo mkdir -p /var/run/munge
+  sudo mkdir -p /run/munge
 
-  sudo chown -R munge:munge /etc/munge
-  sudo chown -R munge:munge /var/log/munge
-  sudo chown -R munge:munge /var/lib/munge
-  sudo chown -R munge:munge /var/run/munge
+  sudo chown munge:munge /etc/munge
+  sudo chown munge:munge /var/log/munge
+  sudo chown munge:munge /var/lib/munge
+  sudo chown munge:munge /run/munge
 
-  spack install $SPACKOPTS munge localstatedir=/var %${COMPILER}
+  #spack install $SPACKOPTS munge localstatedir=/var %${COMPILER}
+  spack install $SPACKOPTS munge runstatedir=/run localstatedir=/var %${COMPILER}
   result=$?
   if [ $result -ne 0 ]; then
     return $result
   fi
 
-  
   spack load munge
   result=$?
   if [ $result -ne 0 ]; then
