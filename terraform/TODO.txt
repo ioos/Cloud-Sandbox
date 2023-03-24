@@ -1,8 +1,3 @@
 Add the clear display/output of the following for cloudflow cluster config files:
-
-
 Eventually this should be automated - abstracted away from the user view.
-------------------------------------------------------------------------------------
-
-ESMF is installing mvapich since it does not recognize intel mpi or something
 

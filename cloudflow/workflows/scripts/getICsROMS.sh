@@ -6,7 +6,7 @@
 
 . /usr/share/Modules/init/sh
 module load produtil
-module load gcc
+# module load gcc
 
 if [ $# -ne 4 ] ; then
   echo "Usage: $0 YYYYMMDD HH cbofs|(other ROMS model) COMDIR"
@@ -18,6 +18,7 @@ cyc=$2
 ofs=$3
 COMDIR=$4
 
+WGOPTS='-nc -nv --no-check-certificate'
 url=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$CDATE
 
 #COMDIR=/com/nos/${ofs}.$CDATE
@@ -56,7 +57,7 @@ $pfx.forecast.${CDATE}.t${cyc}z.in
 
 for file in $icfiles
 do
-  wget -nc -nv ${url}/$file
+  wget $WGOPTS -nc -nv ${url}/$file
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: Unable to retrieve $file from $url"
     exit -1
@@ -69,7 +70,7 @@ cp -pf $pfx.roms.tides.$sfx nos.${ofs}.roms.tides.nc
 if [[ "$ofs" == "gomofs" ]]; then
   #nos.gomofs.clim.20200226.t00z.nc
   climfile=$pfx.clim.$sfx
-  wget -nc -nv ${url}/$climfile
+  wget $WGOPTS ${url}/$climfile
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: Unable to retrieve $climfile from $url"
     exit -1
@@ -93,7 +94,7 @@ fi
 ifile=${pfx}.init.nowcast.${nsfx}
 rfile=${pfx}.rst.nowcast.${sfx}
 
-wget -nc -nv ${url}/$ifile
+wget $WGOPTS ${url}/$ifile
 if [[ $? -ne 0 ]] ; then
   echo "ERROR: Unable to retrieve $file from \n $url"
   exit -1

@@ -4,6 +4,8 @@
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
+# Call this from the nosofs-NCO/fix folder
+
 fixdirs="
 shared
 leofs
@@ -17,6 +19,11 @@ tbofs
 sfbofs
 lmhofs
 ciofs
+"
+
+fixdirs="
+shared
+cbofs
 "
 
 bucket=ioos-cloud-sandbox

@@ -29,3 +29,6 @@ terraform/SAVE.mysettings.tfvars
 *.key
 */.secret
 **/*nda*
+dev.tfvars
+my.tfvars
+my.plan

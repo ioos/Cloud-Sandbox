@@ -4,39 +4,36 @@
 #__license__ = "See LICENSE.txt"
 #__email__ = "patrick.tripp@rpsgroup.com"
 
-version="v3.2.1"
+version="v3.5.4"
 noaaurl="https://www.nco.ncep.noaa.gov/pmb/codes/nwprod/nosofs.${version}"
 
 opts="-nc -np -r"
 
 fixdirs="
 cbofs
-dbofs
-ngofs
-negofs
-nwgofs
-leofs
-shared
-gomofs
-tbofs
-"
-
-
-fixdirs='
-sfbofs
-lmhofs
 ciofs
-'
-
-notdone='
+creofs
+dbofs
+gomofs
+leofs
+lmhofs
+loofs
+lsofs
+ngofs2
+sfbofs
+tbofs
 wcofs
-'
+"
+# shared
+
+#fixdirs='
+#shared
+#'
 
 for dir in $fixdirs
 do
   wget $opts $noaaurl/fix/$dir/
 done
-
 
 cd www.nco.ncep.noaa.gov
 rm robots.txt
@@ -57,7 +54,7 @@ for dir in $fixdirs
 do
   tarfile=$dir.${version}.fix.tgz
   tar -czvf $tarfile $dir
-  aws s3 cp $tarfile s3://${bucket}/public/nosofs/fix/${tarfile}
+  aws s3 cp $tarfile s3://${bucket}/public/nosofs/fix/${tarfile} --acl public-read
   #https://ioos-cloud-sandbox.s3.amazonaws.com/public/nosofs/fix/cbofs.v3.2.1.fix.tgz
   rm $tarfile
 done
