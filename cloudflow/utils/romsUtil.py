@@ -15,10 +15,10 @@ __email__ = "patrick.tripp@rpsgroup.com"
 debug = False
 
 roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
-fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
+fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
 
 nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
-                  "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs"]
+                  "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
 
 def nosofs_cyc0(ofs : str) -> str:
     if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs" ]:
