@@ -2,7 +2,9 @@
 
 The IOOS Cloud Sandbox is a platform for running regional coastal models in the cloud. The cloud resources are configured using Terraform and installs all dependencies necessary to run the models.
 
-## Prerequisites
+## Sandbox Deployment Instructions (if deploying a new Sandbox)
+
+### Prerequisites
 
 Install the AWS CLI: <br>
 https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
@@ -13,8 +15,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#c
 Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
-## Sandbox Installation Instructions
-
+### Create the Cloud Resources
 Terraform will create **all** of the AWS resources needed for the sandbox. 
 This includes the VPC, subnet, security groups, EFS networked disk volumes, and others. AWS has a default limit of 5 VPCs per region. You will have to request a quota increase from AWS if you are already at your limit.
 
@@ -111,6 +112,7 @@ terraform import aws_iam_role.sandbox_iam_role ioos_cloud_sandbox_terraform_role
 ```
 
 After resolving any existing resource conflicts, run `terraform apply` again.
+
 ---
 
 ### Install all of the required software and libraries
@@ -150,18 +152,6 @@ This is done automatically.
 The AMI ID will be found at the end of the log at /tmp/setup.log
 It can also be found in the AWS console or via the AWS CLI. This AMI ID will be needed later.
 
-### Install the NOS OFS ROMS and FVCOM models
-```
-ssh -i <your-key.pem> centos@<your-ec2-instance>
-cd /save
-git clone https://github.com/ioos/nosofs-NCO.git
-cd nosofs-NCO/sorc
-
-# To build everything
-./ROMS_COMPILE.sh
-./FVCOM_COMPILE.sh
-```
-
 ### Optional: After setting everything up, you can change the instance type to something smaller
 Edit mysettings.tfvars and change the following:
 
@@ -179,15 +169,54 @@ When done using the sandbox all of the AWS resources (including disks) can be de
 terraform destroy -var-file="mysettings.tfvars"
 ```
 
-## Cloud Sandbox Setup
-
 ### Cloud-Sandbox Setup and User Guide
 The following document contains some older instructions on building and running the models that is still valid.
 
 https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0.docx
 
+# Install and Run the Models
+
+## Install the NOS OFS ROMS and FVCOM models
+
+Log into the sandbox using SSH and providing your SSL private key. <br>
+
+For example: `ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws`
+
+### Obtaian the NOSOFS 3.5 Source Code
+https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO
+
+```
+cd /save/<your personal work folder>
+git clone -b ioos-cloud https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO nosofs-NCO
+cd nosofs-NCO/sorc
+
+### To build everything
+./ROMS_COMPILE.sh
+./FVCOM_COMPILE.sh
+```
+The build scripts can be modified to only build specific models.
+
+### Obtain the Fixed Field Files
+These files are too large to easily store on github and need to be obtained elsewhere.
+You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
+Edit the script to only download a subset.
+```
+Example:
+mkdir -p /save/ioos/nosofs-NCO/fix
+cd /save/ioos/nosofs-NCO/fix
+/save/ioos/Cloud-Sandbox/cloudflow/workflows/scripts/get_fixfiles_s3.sh
+```
+## Setup the run
+
 ### CloudFlow API Specification
-https://ioos.github.io/Cloud-Sandbox/
+https://ioos.github.io/Cloud-Sandbox
+
+### Run the following commands
+
+```
+cd /save/<your personal folder>/Cloud-Sandbox/cloudflow
+python3 -m pip install --user -r requirements.txt
+```
 
 ### Directory structure
     .
@@ -210,13 +239,9 @@ https://ioos.github.io/Cloud-Sandbox/
 
 ### Setup the machine configuration files for the forecast and/or post processing
 
-Log into the EC2 instance created in the previous section. <br>
-
-For example: `ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws`
-
 Update the configuration files to match your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/cbofs.config`
+Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/ioos.config`
 
 | Key | Description |
 | --- | ----- |
@@ -254,17 +279,28 @@ Copy the same values over for the post-processing. The nodeType and nodeCount ma
 
 Edit this file: `./Cloud-Sandbox/cloudflow/cluster/configs/post.config`
 
+The above machine configuration files are specified in the workflow_main.py script. Feel free to rename them to whatever you want.
+
+```
+fcstconf = f'{curdir}/../cluster/configs/ioos.config'
+postconf = f'{curdir}/../cluster/configs/post.config'
+```
+
 ### Setup the job configuration files
 
 These files contain parameters for running the models. These are provided as command line arguments to workflow_main.py.
+
+Example:
 
 `./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst` (forecast)
 
 `./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots` (plots)
 
+The variables are described below:
+
 | Variable | Description |
 | -------- | ----------- |
-| JOBTYPE | current options are "forecast" and "plotting" |
+| JOBTYPE  | current options are "forecast" and "plotting" |
 | OFS       | name of the forecast. Current options are "cbofs", "dbofs", "liveocean" |
 | CDATE     | run date, format YYYYMMDD or "today" = today's date |
 | HH        | forecast cycle, e.g. 06 for 06z forecast cycle |
@@ -299,15 +335,6 @@ These files contain parameters for running the models. These are provided as com
 }
 ```
 
-### Obtain the Fixed Field Files
-These files are too large to easily store on github and need to be obtained elsewhere.
-You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
-Edit the script to only download a subset.
-```
-mkdir -p /save/nosofs-NCO/fix
-cd /save/nosofs-NCO/fix
-~/Cloud-Sandbox/scripts/get_fixfiles_s3.sh
-```
 
 ### Run the Job
 
@@ -335,4 +362,4 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
 
-Copyright © 2021 RPS Group, Inc. All rights reserved.
+Copyright © 2023 RPS Group, Inc. All rights reserved.

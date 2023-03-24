@@ -2,6 +2,8 @@
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
+WRKDIR=/save/$GROUP/$USER
+
 set -xa
 ulimit -c unlimited
 ulimit -s unlimited
@@ -28,12 +30,12 @@ fi
 
 export CDATE=$1
 export HH=$2
-export COMOUT=$3
+export COMOUT=$3   # OUTDIR in caller
 export NPROCS=$4
 export PPN=$5
 export HOSTS=$6
 export OFS=$7
-export EXEC=$8       # only used for ADNOC currently
+export EXEC=$8
 
 #OpenMPI
 #mpirun --version
@@ -45,16 +47,20 @@ export EXEC=$8       # only used for ADNOC currently
 #Copyright (C) 2003-2017, Intel Corporation. All rights reserved.
 
 # module -t avail >& avail ; grep mpi avail
-# mpirun not in path if module is not loaded
-#mpirun --version | grep Intel
-#impi=$?
+
+# TODO: put the following back in
+# mpirun --version | grep Intel
+# impi=$?
 #
-#mpirun --version | grep "Open MPI"
-#openmpi=$?
+# mpirun --version | grep "Open MPI"
+# openmpi=$?
 
 # for openMPI openmpi=1
 # for Intel MPI set impi=1
 if [[ $OFS == "adnoc" ]]; then
+  openmpi=1
+  impi=0
+elif [[ $OFS == "nyh-hindcast" ]]; then
   openmpi=1
   impi=0
 else
@@ -83,7 +89,7 @@ fi
 # Can put domain specific options here
 case $OFS in
   liveocean)
-    export HOMEnos=/save/LiveOcean
+    export HOMEnos=$WRKDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export JOBARGS="$CDATE"
@@ -92,7 +98,7 @@ case $OFS in
     result=$?
     ;;
   cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=/save/nosofs-NCO
+    export HOMEnos=$WRKDIR/nosofs-NCO
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export cyc=$HH
@@ -102,7 +108,7 @@ case $OFS in
     result=$?
     ;;
   wrfroms)
-    export HOMEnos=/save/WRF-ROMS-Coupled
+    export HOMEnos=$WRKDIR/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
     cd "$JOBDIR" || exit 1
@@ -117,7 +123,21 @@ case $OFS in
     mpirun $MPIOPTS $EXEC ocean.in > ocean.log
     result=$?
     ;;
-
+  nyh-hindcast)
+    EXEC=${EXEC:-roms}
+    export JOBDIR=$COMOUT
+    mkdir -p $JOBDIR
+    cd $JOBDIR || exit 1
+    echo "Run command: mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1"
+    mpirun $MPIOPTS $EXEC ocean.in > ocean.out 2>&1
+  adcircofs)
+    #export HOMEnos=/save/ADCIRC_Copied/
+    export JOBDIR=/home/mmonim/Cloud-Sandbox/cloudflow/workflows
+    export JOBSCRIPT=$JOBDIR/fcstrun_adcirc_cluster.sh
+    cd "$JOBDIR" || exit 1
+    $JOBSCRIPT
+    result=$?
+    ;;
   *)
     echo "Model not supported $OFS"
     exit 1

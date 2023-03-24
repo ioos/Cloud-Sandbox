@@ -32,7 +32,7 @@ mkdir -p $COMDIR
 cd $COMDIR
 
 
-nomads=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.${CDATE}
+nomads=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/${ofs}.${CDATE}
 
 pfx=nos.$ofs
 sfx=${CDATE}.t${cyc}z.nc
@@ -75,7 +75,7 @@ nsfx=${NCDATE}.t${ncyc}z.nc
 
 # if current cycle is last for the day, the next cycle will be during the next day
 if [ "$cyc" -eq "21" -o "$cyc" -eq "18" ] ; then
-  nomads=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nos/prod/${ofs}.$NCDATE
+  nomads=https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/${ofs}.$NCDATE
 fi
 
 

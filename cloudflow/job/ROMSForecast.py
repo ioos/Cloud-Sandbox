@@ -104,7 +104,8 @@ class ROMSForecast(Job):
 
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
-        self.make_oceanin()
+        if self.OCEANIN == "auto":
+            self.make_oceanin()
 
         if self.OFS == 'wrfroms':
             self.__make_couplerin()
@@ -175,7 +176,7 @@ class ROMSForecast(Job):
         elif OFS == 'wrfroms':
             self.__make_oceanin_wrfroms()
         else:
-            raise Exception(f"{OFS} is not a supported forecast")
+            raise Exception(f"I don't know how to create an ocean.in for {OFS}")
 
         return
 

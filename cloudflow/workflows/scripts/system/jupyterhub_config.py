@@ -25,7 +25,7 @@ c.GoogleOAuthenticator.client_id = ''
 c.GoogleOAuthenticator.client_secret = ''
 c.LocalAuthenticator.create_system_users = True
 c.Authenticator.delete_invalid_users = False
-c.Authenticator.admin_users = {'jonmjoyce@gmail.com', 'patrick.tripp.rps@gmail.com'}
+c.Authenticator.admin_users = {'jupyter', 'jonmjoyce', 'patrick.tripp.rps'}
 c.Authenticator.username_map = { "jonmjoyce@gmail.com": "jonmjoyce", "patrick.tripp.rps@gmail.com": "patrick.tripp" }
 
 ## Fill this out to make users administrators
@@ -217,7 +217,7 @@ c.JupyterHub.bind_url = 'http://:8000'
 #c.JupyterHub.cookie_secret = traitlets.Undefined
 
 ## File in which to store the cookie secret.
-c.JupyterHub.cookie_secret_file = '/opt/jupyterhub/jupyterhub_cookie_secret'
+#c.JupyterHub.cookie_secret_file = '/opt/jupyterhub/jupyterhub_cookie_secret'
 
 ## The location of jupyterhub data files (e.g. /usr/local/share/jupyterhub)
 #c.JupyterHub.data_files_path = '/home/centos/.local/share/jupyterhub'
@@ -227,7 +227,7 @@ c.JupyterHub.cookie_secret_file = '/opt/jupyterhub/jupyterhub_cookie_secret'
 #c.JupyterHub.db_kwargs = {}
 
 ## url for the database. e.g. `sqlite:///jupyterhub.sqlite`
-c.JupyterHub.db_url = 'sqlite:///opt/jupyterhub/jupyterhub.sqlite'
+#c.JupyterHub.db_url = 'sqlite:///opt/jupyterhub/jupyterhub.sqlite'
 
 ## log all database transactions. This has A LOT of output
 #c.JupyterHub.debug_db = False
@@ -513,8 +513,8 @@ c.JupyterHub.db_url = 'sqlite:///opt/jupyterhub/jupyterhub.sqlite'
 #c.JupyterHub.oauth_token_expires_in = 0
 
 ## File to write PID Useful for daemonizing JupyterHub.
-c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub.pid'
-c.ConfigurableHTTPProxy.pid_file = '/opt/jupyterhub/jupyterhub-proxy.pid'
+#c.JupyterHub.pid_file = '/opt/jupyterhub/jupyterhub.pid'
+#c.ConfigurableHTTPProxy.pid_file = '/opt/jupyterhub/jupyterhub-proxy.pid'
 
 ## The public facing port of the proxy.
 #  
@@ -596,7 +596,7 @@ c.ConfigurableHTTPProxy.pid_file = '/opt/jupyterhub/jupyterhub-proxy.pid'
 #    - default: jupyterhub.spawner.LocalProcessSpawner
 #    - localprocess: jupyterhub.spawner.LocalProcessSpawner
 #    - simple: jupyterhub.spawner.SimpleLocalProcessSpawner
-#c.JupyterHub.spawner_class = 'jupyterhub.spawner.LocalProcessSpawner'
+c.JupyterHub.spawner_class = 'sudospawner.SudoSpawner'
 
 ## Path to SSL certificate file for the public facing interface of the proxy
 #  
