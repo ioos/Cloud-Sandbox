@@ -214,7 +214,10 @@ class AWSCluster(Cluster):
         ec2 = boto3.resource('ec2', region_name=self.region)
 
         try:
-            self.__instances = ec2.create_instances(
+
+            if self.nodeType == 'hpc6a.48xlarge':
+
+              self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
                 KeyName=self.key_name,
@@ -227,13 +230,32 @@ class AWSCluster(Cluster):
                     }
                 ],
                 Placement=self.__placementGroup(),
+                NetworkInterfaces=[self.__netInterface()]
+                #CpuOptions={
+                #    'CoreCount': self.PPN,
+                #    'ThreadsPerCore': 1
+                #}
+              )
+            else:
+              self.__instances = ec2.create_instances(
+                ImageId=self.image_id,
+                InstanceType=self.nodeType,
+                KeyName=self.key_name,
+                MinCount=self.nodeCount,
+                MaxCount=self.nodeCount,
+                TagSpecifications=[
+                    {   
+                        'ResourceType': 'instance',
+                        'Tags': self.tags
+                    }
+                ],
+                Placement=self.__placementGroup(),
                 NetworkInterfaces=[self.__netInterface()],
                 CpuOptions={
                     'CoreCount': self.PPN,
                     'ThreadsPerCore': 1
                 }
-
-            )
+              )
         except ClientError as e:
             log.exception('ClientError exception in createCluster' + str(e))
             raise Exception() from e
@@ -379,7 +401,8 @@ class AWSCluster(Cluster):
             'SubnetId': self.subnet_id
         }
 
-        if self.nodeType == 'c5n.18xlarge':
+        # if self.nodeType == 'c5n.18xlarge':
+        if self.nodeType in nodeInfo.efaTypes:
             interface['InterfaceType'] = 'efa'
 
         return interface

@@ -1,0 +1,50 @@
+Test skylake-avx512 spack libs work on hpc6a with model compiled without avx-512 options.
+If not, haswell target should work.
+
+
+Munge
+/var/run/munge does not exist when creating a new node from the AMI
+
+
+SLURM
+
+https://slurm.schedmd.com/power_save.html
+
+Add to .bashrc
+module load intel-oneapi-mpi-2021.3.0-intel-2021.3.0-bixgqcx
+module load slurm-22-05-2-1-gcc-8.5.0-apqgpml
+
+example using intel mpirun hydra
+salloc -N2 --exclusive
+export I_MPI_PMI_LIBRARY=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-centos7-skylake_avx512/gcc-8.5.0/slurm-22-05-2-1-apqgpmlebpnvu45ouivnhtftrxvxsk7t/lib/libpmi2.so
+mpirun -np <num_procs> app.bin
+
+$ salloc -N10 --exclusive
+$ export I_MPI_PMI_LIBRARY=/path/to/slurm/lib/libpmi2.so
+$ srun user_app.bin
+
+
+https://hpc.llnl.gov/banks-jobs/running-jobs/slurm-quick-start-guide
+
+Create a batch job script and submit it
+$ cat > myBatch.cmd
+#!/bin/bash
+#SBATCH -N 4
+#SBATCH -p pdebug
+#SBATCH -A myBank
+#SBATCH -t 30
+
+srun -N 4 -n 32 myApp
+^D
+This script asks for 4 nodes from the pdebug queue for no more than 30 minutes charging the myBank account.  The srun command launches 32 tasks of myApp across the four nodes.
+
+Now submit the job:
+
+$ sbatch myBatch.cmd
+Submitted batch job 150104
+See the job pending in the queue:
+
+$ squeue
+  JOBID PARTITION     NAME     USER  ST       TIME  NODES NODELIST(REASON)
+ 150104    pdebug myBatch.       me  PD       0:00      4 (Priority)
+
