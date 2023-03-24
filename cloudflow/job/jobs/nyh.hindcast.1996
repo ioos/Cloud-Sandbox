@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "nyh-hindcast",
+  "OUTDIR"    : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations/1996",
+  "OCEANIN"   : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations/1996/ocean.in",
+  "COMROT"    : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations",
+  "EXEC"      : "/mnt/efs/ROMS/bin/WithTide_WithRadNud_WithStations.oceanM",
+  "CDATE"     : "",
+  "HH"        : "",
+  "PTMP"      : "",
+  "TIME_REF"  : "",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "NTIMES"    : "",
+  "ININAME"   : "",
+  "OCNINTMPL" : ""
+}
