@@ -1,0 +1,42 @@
+# NetCDF C Configuration Summary
+==============================
+
+# General
+-------
+NetCDF Version:		4.7.3
+Dispatch Version:       1
+Configured On:		Thu Dec 12 22:10:35 UTC 2019
+Host System:		x86_64-pc-linux-gnu
+Build Directory: 	/home/centos/builddir.libs.tools/libraries/netcdf-c-4.7.3
+Install Prefix:         /usrx/netcdf/4.5
+
+# Compiling Options
+-----------------
+C Compiler:		/usrx/gcc/6.5.0/bin/gcc
+CFLAGS:			-I/usrx/hdf5/1.10.5/include
+CPPFLAGS:		
+LDFLAGS:		-L/usrx/hdf5/1.10.5/lib -lhdf5 -lhdf5_hl -lz
+AM_CFLAGS:		
+AM_CPPFLAGS:		
+AM_LDFLAGS:		
+Shared Library:		yes
+Static Library:		yes
+Extra libraries:	-lm -ldl 
+
+# Features
+--------
+NetCDF-2 API:		yes
+HDF4 Support:		no
+HDF5 Support:		yes
+NetCDF-4 API:		yes
+NC-4 Parallel Support:	no
+PnetCDF Support:	no
+DAP2 Support:		no
+DAP4 Support:		no
+Byte-Range Support:	no
+Diskless Support:	yes
+MMap Support:		no
+JNA Support:		no
+CDF5 Support:		yes
+ERANGE Fill Support:	no
+Relaxed Boundary Check:	yes

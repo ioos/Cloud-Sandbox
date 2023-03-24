@@ -18,3 +18,17 @@ workflow/venv/
 dist/
 docs/build/
 cloudflow/notebooks/docs/
+terraform/.terraform/
+terraform/terraform-notes.txt
+terraform/terraform.tfstate
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate.backup
+terraform/.terraform.tfstate.lock.info
+terraform/SAVE.mysettings.tfvars
+*.pem
+*.key
+*/.secret
+**/*nda*
+dev.tfvars
+my.tfvars
+my.plan

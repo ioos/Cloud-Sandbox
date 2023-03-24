@@ -1,4 +1,4 @@
-pyproj
+pyproj==2.6
 dask
 distributed
 cmocean

@@ -1,0 +1,3 @@
+mirrors:
+  local-mirror: file:///save/builds/mirror
+  s3-mirror: s3://ioos-cloud-sandbox/public/spack/mirror
