@@ -11,6 +11,8 @@
   # install nginx
   sudo yum install -y nginx
   sudo cp system/jupyterhub.conf /etc/nginx/conf.d/jupyterhub.conf
+  #TODO: Copy certs to correct place
+  # /etc/ssl/star_rpsgroup_com.crt
   sudo systemctl enable nginx
   sudo systemctl start nginx
 
@@ -21,6 +23,9 @@
   sudo /opt/jupyterhub/bin/python -m pip install setuptools_rust
   sudo /opt/jupyterhub/bin/python3 -m pip install ipywidgets
   sudo /opt/jupyterhub/bin/python -m pip install jupyterhub jupyterlab
+  # allow interaction with conda-store (https://pypi.org/project/nb-conda-store-kernels/)
+  #sudo /opt/jupyterhub/bin/python -m pip install nb_conda_store_kernels
+  #sudo /opt/jupyterhub/bin/python -m nb_conda_store_kernels.install --enable
 
   # needed if running the notebook servers in the same environment
   sudo /opt/jupyterhub/bin/python -m pip install notebook
@@ -53,7 +58,12 @@
   sudo bash /tmp/Anaconda3-2022.05-Linux-x86_64.sh -b -p /opt/conda
   sudo ln -sf /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
-  sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python ipykernel --yes
+  # allows all users to make changes to conda environments (alternatively could give permissions to each user)
+  sudo chmod -R a+rwX /opt/conda/envs
+
+  # make kernel visible to JupyterHub
+  sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/pangeo xarray zarr dask ipykernel --yes
+  sudo /opt/jupyterhub/bin/jupyter kernelspec install /opt/conda/envs/python
 
   # To activate this environment, use
   #     $ conda activate /opt/conda/envs/python
@@ -70,8 +80,8 @@
   # /path/to/kernel/env/bin/python -m ipykernel install --user --name 'python-my-env' --display-name "Python My Env"
   sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
 
+  sudo /opt/conda/envs/python/bin/python -m ipykernel install --user --name 'python' --display-name "Python (default spec)"
+
   # ************** Work in progress ******************
   # TODO: configure sudospawner so we can run jupyterhub as jupyter user
   # sudo /opt/jupyterhub/bin/python -m pip install sudospawner
-
-

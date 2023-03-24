@@ -233,6 +233,11 @@ def get_forcing(job: Job, sshuser=None):
         if result.returncode != 0:
             log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
             raise signals.FAIL()
+    elif ofs == 'adcircofs':
+	
+        #script = f"{curdir}/fcstrun_adcirc_prep.sh"
+        #result = subprocess.run([script])
+        print('Not required to download forcing') 
     else:
         log.error("Unsupported forecast: ", ofs)
         raise signals.FAIL()

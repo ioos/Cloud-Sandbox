@@ -50,6 +50,66 @@ for handler in prelog.handlers:
     handler.setFormatter(pformatter)
 
 
+def test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
+
+    with Flow('fcst workflow') as fcstflow:
+        #####################################################################
+        # FORECAST
+        #####################################################################
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(fcstconf)
+
+        # Setup the job
+        fcstjob = tasks.job_init(cluster, fcstjobfile)
+
+        # Get forcing data here
+
+        # Start the cluster
+        #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
+
+        # Run the forecast
+        fcst_run = tasks.forecast_run(cluster, fcstjob)
+
+        # Terminate the cluster nodes
+        #cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+
+        # If the fcst fails, then set the whole flow to fail
+        fcstflow.set_reference_tasks([fcst_run])
+
+    return fcstflow
+
+
+def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
+
+    with Flow('fcst workflow') as fcstflow:
+        #####################################################################
+        # FORECAST
+        #####################################################################
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(fcstconf)
+
+        # Setup the job
+        fcstjob = tasks.job_init(cluster, fcstjobfile)
+
+        # Get forcing data here
+
+        # Start the cluster
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
+
+        # Run the forecast
+        fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+
+        # Terminate the cluster nodes
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+
+        # If the fcst fails, then set the whole flow to fail
+        fcstflow.set_reference_tasks([fcst_run])
+
+    return fcstflow
+
+
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.
 

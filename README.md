@@ -174,9 +174,15 @@ The following document contains some older instructions on building and running 
 
 https://ioos-cloud-sandbox.s3.amazonaws.com/public/IOOS_Cloud_Sandbox_Ref_v1.3.0.docx
 
+# Install and Run the Models
+
 ## Install the NOS OFS ROMS and FVCOM models
 
-### NOSOFS 3.5 Source Code
+Log into the sandbox using SSH and providing your SSL private key. <br>
+
+For example: `ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws`
+
+### Obtaian the NOSOFS 3.5 Source Code
 https://github.com/asascience/2022-NOS-Code-Delivery-to-NCO
 
 ```
@@ -203,7 +209,14 @@ cd /save/ioos/nosofs-NCO/fix
 ## Setup the run
 
 ### CloudFlow API Specification
-https://ioos.github.io/Cloud-Sandbox/
+https://ioos.github.io/Cloud-Sandbox
+
+### Run the following commands
+
+```
+cd /save/<your personal folder>/Cloud-Sandbox/cloudflow
+python3 -m pip install --user -r requirements.txt
+```
 
 ### Directory structure
     .
@@ -226,13 +239,9 @@ https://ioos.github.io/Cloud-Sandbox/
 
 ### Setup the machine configuration files for the forecast and/or post processing
 
-Log into the EC2 instance created in the previous section. <br>
-
-For example: `ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws`
-
 Update the configuration files to match your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/cbofs.config`
+Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/ioos.config`
 
 | Key | Description |
 | --- | ----- |
@@ -270,17 +279,28 @@ Copy the same values over for the post-processing. The nodeType and nodeCount ma
 
 Edit this file: `./Cloud-Sandbox/cloudflow/cluster/configs/post.config`
 
+The above machine configuration files are specified in the workflow_main.py script. Feel free to rename them to whatever you want.
+
+```
+fcstconf = f'{curdir}/../cluster/configs/ioos.config'
+postconf = f'{curdir}/../cluster/configs/post.config'
+```
+
 ### Setup the job configuration files
 
 These files contain parameters for running the models. These are provided as command line arguments to workflow_main.py.
+
+Example:
 
 `./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst` (forecast)
 
 `./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots` (plots)
 
+The variables are described below:
+
 | Variable | Description |
 | -------- | ----------- |
-| JOBTYPE | current options are "forecast" and "plotting" |
+| JOBTYPE  | current options are "forecast" and "plotting" |
 | OFS       | name of the forecast. Current options are "cbofs", "dbofs", "liveocean" |
 | CDATE     | run date, format YYYYMMDD or "today" = today's date |
 | HH        | forecast cycle, e.g. 06 for 06z forecast cycle |
