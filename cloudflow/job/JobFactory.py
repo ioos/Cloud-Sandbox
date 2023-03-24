@@ -6,7 +6,7 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 
-__copyright__ = "Copyright © 020 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
 __license__ = "See LICENSE.txt"
 __email__ = "patrick.tripp@rpsgroup.com"
 
