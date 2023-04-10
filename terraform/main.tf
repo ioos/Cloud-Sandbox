@@ -5,10 +5,29 @@ terraform {
       version = "~> 3.47"
     }
   }
+  backend "s3" {
+    bucket = "ioos-cloud-sandbox"
+    key    = "tfstate"
+    region = "us-east-1"
+    dynamodb_table = "sandbox-terraform-state-lock"
+  }
 }
 
 provider "aws" {
   region  = var.preferred_region
+}
+
+# this creates a state lock table used by Terraform for managing state
+resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
+  name = "sandbox-terraform-state-lock"
+  hash_key = "LockID"
+  read_capacity = 20
+  write_capacity = 20
+ 
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
 }
 
 resource "aws_iam_role" "sandbox_iam_role" {
