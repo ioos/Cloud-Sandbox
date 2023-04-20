@@ -2,7 +2,7 @@
 
 NUID=1002
 GID=1001
-USERNAME="patrick.tripp"
+USERNAME=""
 
 #cd /save/home
 sudo adduser --uid $NUID -m -N --gid $GID $USERNAME

@@ -13,9 +13,9 @@ from prefect.engine import signals
 from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
 import cloudflow.services.ScratchDisk as ScratchDiskModule
 
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-__license__ = "See LICENSE.txt"
-__email__ = "patrick.tripp@rpsgroup.com"
+__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
+
 
 log = logging.getLogger('workflow')
 log.setLevel(logging.DEBUG)

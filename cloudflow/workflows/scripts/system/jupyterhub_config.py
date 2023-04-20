@@ -25,8 +25,8 @@ c.GoogleOAuthenticator.client_id = ''
 c.GoogleOAuthenticator.client_secret = ''
 c.LocalAuthenticator.create_system_users = True
 c.Authenticator.delete_invalid_users = False
-c.Authenticator.admin_users = {'jupyter', 'jonmjoyce', 'patrick.tripp.rps'}
-c.Authenticator.username_map = { "jonmjoyce@gmail.com": "jonmjoyce", "patrick.tripp.rps@gmail.com": "patrick.tripp" }
+c.Authenticator.admin_users = {'jupyter', 'user1'}
+c.Authenticator.username_map = { "user1@gmail.com": "user1", "user2@gmail.com": "user2" }
 
 ## Fill this out to make users administrators
 #c.Authenticator.admin_users = {'example_user@gmail.com'}

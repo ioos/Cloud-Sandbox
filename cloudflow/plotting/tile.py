@@ -5,8 +5,8 @@ import math
 import numpy as np
 import os.path
 
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-__license__ = "See LICENSE.txt"
+__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
 
 def _qkx(qk):
     """ integer representation of quadkey x positon) """

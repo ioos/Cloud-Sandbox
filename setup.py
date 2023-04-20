@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
-#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-#__license__ = "See LICENSE.txt"
-#__email__ = "patrick.tripp@rpsgroup.com"
+#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__license__ = "BSD 3-Clause"
+
 
 # setup cloud-workflow package
 setup(name="cloudflow",
@@ -9,7 +9,6 @@ setup(name="cloudflow",
     description='Workflows for cloud based numerical weather prediction',
     url='https://github.com/asascience/Cloud-Sandbox',
     author='RPS North America',
-    author_email='patrick.tripp@rpsgroup.com',
     license="LICENSE.txt",
     setup_requires=['setuptools_scm'],
     packages=[ 'cloudflow/cluster', 'cloudflow/job',

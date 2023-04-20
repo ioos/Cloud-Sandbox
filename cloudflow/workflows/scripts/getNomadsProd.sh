@@ -1,9 +1,9 @@
 #!/bin/bash
 set -x
 
-#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-#__license__ = "See LICENSE.txt"
-#__email__ = "patrick.tripp@rpsgroup.com"
+#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__license__ = "BSD 3-Clause"
+
 
 if [ $# -lt 3 ] ; then
   echo "Usage: $0 cbofs|ngofs|etc. yyyymmdd hh [/com/nos-noaa/cbofs.20200416 | other destination]"

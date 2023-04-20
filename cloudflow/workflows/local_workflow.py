@@ -10,9 +10,9 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import job_tasks as jtasks
 from cloudflow.workflows import cluster_tasks as ctasks
 
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-__license__ = "See LICENSE.txt"
-__email__ = "patrick.tripp@rpsgroup.com"
+__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
+
 
 # keep things cloud platform agnostic at this layer
 
