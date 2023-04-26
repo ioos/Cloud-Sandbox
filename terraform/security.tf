@@ -1,6 +1,7 @@
 # base sg
 resource "aws_security_group" "base_sg" {
-  vpc_id = aws_vpc.cloud_vpc.id
+  #vpc_id = aws_vpc.cloud_vpc.id
+  vpc_id = local.vpc.id
   ingress {
     self = true
     from_port = 0
@@ -20,7 +21,8 @@ resource "aws_security_group" "base_sg" {
 }
 
 resource "aws_security_group" "efs_sg" {
-   vpc_id = aws_vpc.cloud_vpc.id
+   #vpc_id = aws_vpc.cloud_vpc.id
+   vpc_id = local.vpc.id
    ingress {
      self = true
      from_port = 2049
@@ -42,7 +44,8 @@ resource "aws_security_group" "efs_sg" {
 }
 
 resource "aws_security_group" "ssh_ingress" {
-  vpc_id = aws_vpc.cloud_vpc.id
+  #vpc_id = aws_vpc.cloud_vpc.id
+  vpc_id = local.vpc.id
   ingress {
           description = "Allow SSH from approved IP addresses"
           from_port = 22
