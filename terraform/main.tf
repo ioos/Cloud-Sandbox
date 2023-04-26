@@ -58,6 +58,8 @@ resource "aws_placement_group" "cloud_sandbox_placement_group" {
 }
 
 resource "aws_vpc" "cloud_vpc" {
+   # we only will create this vpc if vpc_id is not passed in as a variable
+   count = var.vpc_id != null ? 0 : 1
    # This is a large vpc, 256 x 256 IPs available
    cidr_block = "10.0.0.0/16"
    enable_dns_support = true
@@ -68,20 +70,48 @@ resource "aws_vpc" "cloud_vpc" {
     }
 }
 
+
+data "aws_vpc" "pre-provisioned" {
+  # the pre-provisioned VPC will be returned if vpc_id matches an existing VPC
+  count = var.vpc_id != null ? 1 : 0
+  id = var.vpc_id
+}
+
 resource "aws_subnet" "main" {
-  vpc_id   = aws_vpc.cloud_vpc.id
-  # This subnet will allow 256 IPs
-  cidr_block = "10.0.0.0/24"
-  map_public_ip_on_launch = true
-  availability_zone = var.availability_zone
+   count = var.vpc_id != null ? 0 : 1
+   #vpc_id   = aws_vpc.cloud_vpc[0].id
+   vpc_id = local.vpc.id
+   # This subnet will allow 256 IPs
+   cidr_block = "10.0.0.0/24"
+   map_public_ip_on_launch = true
+   availability_zone = var.availability_zone
    tags = {
       Name = "${var.name_tag} Subnet"
       Project = var.project_tag
-    }
+   }
 }
 
+
+data "aws_subnet" "pre-provisioned" {
+  # the pre-provisioned Subnet will be returned if subnet_id matches an existing Subnet
+  count = var.subnet_id != null ? 1 : 0
+  id = var.subnet_id
+}
+
+
+# here we assign local variables for both the VPC and the Subnet we'll need to refer to to deploy further resources below:
+# use of the one() function is needed to ensure only a single value is assigned, rather than a tuple/set
+locals {
+  vpc = var.vpc_id != null ? one(data.aws_vpc.pre-provisioned[*]) : one(aws_vpc.cloud_vpc[*])
+  subnet = var.subnet_id != null ? one(data.aws_subnet.pre-provisioned[*]) : one(aws_subnet.main[*])
+
+}
+
+
 resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.cloud_vpc.id
+   count = var.vpc_id != null ? 0 : 1
+   #vpc_id = aws_vpc.cloud_vpc[0].id
+   vpc_id = local.vpc.id
    tags = {
       Name = "${var.name_tag} Internet Gateway"
       Project = var.project_tag
@@ -89,22 +119,26 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_route_table" "default" {
-    vpc_id = aws_vpc.cloud_vpc.id
+   count = var.vpc_id != null ? 0 : 1
+   #vpc_id = aws_vpc.cloud_vpc[0].id
+   vpc_id = local.vpc.id
 
-    route {
-      cidr_block = "0.0.0.0/0"
-      gateway_id = aws_internet_gateway.gw.id
-    }
+   route {
+     cidr_block = "0.0.0.0/0"
+     gateway_id = one(aws_internet_gateway.gw[*].id)
+   }
    tags = {
-      Name = "${var.name_tag} Route Table"
-      Project = var.project_tag
-    }
+     Name = "${var.name_tag} Route Table"
+     Project = var.project_tag
+   }
 }
 
 resource "aws_route_table_association" "main" {
-  subnet_id = aws_subnet.main.id
-  route_table_id = aws_route_table.default.id
+  count = var.vpc_id != null ? 0 : 1
+  subnet_id = one(aws_subnet.main[*].id)
+  route_table_id = one(aws_route_table.default[*].id)
 }
+
 
 resource "aws_efs_file_system" "main_efs" {
   encrypted = false
@@ -116,7 +150,7 @@ resource "aws_efs_file_system" "main_efs" {
 }
 
 resource "aws_efs_mount_target" "mount_target_main_efs" {
-    subnet_id = aws_subnet.main.id
+    subnet_id = local.subnet.id
     security_groups = [aws_security_group.efs_sg.id]
     file_system_id = aws_efs_file_system.main_efs.id
 }
@@ -377,7 +411,8 @@ data "template_file" "init_instance" {
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "standard" {
   
-  subnet_id   = aws_subnet.main.id
+  #subnet_id   = aws_subnet.main.id
+  subnet_id   = local.subnet.id
   description = "The network adaptor to attach to the instance if EFA is not supported"
   security_groups = [aws_security_group.base_sg.id,
                      aws_security_group.ssh_ingress.id,
@@ -390,8 +425,9 @@ resource "aws_network_interface" "standard" {
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "efa_network_adapter" {
-
-  subnet_id   = aws_subnet.main.id
+  
+  #subnet_id   = aws_subnet.main.id
+  subnet_id   = local.subnet.id
   description = "The Elastic Fabric Adapter to attach to instance if supported"
   security_groups = [aws_security_group.base_sg.id,
                      aws_security_group.ssh_ingress.id,
