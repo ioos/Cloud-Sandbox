@@ -2,7 +2,7 @@
 
 The IOOS Cloud Sandbox is a platform for running regional coastal models in the cloud. The cloud resources are configured using Terraform and installs all dependencies necessary to run the models.
 
-## Sandbox Deployment Instructions (if deploying a new Sandbox)
+## Deploying a New Sandbox
 
 ### Prerequisites
 
@@ -15,7 +15,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#c
 Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
-### Create the Cloud Resources
+### Initialize Terraform
 Terraform will create **all** of the AWS resources needed for the sandbox. 
 This includes the VPC, subnet, security groups, EFS networked disk volumes, and others. AWS has a default limit of 5 VPCs per region. You will have to request a quota increase from AWS if you are already at your limit.
 
@@ -23,12 +23,40 @@ Clone this repository: <br>
 *(e.g. using the default path ./Cloud-Sandbox)*
 ```
 git clone https://github.com/ioos/Cloud-Sandbox.git
+```
+
+Terraform tracks internal resource state separately from the project state. 
+
+Initialize the remote state resources by running the following commands in the `Cloud-Sandbox/terraform/remote-state` directory. **This only needs to be performed once per AWS account.**
+
+```
+cd ./Cloud-Sandbox/terraform/remote-state
+terraform init
+terraform apply
+```
+
+Once those resources are deployed you can initialize the project state.
+
+Run the following command to initialize Terraform for the project: 
+```
 cd ./Cloud-Sandbox/terraform
-```
-Run the following command to initialize Terraform: 
-```
 terraform init
 ```
+
+If multiple users are deploying different Cloud Sandbox resources in the same AWS account, each user should create their own Terraform workspace:
+
+```
+terraform workspace new my_workspace
+```
+
+Alternatively, list and select an existing workspace:
+
+```
+terraform workspace list
+terraform workspace select existing_workspace
+```
+
+For more info on workspaces, this is a good overview: https://spacelift.io/blog/terraform-workspaces
 
 ### Generate a Key Pair ###
 Terraform requires an existing key-pair to provide SSH access to the instance(s). The public key will be added to the created instance when it is created. Then the private key can be used to login it.
@@ -168,6 +196,8 @@ When done using the sandbox all of the AWS resources (including disks) can be de
 ```
 terraform destroy -var-file="mysettings.tfvars"
 ```
+
+
 
 ### Cloud-Sandbox Setup and User Guide
 The following document contains some older instructions on building and running the models that is still valid.
