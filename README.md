@@ -197,7 +197,9 @@ When done using the sandbox all of the AWS resources (including disks) can be de
 terraform destroy -var-file="mysettings.tfvars"
 ```
 
+### Recovering Terraform State
 
+In case you've already deployed cloud resources but your local copy of Cloud Sandbox is destroyed or you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
 
 ### Cloud-Sandbox Setup and User Guide
 The following document contains some older instructions on building and running the models that is still valid.
