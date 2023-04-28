@@ -5,6 +5,11 @@ terraform {
       version = "~> 3.47"
     }
   }
+  backend "s3" {
+    bucket = "cloud-sandbox-tfstate"
+    key    = "tfstate"
+    region = "us-east-2"
+  }
 }
 
 provider "aws" {
