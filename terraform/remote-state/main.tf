@@ -1,9 +1,9 @@
 provider "aws" {
-  region = "us-east-2"
+  region  = var.preferred_region
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "cloud-sandbox-tfstate"
+  bucket = var.tfstate_s3_bucket_name
      
   lifecycle {
     prevent_destroy = true
