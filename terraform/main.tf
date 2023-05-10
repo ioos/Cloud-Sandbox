@@ -6,9 +6,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "cloud-sandbox-tfstate"
     key    = "tfstate"
-    region = "us-east-2"
   }
 }
 
@@ -79,7 +77,6 @@ data "aws_vpc" "pre-provisioned" {
 
 resource "aws_subnet" "main" {
    count = var.vpc_id != null ? 0 : 1
-   #vpc_id   = aws_vpc.cloud_vpc[0].id
    vpc_id = local.vpc.id
    # This subnet will allow 256 IPs
    cidr_block = "10.0.0.0/24"
@@ -110,7 +107,6 @@ locals {
 
 resource "aws_internet_gateway" "gw" {
    count = var.vpc_id != null ? 0 : 1
-   #vpc_id = aws_vpc.cloud_vpc[0].id
    vpc_id = local.vpc.id
    tags = {
       Name = "${var.name_tag} Internet Gateway"
@@ -120,7 +116,6 @@ resource "aws_internet_gateway" "gw" {
 
 resource "aws_route_table" "default" {
    count = var.vpc_id != null ? 0 : 1
-   #vpc_id = aws_vpc.cloud_vpc[0].id
    vpc_id = local.vpc.id
 
    route {
@@ -411,7 +406,6 @@ data "template_file" "init_instance" {
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "standard" {
   
-  #subnet_id   = aws_subnet.main.id
   subnet_id   = local.subnet.id
   description = "The network adaptor to attach to the instance if EFA is not supported"
   security_groups = [aws_security_group.base_sg.id,
@@ -426,7 +420,6 @@ resource "aws_network_interface" "standard" {
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "efa_network_adapter" {
   
-  #subnet_id   = aws_subnet.main.id
   subnet_id   = local.subnet.id
   description = "The Elastic Fabric Adapter to attach to instance if supported"
   security_groups = [aws_security_group.base_sg.id,
