@@ -25,24 +25,35 @@ Clone this repository: <br>
 git clone https://github.com/ioos/Cloud-Sandbox.git
 ```
 
-Terraform tracks internal resource state separately from the project state. 
+#### Initialize S3 Resources for the Terraform Backend 
+Terraform tracks internal resource state separately from the project state.  Cloud-Sandbox is configured to use a Terraform S3 backend for tracking resource state.  These resources are created within the `remote-state` module.  
 
-Initialize the remote state resources by running the following commands in the `Cloud-Sandbox/terraform/remote-state` directory. **This only needs to be performed once per AWS account.**
+Initialize the resources in the remote-state module (S3 bucket) by running the following commands in the Cloud-Sandbox/terraform/remote-state directory.  Running the `terraform apply` command verbatim as follows will use the default bucket configuration as provided by `s3.defaults.tfvars`.  Supply a different `.tfvars` file to override the defaults.  
 
 ```
 cd ./Cloud-Sandbox/terraform/remote-state
 terraform init
-terraform apply
+terraform apply -var-file=s3.defaults.tfvars
 ```
 
-Once those resources are deployed you can initialize the project state.
+The S3 bucket created in this step will then be used by the main Cloud-Sandbox project as the Terraform backend to store resource state.   **This only needs to be performed once per AWS account.**  
 
-Run the following command to initialize Terraform for the project: 
+#### Initialize the Cloud-Sandbox project
+Once the resources from the remote-state module are deployed you can initialize the main Cloud-Sandbox project.  Run the following command: 
 ```
 cd ./Cloud-Sandbox/terraform
-terraform init
+terraform init -backend-config=config.s3.tfbackend
+```
+The `-backend-config` parameter is used to provide the Availability Zone and S3 bucket name to use.  A different `.tfbackend` config file can be provided if the defaults have been modified within the remote-state module.
+ 
+If for some reason it is necessary to change from one S3 backend to another, the `--reconfigure` param can be used:
+
+```
+terraform init --reconfigure --backend-config=alternate.s3.tfbackend
 ```
 
+
+#### Terraform Workspaces
 If multiple users are deploying different Cloud Sandbox resources in the same AWS account, each user should create their own Terraform workspace:
 
 ```
@@ -102,6 +113,9 @@ Edit the following file to specify custom values to use for the following:
 | allowed_ssh_cidr | "your publicly visible IPv4 address/32" | You can find your IP at https://www.whatismyip.com/ |
 | key_name | "your-key-pair" | The key pair generated in the prior step |
 | public_key | "ssh-rsa your_public_key" | The public key obtained in the prior step. Must include "ssh-rsa", assuming it is an rsa key |
+| vpc_id | "vpc- your_vpc_id" | The ID of an existing VPC for Terraform to use for deployment |
+| subnet_id | "subnet- your_subnet_id" | The ID of an existing Subnet for Terraform to use for deployment |
+
 
 Optionally change these settings to override the defaults:
 
