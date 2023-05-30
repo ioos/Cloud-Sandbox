@@ -210,6 +210,7 @@ resource "aws_instance" "head_node" {
   instance_type = var.instance_type
   cpu_threads_per_core = 2
   root_block_device {
+	encrypted = true
         delete_on_termination = true
         volume_size = 12
   }
