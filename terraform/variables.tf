@@ -79,13 +79,25 @@ variable "vpc_id" {
 
 
 variable "subnet_id" {
-  description = "The ID of an existing Subnect within the target VPC.  Must be specified if using an exsiting VPC."
+  description = "The ID of an existing Subnet within the target VPC to use.  If not provided a Subnet will be created."
   type = string
   default = null
 
   validation {
     condition     = var.subnet_id == null ? true : ( length(var.subnet_id) > 7 && substr(var.subnet_id, 0, 7) == "subnet-" )
     error_message = "The subnet_id value must start with \"subnet-\"."
+  }
+
+}
+
+variable "subnet_cidr" {
+  description = "An explicit CIDR block to use for the created Subnet, if subnet_id is not specified.  Optional."
+  type = string
+  default = null
+
+  validation {
+    condition     = var.subnet_cidr == null ? true : can(cidrhost(var.subnet_cidr, 0))
+    error_message = "The subnet_cidr variable must be a valid CIDR notation (e.g. \"10.0.0.0/24\")."
   }
 
 }
