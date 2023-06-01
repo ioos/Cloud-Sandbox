@@ -78,10 +78,15 @@ data "aws_vpc" "pre-provisioned" {
 resource "aws_subnet" "main" {
    count = var.subnet_id != null ? 0 : 1
    vpc_id = local.vpc.id
-   # This subnet will allow 256 IPs
-   cidr_block = "10.0.0.0/24"
+
+   # If a subnet_cidr variable is passed explicitly, we use that,  
+   # otherwise, use the first 1/4 of available space to create a new subnet:
+   cidr_block = var.subnet_cidr != null ? var.subnet_cidr : cidrsubnet(one(data.aws_vpc.pre-provisioned[*]).cidr_block, 2, 0)
+   
    map_public_ip_on_launch = true
+   
    availability_zone = var.availability_zone
+   
    tags = {
       Name = "${var.name_tag} Subnet"
       Project = var.project_tag
@@ -106,7 +111,6 @@ locals {
 
 
 resource "aws_internet_gateway" "gw" {
-   count = var.vpc_id != null ? 0 : 1
    vpc_id = local.vpc.id
    tags = {
       Name = "${var.name_tag} Internet Gateway"
@@ -115,7 +119,6 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_route_table" "default" {
-   count = var.vpc_id != null ? 0 : 1
    vpc_id = local.vpc.id
 
    route {
@@ -129,7 +132,6 @@ resource "aws_route_table" "default" {
 }
 
 resource "aws_route_table_association" "main" {
-  count = var.vpc_id != null ? 0 : 1
   subnet_id = one(aws_subnet.main[*].id)
   route_table_id = one(aws_route_table.default[*].id)
 }
@@ -368,7 +370,7 @@ resource "aws_instance" "head_node" {
   # associate_public_ip_address = true
   network_interface {
     device_index = 0    # MUST be 0
-    network_interface_id = var.use_efa == true ? aws_network_interface.efa_network_adapter.id : aws_network_interface.standard.id
+    network_interface_id = aws_network_interface.head_node.id
   }
 
   # This logic isn't perfect since some ena instance types can be in a placement group also
@@ -404,31 +406,18 @@ data "template_file" "init_instance" {
 }
 
 # Can only attach efa adaptor to a stopped instance!
-resource "aws_network_interface" "standard" {
+resource "aws_network_interface" "head_node" {
   
   subnet_id   = local.subnet.id
-  description = "The network adaptor to attach to the instance if EFA is not supported"
+  description = "The network adaptor to attach to the head_node instance"
   security_groups = [aws_security_group.base_sg.id,
                      aws_security_group.ssh_ingress.id,
                      aws_security_group.efs_sg.id]
-  tags = {
-      Name = "${var.name_tag} Standard Network Adapter"
-      Project = var.project_tag
-  }
-}
+  
+  interface_type = var.use_efa == true ? "efa" : null 
 
-# Can only attach efa adaptor to a stopped instance!
-resource "aws_network_interface" "efa_network_adapter" {
-  
-  subnet_id   = local.subnet.id
-  description = "The Elastic Fabric Adapter to attach to instance if supported"
-  security_groups = [aws_security_group.base_sg.id,
-                     aws_security_group.ssh_ingress.id,
-                     aws_security_group.efs_sg.id]
-  
-  interface_type = "efa"
   tags = {
-      Name = "${var.name_tag} EFA Network Adapter"
+      Name = "${var.name_tag} Head Node Network Adapter"
       Project = var.project_tag
   }
 }
