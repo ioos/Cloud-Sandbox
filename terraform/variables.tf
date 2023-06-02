@@ -30,15 +30,15 @@ variable "availability_zone" {
 
 variable "instance_type" {
   description = "EC2 Instance Type"
-  type = string
+  type        = string
   #default = "c5n.18xlarge"
   default = "t3.medium"
 }
 
 variable "use_efa" {
   description = "Attach EFA Network"
-  type = bool
-  default = "true"
+  type        = bool
+  default     = "true"
 }
 
 variable "key_name" {
@@ -49,7 +49,7 @@ variable "key_name" {
 
 variable "allowed_ssh_cidr" {
   description = "Public IP address/range allowed for SSH access"
-  type = string
+  type        = string
 }
 
 variable "public_key" {
@@ -60,12 +60,12 @@ variable "public_key" {
 variable "managed_policies" {
   description = "The attached IAM policies granting machine permissions"
   default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-             "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-             "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+  "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
 }
 
 variable "ami_id" {
   description = "The random ID used for AMI creation"
-  type = string
-  default="unknown value"
+  type        = string
+  default     = "unknown value"
 }
