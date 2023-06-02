@@ -76,7 +76,7 @@ data "aws_vpc" "pre-provisioned" {
 }
 
 resource "aws_subnet" "main" {
-   count = var.vpc_id != null ? 0 : 1
+   count = var.subnet_id != null ? 0 : 1
    vpc_id = local.vpc.id
    # This subnet will allow 256 IPs
    cidr_block = "10.0.0.0/24"
