@@ -80,8 +80,8 @@ resource "aws_subnet" "main" {
    vpc_id = local.vpc.id
 
    # If a subnet_cidr variable is passed explicitly, we use that,  
-   # otherwise, use the first 1/4 of available space to create a new subnet:
-   cidr_block = var.subnet_cidr != null ? var.subnet_cidr : cidrsubnet(one(data.aws_vpc.pre-provisioned[*]).cidr_block, 2, 0)
+   # otherwise, divide the VPC by four and use 1/4 for a new subnet 
+   cidr_block = var.subnet_cidr != null ? var.subnet_cidr : cidrsubnet(one(data.aws_vpc.pre-provisioned[*]).cidr_block, 2, var.subnet_quartile - 1)
    
    map_public_ip_on_launch = true
    

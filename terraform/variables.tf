@@ -102,6 +102,12 @@ variable "subnet_cidr" {
 
 }
 
+variable "subnet_quartile" {
+  description = "If a specific subnet_cidr is not provided, the quartile of VPC address space to use for the created subnet.  Optional."
+  type = number
+  default = 1
+
+}
 
 variable "managed_policies" {
   description = "The attached IAM policies granting machine permissions"
