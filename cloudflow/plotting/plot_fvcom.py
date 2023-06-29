@@ -15,9 +15,9 @@ if os.path.abspath('..') not in sys.path:
 from cloudflow.plotting import tile
 from cloudflow.plotting import shared
 
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-__license__ = "See LICENSE.txt"
-__email__ = "patrick.tripp@rpsgroup.com"
+__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
+
 
 # This is a fix for matplotlib OSX thread issue
 plt.switch_backend('Agg')

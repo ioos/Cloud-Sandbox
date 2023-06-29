@@ -11,9 +11,9 @@ fi
 # This script will setup the required system components, libraries
 # and tools needed for ROMS forecast models on CentOS 7
 
-#__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-#__license__ = "See LICENSE.txt"
-#__email__ = "patrick.tripp@rpsgroup.com"
+#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__license__ = "BSD 3-Clause"
+
 
 
 setup_environment () {

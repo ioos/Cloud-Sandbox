@@ -1,9 +1,9 @@
 """ Defines supported types of instances and the number of cores of each. Currently only certain AWS EC2 types are
     supported.
 """
-__copyright__ = "Copyright © 2020 RPS Group, Inc. All rights reserved."
-__license__ = "See LICENSE.txt"
-__email__ = "patrick.tripp@rpsgroup.com"
+__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
+
 
 
 awsTypes = {'c5.large': 1, 'c5.xlarge': 2, 'c5.2xlarge': 4, 'c5.4xlarge': 8, 'c5.9xlarge': 18, 'c5.12xlarge': 24,

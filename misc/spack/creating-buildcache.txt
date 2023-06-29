@@ -1,4 +1,4 @@
-spack gpg create --comment cloud-sandbox-spack --export ./gpgkey.pub --export-secret ./gpgkey.secret patrick-tripp patrick.tripp@rpsgroup.com
+spack gpg create --comment cloud-sandbox-spack --export ./gpgkey.pub --export-secret ./gpgkey.secret user first.last@rpsgroup.com
 
 spack mirror add s3-mirror s3://ioos-cloud-sandbox/public/spack/mirror
 

@@ -2,7 +2,7 @@
 
 The IOOS Cloud Sandbox is a platform for running regional coastal models in the cloud. The cloud resources are configured using Terraform and installs all dependencies necessary to run the models.
 
-## Sandbox Deployment Instructions (if deploying a new Sandbox)
+## Deploying a New Sandbox
 
 ### Prerequisites
 
@@ -15,7 +15,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#c
 Install the Terraform CLI: <br>
 https://www.terraform.io/downloads.html
 
-### Create the Cloud Resources
+### Initialize Terraform
 Terraform will create **all** of the AWS resources needed for the sandbox. 
 This includes the VPC, subnet, security groups, EFS networked disk volumes, and others. AWS has a default limit of 5 VPCs per region. You will have to request a quota increase from AWS if you are already at your limit.
 
@@ -23,12 +23,51 @@ Clone this repository: <br>
 *(e.g. using the default path ./Cloud-Sandbox)*
 ```
 git clone https://github.com/ioos/Cloud-Sandbox.git
-cd ./Cloud-Sandbox/terraform
 ```
-Run the following command to initialize Terraform: 
+
+#### Initialize S3 Resources for the Terraform Backend 
+Terraform tracks internal resource state separately from the project state.  Cloud-Sandbox is configured to use a Terraform S3 backend for tracking resource state.  These resources are created within the `remote-state` module.  
+
+Initialize the resources in the remote-state module (S3 bucket) by running the following commands in the Cloud-Sandbox/terraform/remote-state directory.  Running the `terraform apply` command verbatim as follows will use the default bucket configuration as provided by `s3.defaults.tfvars`.  Supply a different `.tfvars` file to override the defaults.  
+
 ```
+cd ./Cloud-Sandbox/terraform/remote-state
 terraform init
+terraform apply -var-file=s3.defaults.tfvars
 ```
+
+The S3 bucket created in this step will then be used by the main Cloud-Sandbox project as the Terraform backend to store resource state.   **This only needs to be performed once per AWS account.**  
+
+#### Initialize the Cloud-Sandbox project
+Once the resources from the remote-state module are deployed you can initialize the main Cloud-Sandbox project.  Run the following command: 
+```
+cd ./Cloud-Sandbox/terraform
+terraform init -backend-config=config.s3.tfbackend
+```
+The `-backend-config` parameter is used to provide the Availability Zone and S3 bucket name to use.  A different `.tfbackend` config file can be provided if the defaults have been modified within the remote-state module.
+ 
+If for some reason it is necessary to change from one S3 backend to another, the `--reconfigure` param can be used:
+
+```
+terraform init --reconfigure --backend-config=alternate.s3.tfbackend
+```
+
+
+#### Terraform Workspaces
+If multiple users are deploying different Cloud Sandbox resources in the same AWS account, each user should create their own Terraform workspace:
+
+```
+terraform workspace new my_workspace
+```
+
+Alternatively, list and select an existing workspace:
+
+```
+terraform workspace list
+terraform workspace select existing_workspace
+```
+
+For more info on workspaces, this is a good overview: https://spacelift.io/blog/terraform-workspaces
 
 ### Generate a Key Pair ###
 Terraform requires an existing key-pair to provide SSH access to the instance(s). The public key will be added to the created instance when it is created. Then the private key can be used to login it.
@@ -74,6 +113,9 @@ Edit the following file to specify custom values to use for the following:
 | allowed_ssh_cidr | "your publicly visible IPv4 address/32" | You can find your IP at https://www.whatismyip.com/ |
 | key_name | "your-key-pair" | The key pair generated in the prior step |
 | public_key | "ssh-rsa your_public_key" | The public key obtained in the prior step. Must include "ssh-rsa", assuming it is an rsa key |
+| vpc_id | "vpc- your_vpc_id" | The ID of an existing VPC for Terraform to use for deployment |
+| subnet_id | "subnet- your_subnet_id" | The ID of an existing Subnet for Terraform to use for deployment |
+
 
 Optionally change these settings to override the defaults:
 
@@ -168,6 +210,10 @@ When done using the sandbox all of the AWS resources (including disks) can be de
 ```
 terraform destroy -var-file="mysettings.tfvars"
 ```
+
+### Recovering Terraform State
+
+In case you've already deployed cloud resources but your local copy of Cloud Sandbox is destroyed or you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
 
 ### Cloud-Sandbox Setup and User Guide
 The following document contains some older instructions on building and running the models that is still valid.

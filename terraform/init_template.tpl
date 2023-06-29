@@ -42,10 +42,6 @@ cd /mnt/efs/fs1/save
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow/workflows/scripts
 
-BRANCH=master
-
-sudo -u $RUNUSER git checkout $BRANCH
-
 # Need to pass ami_name
 export ami_name=${ami_name}
 echo "ami name : $ami_name"

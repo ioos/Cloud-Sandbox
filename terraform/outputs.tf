@@ -50,9 +50,14 @@ output "project_tag" {
   value       = var.project_tag
 }
 
+output "aws_vpc" {
+    description = "AWS VPC"
+    value = local.vpc.id
+}
+
 output "aws_subnet" {
-  description = "AWS Subnet"
-  value       = aws_subnet.main.id
+    description = "AWS Subnet"
+    value = local.subnet.id
 }
 
 output "aws_placement_group" {
