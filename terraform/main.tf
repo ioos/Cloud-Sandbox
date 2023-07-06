@@ -335,6 +335,7 @@ resource "aws_instance" "head_node" {
   # Choosing direct from CentOS as it is more recent
 
 
+<<<<<<< HEAD
   #################################
   ### Specify which AMI to use here
   ### Only CentOS 7 has been thoroughly tested
@@ -354,6 +355,13 @@ resource "aws_instance" "head_node" {
   }
   instance_type        = var.instance_type
 
+=======
+  # Can optionally use redhat - use the parameterized
+  # ami = data.aws_ami.rh_ufs.id
+  metadata_options {
+	 http_tokens = "required"
+  }	
+>>>>>>> 7185af3 (Update resource to require token for metric endpoint)
   instance_type = var.instance_type
   cpu_threads_per_core = 2
   root_block_device {
