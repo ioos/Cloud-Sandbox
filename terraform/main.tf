@@ -11,44 +11,44 @@ terraform {
 }
 
 provider "aws" {
-  region  = var.preferred_region
+  region = var.preferred_region
 }
 
 resource "aws_iam_role" "sandbox_iam_role" {
   name = "${var.nameprefix}_terraform_role"
   assume_role_policy = jsonencode(
-{
-  "Version": "2012-10-17",
-  "Statement": [
     {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-})
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : "sts:AssumeRole",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          },
+          "Effect" : "Allow",
+          "Sid" : ""
+        }
+      ]
+  })
   tags = {
-    Name = "${var.name_tag} IAM Role"
+    Name    = "${var.name_tag} IAM Role"
     Project = var.project_tag
   }
 }
 
 resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
-   count = length(var.managed_policies)
-   policy_arn = element(var.managed_policies, count.index)
-   role = aws_iam_role.sandbox_iam_role.name
+  count      = length(var.managed_policies)
+  policy_arn = element(var.managed_policies, count.index)
+  role       = aws_iam_role.sandbox_iam_role.name
 }
 
 resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
-    name = "${var.nameprefix}_terraform_role"
-    role = aws_iam_role.sandbox_iam_role.name
+  name = "${var.nameprefix}_terraform_role"
+  role = aws_iam_role.sandbox_iam_role.name
 }
 
 resource "aws_placement_group" "cloud_sandbox_placement_group" {
-  name = "${var.nameprefix}_Terraform_Placement_Group"
+  name     = "${var.nameprefix}_Terraform_Placement_Group"
   strategy = "cluster"
   tags = {
     project = var.project_tag
@@ -138,11 +138,11 @@ resource "aws_route_table_association" "main" {
 
 
 resource "aws_efs_file_system" "main_efs" {
-  encrypted = false
+  encrypted              = false
   availability_zone_name = var.availability_zone
   tags = {
-     Name = "${var.name_tag} EFS"
-     Project = var.project_tag
+    Name    = "${var.name_tag} EFS"
+    Project = var.project_tag
   }
 }
 
@@ -219,8 +219,6 @@ data "aws_ami" "centos_7_aws" {
   }
 }
 
-
-
 ###################################
 # Amazon Linux 2 AMI - untested
 # ami-0b0f111b5dcb2800f  Amazon Linux 2 Kernel 5.10 AMI 2.0.20230404.1 x86_64 HVM gp2
@@ -253,8 +251,6 @@ data "aws_ami" "amazon_linux_2" {
     values = ["hvm"]
   }
 } 
-
-
 
 ###################################
 # Amazon Linux 2023 AMI - untested
@@ -323,11 +319,11 @@ data "aws_ami" "rh_ufs" {
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
-  depends_on = [ aws_internet_gateway.gw ]
-  vpc = true
-  instance = aws_instance.head_node.id
+  depends_on = [aws_internet_gateway.gw]
+  vpc        = true
+  instance   = aws_instance.head_node.id
   tags = {
-    Name = "${var.name_tag} Elastic IP"
+    Name    = "${var.name_tag} Elastic IP"
     Project = var.project_tag
   }
 }
@@ -339,6 +335,7 @@ resource "aws_instance" "head_node" {
   # Choosing direct from CentOS as it is more recent
 
 
+<<<<<<< HEAD
   #################################
   ### Specify which AMI to use here
   ### Only CentOS 7 has been thoroughly tested
@@ -351,25 +348,38 @@ resource "aws_instance" "head_node" {
   # ami = data.aws_ami.amazon_linux_2.id
   # ami = data.aws_ami.amazon_linux_2023.id
 
+  # Can optionally use redhat - use the parameterized
+  # ami = data.aws_ami.rh_ufs.id
+  metadata_options {
+    http_tokens = "required"
+  }
+  instance_type        = var.instance_type
 
+=======
+  # Can optionally use redhat - use the parameterized
+  # ami = data.aws_ami.rh_ufs.id
+  metadata_options {
+	 http_tokens = "required"
+  }	
+>>>>>>> 7185af3 (Update resource to require token for metric endpoint)
   instance_type = var.instance_type
   cpu_threads_per_core = 2
   root_block_device {
-        delete_on_termination = true
-        volume_size = 12
+    encrypted             = true
+    delete_on_termination = true
+    volume_size           = 12
   }
 
-  depends_on = [aws_internet_gateway.gw, 
-                aws_efs_file_system.main_efs,
-                aws_efs_mount_target.mount_target_main_efs]
+  depends_on = [aws_internet_gateway.gw,
+    aws_efs_file_system.main_efs,
+  aws_efs_mount_target.mount_target_main_efs]
 
-  key_name = var.key_name
+  key_name             = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
-  user_data = data.template_file.init_instance.rendered
+  user_data            = templatefile("init_template.tpl", { efs_name = aws_efs_file_system.main_efs.dns_name, ami_name = "${var.name_tag}-${random_pet.ami_id.id}", aws_region = var.preferred_region, project = var.project_tag })
 
   # associate_public_ip_address = true
   network_interface {
-    device_index = 0    # MUST be 0
     network_interface_id = aws_network_interface.head_node.id
   }
 
@@ -377,7 +387,7 @@ resource "aws_instance" "head_node" {
   placement_group = var.use_efa == true ? aws_placement_group.cloud_sandbox_placement_group.id : null
 
   tags = {
-    Name = "${var.name_tag} EC2 Head Node"
+    Name    = "${var.name_tag} EC2 Head Node"
     Project = var.project_tag
   }
 }
@@ -389,21 +399,21 @@ resource "random_pet" "ami_id" {
     #instance_id = aws_instance.head_node.id
     ami_id = var.ami_id
   }
-  length    = 2
+  length = 2
 }
 
-data "template_file" "init_instance" {
-  template = file("./init_template.tpl")
-  vars = {
-    efs_name = aws_efs_file_system.main_efs.dns_name
-    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
-    aws_region = var.preferred_region
-    project = var.project_tag
-  }
-
-  #depends_on = [aws_efs_file_system.main_efs,
-  #              aws_efs_mount_target.mount_target_main_efs]
-}
+#data "template_file" "init_instance" {
+#  template = file("./init_template.tpl")
+#  vars = {
+#    efs_name = aws_efs_file_system.main_efs.dns_name
+#    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
+#    aws_region = var.preferred_region
+#    project = var.project_tag
+#  }
+#
+#depends_on = [aws_efs_file_system.main_efs,
+#              aws_efs_mount_target.mount_target_main_efs]
+#}
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "head_node" {
