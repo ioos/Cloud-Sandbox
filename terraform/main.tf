@@ -352,8 +352,6 @@ resource "aws_instance" "head_node" {
   metadata_options {
     http_tokens = "required"
   }
-  instance_type        = var.instance_type
-
   metadata_options {
 	 http_tokens = "required"
   }	
