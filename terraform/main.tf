@@ -380,9 +380,6 @@ resource "aws_instance" "head_node" {
 
   # associate_public_ip_address = true
   network_interface {
-    device_index         = 0 # MUST be 0
-    network_interface_id = var.use_efa == true ? aws_network_interface.efa_network_adapter.id : aws_network_interface.standard.id
-    device_index = 0    # MUST be 0
     network_interface_id = aws_network_interface.head_node.id
   }
 
