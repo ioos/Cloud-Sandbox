@@ -350,11 +350,6 @@ resource "aws_instance" "head_node" {
   # Can optionally use redhat - use the parameterized
   # ami = data.aws_ami.rh_ufs.id
   metadata_options {
-    http_tokens = "required"
-  }
-  instance_type        = var.instance_type
-
-  metadata_options {
 	 http_tokens = "required"
   }	
   instance_type = var.instance_type
