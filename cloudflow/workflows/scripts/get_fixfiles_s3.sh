@@ -23,6 +23,8 @@ tbofs
 wcofs
 "
 
+#fixdirs='tbofs'
+
 bucket=ioos-cloud-sandbox
 version="v3.5.4"
 
