@@ -8,7 +8,7 @@
   "EXEC"      : "",
   "TIME_REF"  : "20090101.0d0",
   "BUCKET"    : "ioos-cloud-sandbox",
-  "BCKTFLDR"  : "nosofs/patrick.tripp/cbofs/output",
+  "BCKTFLDR"  : "nosofs/patrick.tripp/tbofs/output",
   "NTIMES"    : "34560",
   "ININAME"   : "",
   "OUTDIR"    : "auto",
