@@ -966,8 +966,8 @@
 
 ! Input NetCDF file names, [1:Ngrids].
 
-     GRDNAME == nos.cbofs.romsgrid.nc
-     ININAME == nos.cbofs.rst.nowcast.20230224.t__HH__z.nc
+          GRDNAME == nos.cbofs.romsgrid.nc
+          ININAME == nos.cbofs.rst.nowcast.__CDATE__.t__HH__z.nc
           ITLNAME == damee4_itl.nc
           IRPNAME == damee4_irp.nc
           IADNAME == damee4_iad.nc
@@ -1009,7 +1009,7 @@
 
          NBCFILES == 1                          ! number of boundary files
 
-     BRYNAME == nos.cbofs.obc.20230224.t__HH__z.nc
+     BRYNAME == nos.cbofs.obc.__CDATE__.t__HH__z.nc
 
 ! Input climatology file names. The USER has the option to separate the
 ! climatology variables into individual NetCDF files (NCLMFILES > 1),
@@ -1029,7 +1029,7 @@
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-     SSFNAME == nos.cbofs.river.20230224.t__HH__z.nc
+     SSFNAME == nos.cbofs.river.__CDATE__.t__HH__z.nc
 
 ! Input tidal forcing file name.
 
@@ -1055,23 +1055,23 @@
 
      NFFILES == 2
 
-     FRCNAME == nos.cbofs.met.forecast.20230224.t__HH__z.nc \
+     FRCNAME == nos.cbofs.met.forecast.__CDATE__.t__HH__z.nc \
      nos.cbofs.respirate.nc
 
 ! Output NetCDF file names, [1:Ngrids].
 
           DAINAME == damee4_dai.nc
           GSTNAME == damee4_gst.nc
-     RSTNAME == nos.cbofs.rst.forecast.20230224.t__HH__z.nc
-     HISNAME == nos.cbofs.fields.forecast.20230224.t__HH__z.nc
-     QCKNAME == nos.cbofs.surface.forecast.20230224.t__HH__z.nc
+     RSTNAME == nos.cbofs.rst.forecast.__CDATE__.t__HH__z.nc
+     HISNAME == nos.cbofs.fields.forecast.__CDATE__.t__HH__z.nc
+     QCKNAME == nos.cbofs.surface.forecast.__CDATE__.t__HH__z.nc
           TLMNAME == damee4_tlm.nc
           TLFNAME == damee4_tlf.nc
           ADJNAME == damee4_adj.nc
           AVGNAME == damee4_avg.nc
           HARNAME == damee4_har.nc
           DIANAME == damee4_dia.nc
-     STANAME == nos.cbofs.stations.forecast.20230224.t__HH__z.nc
+     STANAME == nos.cbofs.stations.forecast.__CDATE__.t__HH__z.nc
           FLTNAME == damee4_flt.nc
 
 ! Input ASCII parameter filenames.
