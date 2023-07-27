@@ -23,7 +23,8 @@ tbofs
 wcofs
 "
 
-#fixdirs='tbofs'
+# Optionally only download some
+#fixdirs='shared cbofs'
 
 bucket=ioos-cloud-sandbox
 version="v3.5.4"
