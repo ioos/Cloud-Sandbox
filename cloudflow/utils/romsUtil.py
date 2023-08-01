@@ -21,7 +21,7 @@ nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
                   "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
 
 def nosofs_cyc0(ofs : str) -> str:
-    if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs" ]:
+    if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2" ]:
         return "03"
     else:
         return "00"
@@ -288,7 +288,6 @@ def get_ICs_roms(ofs, cdate, cycle, localpath):
     # There is a shell script that already exists to do this
     # Can maybe re write it in Python later
     # Or wrap it here
-
     return
 
 
@@ -325,6 +324,11 @@ def get_baseline_lo(cdate, vdir, sshuser):
 
 
 def get_ICs_lo(cdate, localpath, sshuser):
+
+    """ Out of date """
+    print("get_ICs_lo needs an update... skipping")
+    return
+
     """ Get the atmospheric forcing and boundary layer conditions and ICs
         for LiveOcean ROMS model.
 

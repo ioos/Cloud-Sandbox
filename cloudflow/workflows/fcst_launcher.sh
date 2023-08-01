@@ -91,8 +91,9 @@ case $OFS in
   liveocean)
     export HOMEnos=$WRKDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
+    export COMROT=/com/$USER
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
-    export JOBARGS="$CDATE"
+    export JOBARGS="$CDATE $COMROT"
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
     result=$?

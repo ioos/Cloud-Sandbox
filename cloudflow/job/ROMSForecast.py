@@ -198,13 +198,13 @@ class ROMSForecast(Job):
 
         #TODO: Document the multiple options. OUTDIR=auto | /path, OCEANIN=auto | /path/filename
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{fdate}"
+            self.OUTDIR = f"{COMROT}/LO_roms/cas6_traps2_x2b/{fdate}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
 
         if self.ININAME == "auto":
-            self.ININAME = f"{COMROT}/{OFS}/{fprevdate}/ocean_his_0025.nc"
+            self.ININAME = f"{COMROT}/LO_roms/cas6_traps2_x2b/{fprevdate}/ocean_rst.nc"
 
         DSTART = util.ndays(CDATE, self.TIME_REF)
         # DSTART = days from TIME_REF to start of forecast day
@@ -215,7 +215,8 @@ class ROMSForecast(Job):
             "__TIME_REF__": self.TIME_REF,
             "__DSTART__": DSTART,
             "__FDATE__": fdate,
-            "__ININAME__": self.ININAME
+            "__ININAME__": self.ININAME,
+            "__COMROT__": COMROT
         }
 
         # Create the ocean.in
