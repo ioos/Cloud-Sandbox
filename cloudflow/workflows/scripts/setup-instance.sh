@@ -11,6 +11,8 @@ SPACK_VER='releases/v0.18'
 #SPACK_DIR='/mnt/efs/fs1/opt/spack'
 SPACK_DIR='/save/environments/spack'
 SPACKOPTS='-v -y'
+SPACKTARGET='target=skylake_avx512'
+#export SPACKTARGET='target=haswell'        # for AMD nodes
 
 SLURM_VER='22-05-2-1'
 

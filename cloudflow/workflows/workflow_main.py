@@ -32,7 +32,7 @@ postconf = f'{curdir}/../cluster/configs/post.config'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
-sshuser = 'username@boiler.ocean.washington.edu'
+sshuser = 'username@apogee.ocean.washington.edu'
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')

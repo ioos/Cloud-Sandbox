@@ -104,7 +104,7 @@ class AWSCluster(Cluster):
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
         self.__instances = []
-        self.__start_time = None
+        self.__start_time = time.time()
         self.region = ""
         self.nodeType = ''
         self.nodeCount = 0
