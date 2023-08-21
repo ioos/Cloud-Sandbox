@@ -38,7 +38,7 @@ variable "instance_type" {
 variable "use_efa" {
   description = "Attach EFA Network"
   type        = bool
-  default     = "true"
+  default     = "false"
 }
 
 variable "key_name" {

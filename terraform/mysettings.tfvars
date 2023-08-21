@@ -35,17 +35,16 @@ vpc_id = "" 		# the ID of an existing VPC to deploy resources to
 subnet_id = ""		# the ID of an existing Subnet within the VPC to deploy resources to
 
 
-
 #------------------------------------------------------------
 
 
 #---------------------------------------------------------------
-# Optionally uncomment and change these to override the defaults
+# Optionally uncomment and change the defaults shown
 #---------------------------------------------------------------
 
-# preferred_region = "us-east-2"
+# preferred_region = "us-east-1"
 # name_tag = "IOOS-Cloud-Sandbox-Terraform"
-# availability_zone = "us-east-2a"
+# availability_zone = "us-east-1a"
 # project_tag = "IOOS-Cloud-Sandbox"
 # instance_type = "t3.medium"
 # use_efa = false 
