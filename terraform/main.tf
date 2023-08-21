@@ -371,6 +371,7 @@ resource "aws_instance" "head_node" {
   # associate_public_ip_address = true
   network_interface {
     network_interface_id = aws_network_interface.head_node.id
+    device_index = 0
   }
 
   # This logic isn't perfect since some ena instance types can be in a placement group also
