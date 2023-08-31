@@ -146,6 +146,7 @@ resource "aws_efs_file_system" "main_efs" {
   }
 }
 
+
 resource "aws_efs_mount_target" "mount_target_main_efs" {
     subnet_id = local.subnet.id
     security_groups = [aws_security_group.efs_sg.id]
@@ -292,7 +293,7 @@ data "aws_ami" "amazon_linux_2023" {
 
 
 ################################
-# RedHat 8 UFS AMI - testing
+# RedHat 8 UFS AMI - untested
 ################################
 
 data "aws_ami" "rh_ufs" {
@@ -316,6 +317,42 @@ data "aws_ami" "rh_ufs" {
   } 
 } 
 
+###################################
+# CentOS Stream 8 - Testing
+# ami-0ffbdee6ae3169e6c
+# AMI name: CentOS Stream 8 x86_64 20230308
+# Owner account ID 125523088429
+##################################
+
+data "aws_ami" "centos_stream_8" {
+  owners = ["125523088429"]   # CentOS Official CPE
+  #owners = ["679593333241"]   # AWS Marketplace
+  #owners = ["137112412989"]   # amazon
+  #owners = ["amazon"]   # AWS
+  most_recent = true
+
+  filter {
+    name = "description"
+    values = ["CentOS Stream 8 *"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
@@ -331,6 +368,7 @@ resource "aws_eip" "head_node" {
 
 # efa enabled node
 resource "aws_instance" "head_node" {
+
   # Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
   # Choosing direct from CentOS as it is more recent
 
@@ -340,7 +378,9 @@ resource "aws_instance" "head_node" {
   ### Only CentOS 7 has been thoroughly tested
   #############################################
 
-  ami = data.aws_ami.centos_7.id
+  ami = data.aws_ami.centos_stream_8.id
+
+  # ami = data.aws_ami.centos_7.id
   # ami = data.aws_ami.centos_7_aws.id
 
   # Untested
@@ -349,9 +389,12 @@ resource "aws_instance" "head_node" {
 
   # Can optionally use redhat - use the parameterized
   # ami = data.aws_ami.rh_ufs.id
+
   metadata_options {
+         http_endpoint = "disabled"
 	 http_tokens = "required"
   }	
+
   instance_type = var.instance_type
   cpu_threads_per_core = 2
   root_block_device {

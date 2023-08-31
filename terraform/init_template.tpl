@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
+set -x
 
 echo `date` > /tmp/setup.log
 
 # AMZ linux and some other AMIs use ec2-user. CentOS 7 usese centos
 
-# RUNUSER="ec2-user"
-RUNUSER="centos"
+RUNUSER="ec2-user"
+# RUNUSER="centos"
 
 # Mount the EFS volume
 
@@ -47,7 +48,7 @@ export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
 # Install all of the software and drivers
-sudo -E -u $RUNUSER ./setup-instance.sh >> /tmp/setup.log 2>&1
+# sudo -E -u $RUNUSER ./setup-instance.sh >> /tmp/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 

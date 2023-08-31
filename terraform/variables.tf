@@ -1,7 +1,7 @@
 variable "preferred_region" {
   description = "Preferred region in which to launch EC2 instances. Defaults to us-east-1"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "nameprefix" {
@@ -25,7 +25,7 @@ variable "project_tag" {
 variable "availability_zone" {
   description = "Availability zone to use"
   type        = string
-  default     = "us-east-1a"
+  default     = "us-east-2a"
 }
 
 variable "instance_type" {
