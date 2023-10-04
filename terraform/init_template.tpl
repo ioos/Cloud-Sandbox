@@ -6,7 +6,9 @@ echo `date` > /tmp/setup.log
 # AMZ linux and some other AMIs use ec2-user. CentOS 7 usese centos
 
 RUNUSER="ec2-user"
-# RUNUSER="centos"
+
+# CentOS 7 - Stream 8
+#RUNUSER="centos"
 
 # Mount the EFS volume
 
@@ -40,8 +42,8 @@ sudo chmod 777 save
 # Clone the Cloud-Sandbox repository
 # Placing this in a common location
 cd /mnt/efs/fs1/save
-sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
-cd Cloud-Sandbox/cloudflow/workflows/scripts
+#sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
+#cd Cloud-Sandbox/cloudflow/workflows/scripts
 
 # Need to pass ami_name
 export ami_name=${ami_name}

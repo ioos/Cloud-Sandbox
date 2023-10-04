@@ -352,7 +352,8 @@ data "aws_ami" "centos_stream_8" {
   }
 }
 
-
+# Centos Stream 9 
+#ami-0c2abda83f1b9e09d
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
@@ -378,8 +379,9 @@ resource "aws_instance" "head_node" {
   ### Only CentOS 7 has been thoroughly tested
   #############################################
 
-  ami = data.aws_ami.centos_stream_8.id
+  ami = "ami-0c2abda83f1b9e09d"
 
+  #ami = data.aws_ami.centos_stream_8.id
   # ami = data.aws_ami.centos_7.id
   # ami = data.aws_ami.centos_7_aws.id
 
@@ -391,8 +393,8 @@ resource "aws_instance" "head_node" {
   # ami = data.aws_ami.rh_ufs.id
 
   metadata_options {
-         http_endpoint = "disabled"
-	 http_tokens = "required"
+     http_endpoint = "enabled"
+     http_tokens = "required"
   }	
 
   instance_type = var.instance_type
@@ -404,11 +406,14 @@ resource "aws_instance" "head_node" {
   }
 
   depends_on = [aws_internet_gateway.gw,
-    aws_efs_file_system.main_efs,
-  aws_efs_mount_target.mount_target_main_efs]
+                aws_efs_file_system.main_efs,
+                aws_efs_mount_target.mount_target_main_efs]
 
   key_name             = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
+
+  # user_data = data.template_file.init_instance.rendered
+
   user_data            = templatefile("init_template.tpl", { efs_name = aws_efs_file_system.main_efs.dns_name, ami_name = "${var.name_tag}-${random_pet.ami_id.id}", aws_region = var.preferred_region, project = var.project_tag })
 
   # associate_public_ip_address = true
@@ -444,7 +449,7 @@ resource "random_pet" "ami_id" {
 #    aws_region = var.preferred_region
 #    project = var.project_tag
 #  }
-#
+
 #depends_on = [aws_efs_file_system.main_efs,
 #              aws_efs_mount_target.mount_target_main_efs]
 #}

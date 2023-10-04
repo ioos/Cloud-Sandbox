@@ -65,13 +65,13 @@ output "aws_placement_group" {
   value       = aws_placement_group.cloud_sandbox_placement_group.id
 }
 
-output "login_command" {
-  description = "SSH Login"
-  value       = "ssh -i ${var.key_name}.pem centos@${aws_eip.head_node.public_dns}"
-}
-
-# output "login_command" {
-#   description = "SSH Login"
-#   value = "ssh -i ${var.key_name}.pem ec2-user@${aws_eip.head_node.public_dns}"
+#output "login_command" {
+#  description = "SSH Login"
+#  value       = "ssh -i ${var.key_name}.pem centos@${aws_eip.head_node.public_dns}"
 #}
+
+output "login_command" {
+   description = "SSH Login"
+   value = "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_eip.head_node.public_dns}"
+}
 

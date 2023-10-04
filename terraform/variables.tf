@@ -13,7 +13,7 @@ variable "nameprefix" {
 variable "name_tag" {
   description = "Value of the Name tag for the EC2 instance"
   type        = string
-  default     = "IOOS-Cloud-Sandbox-Terraform"
+  default     = "IOOS-Cloud-Sandbox"
 }
 
 variable "project_tag" {
@@ -25,14 +25,14 @@ variable "project_tag" {
 variable "availability_zone" {
   description = "Availability zone to use"
   type        = string
-  default     = "us-east-2a"
+  default     = "us-east-2b"
 }
 
 variable "instance_type" {
   description = "EC2 Instance Type"
   type        = string
-  #default = "c5n.18xlarge"
-  default = "t3.medium"
+  default     = "t3.medium"
+  
 }
 
 variable "use_efa" {
@@ -56,9 +56,9 @@ variable "allowed_ssh_cidr" {
 variable "public_key" {
   description = "Contents of the SSH public key to be used for authentication"
   type        = string
+
   sensitive = true
   nullable = false
-
   validation {
     condition     = length(var.public_key) > 8 && substr(var.public_key, 0, 8) == "ssh-rsa "
     error_message = "The public_key value must start with \"ssh-rsa \"."
@@ -112,8 +112,8 @@ variable "subnet_quartile" {
 variable "managed_policies" {
   description = "The attached IAM policies granting machine permissions"
   default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-  "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
+             "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+             "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
 }
 
 variable "ami_id" {
