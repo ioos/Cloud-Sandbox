@@ -3,9 +3,9 @@
 # -1 = Don't check pre-built binary cache
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
-  SPACKOPTS="$SPACKOPS --cache-only"
+  SPACKOPTS="$SPACKOPTS --cache-only"
 elif [ $SPACK_CACHEONLY -eq -1 ]; then
-  SPACKOPTS="$SPACKOPS --no-cache"
+  SPACKOPTS="$SPACKOPTS --no-cache"
 fi
 
 # This script will setup the required system components, libraries
@@ -13,7 +13,6 @@ fi
 
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
-
 
 
 setup_environment () {
@@ -248,7 +247,7 @@ install_gcc () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # TODO: Rebuild all using x86_64
-  spack install $SPACKOPTS gcc@$GCC_VER
+  spack install $SPACKOPTS --no-checksum gcc@$GCC_VER ^ncurses@6.4 $SPACKTARGET
 
   spack compiler add `spack location -i gcc@$GCC_VER`/bin
 
@@ -870,11 +869,10 @@ install_python_modules_user () {
   python3 -m pip install --user --upgrade boto3==1.20.46
 
   # Install requirements for plotting module
-  cd ../..
+  cd ../cloudflow
   python3 -m pip install --user -r requirements.txt
 
   python3 setup.py sdist
-
 
   cd $home 
 }
