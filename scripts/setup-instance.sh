@@ -4,7 +4,7 @@
 #__license__ = "BSD 3-Clause"
 
 
-GCC_VER=9.2.0
+GCC_VER=11.2.1
 INTEL_VER=2021.3.0
 
 SPACK_VER='releases/v0.18'
@@ -31,19 +31,20 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-# setup_environment
-# setup_paths
-# setup_aliases
-# install_jupyterhub # Not fully tested yet
-# setup_ssh_mpi
-# install_efa_driver
+#setup_environment
+#setup_paths
+#setup_aliases
+## install_jupyterhub # Not fully tested yet
+#setup_ssh_mpi
+install_efa_driver
+
+exit
 
 # Compilers and libraries
 # install_python_modules_user
-#install_spack
-install_gcc
-exit
-install_intel_oneapi
+# install_spack
+# install_gcc
+# install_intel_oneapi
 
 
 install_esmf

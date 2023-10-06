@@ -42,10 +42,10 @@ setup_environment () {
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
   sudo yum -y install environment-modules
-  sudo yum -y install python3-devel
+  sudo yum -y install python3.11-devel
   sudo yum -y install jq
 
-  cliver="2.2.10"
+  cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
   /usr/bin/unzip -q awscliv2.zip
   sudo ./aws/install
@@ -144,9 +144,8 @@ install_efa_driver() {
 
   home=$PWD
 
-  version=latest
-  #version=1.11.2 (April 20, 2021)
-  #version=1.8.3
+  #version=latest
+  version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
