@@ -5,11 +5,14 @@
 
 
 GCC_VER=11.2.1
-INTEL_VER=2021.3.0
+
+# Current versions
+INTEL_VER=2023.2.1
+MPI_VER=2021.10.0
 
 SPACK_VER='releases/v0.18'
 #SPACK_DIR='/mnt/efs/fs1/opt/spack'
-SPACK_DIR='/save/environments/spack'
+SPACK_DIR='/save/environments/spack-stack/spack'
 SPACKOPTS='-v -y'
 #SPACKTARGET='target=skylake_avx512'
 SPACKTARGET='target=x86_64'
@@ -36,16 +39,16 @@ sudo setenforce 0
 #setup_aliases
 ## install_jupyterhub # Not fully tested yet
 #setup_ssh_mpi
-install_efa_driver
-
-exit
+#install_efa_driver
 
 # Compilers and libraries
 # install_python_modules_user
+# install_gcc_toolset
+
+exit
 # install_spack
 # install_gcc
 # install_intel_oneapi
-
 
 install_esmf
 install_base_rpms

@@ -41,9 +41,22 @@ setup_environment () {
   sudo yum -y install bzip2-devel
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
-  sudo yum -y install environment-modules
+
+# Will use Lmod instead
+#  sudo yum -y install environment-modules
+
   sudo yum -y install python3.11-devel
+  sudo alternatives --set python3 /usr/bin/python3.11
+  sudo yum -y install python3.11-pip
   sudo yum -y install jq
+
+  # Additional ones for spack-stack
+  sudo yum -y install git-lfs
+  sudo yum -y install bash-completion
+  sudo yum -y install xorg-x11-xauth
+  sudo yum -y install xterm
+  sudo yum -y install texlive
+  sudo yum -y install mysql-server
 
   cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -52,21 +65,22 @@ setup_environment () {
   rm awscliv2.zip
   rm -Rf "./aws"
 
-  # Only do this once
-  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-  if [ $? -eq 1 ] ; then
-    echo . /usr/share/Modules/init/bash >> ~/.bashrc
-    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-    . /usr/share/Modules/init/bash
-  fi
+#  # Only do this once
+#  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+#  if [ $? -eq 1 ] ; then
+#    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+#    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+#    . /usr/share/Modules/init/bash
+#  fi
+#
+#  # Only do this once
+#  if [ ! -d /usrx/modulefiles ] ; then
+#    sudo mkdir -p /usrx/modulefiles
+#    echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
+#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+#    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+#  fi
 
-  # Only do this once
-  if [ ! -d /usrx/modulefiles ] ; then
-    sudo mkdir -p /usrx/modulefiles
-    echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
-    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-  fi
 }
 
 
@@ -99,6 +113,10 @@ setup_paths () {
   sudo ln -s /mnt/efs/fs1/com  /com
   sudo ln -s /mnt/efs/fs1/save /save
 
+  mkdir /save/$USER
+  mkdir /com/$USER
+  mkdir /ptmp/$USER
+
   cd $home
 }
 
@@ -120,32 +138,10 @@ install_efa_driver() {
 
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
 
-# Note this error:
-# No package kernel-devel-3.10.0-1062.12.1.el7.x86_64 available.
-# Error: Not tolerating missing names on install, stopping.
-# Error: Failed to install packages.
-# 
-# ==============================================================================
-# The kernel header of the current kernel version cannot be installed and is required
-# to build the EFA kernel module. Please install the kernel header package for your
-# distribution manually or build the EFA kernel driver manually and re-run the installer
-# with --skip-kmod.
-# ==============================================================================
-#
-# The kernel version might have been updated since last reboot, if so, reboot the machine, and rerun this step.
-# To see the current running kernel:
-# uname -a
-#
-# Available kernels are visible at /usr/lib/modules
-#
-# The AWS centos 7 is still at version 1062 and has to be updated and rebooted before this will work
-# since the standard yum registry only has the current 1160 kernel-devel package
-# 3.10.0-1160.24.1.el7.x86_64
-
   home=$PWD
 
-  #version=latest
-  version=1.14.1  # Last one with CentOS 8 support
+  version=latest
+  # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
@@ -165,8 +161,6 @@ install_efa_driver() {
 
   # Default version is needed to build the kernel driver
   # If gcc has already been upgraded, this will likely fail
-  # Should uninstall newer one and install the default 4.8
-  # sudo yum -y install gcc
 
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
@@ -187,6 +181,46 @@ install_efa_driver() {
   fi
 
   cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_gcc_toolset() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  sudo yum -y install gcc-toolset-11-gcc-c++
+  sudo yum -y install gcc-toolset-11-gcc-gfortran
+  sudo yum -y install gcc-toolset-11-gdb
+ 
+  # scl enable gcc-toolset-11 bash
+
+  cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_spack-stack() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
+  SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+  #SPACK_MIRROR='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror'
+  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
+
+  scl enable gcc-toolset-11
+
+  cd /save/environments
+  git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
+  cd spack-stack
+  source setup.sh
+
+  # To be continued ....
+
 }
 
 #-----------------------------------------------------------------------------#
@@ -235,7 +269,7 @@ install_spack() {
 
 #-----------------------------------------------------------------------------#
 
-install_gcc () {
+install_gcc_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -256,6 +290,71 @@ install_gcc () {
   # spack compiler add `spack location -i gcc@$GCC_VER`/bin
  
   cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_intel_oneapi-spack-stack () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  SPACK_DIR=/save/environments/spack-stack/
+  cd $SPACK_DIR
+  source setup.sh
+  SPACK_ENV=ioos-aws-rhel
+
+  cd $SPACK_ENV 
+  spack env activate -p .
+  spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+
+  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
+  spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
+
+  cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_intel_oneapi_yum () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+tee > /tmp/oneAPI.repo << EOF
+[oneAPI]
+name=Intel® oneAPI repository
+baseurl=https://yum.repos.intel.com/oneapi
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+EOF
+
+sudo mv /tmp/oneAPI.repo /etc/yum.repos.d
+
+sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+
+# sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-2023.1.0.x86_64
+# sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+# sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+# sudo yum -y install --installroot /apps intel-hpckit-2023.1.0.x86_64
+
+sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+
+mkdir /save/environments/modulefiles
+
+cd /opt/intel/oneapi/
+./modulefiles-setup.sh --ignore-latest --output-dir=/mnt/efs/fs1/save/environments/modulefiles
+module use -a /save/environments/modulefiles
+
+cd $home
+
 }
 
 #-----------------------------------------------------------------------------#
@@ -854,25 +953,29 @@ install_python_modules_user () {
 
   home=$PWD
 
-  sudo python3 -m pip install --upgrade pip
-  python3 -m pip install --user --upgrade wheel
-  python3 -m pip install --user --upgrade dask
-  python3 -m pip install --user --upgrade distributed
-  python3 -m pip install --user --upgrade setuptools_rust  # needed for paramiko
-  python3 -m pip install --user --upgrade paramiko   # needed for dask-ssh
-  python3 -m pip install --user --upgrade prefect
+  # python3 -m venv /save/$USER/csvenv
+  # source /save/$USER/csvenv/bin/activate
+
+  python3 -m pip install --upgrade pip
+  python3 -m pip install --upgrade wheel
+  python3 -m pip install --upgrade dask
+  python3 -m pip install --upgrade distributed
+  python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
+  python3 -m pip install --upgrade paramiko   # needed for dask-ssh
+  python3 -m pip install --upgrade prefect
 
   # SPACK has problems with botocore newer than below
-  python3 -m pip install --user --upgrade botocore==1.23.46
+  python3 -m pip install --upgrade botocore==1.23.46
   # This is the most recent boto3 that is compatible with botocore above
-  python3 -m pip install --user --upgrade boto3==1.20.46
+  python3 -m pip install --upgrade boto3==1.20.46
 
   # Install requirements for plotting module
-  cd ../cloudflow
-  python3 -m pip install --user -r requirements.txt
+  # cd ../cloudflow
+  # python3 -m pip install --user -r requirements.txt
 
-  python3 setup.py sdist
+  # python3 setup.py sdist
 
+  # deactivate
   cd $home 
 }
 
@@ -971,8 +1074,8 @@ setup_ssh_mpi () {
   home=$PWD
 
   # MPI needs key to ssh into cluster nodes
-  sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
-  sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
+  sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/id_rsa
+  sudo -u $USER cat /home/$USER/.ssh/id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 
 # This - assumes we are using 10.0.x.x subnet addresses
 
@@ -985,16 +1088,6 @@ Host 10.0.*
    CheckHostIP no 
    StrictHostKeyChecking no
 " | sudo tee -a /etc/ssh/ssh_config
-
-#  cat >> /etc/ssh/ssh_config <<EOL
-#Host ip-10-0-* 
-#   CheckHostIP no 
-#   StrictHostKeyChecking no 
-#
-#Host 10.0.* 
-#   CheckHostIP no 
-#   StrictHostKeyChecking no
-#EOL
 
   cd $home
 }
@@ -1076,9 +1169,9 @@ setup_aliases () {
   echo alias lst ls -altr >> ~/.tcshrc
   echo alias h history >> ~/.tcshrc
 
-  echo alias cds cd /save >> ~/.tcshrc
-  echo alias cdc cd /com >> ~/.tcshrc
-  echo alias cdpt cd /ptmp >> ~/.tcshrc
+  echo alias cds cd /save/$USER >> ~/.tcshrc
+  echo alias cdc cd /com/$USER >> ~/.tcshrc
+  echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
 
   #echo alias cdns cd /noscrub >> ~/.tcshrc
 
