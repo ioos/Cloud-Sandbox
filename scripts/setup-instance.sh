@@ -3,12 +3,11 @@
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-
 GCC_VER=11.2.1
 
 # Current versions
-INTEL_VER=2023.2.1
-MPI_VER=2021.10.0
+INTEL_VER=2023.1.0
+MPI_VER=2021.9.0
 
 SPACK_VER='releases/v0.18'
 #SPACK_DIR='/mnt/efs/fs1/opt/spack'
@@ -28,22 +27,23 @@ SPACK_CACHEONLY=0
 # source include the functions 
 . funcs-setup-instance.sh
 
-# calling sudo from cloud init adds 25 second delay for each sudo
+# calling sudo from cloud init adds 25 second delay for each sudo command
 sudo setenforce 0
 
 # Use caution when changing the order of the following
 
 # System stuff
-#setup_environment
-#setup_paths
-#setup_aliases
-## install_jupyterhub # Not fully tested yet
-#setup_ssh_mpi
-#install_efa_driver
+setup_paths
+setup_aliases
+setup_environment
+
+## install_jupyterhub # Requires some manual work
+setup_ssh_mpi
+install_efa_driver
 
 # Compilers and libraries
 # install_python_modules_user
-# install_gcc_toolset
+install_gcc_toolset
 
 exit
 # install_spack

@@ -24,11 +24,18 @@ setup_environment () {
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
+  # Get rid of subscription manager messages
+  sudo subscription-manager config --rhsm.manage_repos=0
+  sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
+
   # yum update might update the kernel. 
   # This might cause some of the other installs to fail, e.g. efa driver 
-
   #sudo yum -y update
-  sudo yum -y install epel-release
+
+
+  # CentOS 7
+  # sudo yum -y install epel-release
+
   sudo yum -y install tcsh
   sudo yum -y install ksh
   sudo yum -y install wget
@@ -42,15 +49,12 @@ setup_environment () {
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
 
-# Will use Lmod instead
-#  sudo yum -y install environment-modules
-
   sudo yum -y install python3.11-devel
   sudo alternatives --set python3 /usr/bin/python3.11
   sudo yum -y install python3.11-pip
   sudo yum -y install jq
 
-  # Additional ones for spack-stack
+  # Additional packages for spack-stack
   sudo yum -y install git-lfs
   sudo yum -y install bash-completion
   sudo yum -y install xorg-x11-xauth
@@ -65,22 +69,25 @@ setup_environment () {
   rm awscliv2.zip
   rm -Rf "./aws"
 
-#  # Only do this once
-#  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-#  if [ $? -eq 1 ] ; then
-#    echo . /usr/share/Modules/init/bash >> ~/.bashrc
-#    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-#    . /usr/share/Modules/init/bash
-#  fi
-#
-#  # Only do this once
-#  if [ ! -d /usrx/modulefiles ] ; then
-#    sudo mkdir -p /usrx/modulefiles
-#    echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
-#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-#    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-#  fi
+  sudo yum -y install environment-modules
 
+  # Only do this once
+  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+  if [ $? -eq 1 ] ; then
+    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+    . /usr/share/Modules/init/bash
+  fi
+
+  # Only do this once
+  if [ ! -d /save/environments/modulefiles ] ; then
+    sudo mkdir -p /save/environments/modulefiles
+    echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
+    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+  fi
+
+  # sudo yum clean {option}
 }
 
 
@@ -195,8 +202,8 @@ install_gcc_toolset() {
   sudo yum -y install gcc-toolset-11-gcc-gfortran
   sudo yum -y install gcc-toolset-11-gdb
  
-  # scl enable gcc-toolset-11 bash
-
+  # scl enable gcc-toolset-11 bash - Not inside a script
+  # source scl_source enable gcc-toolset-11
   cd $home
 }
 
@@ -308,8 +315,8 @@ install_intel_oneapi-spack-stack () {
   cd $SPACK_ENV 
   spack env activate -p .
   spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/${INTEL_VER}/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/${INTEL_VER}/linux/bin
 
   spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
   spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
