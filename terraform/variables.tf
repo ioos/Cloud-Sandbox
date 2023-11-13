@@ -47,9 +47,15 @@ variable "key_name" {
   nullable = false
 }
 
-variable "allowed_ssh_cidr" {
+#variable "allowed_ssh_cidr" {
+#  description = "Public IP address/range allowed for SSH access"
+#  type = string
+#  nullable = false
+#}
+
+variable "allowed_ssh_cidr_list" {
   description = "Public IP address/range allowed for SSH access"
-  type = string
+  type = list
   nullable = false
 }
 

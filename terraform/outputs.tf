@@ -67,7 +67,7 @@ output "aws_placement_group" {
 
 #output "login_command" {
 #  description = "SSH Login"
-#  value       = "ssh -i ${var.key_name}.pem centos@${aws_eip.head_node.public_dns}"
+#  value       = "ssh -i ~/.ssh/${var.key_name}.pem centos@${aws_eip.head_node.public_dns}"
 #}
 
 output "login_command" {
