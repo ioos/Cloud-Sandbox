@@ -61,16 +61,15 @@ install_gcc_toolset_yum
 
 install_spack
 
-# (with spack)
 source /opt/rh/gcc-toolset-11/enable
 which gcc
+
 install_intel_oneapi_spack
 
 install_esmf_spack
-# install_base_rpms
-# install_extra_rpms
+install_base_rpms
+install_ncep_rpms
 # install_ffmpeg
-exit
 
 # TODO: create an output file to contain all of this state info - json
 # TODO: re-write in Python ?
@@ -103,6 +102,6 @@ echo "Node image_name: $image_name"
 # Flush the disk cache
 sudo sync
 image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-echo "Head node image_id: $image_id"
+echo "Node image_id: $image_id"
 
 echo "Setup completed!"

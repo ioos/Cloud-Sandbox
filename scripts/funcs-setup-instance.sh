@@ -30,7 +30,7 @@ setup_environment () {
   sudo subscription-manager config --rhsm.manage_repos=0
   sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
 
-  sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+  sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
   # yum update might update the kernel. 
   # This might cause some of the other installs to fail, e.g. efa driver 
@@ -386,14 +386,14 @@ install_intel_oneapi_spack () {
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh 
-  # spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER}
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER}
 
-  # spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-  # spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
   # MPI
-  # spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER}
-  # spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER} target=x86_64
+  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER}
+  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER} target=x86_64
 
   spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER}
   spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
@@ -900,7 +900,7 @@ install_base_rpms () {
   home=$PWD
 
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
-  libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
+  # libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
   wrkdir=~/baserpms
   [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
@@ -934,7 +934,7 @@ install_base_rpms () {
 
 #-----------------------------------------------------------------------------#
 
-install_extra_rpms () {
+install_ncep_rpms () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -973,15 +973,10 @@ install_extra_rpms () {
     sudo yum -y localinstall $file
   done
 
-  # Force install newer libpng leaving the existing one intact
-  # this one will be used for our model builds via the module
-  #sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
-  # refuses to upgrade #  sudo yum -y localinstall  libpng-1.5.30-2.el7.x86_64.rpm  
-  # sudo yum -y downgrade  libpng-1.5.30-2.el7.x86_64.rpm  # WORKS - use spack instead
-
   # rm -Rf "$wrkdir"
 
-  sudo yum -y install jasper-devel
+  #sudo yum -y install jasper-devel
+  sudo yum -y install jasper-libs
 
   cd $home
 }
