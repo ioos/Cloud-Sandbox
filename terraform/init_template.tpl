@@ -41,6 +41,7 @@ sudo chmod 777 save
 # Placing this in a common location
 cd /mnt/efs/fs1/save
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
+cd Cloud-Sandbox
 sudo -u $RUNUSER git checkout -t origin/x86_64
 cd Cloud-Sandbox/scripts
 
