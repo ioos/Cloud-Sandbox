@@ -103,22 +103,28 @@ setup_paths () {
   fi
 
   cd /mnt/efs/fs1
+
   if [ ! -d ptmp ] ; then
     sudo mkdir ptmp
-    sudo mkdir com
-    sudo mkdir save
-
     sudo chgrp wheel ptmp
     sudo chmod 777 ptmp
-    sudo chgrp wheel com
-    sudo chmod 777 com
-    sudo chgrp wheel save
-    sudo chmod 777 save
+    sudo ln -s /mnt/efs/fs1/ptmp /ptmp
   fi
 
-  sudo ln -s /mnt/efs/fs1/ptmp /ptmp
-  sudo ln -s /mnt/efs/fs1/com  /com
-  sudo ln -s /mnt/efs/fs1/save /save
+  if [ ! -d com ] ; then
+    sudo mkdir com
+    sudo chgrp wheel com
+    sudo chmod 777 com
+    sudo ln -s /mnt/efs/fs1/com  /com
+  fi
+
+# Not sure why it keeps creating an extra sym link
+#  if [ ! -d save ] ; then
+#    sudo mkdir save
+#    sudo chgrp wheel save
+#    sudo chmod 777 save
+#    sudo ln -s /mnt/efs/fs1/save /save
+#  fi
 
   mkdir /save/$USER
   mkdir /com/$USER

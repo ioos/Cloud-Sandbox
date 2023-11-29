@@ -33,17 +33,19 @@ mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
 
 cd /mnt/efs/fs1
-sudo mkdir save
-sudo chgrp wheel save
-sudo chmod 777 save
+if [ ! -d save ] ; then
+  sudo mkdir save
+  sudo chgrp wheel save
+  sudo chmod 777 save
+  sudo ln -s /mnt/efs/fs1/save /save
+fi
 
-# Clone the Cloud-Sandbox repository
 # Placing this in a common location
 cd /mnt/efs/fs1/save
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox
 sudo -u $RUNUSER git checkout -t origin/x86_64
-cd Cloud-Sandbox/scripts
+cd scripts
 
 # Need to pass ami_name
 export ami_name=${ami_name}
