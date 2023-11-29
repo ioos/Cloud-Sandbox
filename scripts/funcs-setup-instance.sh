@@ -17,6 +17,8 @@ fi
 
 setup_environment () {
 
+# This has been tested on RHEL8 
+
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -28,13 +30,11 @@ setup_environment () {
   sudo subscription-manager config --rhsm.manage_repos=0
   sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
 
+  sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
   # yum update might update the kernel. 
   # This might cause some of the other installs to fail, e.g. efa driver 
   #sudo yum -y update
-
-
-  # CentOS 7
-  # sudo yum -y install epel-release
 
   sudo yum -y install tcsh
   sudo yum -y install ksh
@@ -55,12 +55,12 @@ setup_environment () {
   sudo yum -y install jq
 
   # Additional packages for spack-stack
-  sudo yum -y install git-lfs
-  sudo yum -y install bash-completion
-  sudo yum -y install xorg-x11-xauth
-  sudo yum -y install xterm
-  sudo yum -y install texlive
-  sudo yum -y install mysql-server
+  #sudo yum -y install git-lfs
+  #sudo yum -y install bash-completion
+  #sudo yum -y install xorg-x11-xauth
+  #sudo yum -y install xterm
+  #sudo yum -y install texlive
+  #sudo yum -y install mysql-server
 
   cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -192,7 +192,7 @@ install_efa_driver() {
 
 #-----------------------------------------------------------------------------#
 
-install_gcc_toolset() {
+install_gcc_toolset_yum() {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -204,6 +204,7 @@ install_gcc_toolset() {
  
   # scl enable gcc-toolset-11 bash - Not inside a script
   # source scl_source enable gcc-toolset-11
+  # source /opt/rh/gcc-toolset-11/enable 
   cd $home
 }
 
@@ -215,11 +216,10 @@ install_spack-stack() {
   home=$PWD
 
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-  #SPACK_MIRROR='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
-  scl enable gcc-toolset-11
+  scl load gcc-toolset-11
 
   cd /save/environments
   git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
@@ -237,8 +237,13 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
+  # Gives an error
+  #source scl_source enable gcc-toolset-11
+  # scl load gcc-toolset-11
+  source /opt/rh/gcc-toolset-11/enable
+  which gcc
+
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-  #SPACK_MIRROR='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
@@ -250,6 +255,7 @@ install_spack() {
   fi
 
   mkdir -p $SPACK_DIR
+  chown ec2-user:ec2-user $SPACK_DIR
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
   git checkout -q $SPACK_VER
@@ -258,21 +264,29 @@ install_spack() {
 
   # Location for overriding default configurations
   sudo mkdir /etc/spack
+  sudo chown ec2-user:ec2-user /etc/spack
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # TODO: Rebuild everything using this, and push to mirror
   # spack config add "config:install_tree:padded_length:128"
+  spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
   spack buildcache keys --install --trust --force
-  spack buildcache update-index -d $SPACK_MIRROR
+  spack buildcache update-index $SPACK_MIRROR
+
+  spack compiler find --scope system
+
+  # Note to recreate modulefiles
+  # spack module tcl refresh -y
 
   cd $home
 }
+
 
 #-----------------------------------------------------------------------------#
 
@@ -307,7 +321,6 @@ install_intel_oneapi-spack-stack () {
 
   home=$PWD
 
-  SPACK_DIR=/save/environments/spack-stack/
   cd $SPACK_DIR
   source setup.sh
   SPACK_ENV=ioos-aws-rhel
@@ -366,20 +379,32 @@ cd $home
 
 #-----------------------------------------------------------------------------#
 
-install_intel_oneapi () {
+install_intel_oneapi_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh 
-  spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
+  # spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER}
 
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+  # spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  # spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
-  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
-  spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
+  # MPI
+  # spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER}
+  # spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER} target=x86_64
+
+  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER}
+  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
+
+  # MKL
+  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
+  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
+
+  # MKL fails with intel classic compiler
+  # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
+  # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 
   cd $home
 }
@@ -556,7 +581,7 @@ install_slurm () {
 
   spack load intel-oneapi-mpi@${INTEL_VER}%${COMPILER}
 
-  #spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+ #spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
   # hwloc build is failing, netloc_mpi_find_hosts.c:116: undefined reference to `MPI_Send' etc.
      #^"$MUNGEDEP" localstatedir='/var' ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
 
@@ -829,7 +854,9 @@ install_slurm-s3() {
 
 #-----------------------------------------------------------------------------#
 
-install_esmf () {
+install_esmf_spack () {
+
+  # Install esmf along with esmf dependencies such as netcdf and hdf5
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -848,10 +875,17 @@ install_esmf () {
   # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
   #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
 
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+  # ==> Warning: Skipping build of bzip2-1.0.8-r3bsbokhomrm3rtsjksaxwa2j5ulb6ba since diffutils-3.9-dq7rdkugtepjanmcngfuzgycguuddxtn failed
+
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER} 
+  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+
+  # This is the same - MPI_VER == INTEL_VER they are != ONEAPI_VER
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
   # HDF5 also needs szip lib
-  spack install $SPACKOPTS libszip%${COMPILER}
+  #spack install $SPACKOPTS libszip%${COMPILER}
+  spack install $SPACKOPTS libszip%${COMPILER} $SPACKTARGET
 
   cd $home
 }
@@ -960,8 +994,8 @@ install_python_modules_user () {
 
   home=$PWD
 
-  # python3 -m venv /save/$USER/csvenv
-  # source /save/$USER/csvenv/bin/activate
+  #python3 -m venv /save/$USER/csvenv
+  #source /save/$USER/csvenv/bin/activate
 
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
