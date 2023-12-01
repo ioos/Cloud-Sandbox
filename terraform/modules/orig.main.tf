@@ -227,7 +227,7 @@ resource "aws_instance" "head_node" {
   key_name = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
   user_data = data.template_file.init_instance.rendered
-  associate_public_ip_address = true
+  # associate_public_ip_address = true
   subnet_id = data.aws_subnet.noaa-pub-subnet-search.id
   vpc_security_group_ids = [
     aws_security_group.base_sg.id,
