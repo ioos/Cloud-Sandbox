@@ -93,6 +93,13 @@ resource "aws_subnet" "main" {
    }
 }
 
+data "aws_subnet" "noaa-pub-subnet-search" {
+  filter {
+    name   = "tag:Name"
+    values = ["NOAA Public IP Subnet"]
+}
+
+
 
 data "aws_subnet" "pre-provisioned" {
   # the pre-provisioned Subnet will be returned if subnet_id matches an existing Subnet
