@@ -3,55 +3,73 @@
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
+GCC_VER=11.2.1
 
-GCC_VER=8.5.0
-INTEL_VER=2021.3.0
+# Current versions
+ONEAPI_VER=2023.1.0
 
-SPACK_VER='releases/v0.18'
-#SPACK_DIR='/mnt/efs/fs1/opt/spack'
+# There is no oneapi mpi version 2023.1.0
+INTEL_VER=2021.9.0
+MPI_VER=2021.9.0
+
+#SPACK_VER='releases/v0.18'
+#SPACK_DIR='/save/environments/spack-stack/spack'
+
+SPACK_VER='releases/v0.21.0'
 SPACK_DIR='/save/environments/spack'
+sudo mkdir -p $SPACK_DIR
+sudo chown ec2-user:ec2-user $SPACK_DIR
+
 SPACKOPTS='-v -y'
 
-SLURM_VER='22-05-2-1'
+# SPACKTARGET is only used for some model libraries such as MPI, 
+#SPACKTARGET='target=skylake_avx512'        # default on skylake intel instances t3.xxxx
+#export SPACKTARGET='target=haswell'        # works on AMD also - has no avx512 extensions
+SPACKTARGET='target=x86_64'                 # works on anything
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 SPACK_CACHEONLY=0
 
+
+##########################################################
+
+
 # source include the functions 
 . funcs-setup-instance.sh
 
-# calling sudo from cloud init adds 25 second delay for each sudo
+# calling sudo from cloud init adds 25 second delay for each sudo command
 sudo setenforce 0
 
 # Use caution when changing the order of the following
 
 # System stuff
-# setup_environment
-# setup_paths
-# setup_aliases
-# install_jupyterhub # Not fully tested yet
-# setup_ssh_mpi
-# install_efa_driver
+#setup_paths
+#setup_aliases
+#setup_environment
+
+module use -a /save/environments/modulefiles
+
+## install_jupyterhub # Requires some manual work
+#setup_ssh_mpi
+#install_efa_driver
 
 # Compilers and libraries
-# install_python_modules_user
-# install_spack
-# install_gcc
-# install_intel_oneapi
-install_esmf
-# install_base_rpms
-# install_extra_rpms
+#install_python_modules_user
+#install_gcc_toolset_yum
+
+#install_spack
+
+source /opt/rh/gcc-toolset-11/enable
+which gcc
+
+#install_intel_oneapi_spack
+
+#install_esmf_spack
+#install_base_rpms
+#install_ncep_rpms
 # install_ffmpeg
-
-exit
-
-# Compute node config
-# install_slurm
-
-# configure_slurm compute
-# sudo yum -y clean all
 
 # TODO: create an output file to contain all of this state info - json
 # TODO: re-write in Python ?
@@ -59,8 +77,17 @@ exit
 ## Create the AMI to be used for the compute nodes
 # TODO: make the next section cleaner, more abstracted away
 
-export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
-instance_id=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+
+# export AWS_DEFAULT_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+export AWS_DEFAULT_REGION=$(curl -sH "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+echo $AWS_DEFAULT_REGION
+
+# curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/
+#instance_id=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
+instance_id=`curl -sH "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id`
+
+echo "instance_id=$instance_id"
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
@@ -70,32 +97,21 @@ ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
 # TODO: pass this in via Terraform init template
 project_tag="IOOS-Cloud-Sandbox"
 
-image_name="${ami_name}-Compute-Node"
-echo "Compute node image_name: '$image_name'"
-
 # For some reason these aren't being seen 
 # Try installing them again in this shell
-python3 -m pip install --user --upgrade botocore==1.23.46
-python3 -m pip install --user --upgrade boto3==1.20.46
+# python3 -m pip install --user --upgrade botocore==1.23.46
+# python3 -m pip install --user --upgrade boto3==1.20.46
+
+# create node image
+###################################
+
+image_name="${ami_name}-Node"
+echo "Node image_name: $image_name"
 
 # Flush the disk cache
 sudo sync
-
 image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-echo "Compute node image_id: $image_id"
-
-# Configure this machine as a head node
-configure_slurm head
-sudo yum -y clean all
-
-# Optionally create Head node image
-###################################
-
-image_name="${ami_name}-Head-Node"
-echo "Head node image_name: $image_name"
-
-sudo sync
-image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-echo "Head node image_id: $image_id"
+# python3 create_image.py $instance_id "$image_name" "$project_tag"
+echo "Node image_id: $image_id"
 
 echo "Setup completed!"

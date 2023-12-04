@@ -6,7 +6,7 @@ import traceback
 import boto3
 from botocore.exceptions import ClientError
 
-DEBUG=False
+DEBUG=True
 
 def main():
 
@@ -22,15 +22,21 @@ def main():
       print(f"Usage: {sys.argv[0]} <instance_id> <image_name> <project_tag>")
       sys.exit(1)
 
+    #print (f"DEBUG: instance_id: {instance_id}, image_name: {image_name}, project_tag: {project_tag}")
+
+    
     snapshot_id = create_snapshot(instance_id, image_name, project_tag)
-    image_id = create_image_from_snapshot(snapshot_id, image_name)
+    #print(f"DEBUG: snapshot_id: {snapshot_id}")
+
+    image_id  = create_image_from_snapshot(snapshot_id, image_name)
     print(str(image_id))
 
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
   ''' NOTE: Run 'sync' on filesystem to flush the disk cache before running this ''' 
 
-  # print(f"create_snapshot: instance_id: {instance_id}, name_tag: {name_tag}, project_tag: {project_tag}")
+  print(f"create_snapshot: instance_id: {instance_id}, name_tag: {name_tag}, project_tag: {project_tag}")
+
 
   ec2 = boto3.client('ec2')
 
@@ -51,11 +57,11 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
               ]
           }
       ],
-      DryRun=False,
-      CopyTagsFromSource='volume'
+      DryRun=False
+      # CopyTagsFromSource='volume'
     )
   except Exception as e:
-    # print(str(e))
+    print(str(e))
     if DEBUG: traceback.print_stack()
     return None
 

@@ -906,7 +906,7 @@ install_base_rpms () {
   home=$PWD
 
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
-  # libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
+  libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
   wrkdir=~/baserpms
   [ -e "$wrkdir" ] && rm -Rf "$wrkdir"
@@ -924,16 +924,19 @@ install_base_rpms () {
   #  esmf-8.0.0-1.el7.x86_64.rpm
   #'
 
+
+  sudo yum install python2
+  sudo alternatives --set python /usr/bin/python2
   rpmlist='
     produtil-1.0.18-2.el7.x86_64.rpm
   '
 
   for file in $rpmlist
   do
-    sudo yum -y install $file
+    sudo rpm -ivh $file --nodeps
   done
 
-  rm -Rf "$wrkdir"
+  # rm -Rf "$wrkdir"
 
   cd $home
 }
@@ -998,13 +1001,13 @@ install_python_modules_user () {
   #python3 -m venv /save/$USER/csvenv
   #source /save/$USER/csvenv/bin/activate
 
+  python3 -m pip install pip install prefect==0.15.13
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
   python3 -m pip install --upgrade dask
   python3 -m pip install --upgrade distributed
   python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
   python3 -m pip install --upgrade paramiko   # needed for dask-ssh
-  python3 -m pip install --upgrade prefect
 
   # SPACK has problems with botocore newer than below
   python3 -m pip install --upgrade botocore==1.23.46
@@ -1012,10 +1015,11 @@ install_python_modules_user () {
   python3 -m pip install --upgrade boto3==1.20.46
 
   # Install requirements for plotting module
-  # cd ../cloudflow
-  # python3 -m pip install --user -r requirements.txt
+  cd ../cloudflow
+  python3 -m pip install --user -r requirements.txt
 
-  # python3 setup.py sdist
+  # install plotting module
+  python3 setup.py sdist
 
   # deactivate
   cd $home 
