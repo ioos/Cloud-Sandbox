@@ -33,26 +33,26 @@ resource "aws_subnet" "main" {
     }
 }
 
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.cloud_vpc.id
-   tags = {
-      Name = "${var.name_tag} Internet Gateway"
-      Project = var.project_tag
-    }
-}
+#resource "aws_internet_gateway" "gw" {
+#  vpc_id = aws_vpc.cloud_vpc.id
+#   tags = {
+#      Name = "${var.name_tag} Internet Gateway"
+#      Project = var.project_tag
+#    }
+#}
 
-resource "aws_route_table" "default" {
-    vpc_id = aws_vpc.cloud_vpc.id
-
-    route {
-      cidr_block = "0.0.0.0/0"
-      gateway_id = aws_internet_gateway.gw.id
-    }
-   tags = {
-      Name = "${var.name_tag} Route Table"
-      Project = var.project_tag
-    }
-}
+#resource "aws_route_table" "default" {
+#    vpc_id = aws_vpc.cloud_vpc.id
+#
+#    route {
+#      cidr_block = "0.0.0.0/0"
+#      gateway_id = aws_internet_gateway.gw.id
+#    }
+#   tags = {
+#      Name = "${var.name_tag} Route Table"
+#      Project = var.project_tag
+#    }
+#}
 
 resource "aws_route_table_association" "main" {
   subnet_id = aws_subnet.main.id
