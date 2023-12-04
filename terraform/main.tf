@@ -111,6 +111,7 @@ locals {
 
 
 resource "aws_internet_gateway" "gw" {
+   count = var.subnet_id != null ? 0 : 1
    vpc_id = local.vpc.id
    tags = {
       Name = "${var.name_tag} Internet Gateway"
@@ -119,6 +120,7 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_route_table" "default" {
+   count = var.subnet_id != null ? 0 : 1
    vpc_id = local.vpc.id
 
    route {
@@ -132,6 +134,7 @@ resource "aws_route_table" "default" {
 }
 
 resource "aws_route_table_association" "main" {
+  count = var.subnet_id != null ? 0 : 1
   subnet_id = one(aws_subnet.main[*].id)
   route_table_id = one(aws_route_table.default[*].id)
 }
@@ -287,6 +290,7 @@ data "aws_ami" "centos_stream_9" {
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
+  count = var.subnet_id != null ? 0 : 1
   depends_on = [aws_internet_gateway.gw]
   vpc        = true
   instance   = aws_instance.head_node.id
@@ -333,6 +337,7 @@ resource "aws_instance" "head_node" {
 
   }
 
+  # depends_on = [var.subnet_id != null ? aws_internet_gateway.gw, aws_efs_file_system.main_efs, aws_efs_mount_target.mount_target_main_efs : aws_efs_file_system.main_efs, aws_efs_mount_target.mount_target_main_efs]
   depends_on = [aws_internet_gateway.gw,
                 aws_efs_file_system.main_efs,
                 aws_efs_mount_target.mount_target_main_efs]
