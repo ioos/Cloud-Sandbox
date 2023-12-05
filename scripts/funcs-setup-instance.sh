@@ -87,6 +87,9 @@ setup_environment () {
     echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
   fi
 
+  # Add unlimited stack size 
+  echo "ulmit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
+
   # sudo yum clean {option}
 }
 
