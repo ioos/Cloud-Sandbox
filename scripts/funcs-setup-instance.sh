@@ -88,7 +88,7 @@ setup_environment () {
   fi
 
   # Add unlimited stack size 
-  echo "ulmit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
+  echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
 
   # sudo yum clean {option}
 }
