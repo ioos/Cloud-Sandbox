@@ -344,7 +344,6 @@ resource "aws_instance" "head_node" {
 
   }
 
-  # depends_on = [var.subnet_id != null ? aws_internet_gateway.gw, aws_efs_file_system.main_efs, aws_efs_mount_target.mount_target_main_efs : aws_efs_file_system.main_efs, aws_efs_mount_target.mount_target_main_efs]
   depends_on = [aws_internet_gateway.gw,
                 aws_efs_file_system.main_efs,
                 aws_efs_mount_target.mount_target_main_efs]
