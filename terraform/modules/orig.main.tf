@@ -33,26 +33,26 @@ resource "aws_subnet" "main" {
     }
 }
 
-#resource "aws_internet_gateway" "gw" {
-#  vpc_id = aws_vpc.cloud_vpc.id
-#   tags = {
-#      Name = "${var.name_tag} Internet Gateway"
-#      Project = var.project_tag
-#    }
-#}
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.cloud_vpc.id
+   tags = {
+      Name = "${var.name_tag} Internet Gateway"
+      Project = var.project_tag
+    }
+}
 
-#resource "aws_route_table" "default" {
-#    vpc_id = aws_vpc.cloud_vpc.id
-#
-#    route {
-#      cidr_block = "0.0.0.0/0"
-#      gateway_id = aws_internet_gateway.gw.id
-#    }
-#   tags = {
-#      Name = "${var.name_tag} Route Table"
-#      Project = var.project_tag
-#    }
-#}
+resource "aws_route_table" "default" {
+    vpc_id = aws_vpc.cloud_vpc.id
+
+    route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.gw.id
+    }
+   tags = {
+      Name = "${var.name_tag} Route Table"
+      Project = var.project_tag
+    }
+}
 
 resource "aws_route_table_association" "main" {
   subnet_id = aws_subnet.main.id
@@ -227,8 +227,8 @@ resource "aws_instance" "head_node" {
   key_name = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
   user_data = data.template_file.init_instance.rendered
-  # associate_public_ip_address = true
-  subnet_id = data.aws_subnet.noaa-pub-subnet-search.id
+  associate_public_ip_address = true
+  subnet_id = aws_subnet.main.id
   vpc_security_group_ids = [
     aws_security_group.base_sg.id,
     aws_security_group.ssh_ingress.id,
