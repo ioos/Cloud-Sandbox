@@ -30,7 +30,7 @@ SPACKTARGET='target=x86_64'                 # works on anything
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-SPACK_CACHEONLY=1
+SPACK_CACHEONLY=0
 
 
 ##########################################################
@@ -59,10 +59,12 @@ install_efa_driver
 install_python_modules_user
 install_gcc_toolset_yum
 
-install_spack
+exit
 
 source /opt/rh/gcc-toolset-11/enable
 which gcc
+
+install_spack
 
 install_intel_oneapi_spack
 
