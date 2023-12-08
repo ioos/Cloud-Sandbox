@@ -9,11 +9,13 @@
 # The following variables must be defined, no default exists:
 #------------------------------------------------------------
 
-# (This should be the public IPv4 address of your workstation for SSH acceess)
-# This should be in the format ###.###.###.###/32
-# Example: 72.245.67.89/32
+# List of the IP's address the are allowed SSH access to the system
+# They should be in the format ###.###.###.###/32
+# Example:  
+# allowed_ssh_cidr_list =  ["72.200.162.64/32", "96.238.4.28/32", "96.238.4.30/32"]
 
-allowed_ssh_cidr = ""
+allowed_ssh_cidr_list =  ["72.200.162.64/32", "96.238.4.28/32", "96.238.4.30/32"]
+
 
 # Specify the SSL key below.
 

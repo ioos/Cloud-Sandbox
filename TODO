@@ -1,0 +1,10 @@
+add ulimit -s unlimited to every user profile
+
+commit changes
+test other builds
+clean up
+commit and tag as 1.5.0b
+commit and tag nosofs as ioos.1.5.0b
+
+Test liveocean build and run
+commit and tag liveocean as ioos.1.5.0b

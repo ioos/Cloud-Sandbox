@@ -48,6 +48,7 @@ setup_environment () {
   sudo yum -y install bzip2-devel
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
+  sudo yum -y install subversion
 
   sudo yum -y install python3.11-devel
   sudo alternatives --set python3 /usr/bin/python3.11

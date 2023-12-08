@@ -93,14 +93,11 @@ resource "aws_subnet" "main" {
    }
 }
 
-
-# Fails if not on NOAA
-# data "aws_subnet" "noaa-pub-subnet-search" {
-#   filter {
-#     name   = "tag:Name"
-#     values = ["NOAA Public IP Subnet"]
-#   }
-# }
+data "aws_subnet" "noaa-pub-subnet-search" {
+  filter {
+    name   = "tag:Name"
+    values = ["NOAA Public IP Subnet"]
+}
 
 
 

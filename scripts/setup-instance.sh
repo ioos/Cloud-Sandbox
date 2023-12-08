@@ -15,7 +15,7 @@ MPI_VER=2021.9.0
 #SPACK_VER='releases/v0.18'
 #SPACK_DIR='/save/environments/spack-stack/spack'
 
-SPACK_VER='releases/v0.21.0'
+SPACK_VER='v0.21.0'
 SPACK_DIR='/save/environments/spack'
 sudo mkdir -p $SPACK_DIR
 sudo chown ec2-user:ec2-user $SPACK_DIR

@@ -94,16 +94,6 @@ resource "aws_subnet" "main" {
 }
 
 
-# Fails if not on NOAA
-# data "aws_subnet" "noaa-pub-subnet-search" {
-#   filter {
-#     name   = "tag:Name"
-#     values = ["NOAA Public IP Subnet"]
-#   }
-# }
-
-
-
 data "aws_subnet" "pre-provisioned" {
   # the pre-provisioned Subnet will be returned if subnet_id matches an existing Subnet
   count = var.subnet_id != null ? 1 : 0
