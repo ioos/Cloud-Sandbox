@@ -1,16 +1,16 @@
 output "instance_id" {
   description = "The EC2 instance id"
-  value       = aws_instance.head_node.id
+  value       = one(aws_instance.head_node[*]).id
 }
 
 output "instance_public_ip" {
   description = "Public IP Address of the EC2 Instance"
-  value       = aws_eip.head_node.public_ip
+  value       = one(aws_eip.head_node[*]) != null ? one(aws_eip.head_node[*]).public_ip : null
 }
 
 output "instance_public_dns" {
   description = "Public DNS Address of the EC2 Instance"
-  value       = aws_eip.head_node.public_dns
+  value       = one(aws_eip.head_node[*]) != null ? one(aws_eip.head_node[*]).public_dns : null
 }
 
 output "key_name" {
@@ -65,13 +65,8 @@ output "aws_placement_group" {
   value       = aws_placement_group.cloud_sandbox_placement_group.id
 }
 
-#output "login_command" {
-#  description = "SSH Login"
-#  value       = "ssh -i ~/.ssh/${var.key_name}.pem centos@${aws_eip.head_node.public_dns}"
-#}
-
 output "login_command" {
    description = "SSH Login"
-   value = "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_eip.head_node.public_dns}"
+   value = one(aws_eip.head_node[*]) != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${one(aws_eip.head_node[*]).public_dns}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"
 }
 

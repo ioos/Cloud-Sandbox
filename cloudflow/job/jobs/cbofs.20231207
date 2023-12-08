@@ -1,7 +1,7 @@
 {
   "JOBTYPE"   : "romsforecast",
   "OFS"       : "cbofs",
-  "CDATE"     : "today",
+  "CDATE"     : "20231207",
   "HH"        : "06",
   "COMROT"    : "/com/ec2-user/nosofs",
   "PTMP"      : "/ptmp/ec2-user",

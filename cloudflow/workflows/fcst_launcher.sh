@@ -2,7 +2,7 @@
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
-WRKDIR=/save/$GROUP/$USER
+WRKDIR=/save/$USER
 
 set -xa
 ulimit -c unlimited
