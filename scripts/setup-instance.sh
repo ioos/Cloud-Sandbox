@@ -30,7 +30,7 @@ SPACKTARGET='target=x86_64'                 # works on anything
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-SPACK_CACHEONLY=0
+SPACK_CACHEONLY=1
 
 
 ##########################################################
