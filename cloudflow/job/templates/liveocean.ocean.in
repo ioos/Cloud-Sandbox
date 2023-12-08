@@ -73,7 +73,8 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-      VARNAME = /save/ioos/patrick.tripp/LiveOcean/LO_roms_source_alt/varinfo/varinfo.yaml
+      #VARNAME = __SAVE__/LiveOcean/LO_roms_source_alt/varinfo/varinfo.yaml
+      VARNAME = varinfo.yaml
       
 ! Number of nested grids.
 
@@ -1012,7 +1013,7 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
     NBCFILES == 1                          ! number of boundary files
 
-     BRYNAME == /com/patrick.tripp/LO_output/forcing/cas6/__FDATE__/ocn00/ocean_bry.nc
+     BRYNAME == __COMROT__/LO_output/forcing/cas6/__FDATE__/ocn00/ocean_bry.nc
 
 ! Input climatology file names. The USER has the option to separate the
 ! climatology variables into individual NetCDF files (NCLMFILES > 1),

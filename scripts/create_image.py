@@ -29,16 +29,16 @@ def main():
     #print(f"DEBUG: snapshot_id: {snapshot_id}")
 
     image_id  = create_image_from_snapshot(snapshot_id, image_name)
-    print(str(image_id))
+    # print(str(image_id))
 
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
   ''' NOTE: Run 'sync' on filesystem to flush the disk cache before running this ''' 
 
-  print(f"create_snapshot: instance_id: {instance_id}, name_tag: {name_tag}, project_tag: {project_tag}")
+  # print(f"create_snapshot: instance_id: {instance_id}, name_tag: {name_tag}, project_tag: {project_tag}")
 
 
-  ec2 = boto3.client('ec2')
+  ec2 = boto3.client('ec2', region_name='us-east-2')
 
   description = f"Created by IOOS Cloud Sandbox for AMI"
   try: 
@@ -62,7 +62,7 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
     )
   except Exception as e:
     print(str(e))
-    if DEBUG: traceback.print_stack()
+    traceback.print_stack()
     return None
 
   snapshot_id = response['Snapshots'][0]['SnapshotId']
@@ -96,18 +96,18 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
 
   # Wait for snapshot to be created 
   # wait_until will throw an exception after 10 minutes
-  maxtries=2
+  maxtries=3
   tries=0
   while tries < maxtries:
     try:
       snapshot.wait_until_completed()
       break
     except Exception as e:
-      #print("Exception: " + str(e))
+      print("Exception: " + str(e))
       tries += 1
       if tries == maxtries:
-        # print("ERROR: maxtries reached. something went wrong")
-        if DEBUG: traceback.print_stack()
+        print("ERROR: maxtries reached. something went wrong")
+        traceback.print_stack()
         return None
   
  

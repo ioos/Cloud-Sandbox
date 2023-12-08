@@ -3,7 +3,7 @@
   "OFS"       : "liveocean",
   "CDATE"     : "20170601",
   "HH"        : "00",
-  "COMROT"    : "/com/patrick.tripp",
+  "COMROT"    : "/com/ec2-user",
   "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",
