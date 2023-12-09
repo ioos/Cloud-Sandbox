@@ -10,7 +10,7 @@ ONEAPI_VER=2023.1.0
 
 # There is no oneapi mpi version 2023.1.0
 INTEL_VER=2021.9.0
-MPI_VER=2021.9.0
+# MPI_VER=2021.9.0
 
 #SPACK_VER='releases/v0.18'
 #SPACK_DIR='/save/environments/spack-stack/spack'
@@ -25,7 +25,9 @@ SPACKOPTS='-v -y'
 # SPACKTARGET is only used for some model libraries such as MPI, 
 #SPACKTARGET='target=skylake_avx512'        # default on skylake intel instances t3.xxxx
 #export SPACKTARGET='target=haswell'        # works on AMD also - has no avx512 extensions
-SPACKTARGET='target=x86_64'                 # works on anything
+#SPACKTARGET='target=x86_64'                 # works on anything
+SPACKTARGET="arch=linux-rhel8-x86_64"
+
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache

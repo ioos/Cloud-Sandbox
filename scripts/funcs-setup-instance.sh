@@ -229,7 +229,7 @@ install_spack-stack() {
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
-  scl load gcc-toolset-11
+  #scl load gcc-toolset-11
 
   cd /save/environments
   git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
@@ -396,21 +396,35 @@ install_intel_oneapi_spack () {
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh 
-  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER}
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
-  # MPI
-  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER}
-  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER} target=x86_64
+  exit
 
-  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER}
-  spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
+  # MPI
+  # Build with Intel Classic compilers
+#  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
+   spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER} $SPACKTARGET
+
+   # Build with Intel OneApi compilers
+#  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %oneapi@${ONEAPI_VER}
+   spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
 
   # MKL
-  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
-  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
+
+  # Build with Intel Classic compilers
+#  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
+   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER} $SPACKTARGET
+
+   # Build with Intel OneApi compilers
+#  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
+   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
+
+   # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
+   # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
+   # 3278    WARNING: 'makeinfo' is missing on your system.
 
   # MKL fails with intel classic compiler
   # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
@@ -887,15 +901,27 @@ install_esmf_spack () {
 
   # ==> Warning: Skipping build of bzip2-1.0.8-r3bsbokhomrm3rtsjksaxwa2j5ulb6ba since diffutils-3.9-dq7rdkugtepjanmcngfuzgycguuddxtn failed
 
+  #spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER}
+  #spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %intel@${INTEL_VER} target=x86_64
+
+  #spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER}
+  #spack install $SPACKOPTS intel-oneapi-mpi@${MPI_VER} %oneapi@${ONEAPI_VER} target=x86_64
+
   # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER} 
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
-  # This is the same - MPI_VER == INTEL_VER they are != ONEAPI_VER
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  # >> 112    cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
+  # >> 113    make: *** [Makefile:64: test] Error 127
 
+  spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 $SPACKTARGET
   # HDF5 also needs szip lib
   #spack install $SPACKOPTS libszip%${COMPILER}
   spack install $SPACKOPTS libszip%${COMPILER} $SPACKTARGET
+
+  COMPILER=oneapi@${ONEAPI_VER}
+
+  # This is the same - MPI_VER == INTEL_VER they are != ONEAPI_VER
+  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
   cd $home
 }
