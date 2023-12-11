@@ -10,7 +10,7 @@ ONEAPI_VER=2023.1.0
 
 # There is no oneapi mpi version 2023.1.0
 INTEL_VER=2021.9.0
-MPI_VER=2021.9.0
+# MPI_VER=2021.9.0
 ESMF_VER=8.5.0
 
 #SPACK_VER='releases/v0.18'
@@ -28,7 +28,7 @@ SPACKOPTS='-v -y'
 #export SPACKTARGET='target=haswell'        # works on AMD also - has no avx512 extensions
 #SPACKTARGET='target=x86_64'                 # works on anything
 SPACKTARGET="arch=linux-rhel8-x86_64"
-#arch=platform-os-target
+
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
@@ -63,20 +63,16 @@ module use -a /save/environments/modulefiles
 #install_gcc_toolset_yum
 
 source /opt/rh/gcc-toolset-11/enable
-# which gcc
 
-#install_spack
+# install_spack
 
-install_intel_oneapi_spack
-exit
+# install_intel_oneapi_spack
 
-#spack load intel-oneapi-compilers
-#module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-bleh5uz
 install_esmf_spack
 exit
 
-install_base_rpms
-install_ncep_rpms
+#install_base_rpms
+#install_ncep_rpms
 # install_ffmpeg
 
 # TODO: create an output file to contain all of this state info - json

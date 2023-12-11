@@ -11,6 +11,7 @@ ONEAPI_VER=2023.1.0
 # There is no oneapi mpi version 2023.1.0
 INTEL_VER=2021.9.0
 # MPI_VER=2021.9.0
+ESMF_VER=8.5.0
 
 #SPACK_VER='releases/v0.18'
 #SPACK_DIR='/save/environments/spack-stack/spack'
