@@ -234,8 +234,6 @@ install_spack-stack() {
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
-  #scl load gcc-toolset-11
-
   cd /save/environments
   git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
   cd spack-stack
@@ -265,7 +263,7 @@ install_spack() {
     return
   fi
 
-  mkdir -p $SPACK_DIR
+  sudo mkdir -p $SPACK_DIR
   chown ec2-user:ec2-user $SPACK_DIR
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
