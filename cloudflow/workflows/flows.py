@@ -162,8 +162,8 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         #pngtocloud.set_upstream(plots)
 
         # Copy the results to S3 (optionally. currently only saves LiveOcean)
-        storage_service = tasks.storage_init(provider)
-        cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+        #storage_service = tasks.storage_init(provider)
+        #cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
 
         #pngtocloud.set_upstream(plots)
 

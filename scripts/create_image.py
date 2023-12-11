@@ -29,7 +29,7 @@ def main():
     #print(f"DEBUG: snapshot_id: {snapshot_id}")
 
     image_id  = create_image_from_snapshot(snapshot_id, image_name)
-    # print(str(image_id))
+    print(str(image_id))
 
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):

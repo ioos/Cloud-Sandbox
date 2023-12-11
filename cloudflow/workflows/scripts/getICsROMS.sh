@@ -6,8 +6,8 @@ set -x
 
 
 . /usr/share/Modules/init/sh
+module use -a /usrx/modulefiles
 module load produtil
-# module load gcc
 
 if [ $# -ne 4 ] ; then
   echo "Usage: $0 YYYYMMDD HH cbofs|(other ROMS model) COMDIR"

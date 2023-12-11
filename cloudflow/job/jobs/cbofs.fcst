@@ -2,7 +2,7 @@
   "JOBTYPE"   : "romsforecast",
   "OFS"       : "cbofs",
   "CDATE"     : "today",
-  "HH"        : "06",
+  "HH"        : "00",
   "COMROT"    : "/com/ec2-user/nosofs",
   "PTMP"      : "/ptmp/ec2-user",
   "EXEC"      : "",
