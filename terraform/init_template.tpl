@@ -3,6 +3,7 @@ set -x
 
 echo `date` > /tmp/setup.log
 
+# RHEL8+
 RUNUSER="ec2-user"
 BRANCH=origin/debug-x86
 
