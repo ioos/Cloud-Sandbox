@@ -135,7 +135,7 @@ setup_paths () {
 #    sudo ln -s /mnt/efs/fs1/save /save
 #  fi
 
-  mkdir /save/$USER
+  # mkdir /save/$USER
   mkdir /com/$USER
   mkdir /ptmp/$USER
 

@@ -43,6 +43,9 @@ fi
 
 # Placing this in a common location
 cd /mnt/efs/fs1/save
+sudo mkdir $RUNUSER
+sudo chown $RUNUSER:$RUNUSER $RUNUSER
+cd $RUNUSER
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox
 sudo -u $RUNUSER git checkout -t $BRANCH
