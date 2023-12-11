@@ -264,7 +264,7 @@ install_spack() {
   fi
 
   sudo mkdir -p $SPACK_DIR
-  chown ec2-user:ec2-user $SPACK_DIR
+  sudo chown ec2-user:ec2-user $SPACK_DIR
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
   git checkout -q $SPACK_VER
