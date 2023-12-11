@@ -61,12 +61,10 @@ install_efa_driver
 install_python_modules_user
 install_gcc_toolset_yum
 
-exit
-
 source /opt/rh/gcc-toolset-11/enable
-which gcc
 
-install_spack
+exit
+# install_spack
 
 install_intel_oneapi_spack
 
