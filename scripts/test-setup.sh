@@ -64,15 +64,13 @@ module use -a /save/environments/modulefiles
 
 source /opt/rh/gcc-toolset-11/enable
 
-# install_spack
-
+#install_spack
 # install_intel_oneapi_spack
 
-install_esmf_spack
-exit
+#install_esmf_spack
 
 #install_base_rpms
-#install_ncep_rpms
+# install_ncep_rpms
 # install_ffmpeg
 
 # TODO: create an output file to contain all of this state info - json
@@ -91,6 +89,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-./create_image.sh $ami_name $project_tag
+#./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"

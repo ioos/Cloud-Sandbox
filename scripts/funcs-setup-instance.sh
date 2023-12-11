@@ -68,7 +68,7 @@ setup_environment () {
   /usr/bin/unzip -q awscliv2.zip
   sudo ./aws/install
   rm awscliv2.zip
-  rm -Rf "./aws"
+  sudo rm -Rf "./aws"
 
   sudo yum -y install environment-modules
 
@@ -92,6 +92,8 @@ setup_environment () {
   echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
 
   # sudo yum clean {option}
+  cd $home
+
 }
 
 
@@ -247,11 +249,7 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  # Gives an error
-  #source scl_source enable gcc-toolset-11
-  # scl load gcc-toolset-11
   source /opt/rh/gcc-toolset-11/enable
-  which gcc
 
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
@@ -397,19 +395,12 @@ install_intel_oneapi_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh 
 
-#  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
-#  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-#  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
-  # MPI
-  # Build with Intel Classic compilers
-   #spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER} $SPACKTARGET
-
-   # Build with Intel OneApi compilers
-   #spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
-
-
+  # MPI will be built with ESMF
   # MKL
 
   # MKL is not installing, a lot of build issues! frustrating!
@@ -417,18 +408,18 @@ install_intel_oneapi_spack () {
   # sudo yum -y install libxml2-devel
 
   # Build with Intel Classic compilers
-#  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
-#   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
+  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
+  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
 
-     # >> 1958    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.17-tw27f45fy4bot6t3an5drrrwdakaewtj/spack-src/lib/fseeko.c(109): error: #error directive: "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
+  # >> 1958    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.17-tw27f45fy4bot6t3an5drrrwdakaewtj/spack-src/lib/fseeko.c(109): error: #error directive: "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
 
-   # Build with Intel OneApi compilers
-#  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
-   #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
+  # Build with Intel OneApi compilers
+  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
+  #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
 
-   # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
-   # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
-   # 3278    WARNING: 'makeinfo' is missing on your system.
+  # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
+  # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
+  # 3278    WARNING: 'makeinfo' is missing on your system.
 
   # MKL fails with intel classic compiler
   # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
@@ -442,7 +433,10 @@ install_intel_oneapi_spack () {
 
 install_netcdf () {
 
+
   echo "Running ${FUNCNAME[0]} ..."
+  echo "Out of date ... returning"
+  return
 
   COMPILER=${COMPILER:-intel@${INTEL_VER}}
 
@@ -473,6 +467,8 @@ install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
   echo "Running ${FUNCNAME[0]} ..."
+  echo "Out of date ... returning"
+  return
 
   COMPILER=gcc@${GCC_VER}
 
@@ -888,41 +884,17 @@ install_esmf_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
-  COMPILER=intel@${INTEL_VER}
-
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # ^netcdf-c@4.8.0
-  # ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe
+  spack load intel-oneapi-compilers@${ONEAPI_VER}
 
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
-  #   ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
-
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
-  #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
-
-  # ==> Warning: Skipping build of bzip2-1.0.8-r3bsbokhomrm3rtsjksaxwa2j5ulb6ba since diffutils-3.9-dq7rdkugtepjanmcngfuzgycguuddxtn failed
-
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER} 
-  #spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
-  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
-  spack install $SPACKOPTS esmf@${ESMF_VER}%intel@${INTEL_VER}  ^intel-oneapi-mpi@${INTEL_VER}%intel@${INTEL_VER} $SPACKTARGET
-
-  # >> 112    cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
-  # >> 113    make: *** [Makefile:64: test] Error 127
-
-  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 $SPACKTARGET
-  # spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} $SPACKTARGET
-  # HDF5 also needs szip lib
-  #spack install $SPACKOPTS libszip%${COMPILER}
-  # spack install $SPACKOPTS libszip%${COMPILER} $SPACKTARGET
+  COMPILER=intel@${INTEL_VER}
+  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
   COMPILER=oneapi@${ONEAPI_VER}
-
-  # This is the same - MPI_VER == INTEL_VER they are != ONEAPI_VER
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }
@@ -956,7 +928,7 @@ install_base_rpms () {
   #'
 
 
-  sudo yum install python2
+  sudo yum -y install python2
   sudo alternatives --set python /usr/bin/python2
   rpmlist='
     produtil-1.0.18-2.el7.x86_64.rpm
