@@ -152,7 +152,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
 
-        # Copy the results to /com (liveocean)
+        # Copy the results to /com (liveocean does not run in ptmp currently)
         cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
 
         # Copy the results to S3 (optionally)
@@ -168,7 +168,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         #pngtocloud.set_upstream(plots)
 
         # If the fcst fails, then set the whole flow to fail
-        fcstflow.set_reference_tasks([fcst_run, cp2com])
+        fcstflow.set_reference_tasks([fcst_run])
 
     return fcstflow
 
