@@ -14,8 +14,7 @@
 # Example:  
 # allowed_ssh_cidr_list =  ["72.200.162.64/32", "96.238.4.28/32", "96.238.4.30/32"]
 
-allowed_ssh_cidr_list =  ["72.200.162.64/32", "96.238.4.28/32", "96.238.4.30/32"]
-
+allowed_ssh_cidr_list =  ["", "", ""]
 
 # Specify the SSL key below.
 
@@ -50,7 +49,7 @@ subnet_cidr = "10.0.0.0/24"
 # name_tag = "IOOS-Cloud-Sandbox"
 # availability_zone = "us-east-2b"
 # project_tag = "IOOS-Cloud-Sandbox"
-# instance_type = "t3.medium"
+# instance_type = "t3.xlarge"
 # use_efa = false 
 
 # You can give your AWS resources a unique name to avoid conflicts
