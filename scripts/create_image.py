@@ -102,14 +102,15 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
   # Wait for snapshot to be created 
   # wait_until will throw an exception after 10 minutes
   maxtries=5
-  tries=0
-  while tries < maxtries:
+  tries=1
+  while tries <= maxtries:
     try:
       snapshot.wait_until_completed()
       break
     except Exception as e:
-      print("Exception: " + str(e))
+      print("WARNING: " + str(e))
       tries += 1
+      print(f"tries {tries} of {maxtries}")
       if tries == maxtries:
         print("ERROR: maxtries reached. something went wrong")
         traceback.print_stack()
