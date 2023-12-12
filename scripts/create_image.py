@@ -24,7 +24,8 @@ def main():
 
     #print (f"DEBUG: instance_id: {instance_id}, image_name: {image_name}, project_tag: {project_tag}")
 
-    
+
+    print("Creating a snapshot of current root volume ...")
     snapshot_id = create_snapshot(instance_id, image_name, project_tag)
     if snapshot_id == None:
       print("ERROR: could not create snapshot")
@@ -32,8 +33,9 @@ def main():
 
     print(f"snapshot_id: {snapshot_id}")
 
+    print("Creating AMI from snapshot ...")
     image_id  = create_image_from_snapshot(snapshot_id, image_name)
-    print(str(image_id))
+    print("image_id: ", str(image_id))
 
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):

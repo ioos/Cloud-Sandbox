@@ -30,6 +30,5 @@ echo "Node image_name: $image_name"
 
 # Flush the disk cache
 sudo sync
-image_id=`python3 create_image.py $instance_id "$image_name" "$project_tag"`
-echo "Node image_id: $image_id"
+python3 create_image.py $instance_id "$image_name" "$project_tag"
 
