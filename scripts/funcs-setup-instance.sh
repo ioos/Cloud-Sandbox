@@ -104,6 +104,7 @@ setup_paths () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
+  set -x
   home=$PWD
 
   if [ ! -d /mnt/efs/fs1 ]; then
@@ -139,6 +140,7 @@ setup_paths () {
   mkdir /com/$USER
   mkdir /ptmp/$USER
 
+  set +x
   cd $home
 }
 
