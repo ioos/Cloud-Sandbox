@@ -910,6 +910,11 @@ install_base_rpms () {
 
   home=$PWD
 
+  . /usr/share/Modules/init/bash
+
+  # Only do this once
+  echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
+
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
   libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
@@ -921,14 +926,6 @@ install_base_rpms () {
   wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
   tar -xf $libstar
   rm $libstar
- 
-  #rpmlist='
-  #  hdf5-1.10.5-4.el7.x86_64.rpm
-  #  netcdf-4.5-3.el7.x86_64.rpm
-  #  produtil-1.0.18-2.el7.x86_64.rpm
-  #  esmf-8.0.0-1.el7.x86_64.rpm
-  #'
-
 
   sudo yum -y install python2
   sudo alternatives --set python /usr/bin/python2
