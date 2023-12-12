@@ -160,67 +160,6 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 ### AMI Options
 ### Specify aws_ami.*****.id in aws_instance section below
 
-########################
-# CentOS 7 CentOS AMI
-# ami-033adaf0b583374d4
-########################
-
-data "aws_ami" "centos_7" {
-  owners = ["125523088429"]   # CentOS.org
-  most_recent = true
-
-  filter {
-    name = "name"
-    values = ["CentOS Linux 7 *"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
-
-########################
-# CentOS 7 AMI by AWS - EOL
-# 2023-04-17 us-east-2 id
-# ami-05a36e1502605b4aa
-########################
-
-data "aws_ami" "centos_7_aws" {
-  owners = ["679593333241"]   # AWS Marketplace
-  most_recent = true
-
-  filter {
-    name = "description"
-    values = ["CentOS-7*"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
 
 ###################################
 # RHEL 8
@@ -304,18 +243,11 @@ resource "aws_eip" "head_node" {
 # efa enabled node
 resource "aws_instance" "head_node" {
 
-  # Base CentOS 7 AMI, can use either AWS's marketplace, or direct from CentOS
-  # Choosing direct from CentOS as it is more recent
-
   #################################
   ### Specify which AMI to use here
-  ### Only CentOS 7 has been thoroughly tested
   #############################################
 
   ami = data.aws_ami.rhel_8.id
-  # ami = data.aws_ami.centos_stream_8.id
-  # ami = data.aws_ami.centos_7.id
-  # ami = data.aws_ami.centos_7_aws.id
 
   metadata_options {
      http_endpoint = "enabled"
@@ -328,7 +260,7 @@ resource "aws_instance" "head_node" {
   root_block_device {
     encrypted             = true
     delete_on_termination = true
-    volume_size           = 24
+    volume_size           = 16
     volume_type           = "gp3"
     tags                  = {
         Name    = "${var.name_tag} Head Node"
@@ -373,18 +305,6 @@ resource "random_pet" "ami_id" {
   length = 2
 }
 
-#data "template_file" "init_instance" {
-#  template = file("./init_template.tpl")
-#  vars = {
-#    efs_name = aws_efs_file_system.main_efs.dns_name
-#    ami_name = "${var.name_tag}-${random_pet.ami_id.id}"
-#    aws_region = var.preferred_region
-#    project = var.project_tag
-#  }
-
-#depends_on = [aws_efs_file_system.main_efs,
-#              aws_efs_mount_target.mount_target_main_efs]
-#}
 
 # Can only attach efa adaptor to a stopped instance!
 resource "aws_network_interface" "head_node" {

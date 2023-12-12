@@ -5,6 +5,7 @@
 
 
 . /usr/share/Modules/init/sh
+module use -a /usrx/modulefiles
 module load produtil
 module load gcc
 

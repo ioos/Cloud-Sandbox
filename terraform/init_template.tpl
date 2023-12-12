@@ -3,7 +3,9 @@ set -x
 
 echo `date` > /tmp/setup.log
 
+# RHEL8+
 RUNUSER="ec2-user"
+BRANCH=origin/debug-x86
 
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
@@ -42,9 +44,12 @@ fi
 
 # Placing this in a common location
 cd /mnt/efs/fs1/save
+sudo mkdir $RUNUSER
+sudo chown $RUNUSER:$RUNUSER $RUNUSER
+cd $RUNUSER
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox
-sudo -u $RUNUSER git checkout -t origin/x86_64
+sudo -u $RUNUSER git checkout -t $BRANCH
 cd scripts
 
 # Need to pass ami_name
