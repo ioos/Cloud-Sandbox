@@ -894,8 +894,9 @@ install_esmf_spack () {
   COMPILER=intel@${INTEL_VER}
   spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
-  COMPILER=oneapi@${ONEAPI_VER}
-  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
+  # Install fails with the following probably because mpi isn't installed with oneapi build
+  #COMPILER=oneapi@${ONEAPI_VER}
+  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }
