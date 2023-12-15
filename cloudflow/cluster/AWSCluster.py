@@ -345,7 +345,8 @@ class AWSCluster(Cluster):
         hosts = []
 
         for instance in self.__instances:
-            hosts.append(instance.private_dns_name)
+            # hosts.append(instance.private_dns_name)
+            hosts.append(instance.private_ip_address)
         return hosts
 
 
