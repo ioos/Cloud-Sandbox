@@ -365,7 +365,7 @@ class AWSCluster(Cluster):
         cnt = 0
         for instance in self.__instances:
             cnt += 1
-            hostname = instance.private_dns_name
+            hostname = instance.private_ip_address
             # no comma on last host
             if cnt == instcnt:
                 hosts += hostname
