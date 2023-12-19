@@ -31,3 +31,5 @@ terraform/SAVE.mysettings.tfvars
 dev.tfvars
 my.tfvars
 my.plan
+build/
+cloudflow/build/

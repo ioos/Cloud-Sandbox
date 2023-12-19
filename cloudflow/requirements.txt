@@ -8,3 +8,5 @@ dask
 distributed
 Pillow
 boto3
+cartopy
+xarray

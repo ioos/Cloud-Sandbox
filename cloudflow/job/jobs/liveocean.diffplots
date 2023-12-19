@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "liveocean",
+  "CDATE"     : "20170601",
+  "HH"        : "00",
+  "INDIR"     : "/com/ec2-user/LO_roms/cas6_traps2_x2b/f2017.06.01",
+  "OUTDIR"    : "/save/ec2-user/LO_plots",
+  "VERIFDIR"  : "/com/ec2-user/apogee/f2017.06.01",
+  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/plots",
+  "FSPEC"     : "ocean_his_*.nc"
+}

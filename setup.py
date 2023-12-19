@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 # setup cloud-workflow package
 setup(name="cloudflow",
-    version='1.3.2',
+    version='1.6.0b',
     description='Workflows for cloud based numerical weather prediction',
     url='https://github.com/asascience/Cloud-Sandbox',
     author='RPS North America',
@@ -33,6 +33,6 @@ setup(name="cloudflow",
         'matplotlib',
         'netCDF4',
         'numpy',
-        'pyproj==2.6',
+        'pyproj',
         'plotting']
      )
