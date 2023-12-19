@@ -1127,16 +1127,86 @@ setup_ssh_mpi () {
   sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/id_rsa
   sudo -u $USER cat /home/$USER/.ssh/id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 
-# This - assumes we are using 10.0.x.x subnet addresses
+# Prevent SSH prompts when using a local/private address
 
 echo "
-Host ip-10-0-* 
-   CheckHostIP no 
-   StrictHostKeyChecking no 
 
-Host 10.0.* 
+Host 127.0.0.1
    CheckHostIP no 
    StrictHostKeyChecking no
+
+Host 10.* 
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 192.168.* 
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.16.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.17.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.18.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.19.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.20.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.21.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.22.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.23.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.24.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.25.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.26.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.27.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.28.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.29.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.30.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.31.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
 " | sudo tee -a /etc/ssh/ssh_config
 
   cd $home
