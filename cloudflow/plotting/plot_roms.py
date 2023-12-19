@@ -274,12 +274,12 @@ if __name__ == '__main__':
 
     target = '/save/ec2-user'
 
-    FHR="25"
+    FHR="07"
     myfcst='/com/ec2-user/LO_roms/cas6_traps2_x2b/f2017.06.01'
-    ncfile = f'{myfcst}/ocean_his_00${FHR}.nc'
+    ncfile = f'{myfcst}/ocean_his_00{FHR}.nc'
 
     otherfcst='/com/ec2-user/apogee/f2017.06.01'
-    ncfile_noaa = f'{otherfcst}/ocean_his_00${FHR}.nc'
+    ncfile_noaa = f'{otherfcst}/ocean_his_00{FHR}.nc'
 
     if not os.path.exists(target):
         os.makedirs(target)
