@@ -47,8 +47,9 @@ resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
   role = aws_iam_role.sandbox_iam_role.name
 }
 
+
 resource "aws_placement_group" "cloud_sandbox_placement_group" {
-  name     = "${var.nameprefix}_Terraform_Placement_Group"
+  name     = "${var.nameprefix}-${var.availability_zone}_Terraform_Placement_Group"
   strategy = "cluster"
   tags = {
     project = var.project_tag
