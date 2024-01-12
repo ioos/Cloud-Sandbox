@@ -15,7 +15,7 @@ provider "aws" {
 }
 
 resource "aws_iam_role" "sandbox_iam_role" {
-  name = "${var.nameprefix}_terraform_role"
+  name = "${var.nameprefix}-${var.availability_zone}_terraform_role"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -43,7 +43,7 @@ resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
 }
 
 resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
-  name = "${var.nameprefix}_terraform_role"
+  name = "${var.nameprefix}-${var.availability_zone}_terraform_instance_profile"
   role = aws_iam_role.sandbox_iam_role.name
 }
 
