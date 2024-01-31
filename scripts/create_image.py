@@ -6,7 +6,7 @@ import traceback
 import boto3
 from botocore.exceptions import ClientError
 
-DEBUG=False
+DEBUG=True
 
 def main():
 
@@ -22,9 +22,20 @@ def main():
       print(f"Usage: {sys.argv[0]} <instance_id> <image_name> <project_tag>")
       sys.exit(1)
 
+    #print (f"DEBUG: instance_id: {instance_id}, image_name: {image_name}, project_tag: {project_tag}")
+
+
+    print("Creating a snapshot of current root volume ...")
     snapshot_id = create_snapshot(instance_id, image_name, project_tag)
-    image_id = create_image_from_snapshot(snapshot_id, image_name)
-    print(str(image_id))
+    if snapshot_id == None:
+      print("ERROR: could not create snapshot")
+      sys.exit(1)
+
+    print(f"snapshot_id: {snapshot_id}")
+
+    print("Creating AMI from snapshot ...")
+    image_id  = create_image_from_snapshot(snapshot_id, image_name)
+    print("image_id: ", str(image_id))
 
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
@@ -32,7 +43,7 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
 
   # print(f"create_snapshot: instance_id: {instance_id}, name_tag: {name_tag}, project_tag: {project_tag}")
 
-  ec2 = boto3.client('ec2')
+  ec2 = boto3.client('ec2', region_name='us-east-2')
 
   description = f"Created by IOOS Cloud Sandbox for AMI"
   try: 
@@ -51,12 +62,12 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
               ]
           }
       ],
-      DryRun=False,
-      CopyTagsFromSource='volume'
+      DryRun=False
+      # CopyTagsFromSource='volume'
     )
   except Exception as e:
-    # print(str(e))
-    if DEBUG: traceback.print_stack()
+    print(str(e))
+    traceback.print_stack()
     return None
 
   snapshot_id = response['Snapshots'][0]['SnapshotId']
@@ -90,18 +101,19 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
 
   # Wait for snapshot to be created 
   # wait_until will throw an exception after 10 minutes
-  maxtries=2
-  tries=0
-  while tries < maxtries:
+  maxtries=5
+  tries=1
+  while tries <= maxtries:
     try:
       snapshot.wait_until_completed()
       break
     except Exception as e:
-      #print("Exception: " + str(e))
+      print("WARNING: " + str(e))
       tries += 1
+      print(f"tries {tries} of {maxtries}")
       if tries == maxtries:
-        # print("ERROR: maxtries reached. something went wrong")
-        if DEBUG: traceback.print_stack()
+        print("ERROR: maxtries reached. something went wrong")
+        traceback.print_stack()
         return None
   
  

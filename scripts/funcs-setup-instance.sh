@@ -3,9 +3,9 @@
 # -1 = Don't check pre-built binary cache
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
-  SPACKOPTS="$SPACKOPS --cache-only"
+  SPACKOPTS="$SPACKOPTS --cache-only"
 elif [ $SPACK_CACHEONLY -eq -1 ]; then
-  SPACKOPTS="$SPACKOPS --no-cache"
+  SPACKOPTS="$SPACKOPTS --no-cache"
 fi
 
 # This script will setup the required system components, libraries
@@ -15,8 +15,9 @@ fi
 #__license__ = "BSD 3-Clause"
 
 
-
 setup_environment () {
+
+# This has been tested on RHEL8 
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -25,11 +26,16 @@ setup_environment () {
   # By default, centos 7 does not install the docs (man pages) for packages, remove that setting here
   sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
 
+  # Get rid of subscription manager messages
+  sudo subscription-manager config --rhsm.manage_repos=0
+  sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
+
+  sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
   # yum update might update the kernel. 
   # This might cause some of the other installs to fail, e.g. efa driver 
-
   #sudo yum -y update
-  sudo yum -y install epel-release
+
   sudo yum -y install tcsh
   sudo yum -y install ksh
   sudo yum -y install wget
@@ -42,16 +48,29 @@ setup_environment () {
   sudo yum -y install bzip2-devel
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
-  sudo yum -y install environment-modules
-  sudo yum -y install python3-devel
+  sudo yum -y install subversion
+
+  sudo yum -y install python3.11-devel
+  sudo alternatives --set python3 /usr/bin/python3.11
+  sudo yum -y install python3.11-pip
   sudo yum -y install jq
 
-  cliver="2.2.10"
+  # Additional packages for spack-stack
+  #sudo yum -y install git-lfs
+  #sudo yum -y install bash-completion
+  #sudo yum -y install xorg-x11-xauth
+  #sudo yum -y install xterm
+  #sudo yum -y install texlive
+  #sudo yum -y install mysql-server
+
+  cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
   /usr/bin/unzip -q awscliv2.zip
   sudo ./aws/install
   rm awscliv2.zip
-  rm -Rf "./aws"
+  sudo rm -Rf "./aws"
+
+  sudo yum -y install environment-modules
 
   # Only do this once
   grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
@@ -62,12 +81,22 @@ setup_environment () {
   fi
 
   # Only do this once
-  if [ ! -d /usrx/modulefiles ] ; then
-    sudo mkdir -p /usrx/modulefiles
-    echo /usrx/modulefiles | sudo tee -a ${MODULESHOME}/init/.modulespath
+  if [ ! -d /save/environments/modulefiles ] ; then
+    sudo mkdir -p /save/environments/modulefiles
+    echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
+    echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
     echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
     echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+    echo "module use -a /usrx/modulefiles" >> ~/.bashrc
+    . ~/.bashrc
   fi
+
+  # Add unlimited stack size 
+  echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
+
+  # sudo yum clean {option}
+  cd $home
+
 }
 
 
@@ -75,6 +104,7 @@ setup_paths () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
+  set -x
   home=$PWD
 
   if [ ! -d /mnt/efs/fs1 ]; then
@@ -83,23 +113,34 @@ setup_paths () {
   fi
 
   cd /mnt/efs/fs1
+
   if [ ! -d ptmp ] ; then
     sudo mkdir ptmp
-    sudo mkdir com
-    sudo mkdir save
-
     sudo chgrp wheel ptmp
     sudo chmod 777 ptmp
-    sudo chgrp wheel com
-    sudo chmod 777 com
-    sudo chgrp wheel save
-    sudo chmod 777 save
+    sudo ln -s /mnt/efs/fs1/ptmp /ptmp
   fi
 
-  sudo ln -s /mnt/efs/fs1/ptmp /ptmp
-  sudo ln -s /mnt/efs/fs1/com  /com
-  sudo ln -s /mnt/efs/fs1/save /save
+  if [ ! -d com ] ; then
+    sudo mkdir com
+    sudo chgrp wheel com
+    sudo chmod 777 com
+    sudo ln -s /mnt/efs/fs1/com  /com
+  fi
 
+# Not sure why it keeps creating an extra sym link
+#  if [ ! -d save ] ; then
+#    sudo mkdir save
+#    sudo chgrp wheel save
+#    sudo chmod 777 save
+#    sudo ln -s /mnt/efs/fs1/save /save
+#  fi
+
+  # mkdir /save/$USER
+  mkdir /com/$USER
+  mkdir /ptmp/$USER
+
+  set +x
   cd $home
 }
 
@@ -121,33 +162,10 @@ install_efa_driver() {
 
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
 
-# Note this error:
-# No package kernel-devel-3.10.0-1062.12.1.el7.x86_64 available.
-# Error: Not tolerating missing names on install, stopping.
-# Error: Failed to install packages.
-# 
-# ==============================================================================
-# The kernel header of the current kernel version cannot be installed and is required
-# to build the EFA kernel module. Please install the kernel header package for your
-# distribution manually or build the EFA kernel driver manually and re-run the installer
-# with --skip-kmod.
-# ==============================================================================
-#
-# The kernel version might have been updated since last reboot, if so, reboot the machine, and rerun this step.
-# To see the current running kernel:
-# uname -a
-#
-# Available kernels are visible at /usr/lib/modules
-#
-# The AWS centos 7 is still at version 1062 and has to be updated and rebooted before this will work
-# since the standard yum registry only has the current 1160 kernel-devel package
-# 3.10.0-1160.24.1.el7.x86_64
-
   home=$PWD
 
   version=latest
-  #version=1.11.2 (April 20, 2021)
-  #version=1.8.3
+  # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
@@ -167,8 +185,6 @@ install_efa_driver() {
 
   # Default version is needed to build the kernel driver
   # If gcc has already been upgraded, this will likely fail
-  # Should uninstall newer one and install the default 4.8
-  # sudo yum -y install gcc
 
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
@@ -193,13 +209,52 @@ install_efa_driver() {
 
 #-----------------------------------------------------------------------------#
 
-install_spack() {
+install_gcc_toolset_yum() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  sudo yum -y install gcc-toolset-11-gcc-c++
+  sudo yum -y install gcc-toolset-11-gcc-gfortran
+  sudo yum -y install gcc-toolset-11-gdb
+ 
+  # scl enable gcc-toolset-11 bash - Not inside a script
+  # source scl_source enable gcc-toolset-11
+  # source /opt/rh/gcc-toolset-11/enable 
+  cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_spack-stack() {
 
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
   SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-  #SPACK_MIRROR='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror'
+  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
+
+  cd /save/environments
+  git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
+  cd spack-stack
+  source setup.sh
+
+  # To be continued ....
+
+}
+
+#-----------------------------------------------------------------------------#
+
+install_spack() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
+  source /opt/rh/gcc-toolset-11/enable
+
+  SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
   SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
   SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
@@ -210,7 +265,8 @@ install_spack() {
     return
   fi
 
-  mkdir -p $SPACK_DIR
+  sudo mkdir -p $SPACK_DIR
+  sudo chown ec2-user:ec2-user $SPACK_DIR
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
   git checkout -q $SPACK_VER
@@ -219,25 +275,33 @@ install_spack() {
 
   # Location for overriding default configurations
   sudo mkdir /etc/spack
+  sudo chown ec2-user:ec2-user /etc/spack
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # TODO: Rebuild everything using this, and push to mirror
   # spack config add "config:install_tree:padded_length:128"
+  spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
 
   spack buildcache keys --install --trust --force
-  spack buildcache update-index -d $SPACK_MIRROR
+  spack buildcache update-index $SPACK_MIRROR
+
+  spack compiler find --scope system
+
+  # Note to recreate modulefiles
+  # spack module tcl refresh -y
 
   cd $home
 }
 
+
 #-----------------------------------------------------------------------------#
 
-install_gcc () {
+install_gcc_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -248,7 +312,7 @@ install_gcc () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # TODO: Rebuild all using x86_64
-  spack install $SPACKOPTS gcc@$GCC_VER
+  spack install $SPACKOPTS --no-checksum gcc@$GCC_VER ^ncurses@6.4 $SPACKTARGET
 
   spack compiler add `spack location -i gcc@$GCC_VER`/bin
 
@@ -262,20 +326,107 @@ install_gcc () {
 
 #-----------------------------------------------------------------------------#
 
-install_intel_oneapi () {
+install_intel_oneapi-spack-stack () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  cd $SPACK_DIR
+  source setup.sh
+  SPACK_ENV=ioos-aws-rhel
+
+  cd $SPACK_ENV 
+  spack env activate -p .
+  spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/${INTEL_VER}/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/${INTEL_VER}/linux/bin
+
+  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
+  spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
+
+  cd $home
+}
+
+#-----------------------------------------------------------------------------#
+
+install_intel_oneapi_yum () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+tee > /tmp/oneAPI.repo << EOF
+[oneAPI]
+name=Intel® oneAPI repository
+baseurl=https://yum.repos.intel.com/oneapi
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+EOF
+
+sudo mv /tmp/oneAPI.repo /etc/yum.repos.d
+
+sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+
+# sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-2023.1.0.x86_64
+# sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+# sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+# sudo yum -y install --installroot /apps intel-hpckit-2023.1.0.x86_64
+
+sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+
+mkdir /save/environments/modulefiles
+
+cd /opt/intel/oneapi/
+./modulefiles-setup.sh --ignore-latest --output-dir=/mnt/efs/fs1/save/environments/modulefiles
+module use -a /save/environments/modulefiles
+
+cd $home
+
+}
+
+#-----------------------------------------------------------------------------#
+
+install_intel_oneapi_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh 
-  spack install $SPACKOPTS intel-oneapi-compilers@${INTEL_VER}
+
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
-  spack install $SPACKOPTS intel-oneapi-mpi@${INTEL_VER} %intel@${INTEL_VER}
-  spack install $SPACKOPTS intel-oneapi-mkl@${INTEL_VER} %intel@${INTEL_VER}
+  # MPI will be built with ESMF
+  # MKL
+
+  # MKL is not installing, a lot of build issues! frustrating!
+  # sudo yum -y install libxml2
+  # sudo yum -y install libxml2-devel
+
+  # Build with Intel Classic compilers
+  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
+  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
+
+  # >> 1958    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.17-tw27f45fy4bot6t3an5drrrwdakaewtj/spack-src/lib/fseeko.c(109): error: #error directive: "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
+
+  # Build with Intel OneApi compilers
+  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
+  #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
+
+  # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
+  # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
+  # 3278    WARNING: 'makeinfo' is missing on your system.
+
+  # MKL fails with intel classic compiler
+  # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
+  # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 
   cd $home
 }
@@ -285,7 +436,10 @@ install_intel_oneapi () {
 
 install_netcdf () {
 
+
   echo "Running ${FUNCNAME[0]} ..."
+  echo "Out of date ... returning"
+  return
 
   COMPILER=${COMPILER:-intel@${INTEL_VER}}
 
@@ -316,6 +470,8 @@ install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
   echo "Running ${FUNCNAME[0]} ..."
+  echo "Out of date ... returning"
+  return
 
   COMPILER=gcc@${GCC_VER}
 
@@ -452,7 +608,7 @@ install_slurm () {
 
   spack load intel-oneapi-mpi@${INTEL_VER}%${COMPILER}
 
-  #spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
+ #spack install $SPACKOPTS --no-checksum slurm@${SLURM_VER}+hwloc+pmix sysconfdir=/etc/slurm ^tar@1.34%gcc@${GCC_VER}  \
   # hwloc build is failing, netloc_mpi_find_hosts.c:116: undefined reference to `MPI_Send' etc.
      #^"$MUNGEDEP" localstatedir='/var' ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER}
 
@@ -725,29 +881,24 @@ install_slurm-s3() {
 
 #-----------------------------------------------------------------------------#
 
-install_esmf () {
+install_esmf_spack () {
+
+  # Install esmf along with esmf dependencies such as netcdf and hdf5
 
   echo "Running ${FUNCNAME[0]} ..."
-
-  COMPILER=intel@${INTEL_VER}
 
   home=$PWD
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # ^netcdf-c@4.8.0
-  # ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe
+  spack load intel-oneapi-compilers@${ONEAPI_VER}
 
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 \
-  #   ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe ^netcdf-c@4.8.0 %${COMPILER}
+  COMPILER=intel@${INTEL_VER}
+  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
-  # spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 \
-  #    ^hdf5/qfvg7gc ^netcdf-c/yynmjgt
-
-  spack install $SPACKOPTS esmf%${COMPILER} ^intel-oneapi-mpi@${INTEL_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
-
-  # HDF5 also needs szip lib
-  spack install $SPACKOPTS libszip%${COMPILER}
+  # Install fails with the following probably because mpi isn't installed with oneapi build
+  #COMPILER=oneapi@${ONEAPI_VER}
+  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }
@@ -761,6 +912,11 @@ install_base_rpms () {
 
   home=$PWD
 
+  . /usr/share/Modules/init/bash
+
+  # Only do this once
+  echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
+
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0
   libstar=base_rpms.gcc.6.5.0.el7.20200716.tgz
 
@@ -772,31 +928,26 @@ install_base_rpms () {
   wget -nv https://ioos-cloud-sandbox.s3.amazonaws.com/public/libs/$libstar
   tar -xf $libstar
   rm $libstar
- 
-  #rpmlist='
-  #  hdf5-1.10.5-4.el7.x86_64.rpm
-  #  netcdf-4.5-3.el7.x86_64.rpm
-  #  produtil-1.0.18-2.el7.x86_64.rpm
-  #  esmf-8.0.0-1.el7.x86_64.rpm
-  #'
 
+  sudo yum -y install python2
+  sudo alternatives --set python /usr/bin/python2
   rpmlist='
     produtil-1.0.18-2.el7.x86_64.rpm
   '
 
   for file in $rpmlist
   do
-    sudo yum -y install $file
+    sudo rpm -ivh $file --nodeps
   done
 
-  rm -Rf "$wrkdir"
+  # rm -Rf "$wrkdir"
 
   cd $home
 }
 
 #-----------------------------------------------------------------------------#
 
-install_extra_rpms () {
+install_ncep_rpms () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -835,15 +986,10 @@ install_extra_rpms () {
     sudo yum -y localinstall $file
   done
 
-  # Force install newer libpng leaving the existing one intact
-  # this one will be used for our model builds via the module
-  #sudo rpm -v --install --force libpng-1.5.30-2.el7.x86_64.rpm  
-  # refuses to upgrade #  sudo yum -y localinstall  libpng-1.5.30-2.el7.x86_64.rpm  
-  # sudo yum -y downgrade  libpng-1.5.30-2.el7.x86_64.rpm  # WORKS - use spack instead
-
   # rm -Rf "$wrkdir"
 
-  sudo yum -y install jasper-devel
+  #sudo yum -y install jasper-devel
+  sudo yum -y install jasper-libs
 
   cd $home
 }
@@ -856,26 +1002,30 @@ install_python_modules_user () {
 
   home=$PWD
 
-  sudo python3 -m pip install --upgrade pip
-  python3 -m pip install --user --upgrade wheel
-  python3 -m pip install --user --upgrade dask
-  python3 -m pip install --user --upgrade distributed
-  python3 -m pip install --user --upgrade setuptools_rust  # needed for paramiko
-  python3 -m pip install --user --upgrade paramiko   # needed for dask-ssh
-  python3 -m pip install --user --upgrade prefect
+  #python3 -m venv /save/$USER/csvenv
+  #source /save/$USER/csvenv/bin/activate
+
+  python3 -m pip install pip install prefect==0.15.13
+  python3 -m pip install --upgrade pip
+  python3 -m pip install --upgrade wheel
+  python3 -m pip install --upgrade dask
+  python3 -m pip install --upgrade distributed
+  python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
+  python3 -m pip install --upgrade paramiko   # needed for dask-ssh
 
   # SPACK has problems with botocore newer than below
-  python3 -m pip install --user --upgrade botocore==1.23.46
+  python3 -m pip install --upgrade botocore==1.23.46
   # This is the most recent boto3 that is compatible with botocore above
-  python3 -m pip install --user --upgrade boto3==1.20.46
+  python3 -m pip install --upgrade boto3==1.20.46
 
   # Install requirements for plotting module
-  cd ../..
+  cd ../cloudflow
   python3 -m pip install --user -r requirements.txt
 
+  # install plotting module
   python3 setup.py sdist
 
-
+  # deactivate
   cd $home 
 }
 
@@ -974,30 +1124,90 @@ setup_ssh_mpi () {
   home=$PWD
 
   # MPI needs key to ssh into cluster nodes
-  sudo -u centos ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/centos/.ssh/id_rsa
-  sudo -u centos cat /home/centos/.ssh/id_rsa.pub >> /home/centos/.ssh/authorized_keys
+  sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/id_rsa
+  sudo -u $USER cat /home/$USER/.ssh/id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 
-# This - assumes we are using 10.0.x.x subnet addresses
+# Prevent SSH prompts when using a local/private address
 
 echo "
-Host ip-10-0-* 
-   CheckHostIP no 
-   StrictHostKeyChecking no 
 
-Host 10.0.* 
+Host 127.0.0.1
    CheckHostIP no 
    StrictHostKeyChecking no
-" | sudo tee -a /etc/ssh/ssh_config
 
-#  cat >> /etc/ssh/ssh_config <<EOL
-#Host ip-10-0-* 
-#   CheckHostIP no 
-#   StrictHostKeyChecking no 
-#
-#Host 10.0.* 
-#   CheckHostIP no 
-#   StrictHostKeyChecking no
-#EOL
+Host 10.* 
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 192.168.* 
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.16.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.17.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.18.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.19.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.20.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.21.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.22.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.23.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.24.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.25.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.26.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.27.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.28.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.29.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.30.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host 172.31.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+" | sudo tee -a /etc/ssh/ssh_config
 
   cd $home
 }
@@ -1079,9 +1289,9 @@ setup_aliases () {
   echo alias lst ls -altr >> ~/.tcshrc
   echo alias h history >> ~/.tcshrc
 
-  echo alias cds cd /save >> ~/.tcshrc
-  echo alias cdc cd /com >> ~/.tcshrc
-  echo alias cdpt cd /ptmp >> ~/.tcshrc
+  echo alias cds cd /save/$USER >> ~/.tcshrc
+  echo alias cdc cd /com/$USER >> ~/.tcshrc
+  echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
 
   #echo alias cdns cd /noscrub >> ~/.tcshrc
 

@@ -152,7 +152,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
 
-        # Copy the results to /com (liveocean)
+        # Copy the results to /com (liveocean does not run in ptmp currently)
         cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
 
         # Copy the results to S3 (optionally)
@@ -162,13 +162,13 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         #pngtocloud.set_upstream(plots)
 
         # Copy the results to S3 (optionally. currently only saves LiveOcean)
-        # storage_service = tasks.storage_init(provider)
-        # cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+        #storage_service = tasks.storage_init(provider)
+        #cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
 
         #pngtocloud.set_upstream(plots)
 
         # If the fcst fails, then set the whole flow to fail
-        fcstflow.set_reference_tasks([fcst_run, cp2com])
+        fcstflow.set_reference_tasks([fcst_run])
 
     return fcstflow
 
@@ -277,10 +277,11 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
 
         # Push the env, install required libs on post machine
         # TODO: install all of the 3rd party dependencies on AMI
-        pushPy = ctasks.push_pyEnv(postmach, upstream_tasks=[pmStarted])
+        #pushPy = ctasks.push_pyEnv(postmach, upstream_tasks=[pmStarted])
 
         # Start a dask scheduler on the new post machine
-        daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pushPy])
+        #daskclient: Client = ctasks.start_dask(postmach, upstream_tasks=[pushPy])
+        daskclient: Client = ctasks.start_dask(postmach)
 
         # Get list of files from job specified directory
         FILES = jtasks.ncfiles_from_Job(plotjob)
@@ -290,24 +291,27 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         plots = jtasks.daskmake_diff_plots(daskclient, FILES, BASELINE, plotjob)
         plots.set_upstream([daskclient, getbaseline])
 
-        storage_service = tasks.storage_init(provider)
+        # storage_service = tasks.storage_init(provider)
         #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.png'], public=True)
         #pngtocloud.set_upstream(plots)
 
         # Make movies
-        mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, diff=True, upstream_tasks=[plots])
-        mp4tocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.mp4'], public=True)
-        mp4tocloud.set_upstream(mpegs)
+        #mpegs = jtasks.daskmake_mpegs(daskclient, plotjob, diff=True, upstream_tasks=[plots])
+        #mp4tocloud = tasks.save_to_cloud(plotjob, storage_service, ['*diff.mp4'], public=True)
+        #mp4tocloud.set_upstream(mpegs)
 
-        closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[mpegs])
-        pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
+        # closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[mpegs])
+        # pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[mpegs, closedask])
+
+        closedask = ctasks.dask_client_close(daskclient, upstream_tasks=[plots])
+        pmTerminated = ctasks.cluster_terminate(postmach, upstream_tasks=[plots, closedask])
 
         #######################################################################
         # This will add Kenny's script
         # https://ioos-cloud-sandbox.s3.amazonaws.com/cloudflow/inject/kenny/cloud_sandbot.py
         #notebook = 'cloudflow/inject/kenny/cloud_sandbot.py'
-        notebook = 'cloudflow/inject/patrick/sandbot_current_fcst.py'
-        injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
+        #notebook = 'cloudflow/inject/patrick/sandbot_current_fcst.py'
+        #injected = tasks.fetchpy_and_run(plotjob, storage_service, notebook)
 
     return diff_plotflow
 

@@ -19,5 +19,8 @@ setup(name="plotting",
           'netCDF4',
           'dask',
           'distributed',
-          'Pillow']
-      )
+          'Pillow',
+          'boto3',
+          'cartopy',
+          'xarray']
+)

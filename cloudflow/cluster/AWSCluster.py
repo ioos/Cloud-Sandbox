@@ -33,6 +33,8 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)
 
+efatypes=['c5', 'hpc' ]
+
 # To avoid duplicate entries, only have one handler
 # This log might have a handler in one of their higher level scripts
 # This didn't work - still got duplicates, even when also added in main caller
@@ -345,7 +347,8 @@ class AWSCluster(Cluster):
         hosts = []
 
         for instance in self.__instances:
-            hosts.append(instance.private_dns_name)
+            # hosts.append(instance.private_dns_name)
+            hosts.append(instance.private_ip_address)
         return hosts
 
 
@@ -364,7 +367,7 @@ class AWSCluster(Cluster):
         cnt = 0
         for instance in self.__instances:
             cnt += 1
-            hostname = instance.private_dns_name
+            hostname = instance.private_ip_address
             # no comma on last host
             if cnt == instcnt:
                 hosts += hostname
@@ -375,11 +378,14 @@ class AWSCluster(Cluster):
 
 
     def __placementGroup(self):
-        """ This is a bit of a hack to satisfy AWS. Only c5 and c5n type of instances support placement group """
+        """ This is a bit of a hack to satisfy AWS. Only some instances support placement group """
 
         group = {}
-        if self.nodeType.startswith('c5'):
+
+
+        if self.nodeType.startswith(tuple(efatypes)):
             group = {'GroupName': self.placement_group}
+
 
         return group
 
@@ -393,16 +399,17 @@ class AWSCluster(Cluster):
             Also attaches security groups """
 
         interface = {
-            'AssociatePublicIpAddress': True,
+            'AssociatePublicIpAddress': False,
             'DeleteOnTermination': True,
-            'Description': 'Network adaptor via boto3 api',
+            'Description': 'Network adaptor via cloudflow boto3 api',
             'DeviceIndex': 0,
             'Groups': self.sg_ids,
             'SubnetId': self.subnet_id
         }
 
         # if self.nodeType == 'c5n.18xlarge':
-        if self.nodeType in nodeInfo.efaTypes:
+
+        if self.nodeType.startswith(tuple(efatypes)):
             interface['InterfaceType'] = 'efa'
 
         return interface

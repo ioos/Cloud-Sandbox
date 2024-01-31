@@ -1,3 +1,5 @@
 Add the clear display/output of the following for cloudflow cluster config files:
 Eventually this should be automated - abstracted away from the user view.
 
+change security group to allow multiple ssh cidrs
+

@@ -266,25 +266,26 @@ def plot_diff(ncfile1: str, ncfile2: str, target: str, varname: str,
 
 
 if __name__ == '__main__':
-    # source = 'figs/temp/his_arg_temp_%04d.png'
-    # target = 'figs/test_temp.mp4'
-    # png_ffmpeg(source, target)
+
     var = 'temp'
-    target = '/com/nos/plots/tbofs.20200310'
+    # alkalinity
+    # salt
+    # oxygen
 
-    ncfile = '/com/nos/tbofs.20200310/nos.tbofs.fields.f048.20200310.t00z.nc'
-    ncfile_noaa = '/com/nos-noaa/tbofs.20200310/nos.tbofs.fields.f048.20200310.t00z.nc'
+    target = '/save/ec2-user'
 
-    #ncfile = '/com/nos/tbofs.20200310/nos.tbofs.fields.f001.20200310.t00z.nc'
-    #ncfile_noaa = '/com/nos-noaa/tbofs.20200310/nos.tbofs.fields.f001.20200310.t00z.nc'
+    FHR="07"
+    myfcst='/com/ec2-user/LO_roms/cas6_traps2_x2b/f2017.06.01'
+    ncfile = f'{myfcst}/ocean_his_00{FHR}.nc'
+
+    otherfcst='/com/ec2-user/apogee/f2017.06.01'
+    ncfile_noaa = f'{otherfcst}/ocean_his_00{FHR}.nc'
 
     if not os.path.exists(target):
         os.makedirs(target)
 
-    # ncfile='/com/liveocean/f2020.02.13/ocean_his_0001.nc'
-    # target='/com/liveocean/plots/f2020.02.13'
     # plot_roms(ncfile, target, var, True, 8)
-    #plot(ncfile, target, var)
+    # plot(ncfile, target, var)
 
     plot_diff(ncfile_noaa, ncfile, target, var, vmin=-0.5, vmax=0.5)
 

@@ -158,7 +158,7 @@ class ROMSForecast(Job):
 
         if self.OCNINTMPL == "auto":
             self.OCNINTMPL = f"{self.TEMPLPATH}/{self.OFS}.ocean.in"
-    
+  
         return
 
 
