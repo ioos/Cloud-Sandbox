@@ -5,7 +5,8 @@ echo `date` > /tmp/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
-BRANCH=origin/x86_64
+#BRANCH=origin/x86_64
+BRANCH=origin/main
 
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
