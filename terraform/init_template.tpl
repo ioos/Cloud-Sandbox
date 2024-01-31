@@ -5,11 +5,11 @@ echo `date` > /tmp/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
-#BRANCH=origin/x86_64
-BRANCH=main
 
 # CentOS 7 - Stream 8
-#RUNUSER="centos"
+# RUNUSER="centos"
+
+BRANCH=v2.0.0b
 
 # Mount the EFS volume
 
@@ -50,7 +50,7 @@ sudo chown $RUNUSER:$RUNUSER $RUNUSER
 cd $RUNUSER
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox
-sudo -u $RUNUSER git checkout -t $BRANCH
+sudo -u $RUNUSER git checkout $BRANCH
 cd scripts
 
 # Need to pass ami_name
