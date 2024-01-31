@@ -5,10 +5,12 @@ echo `date` > /tmp/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
+BRANCH=v2.0.0b
 
 # CentOS 7 - Stream 8
 # RUNUSER="centos"
 
+# Using tag for release
 BRANCH=v2.0.0b
 
 # Mount the EFS volume
