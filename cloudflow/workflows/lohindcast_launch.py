@@ -27,6 +27,7 @@ fcstconf = f'{curdir}/../cluster/configs/liveocean.ioos'
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
 sshuser = 'mlalime@apogee.ocean.washington.edu'
+#sshuser = 'ptripp@apogee.ocean.washington.edu'
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
