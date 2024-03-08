@@ -369,6 +369,61 @@ def forecast_run(cluster: Cluster, job: Job):
 
 #######################################################################
 
+# cluster, job
+@task
+def hindcast_run_multi(cluster: Cluster, job: Job):
+    """ Run the hindcast
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+    PPN = cluster.getCoresPN()
+
+    # Easier to read
+    SDATE = job.SDATE
+    EDATE = job.EDATE
+    HH = job.HH
+    OFS = job.OFS
+    NPROCS = job.NPROCS
+    OUTDIR = job.OUTDIR
+
+    runscript = f"{curdir}/fcst_launcher.sh"
+
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('In driver: execption retrieving list of hostnames:' + str(e))
+        raise signals.FAIL()
+
+    job.CDATE = SDATE
+
+    while job.CDATE <= EDATE:
+
+        # Create ocean in file
+        print(f'In hindcast_run_multi: CDATE {job.CDATE} about to make_oceanin')
+        job.make_oceanin()
+
+        try:
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
+                                    stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'Forecast failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        job.CDATE = util.ndate(job.CDATE, 1)
+        print(f'in hindcast run multi: job.CDATE: {job.CDATE}')
+
+
+
 @task
 def run_pynotebook(pyfile: str):
     """ Wraps the execution of a python3 script

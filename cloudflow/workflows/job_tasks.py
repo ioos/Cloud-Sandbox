@@ -176,7 +176,7 @@ def get_baseline(job: Job, sshuser=None):
 
 
 @task
-def get_forcing(job: Job, sshuser=None):
+def get_forcing_multi(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
 
     Parameters
@@ -188,6 +188,54 @@ def get_forcing(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
+    sdate = job.SDATE
+    edate = job.EDATE
+
+    ofs = job.OFS
+    comrot = job.COMROT
+    hh = job.HH
+
+    comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
+
+    if ofs == 'liveocean':
+
+        # /mnt/efs/fs1/com/ec2-user/LO_output/forcing/cas7
+        #frcdir = job.COMROT + '/liveocean'
+        # TODO: hardcode for now, fix it later
+        # TODO: hardcode for now, fix it later
+        # TODO: hardcode for now, fix it later
+        frcdir = job.COMROT + '/LO_output/forcing/cas7'
+
+        cdate = sdate
+        while cdate <= edate:
+
+            try:
+                # TODO: hardcodde for now, parameterize later
+                util.get_ICs_lo_cas7_hindcast(cdate, frcdir, sshuser)
+            except Exception as e:
+                log.exception('Problem encountered with downloading forcing data ...')
+                raise signals.FAIL()
+
+            cdate = util.ndate(cdate, 1)
+
+    else:
+        log.error("Unsupported forecast: ", ofs)
+        raise signals.FAIL()
+
+    return
+
+@task
+def get_forcing(job: Job, sshuser=None):
+    """ Retrieve operational moddel forcing data and initial conditions
+
+    Parameters
+    ----------
+    job : Job
+        The Job object.
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server. Required for LiveOcean.
+    """
 
     cdate = job.CDATE
     ofs = job.OFS
