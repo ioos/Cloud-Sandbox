@@ -11,7 +11,7 @@ body:
 - type: input
   id: username
   attributes:
-    label: Sandbox User Name
+    label: User's Name
     description: "First and Last name of user "
   validations:
     required: true
