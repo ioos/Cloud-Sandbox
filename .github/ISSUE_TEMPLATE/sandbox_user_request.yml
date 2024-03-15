@@ -49,6 +49,19 @@ body:
 - type: markdown
   attributes:
     value: "## Please provide some additional model details to help us determine resources needs."
+- type: dropdown
+    id: base_model
+    attributes:
+      label: Ocean Model Component
+      description: Which ocean model component does your model use?
+      options:
+        - ROMS
+        - SCHISM
+        - FVCOM
+        - ADCIRC
+      default: 0
+    validations:
+      required: true
 - type: input
   id: model_size
   attributes:
