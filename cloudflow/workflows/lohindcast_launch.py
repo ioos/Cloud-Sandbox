@@ -22,6 +22,7 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
+#fcstconf = f'{curdir}/../cluster/configs/liveocean.rps'
 fcstconf = f'{curdir}/../cluster/configs/liveocean.config'
 
 # This is used for obtaining liveocean forcing data
