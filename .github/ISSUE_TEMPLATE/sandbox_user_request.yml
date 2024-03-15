@@ -1,5 +1,5 @@
 name: New IOOS Coastal Sandbox User Request
-description: Enter a new model/user request for access to the IOOS Costal Sandbox
+description: Enter a new model/user request for access to the IOOS Coastal Sandbox
 title: "Request for Sandbox access for: [ENTER NAME]"
 body:
 - type: markdown
@@ -46,17 +46,41 @@ body:
     description: "Please describe any collaborative efforts the sandbox will help you achieve"
   validations:
     required: true
+- type: markdown
+  attributes:
+    value: "## Please provide some additional model details to help us determine resources needs."
 - type: input
   id: model_size
   attributes:
-    label: Your Model's Size
-    description: "Please provide your model's size (nodes/elements)"
+    label: Your Model's Run Requirements/Size
+    description: "Please provide your model's run requirements (nodes/cores/elements)"
   validations:
     required: true
 - type: input
   id: model_resolution
   attributes:
     label: Your Model's Resolution
-    description: "Please provide your model's resolution"
+    description: "Your model's resolution"
+  validations:
+    required: true
+- type: input
+  id: model_output_size
+  attributes:
+    label: Your Model's Output File Size
+    description: "Your model's output file size"
+  validations:
+    required: true
+- type: input
+  id: model_runtime
+  attributes:
+    label: Your Model's Runtime
+    description: "Your model's time to complete a typical run"
+  validations:
+    required: true
+- type: input
+  id: model_forcing
+  attributes:
+    label: Your Model's Forcing
+    description: "Your model's forcing files"
   validations:
     required: true
