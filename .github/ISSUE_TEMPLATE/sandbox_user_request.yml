@@ -50,7 +50,7 @@ body:
   attributes:
     value: "## Please provide some additional model details to help us determine resources needs."
 - type: dropdown
-    id: model_component
+  id: model_component
     attributes:
       label: Which ocean model component does your model use?
       options:
