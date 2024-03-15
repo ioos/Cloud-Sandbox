@@ -1,0 +1,62 @@
+name: New IOOS Coastal Sandbox User Request
+description: Enter a new model/user request for access to the IOOS Costal Sandbox
+title: "Request for Sandbox access for: [ENTER NAME]"
+body:
+- type: markdown
+  attributes:
+    value: "## User Request for IOOS Coastal Sandbox Access"
+- type: markdown
+  attributes:
+    value: Please add the name, email, and organization for the user requesting access
+- type: input
+  id: username
+  attributes:
+    label: Sandbox User Name
+    description: "First and Last name of user "
+  validations:
+    required: true
+- type: input
+  id: useremail
+  attributes:
+    label: User's Email
+    description: "Sandbox user's email address "
+  validations:
+    required: true
+- type: input
+  id: partnerorg
+  attributes:
+    label: The new user's organization
+    description: "Sandbox user's organization "
+  validations:
+    required: true
+- type: markdown
+  attributes:
+    value: "## Please provide a brief description of your project and what you would like to accomplish in the Coastal Sandbox"
+- type: input
+  id: project_desc
+  attributes:
+    label: Sandbox Project Description
+    description: "Brief description of your project "
+  validations:
+    required: true
+- type: input
+  id: collabortive_desc
+  attributes:
+    label: Sandbox Project Collaborations
+    description: "Please describe any collaborative efforts the sandbox will help you achieve"
+  validations:
+    required: true
+- type: input
+  id: model_size
+  attributes:
+    label: Your Model's Size
+    description: "Please provide your model's size (nodes/elements)"
+  validations:
+    required: true
+- type: input
+  id: model_resolution
+  attributes:
+    label: Your Model's Resolution
+    description: "Please provide your model's resolution"
+  validations:
+    required: true
