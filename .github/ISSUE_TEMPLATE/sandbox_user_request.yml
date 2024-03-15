@@ -39,7 +39,7 @@ body:
     description: "Brief description of your project "
   validations:
     required: true
-- type: input
+- type: textarea
   id: collabortive_desc
   attributes:
     label: Sandbox Project Collaborations
@@ -59,28 +59,35 @@ body:
 - type: input
   id: model_resolution
   attributes:
-    label: Your Model's Resolution
-    description: "Your model's resolution"
+    label: Your Model's Spatial Resolution / Grid size (longitude/latitude or miles/km)
+    description: "Your model's spatial resolution"
   validations:
     required: true
 - type: input
   id: model_output_size
   attributes:
     label: Your Model's Output File Size
-    description: "Your model's output file size"
+    description: "Your model's output file size (MB, GB, etc.)"
   validations:
     required: true
 - type: input
   id: model_runtime
   attributes:
     label: Your Model's Runtime
-    description: "Your model's time to complete a typical run"
+    description: "Your model's time to complete a typical run (Hours)"
   validations:
     required: true
 - type: input
-  id: model_forcing
+  id: model_forcing_1
   attributes:
-    label: Your Model's Forcing
-    description: "Your model's forcing files"
+    label: Your Model's Forcing Files
+    description: "Model forcing file"
   validations:
     required: true
+- type: input
+  id: model_forcing_2
+  attributes:
+    label: Your Model's Forcing Files (additional)
+    description: "Model forcing file (additional)"
+  validations:
+    required: false
