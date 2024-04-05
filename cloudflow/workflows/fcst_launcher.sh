@@ -5,6 +5,7 @@
 WRKDIR=/save/$USER
 
 set -xa
+set -a
 ulimit -c unlimited
 ulimit -s unlimited
 

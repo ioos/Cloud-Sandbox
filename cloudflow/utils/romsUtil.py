@@ -322,6 +322,41 @@ def get_baseline_lo(cdate, vdir, sshuser):
 
     return
 
+def get_ICs_lo_cas7_hindcast(cdate, localpath, sshuser):
+    """ Get the atmospheric forcing and boundary layer conditions and ICs
+        for LiveOcean ROMS model.
+
+        This requires an account on the remote server with private key authentication.
+    """
+
+    # Not using Parker's restart, but our own from previous day
+    #restart_file = "ocean_his_0025.nc"
+    #remotepath_rst = "/data1/parker/LiveOcean_roms/output/cas6_v3_lo8b"
+
+    remotepath = "/dat1/parker/LO_output/forcing/cas7"
+
+    fdate = lo_date(cdate)
+    prevdate = ndate(cdate, -1)
+    fprevdate = lo_date(prevdate)
+
+    forceroot = localpath
+    forcedir = f"{localpath}/{fdate}"
+
+    if not os.path.exists(forcedir):
+        os.makedirs(forcedir)
+    else:
+        # TODO: check if empty
+        print(f"Forcing directory {forcedir} already exists .... not downloading.")
+        print(f"Remove the {forcedir} directory to force the download.")
+        return
+
+    # Get the forcing
+    scpdir = f"{sshuser}:{remotepath}/{fdate}"
+
+    # TODO: add exception handing, check return value from scp
+    subprocess.run(["scp", "-rp", scpdir, forceroot], stderr=subprocess.STDOUT)
+
+
 
 def get_ICs_lo(cdate, localpath, sshuser):
 
