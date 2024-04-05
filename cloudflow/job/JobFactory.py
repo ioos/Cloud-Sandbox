@@ -2,6 +2,7 @@ import json
 
 from cloudflow.job.Job import Job
 from cloudflow.job.ROMSForecast import ROMSForecast
+from cloudflow.job.ROMSHindcast import ROMSHindcast
 from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
@@ -44,6 +45,8 @@ class JobFactory:
 
         if jobtype == 'romsforecast':
             newjob = ROMSForecast(configfile, NPROCS)
+        if jobtype == 'romshindcast':
+            newjob = ROMSHindcast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
         elif jobtype == 'adcircforecast':

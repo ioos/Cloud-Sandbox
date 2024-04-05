@@ -109,6 +109,75 @@ def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
 
     return fcstflow
 
+######################################################################
+
+def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow: 
+
+    """ Provides a Prefect Flow for a hindcast workflow.
+
+    Parameters
+    ----------
+    hcstconf : str
+        The JSON configuration file for the Cluster to create
+
+    hcstjobfile : str
+        The JSON configuration file for the hindcast Job
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server.
+
+    Returns
+    -------
+    hindcastflow : prefect.Flow
+    """
+
+    with Flow('hindcast workflow') as hcstflow:
+        #####################################################################
+        # HINDCAST
+        #####################################################################
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(hcstconf)
+
+        # Setup the job and create the ocean.in
+        hcstjob = tasks.job_init(cluster, hcstjobfile)
+
+        # Get forcing data
+        forcing = jtasks.get_forcing_multi(hcstjob, sshuser)
+
+        # Start the cluster
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+
+
+        # Run the forecast
+        # This will run in a loop to complete all forecasts 
+        hcst_run = tasks.hindcast_run_multi(cluster, hcstjob, upstream_tasks=[cluster_start])
+
+
+        # Terminate the cluster nodes
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])
+
+        # Copy the results to /com (liveocean does not run in ptmp currently)
+        #cp2com = jtasks.ptmp2com(hcstjob, upstream_tasks=[hcst_run])
+
+        # Copy the results to S3 (optionally)
+        #cp2s3 = jtasks.cp2s3(hcstjob, upstream_tasks=[hcst_run])
+        #storage_service = tasks.storage_init(provider)
+        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
+        #pngtocloud.set_upstream(plots)
+
+        # Copy the results to S3 (optionally. currently only saves LiveOcean)
+        #storage_service = tasks.storage_init(provider)
+        #cp2cloud = tasks.save_history(hcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+
+        #pngtocloud.set_upstream(plots)
+
+        # If the hcst fails, then set the whole flow to fail
+        hcstflow.set_reference_tasks([hcst_run])
+
+    return hcstflow
+
+######################################################################
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.

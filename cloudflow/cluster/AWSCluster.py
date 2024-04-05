@@ -233,10 +233,6 @@ class AWSCluster(Cluster):
                 ],
                 Placement=self.__placementGroup(),
                 NetworkInterfaces=[self.__netInterface()]
-                #CpuOptions={
-                #    'CoreCount': self.PPN,
-                #    'ThreadsPerCore': 1
-                #}
               )
             else:
               self.__instances = ec2.create_instances(
