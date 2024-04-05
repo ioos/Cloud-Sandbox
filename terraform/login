@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
+terraform output | grep login_command | awk -F= '{print $2}' | awk -F\" '{print $2}'
+
 $(terraform output | grep login_command | awk -F= '{print $2}' | awk -F\" '{print $2}')

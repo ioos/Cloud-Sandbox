@@ -43,7 +43,6 @@ if [ ! -d save ] ; then
   sudo ln -s /mnt/efs/fs1/save /save
 fi
 
-# Placing this in a common location
 cd /mnt/efs/fs1/save
 sudo mkdir $RUNUSER
 sudo chown $RUNUSER:$RUNUSER $RUNUSER
@@ -58,9 +57,9 @@ export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
 # Install all of the software and drivers
-sudo -E -u $RUNUSER ./setup-instance.sh >> /tmp/setup.log 2>&1
+sudo -E -u $RUNUSER ./setup-instance.sh >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 
-echo "Installation completed!" >> /tmp/setup.log
-echo `date` >> /tmp/setup.log
+echo "Installation completed!" >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log
+echo `date` >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log
