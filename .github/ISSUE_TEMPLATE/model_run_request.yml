@@ -130,7 +130,7 @@ body:
     value: "## ------------------------------------"
 - type: markdown
   attributes:
-    value: "## 4. Test commands and procedures
+    value: "## 4. Test commands and procedures"
 - type: textarea
   id: model_tests
   attributes:
