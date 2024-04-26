@@ -16,7 +16,7 @@ body:
 - type: dropdown
   id: model_framework
   attributes:
-    label: Select a Model Framework:
+    label: Select a Model Framework
     options:
         - ROMS
         - SCHISM
