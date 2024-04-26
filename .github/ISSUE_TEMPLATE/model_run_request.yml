@@ -1,0 +1,132 @@
+name: Coastal Sandbox Model Run Request
+description: Make a model run request, providing configuration details. 
+title: "Request model run in the Coastal Sandbox: [Enter a Run ID]"
+body:
+- type: input
+  id: run_ID
+  attributes:
+    label: Model Run ID
+    description: "Select a unique model run ID"
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: Name of the Model
+    description: "Model"
+- type: dropdown
+  id: model_framework
+  attributes:
+    label: Select a Model Framework:
+    options:
+        - ROMS
+        - SCHISM
+        - FVCOM
+        - ADCIRC
+  validations:
+     required: true
+- type: input
+  id: username
+  attributes:
+    label: User's Name
+    description: "User's Name"
+  validations:
+    required: true
+- type: input
+  id: useremail
+  attributes:
+    label: User's Email
+    description: "User's Email Address "
+  validations:
+    required: true
+- type: input
+  id: partnerorg
+  attributes:
+    label: The new user's organization
+    description: "User's Organization "
+  validations:
+    required: true
+- type: markdown
+  attributes:
+    value: "## Please provide a description of the model run"
+- type: textarea
+  id: project_desc
+  attributes:
+    label: Model Run Description
+    description: "Description of this model run "
+  validations:
+    required: true
+- type: markdown
+  attributes:
+    value: "## Please provide all of the model details in each section below."
+- type: input
+  id: model_nodes
+  attributes:
+    label: Number of Nodes
+    description: "Number of Nodes"
+  validations:
+    required: true
+- type: input
+  id: model_cores
+  attributes:
+    label: Number of Cores
+    description: "Number of Cores"
+  validations:
+    required: true
+- type: input
+  id: model_resolution
+  attributes:
+    label: Your Model's Spatial Resolution / Grid size (longitude/latitude or miles/km)
+    description: "Your model's spatial resolution"
+  validations:
+    required: true
+- type: input
+  id: model_output_size
+  attributes:
+    label: Your Model's Output File Size
+    description: "Your model's output file size (MB, GB, etc.)"
+  validations:
+    required: true
+--------
+- type: markdown
+  attributes:
+    value: "## 1. Explicit packages and modules, including specific version numbers"
+- type: textarea
+  id: model_packages
+  attributes:
+    label: Your Model's Packages and Version Numbers for Each
+    description: "List all of the packages and versions for each "
+  validations:
+    required: true
+--------
+- type: markdown
+  attributes:
+    value: "## 2. Explicit compile instructions, with exact commands"
+- type: textarea
+  id: model_compile_instruct
+  attributes:
+    label: List all compile instructions with exact commands
+    description: "List all compile instructions with exact commands"
+  validations:
+    required: true
+--------
+- type: markdown
+  attributes:
+    value: "## 3. Explicit Data with locations, paths, and file size estimates"
+- type: textarea
+  id: model_data
+  attributes:
+    label: List all data, file locations, paths, and sizes
+    description: "List all data, file locations, paths, and sizes"
+  validations:
+    required: true
+--------
+- type: markdown
+  attributes:
+    value: "## 4. Test commands and procedures
+- type: textarea
+  id: model_tests
+  attributes:
+    label: List the test commands and procedures to follow
+    description: "List all test commands and procedures"
+  validations:
+    required: true
