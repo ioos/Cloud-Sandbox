@@ -86,7 +86,9 @@ body:
     description: "Your model's output file size (MB, GB, etc.)"
   validations:
     required: true
---------
+- type: markdown
+  attributes:
+    value: "## ------------------------------------"
 - type: markdown
   attributes:
     value: "## 1. Explicit packages and modules, including specific version numbers"
@@ -97,7 +99,9 @@ body:
     description: "List all of the packages and versions for each "
   validations:
     required: true
---------
+- type: markdown
+  attributes:
+    value: "## ------------------------------------"
 - type: markdown
   attributes:
     value: "## 2. Explicit compile instructions, with exact commands"
@@ -108,7 +112,9 @@ body:
     description: "List all compile instructions with exact commands"
   validations:
     required: true
---------
+- type: markdown
+  attributes:
+    value: "## ------------------------------------"
 - type: markdown
   attributes:
     value: "## 3. Explicit Data with locations, paths, and file size estimates"
@@ -119,7 +125,9 @@ body:
     description: "List all data, file locations, paths, and sizes"
   validations:
     required: true
---------
+- type: markdown
+  attributes:
+    value: "## ------------------------------------"
 - type: markdown
   attributes:
     value: "## 4. Test commands and procedures
