@@ -102,6 +102,12 @@ def makeOceanin(NPROCS, settings, template, outfile, ratio=1.0):
 
 #####################################################################
 
+def makeADCIRCin(settings, template, outfile):
+    sedoceanin(template, outfile, settings)
+    return
+
+#####################################################################
+
 
 
 def ndays(cdate1, cdate2):
