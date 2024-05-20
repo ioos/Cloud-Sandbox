@@ -18,26 +18,21 @@ ESMF_VER=8.5.0
 
 SPACK_VER='v0.21.0'
 SPACK_DIR='/save/environments/spack'
-#sudo mkdir -p $SPACK_DIR
-#sudo chown ec2-user:ec2-user $SPACK_DIR
 
 SPACKOPTS='-v -y'
 
-# SPACKTARGET is only used for some model libraries such as MPI, 
 #SPACKTARGET='target=skylake_avx512'        # default on skylake intel instances t3.xxxx
 #export SPACKTARGET='target=haswell'        # works on AMD also - has no avx512 extensions
 #SPACKTARGET='target=x86_64'                 # works on anything
 SPACKTARGET="arch=linux-rhel8-x86_64"
 
-
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-SPACK_CACHEONLY=0
-
+#SPACK_CACHEONLY=1
+SPACK_CACHEONLY=-1
 
 ##########################################################
-
 
 # source include the functions 
 . funcs-setup-instance.sh
@@ -65,12 +60,14 @@ module use -a /save/environments/modulefiles
 source /opt/rh/gcc-toolset-11/enable
 
 #install_spack
-# install_intel_oneapi_spack
+#install_intel_oneapi_spack
+install_esmf_spack
 
-#install_esmf_spack
+exit
 
-#install_base_rpms
-# install_ncep_rpms
+install_base_rpms
+install_ncep_rpms
+
 # install_ffmpeg
 
 # TODO: create an output file to contain all of this state info - json
@@ -89,6 +86,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-#./create_image.sh $ami_name $project_tag
+./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"

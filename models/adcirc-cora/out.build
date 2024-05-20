@@ -1,0 +1,510 @@
+/save/ec2-user/Cloud-Sandbox/models/adcirc-cora
+Loading intel_x86_64
+  Loading requirement: intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3 intel-oneapi-mpi/2021.9.0-intel-2021.9.0-egjrbfg
+    zlib-ng/2.1.4-intel-2021.9.0-57ptxrw libszip/2.1.1-intel-2021.9.0-s3p3pgl pkgconf/1.9.5-intel-2021.9.0-yzqxmv6 hdf5/1.14.3-intel-2021.9.0-4xskthb
+    bzip2/1.0.8-intel-2021.9.0-jky2iw7 lz4/1.9.4-intel-2021.9.0-a7shfis snappy/1.1.10-intel-2021.9.0-67s3jwz zstd/1.5.5-intel-2021.9.0-x3khtnn
+    c-blosc/1.21.5-intel-2021.9.0-ltu7tzq netcdf-c/4.9.2-intel-2021.9.0-vznmeik netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
+-- The C compiler identification is Intel 2021.9.0.20230302
+-- The CXX compiler identification is Intel 2021.9.0.20230302
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /save/environments/spack/opt/spack/linux-rhel8-x86_64/gcc-11.2.1/intel-oneapi-compilers-2023.1.0-3a7dxu3ma4q7dr664wmomttuqnzl7nud/compiler/2023.1.0/linux/bin/intel64/icc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /save/environments/spack/opt/spack/linux-rhel8-x86_64/gcc-11.2.1/intel-oneapi-compilers-2023.1.0-3a7dxu3ma4q7dr664wmomttuqnzl7nud/compiler/2023.1.0/linux/bin/intel64/icc - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The Fortran compiler identification is Intel 2021.9.0.20230302
+-- Detecting Fortran compiler ABI info
+-- Detecting Fortran compiler ABI info - done
+-- Check for working Fortran compiler: /save/environments/spack/opt/spack/linux-rhel8-x86_64/gcc-11.2.1/intel-oneapi-compilers-2023.1.0-3a7dxu3ma4q7dr664wmomttuqnzl7nud/compiler/2023.1.0/linux/bin/intel64/ifort - skipped
+-- System Architecture Detected: x86_64
+-- Found MPI_C: /save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/intel-oneapi-mpi-2021.9.0-egjrbfgil6gjzqlkz265edcecbx7q2c5/lib/libmpifort.so (found version "3.1") 
+-- Found MPI_CXX: /save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/intel-oneapi-mpi-2021.9.0-egjrbfgil6gjzqlkz265edcecbx7q2c5/lib/libmpicxx.so (found version "3.1") 
+-- Found MPI_Fortran: /save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/intel-oneapi-mpi-2021.9.0-egjrbfgil6gjzqlkz265edcecbx7q2c5/lib/libmpifort.so (found version "3.1") 
+-- Found MPI: TRUE (found version "3.1")  
+-- Unlimited stack size detected. No heap array flag added.
+-- Found NetCDF: /save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel/lib/libnetcdff.so;/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel/lib/libnetcdf.so  
+-- Configuring done (24.0s)
+-- Generating done (2.0s)
+-- Build files have been written to: /save/ec2-user/adcirc/build
+[  1%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/coarsen.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  2%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/fm.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  2%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/initpart.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/initpart.c(199): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, &queue, &touched, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/initpart.c(337): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, &queue, &touched, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/initpart.c(417): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, &perm, LTERM);
+           ^
+
+[  3%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/match.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  4%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/ccgraph.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  4%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/memory.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/memory.c(89): warning #167: argument of type "EDegreeType **" is incompatible with parameter of type "void **"
+    GKfree(&ctrl->wspace.edegrees, &ctrl->wspace.vedegrees, &ctrl->wspace.core, &ctrl->wspace.pmat, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/memory.c(205): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->npwgts, LTERM);
+           ^
+
+[  5%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/pmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/pmetis.c(138): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/pmetis.c(157): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&lgraph.gdata, &lgraph.label, LTERM);
+             ^
+
+[  6%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/pqueue.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/pqueue.c(110): warning #167: argument of type "ListNodeType **" is incompatible with parameter of type "void **"
+        GKfree(&queue->nodes, &queue->buckets, LTERM);
+               ^
+
+[  6%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/refine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  7%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/util.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  8%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/timing.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  8%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/debug.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  9%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/bucketsort.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[  9%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/graph.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/graph.c(445): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&touched, &queue, &cptr, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/graph.c(544): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&touched, &queue, &cptr, LTERM);
+           ^
+
+[ 10%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/stat.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/stat.c(123): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&kpwgts, &padjncy, &padjwgt, &padjcut, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/stat.c(227): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&kpwgts, &padjncy, &padjwgt, &padjcut, LTERM);
+           ^
+
+[ 11%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kmetis.c(124): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, LTERM);
+           ^
+
+[ 11%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kwayrefine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayrefine.c(74): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&graph->gdata, LTERM);  /* Deallocate the graph related arrays */
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayrefine.c(106): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&graph->vwgt, &graph->adjwgt, LTERM);
+             ^
+
+[ 12%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kwayfm.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 13%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/balance.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 13%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/ometis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(138): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+        GKfree(&cptr, &cind, LTERM);
+               ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(170): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&piperm, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(184): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&cptr, &cind, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(303): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(309): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&rgraph.gdata, &rgraph.rdata, &rgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(315): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&lgraph.gdata, &lgraph.rdata, &lgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(360): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&cptr, &cind, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(363): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(369): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+        GKfree(&sgraphs[i].gdata, &sgraphs[i].label, LTERM);
+               ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(413): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+        GKfree(&graph->rdata, LTERM);
+               ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/ometis.c(447): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+        GKfree(&cgraph->rdata, LTERM);
+               ^
+
+[ 14%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/srefine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 15%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/sfm.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 15%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/separator.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/separator.c(40): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->rdata, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/separator.c(146): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&bxadj, &badjncy, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/separator.c(261): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&bxadj, &badjncy, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/separator.c(270): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->rdata, LTERM);
+           ^
+
+[ 16%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mincover.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mincover.c(118): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&mate, &flag, &level, &queue, &lst, LTERM);
+           ^
+
+[ 17%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mmd.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 17%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mesh.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 18%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/meshpart.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/meshpart.c(101): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&xadj, &adjncy, &pwgts, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/meshpart.c(202): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&xadj, &adjncy, &pwgts, &nptr, &nind, LTERM);
+           ^
+
+[ 18%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/frename.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 19%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/fortran.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 20%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/myqsort.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 20%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/compress.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/compress.c(151): warning #167: argument of type "KeyValueType **" is incompatible with parameter of type "void **"
+    GKfree(&keys, &map, &mark, LTERM);
+           ^
+
+[ 21%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/parmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(143): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+        GKfree(&cptr, &cind, LTERM);
+               ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(176): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&cptr, &cind, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(204): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&graph->gdata, &graph->rdata, &graph->label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(239): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(245): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&rgraph.gdata, &rgraph.rdata, &rgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(251): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&lgraph.gdata, &lgraph.rdata, &lgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(307): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph.gdata, &graph.rdata, &graph.label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/parmetis.c(366): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph.gdata, &graph.rdata, &graph.label, LTERM);
+           ^
+
+[ 22%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/estmem.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/estmem.c(102): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&cmap, &match, &perm, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/estmem.c(152): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&htable, LTERM);
+           ^
+
+[ 22%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mpmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(125): warning #167: argument of type "float **" is incompatible with parameter of type "void **"
+    GKfree(&myubvec, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(228): warning #167: argument of type "float **" is incompatible with parameter of type "void **"
+    GKfree(&myubvec, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(268): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->npwgts, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(278): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&lgraph.gdata, &lgraph.nvwgt, &lgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(341): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->npwgts, &graph->label, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(351): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&lgraph.gdata, &lgraph.nvwgt, &lgraph.label, LTERM);
+             ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mpmetis.c(354): warning #167: argument of type "float **" is incompatible with parameter of type "void **"
+    GKfree(&lubvec, &rubvec, LTERM);
+           ^
+
+[ 23%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mcoarsen.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 24%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mmatch.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 24%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/minitpart.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/minitpart.c(97): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/minitpart.c(166): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, &perm, LTERM);
+           ^
+
+[ 25%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mbalance.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 26%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mrefine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 26%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mutil.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 27%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mfm.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 28%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mkmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/mkmetis.c(118): warning #167: argument of type "float **" is incompatible with parameter of type "void **"
+    GKfree(&graph->nvwgt, &graph->npwgts, &graph->gdata, &graph->rdata, LTERM);
+           ^
+
+[ 28%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mkwayrefine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 29%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mkwayfmh.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 29%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mrefine2.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 30%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/minitpart2.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/minitpart2.c(95): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/minitpart2.c(143): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&bestwhere, LTERM);
+           ^
+
+[ 31%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mbalance2.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 31%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/mfm2.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 32%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kvmetis.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kvmetis.c(125): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&graph->gdata, &graph->rdata, LTERM);
+           ^
+
+[ 33%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kwayvolrefine.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolrefine.c(76): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+      GKfree(&graph->gdata, LTERM);  /* Deallocate the graph related arrays */
+             ^
+
+[ 33%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/kwayvolfm.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolfm.c(151): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&marker, &updind, &phtable, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolfm.c(387): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&marker, &updind, &phtable, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolfm.c(540): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&marker, &updind, &phtable, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolfm.c(784): warning #167: argument of type "idxtype={int} **" is incompatible with parameter of type "void **"
+    GKfree(&marker, &updind, &phtable, LTERM);
+           ^
+
+/save/ec2-user/adcirc/thirdparty/metis/Lib/kwayvolfm.c(1604): warning #167: argument of type "KeyValueType **" is incompatible with parameter of type "void **"
+    GKfree(&cand, &cand2, LTERM);
+           ^
+
+[ 34%] Building C object CMakeFiles/metis.dir/thirdparty/metis/Lib/subdomains.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+/save/ec2-user/adcirc/thirdparty/metis/Lib/subdomains.c(885): warning #167: argument of type "KeyValueType **" is incompatible with parameter of type "void **"
+    GKfree(&cand, &cand2, LTERM);
+           ^
+
+[ 35%] Linking C static library CMakeFiles/libmetis.a
+[ 35%] Built target metis
+[ 35%] Generating ADCIRC version...
+[ 36%] Building Fortran object CMakeFiles/version.dir/CMakeFiles/version_cmake.F.o
+[ 37%] Linking Fortran static library CMakeFiles/libversion.a
+[ 37%] Built target version
+[ 37%] Building C object CMakeFiles/mkdir.dir/prep/mkdir.c.o
+icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
+[ 38%] Linking C static library CMakeFiles/libmkdir.a
+[ 38%] Built target mkdir
+[ 39%] Building Fortran object CMakeFiles/adcprep.dir/src/sizes.F.o
+[ 39%] Building Fortran object CMakeFiles/adcprep.dir/thirdparty/KDTREE2/kdtree2.F.o
+[ 40%] Building Fortran object CMakeFiles/adcprep.dir/src/global.F.o
+[ 41%] Building Fortran object CMakeFiles/adcprep.dir/src/boundaries.F.o
+[ 41%] Building Fortran object CMakeFiles/adcprep.dir/src/global_3dvs.F.o
+[ 41%] Building Fortran object CMakeFiles/adcprep.dir/src/hashtable.F.o
+[ 42%] Building Fortran object CMakeFiles/adcprep.dir/src/mesh.F.o
+[ 43%] Building Fortran object CMakeFiles/adcprep.dir/src/owiwind.F.o
+[ 43%] Building Fortran object CMakeFiles/adcprep.dir/src/owiwind_netcdf.F.o
+[ 44%] Building Fortran object CMakeFiles/adcprep.dir/src/nodalattr.F.o
+[ 45%] Building Fortran object CMakeFiles/adcprep.dir/wind/vortex.F.o
+[ 46%] Building Fortran object CMakeFiles/adcprep.dir/src/wind.F.o
+[ 47%] Building Fortran object CMakeFiles/adcprep.dir/prep/presizes.F.o
+[ 47%] Building Fortran object CMakeFiles/adcprep.dir/prep/pre_global.F.o
+[ 48%] Building Fortran object CMakeFiles/adcprep.dir/prep/prep_weir.F.o
+[ 49%] Building Fortran object CMakeFiles/adcprep.dir/prep/subprep.F.o
+[ 50%] Building Fortran object CMakeFiles/adcprep.dir/src/quadrature.F.o
+[ 51%] Building Fortran object CMakeFiles/adcprep.dir/src/sponge_layer.F.o
+[ 51%] Building Fortran object CMakeFiles/adcprep.dir/src/couple2baroclinic3D.F.o
+[ 51%] Building Fortran object CMakeFiles/adcprep.dir/src/itpackv.F.o
+[ 52%] Building Fortran object CMakeFiles/adcprep.dir/src/subdomain.F.o
+[ 53%] Building Fortran object CMakeFiles/adcprep.dir/src/vew1d.F.o
+[ 54%] Building Fortran object CMakeFiles/adcprep.dir/src/momentum.F.o
+[ 55%] Building Fortran object CMakeFiles/adcprep.dir/src/gwce.F.o
+[ 56%] Building Fortran object CMakeFiles/adcprep.dir/src/harm.F.o
+[ 56%] Building Fortran object CMakeFiles/adcprep.dir/src/netcdfio.F.o
+[ 56%] Building Fortran object CMakeFiles/adcprep.dir/src/owi_ice.F.o
+[ 57%] Building Fortran object CMakeFiles/adcprep.dir/src/rs2.F.o
+[ 57%] Building Fortran object CMakeFiles/adcprep.dir/src/wetdry.F.o
+[ 58%] Building Fortran object CMakeFiles/adcprep.dir/prep/metis.F.o
+[ 58%] Building Fortran object CMakeFiles/adcprep.dir/prep/adcprep.F.o
+[ 59%] Building Fortran object CMakeFiles/adcprep.dir/prep/decomp.F.o
+[ 59%] Building Fortran object CMakeFiles/adcprep.dir/prep/read_global.F.o
+[ 60%] Building Fortran object CMakeFiles/adcprep.dir/prep/prep.F.o
+[ 61%] Building Fortran object CMakeFiles/adcprep.dir/prep/interp.F.o
+[ 61%] Building Fortran object CMakeFiles/adcprep.dir/prep/machdep.F.o
+[ 62%] Linking Fortran executable adcprep
+[ 62%] Built target adcprep
+[ 63%] Building Fortran object CMakeFiles/padcirc.dir/src/sizes.F.o
+[ 64%] Building Fortran object CMakeFiles/padcirc.dir/thirdparty/KDTREE2/kdtree2.F.o
+[ 64%] Building Fortran object CMakeFiles/padcirc.dir/src/global.F.o
+[ 65%] Building Fortran object CMakeFiles/padcirc.dir/src/boundaries.F.o
+[ 66%] Building Fortran object CMakeFiles/padcirc.dir/src/global_3dvs.F.o
+[ 66%] Building Fortran object CMakeFiles/padcirc.dir/src/hashtable.F.o
+[ 66%] Building Fortran object CMakeFiles/padcirc.dir/src/messenger.F.o
+[ 67%] Building Fortran object CMakeFiles/padcirc.dir/src/mesh.F.o
+[ 68%] Building Fortran object CMakeFiles/padcirc.dir/src/globalio.F.o
+[ 68%] Building Fortran object CMakeFiles/padcirc.dir/src/itpackv.F.o
+[ 69%] Building Fortran object CMakeFiles/padcirc.dir/src/nodalattr.F.o
+[ 69%] Building Fortran object CMakeFiles/padcirc.dir/src/quadrature.F.o
+[ 70%] Building Fortran object CMakeFiles/padcirc.dir/src/sponge_layer.F.o
+[ 70%] Building Fortran object CMakeFiles/padcirc.dir/src/subdomain.F.o
+[ 71%] Building Fortran object CMakeFiles/padcirc.dir/src/vew1d.F.o
+[ 72%] Building Fortran object CMakeFiles/padcirc.dir/src/owiwind.F.o
+[ 73%] Building Fortran object CMakeFiles/padcirc.dir/src/owiwind_netcdf.F.o
+[ 74%] Building Fortran object CMakeFiles/padcirc.dir/wind/vortex.F.o
+[ 75%] Building Fortran object CMakeFiles/padcirc.dir/src/wind.F.o
+[ 75%] Building Fortran object CMakeFiles/padcirc.dir/src/momentum.F.o
+[ 76%] Building Fortran object CMakeFiles/padcirc.dir/src/gwce.F.o
+[ 76%] Building Fortran object CMakeFiles/padcirc.dir/src/harm.F.o
+[ 77%] Building Fortran object CMakeFiles/padcirc.dir/src/netcdfio.F.o
+[ 78%] Building Fortran object CMakeFiles/padcirc.dir/src/writer.F.o
+[ 79%] Building Fortran object CMakeFiles/padcirc.dir/src/write_output.F.o
+[ 80%] Building Fortran object CMakeFiles/padcirc.dir/src/adcirc.F.o
+[ 81%] Building Fortran object CMakeFiles/padcirc.dir/src/control.F.o
+[ 82%] Building Fortran object CMakeFiles/padcirc.dir/src/couple2baroclinic3D.F.o
+[ 82%] Building Fortran object CMakeFiles/padcirc.dir/src/couple2swan.F.o
+[ 83%] Building Fortran object CMakeFiles/padcirc.dir/src/owi_ice.F.o
+[ 83%] Building Fortran object CMakeFiles/padcirc.dir/src/rs2.F.o
+[ 83%] Building Fortran object CMakeFiles/padcirc.dir/src/weir_boundary.F.o
+[ 84%] Building Fortran object CMakeFiles/padcirc.dir/src/wetdry.F.o
+[ 84%] Building Fortran object CMakeFiles/padcirc.dir/src/xdmfio.F.o
+[ 85%] Building Fortran object CMakeFiles/padcirc.dir/src/read_input.F.o
+[ 86%] Building Fortran object CMakeFiles/padcirc.dir/src/cstart.F.o
+[ 86%] Building Fortran object CMakeFiles/padcirc.dir/src/hstart.F.o
+[ 87%] Building Fortran object CMakeFiles/padcirc.dir/src/timestep.F.o
+[ 88%] Building Fortran object CMakeFiles/padcirc.dir/src/vsmy.F.o
+[ 88%] Building Fortran object CMakeFiles/padcirc.dir/src/transport.F.o
+[ 89%] Building Fortran object CMakeFiles/padcirc.dir/src/driver.F.o
+[ 90%] Linking Fortran executable padcirc
+[ 90%] Built target padcirc
+[ 90%] Building Fortran object CMakeFiles/adccmp.dir/util/adccmp.F.o
+[ 91%] Linking Fortran executable adccmp
+[ 91%] Built target adccmp
+[ 92%] Building Fortran object CMakeFiles/p15.dir/wind/p15.F.o
+[ 92%] Linking Fortran executable p15
+[ 92%] Built target p15
+[ 93%] Building Fortran object CMakeFiles/owi22.dir/wind/owi22.F.o
+[ 93%] Linking Fortran executable owi22
+[ 93%] Built target owi22
+[ 94%] Building Fortran object CMakeFiles/build13.dir/util/build13.F.o
+[ 94%] Linking Fortran executable build13
+[ 94%] Built target build13
+[ 95%] Building Fortran object CMakeFiles/buildstwave23.dir/util/buildstwave23.F.o
+[ 96%] Linking Fortran executable buildstwave23
+[ 96%] Built target buildstwave23
+[ 96%] Building Fortran object CMakeFiles/hot2asc.dir/util/hot2asc.F.o
+[ 97%] Linking Fortran executable hot2asc
+[ 97%] Built target hot2asc
+[ 98%] Building Fortran object CMakeFiles/inflate.dir/util/inflate.F.o
+[ 98%] Linking Fortran executable inflate
+[ 98%] Built target inflate
+[ 98%] Building Fortran object CMakeFiles/hstime.dir/util/hstime.F.o
+[ 99%] Linking Fortran executable hstime
+[ 99%] Built target hstime
+[ 99%] Building Fortran object CMakeFiles/adcircResultsComparison.dir/util/adcircResultsComparison.F90.o
+[100%] Linking Fortran executable adcircResultsComparison
+[100%] Built target adcircResultsComparison

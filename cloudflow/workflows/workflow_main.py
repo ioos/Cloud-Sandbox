@@ -27,10 +27,11 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-#postconf = f'{curdir}/../cluster/configs/post.config'
-postconf = f'{curdir}/../cluster/configs/local.config'
+#fcstconf = f'{curdir}/../cluster/configs/ioos.config'
+fcstconf = f'{curdir}/../cluster/configs/cora.config'
+
 #postconf = f'{curdir}/../cluster/configs/ioos.config'
+postconf = f'{curdir}/../cluster/configs/local.config'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
@@ -64,6 +65,10 @@ def main():
         # Add the forecast flow
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
+
+        elif jobtype == "adcircreanalysis":
+            raflow = flows.reanalysis_flow(fcstconf, jobfile)
+            flowdeq.appendleft(raflow)
 
         # Add the plot flow
         elif jobtype == "plotting":

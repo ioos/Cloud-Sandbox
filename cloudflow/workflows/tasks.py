@@ -423,6 +423,52 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
         print(f'in hindcast run multi: job.CDATE: {job.CDATE}')
 
 
+###############################################################################
+# cluster, job
+
+@task
+def cora_reanalysis_run(cluster: Cluster, job: Job):
+    """ Run the forecast
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+    PPN = cluster.getCoresPN()
+
+    # Easier to read
+    YYYY = job.YYYY
+    OFS = job.OFS
+    NPROCS = job.NPROCS
+    ProjectHome = job.ProjectHome
+    CONFIG=job.CONFIG
+
+    runscript = f"{curdir}/cora_launcher.sh"
+
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('In driver: execption retrieving list of hostnames:' + str(e))
+        raise signals.FAIL()
+
+    try:
+        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG], \
+                                    stderr=subprocess.STDOUT)
+
+        if result.returncode != 0:
+            log.exception(f'Forecast failed ... result: {result.returncode}')
+            raise signals.FAIL()
+
+    except Exception as e:
+        log.exception('In driver: Exception during subprocess.run :' + str(e))
+        raise signals.FAIL()
+
+    log.info('Forecast finished successfully')
+
+###############################################################################
 
 @task
 def run_pynotebook(pyfile: str):
