@@ -49,6 +49,4 @@ make
 #make compiler=intel
 #make padcirc compiler=intel
 
-# -j4  # parallel build does not work
-
 #cmake .. -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=ifort -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-xCORE-AVX2"
