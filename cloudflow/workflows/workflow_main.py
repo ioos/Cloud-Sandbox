@@ -27,8 +27,9 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-#fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-fcstconf = f'{curdir}/../cluster/configs/cora.config'
+# fcstconf = f'{curdir}/../cluster/configs/ioos.config'
+#fcstconf = f'{curdir}/../cluster/configs/ioos.cora.config'
+fcstconf = f'{curdir}/../cluster/configs/noaa.cora.config'
 
 #postconf = f'{curdir}/../cluster/configs/ioos.config'
 postconf = f'{curdir}/../cluster/configs/local.config'
