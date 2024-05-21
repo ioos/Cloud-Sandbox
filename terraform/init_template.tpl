@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -x
 
-echo `date` > /tmp/setup.log
+echo `date` > ~/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
 #BRANCH=origin/x86_64
 BRANCH=main
+
+EFS_VERS='v1.36.0'
 
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
@@ -22,11 +24,13 @@ if [ $? -ne 0 ]; then
   # Error: Unable to find a match: amazon-efs-utils
   # Alternate method
   sudo yum -y install rpm-build
-  cd /tmp
-  git clone https://github.com/aws/efs-utils
-  cd efs-utils
   sudo yum -y install make
-  sudo yum -y install rpm-build
+#  sudo yum -y install openssl-devel
+#  sudo yum -y install cargo
+#  sudo yum -y install rust
+  cd /tmp
+  git clone -b $EFS_VERS https://github.com/aws/efs-utils
+  cd efs-utils
   sudo make rpm
   sudo yum -y install ./build/amazon-efs-utils*rpm
   cd /tmp
@@ -57,9 +61,9 @@ export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
 # Install all of the software and drivers
-sudo -E -u $RUNUSER ./setup-instance.sh >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log 2>&1
+sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 
-echo "Installation completed!" >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log
-echo `date` >> /mnt/efs/fs1/save/$RUNUSER/Cloud-Sandbox/setup.log
+echo "Installation completed!" >> ~/setup.log
+echo `date` >> ~/setup.log
