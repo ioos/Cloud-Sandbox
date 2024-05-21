@@ -26,7 +26,7 @@ git status
 git add list of files or folders
 ```
 
-#### Example add all new and modified files and commit
+#### Or, for example add all new and modified files
 git add -A
 
 #### Commit your changes
@@ -65,18 +65,55 @@ git checkout -t origin/cora-test
 
 ### Download the CORA packages from S3
 ```
-cd /save/ec2-user/Cloud-Sandbox/models/adcirc-cora || exit 1
+cd /save/ec2-user/Cloud-Sandbox/models/adcirc-cora
 ./getS3packages.sh
 ```
 
 ### Run the sandbox patch
 ```
-cd /save/ec2-user/Cloud-Sandbox/patches/adcirc-cora || exit 1
+cd /save/ec2-user/Cloud-Sandbox/patches/adcirc-cora
 ./fix4cora.sh
 ```
 
+### Launch the test run
 
+#### Setup your config file, using the entries from your current config file.
+This test takes about an hour on 1 hpc6a node.
+```
+cd /save/ec2-user/Cloud-Sandbox/cloudflow/cluster/configs
+cp ioos.cora.config noaa.cora.config
+vi noaa.cora.config
+```
 
+There is nothing that needs to be changed in the job file
+```
+cd /save/ec2-user/Cloud-Sandbox/cloudflow
+cat job/jobs/cora.reanalysis 
+```
 
+#### Make sure workflows/workflow_main.py is using the correct cluster .config file.
+```
+vi workflows/workflow_main.py
+```
 
+Look for the following around line 30 and use the config file you have been using, 
+setting the type and number of nodes to whatever you want to use.
 
+e.g.
+```
+fcstconf = f'{curdir}/../cluster/configs/noaa.cora.config'
+```
+
+#### Launch it using the workflow main script
+```
+./workflows/workflow_main.py job/jobs/cora.reanalysis >& job.out &
+tail -f job.out
+```
+
+The model runs in /save/ec2-user/cora-runs/ADCIRC/ERA5/ec95d/2018
+
+There is an executable in the adcirc work folder that can be used to compare two different runs.
+I haven't played with it yet.
+```
+/save/ec2-user/adcirc/work/adcircResultsComparison --help
+```
