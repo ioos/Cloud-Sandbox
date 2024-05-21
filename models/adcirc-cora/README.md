@@ -27,7 +27,9 @@ git add list of files or folders
 ```
 
 #### Or, for example add all new and modified files
+```
 git add -A
+```
 
 #### Commit your changes
 ```
