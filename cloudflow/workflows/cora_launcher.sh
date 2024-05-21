@@ -1,9 +1,9 @@
 #!/bin/env bash
 
 # Script used to launch forecasts.
-# BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
+# BASH is used to bridge between the Python workflow and BASH based run scripts
 
-set -xa
+# set -xa
 set -a
 ulimit -c unlimited
 ulimit -s unlimited
@@ -29,14 +29,10 @@ export CONFIG=$6
 
 #OpenMPI
 #mpirun --version
-#mpirun (Open MPI) 2.1.0
 
 #IntelMPI
 #mpirun --version
-#Intel(R) MPI Library for Linux* OS, Version 2017 Update 2 Build 20170125 (id: 16752)
-#Copyright (C) 2003-2017, Intel Corporation. All rights reserved.
 
-# module -t avail >& avail ; grep mpi avail
 
 # TODO: put the following back in
 # mpirun --version | grep Intel
@@ -47,10 +43,10 @@ export CONFIG=$6
 
 # for openMPI openmpi=1
 # for Intel MPI set impi=1
+
 openmpi=0
 impi=1
 
-#TODO: Make this section a switch statement instead
 
 # MPIOPTS is used by the fcstrun.sh script for nosofs and wrfroms
 if [ $openmpi -eq 1 ]; then
@@ -71,10 +67,13 @@ echo "**********************************************************"
 echo "Current directory is $PWD"
 echo "**********************************************************"
 
+#TODO: Make this section a switch statement instead
 # Can put domain specific options here
 if [[ "$OFS" == "adcirc-cora" ]]; then
     
     export JOBDIR=$PROJHOME
+
+    # TODO: parameterize ec95d below
     export RUNDIR=$PROJHOME/ERA5/ec95d/$YYYY
     TRACKSDIR=$PROJHOME/TracksToRun
 

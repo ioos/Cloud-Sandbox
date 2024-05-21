@@ -1,6 +1,6 @@
 # SRCDIR is set in makefile or on the compile line
 INCDIRS := -I. -I$(SRCDIR)/prep
-DEBUG := full
+#DEBUG := full
 
 ########################################################################
 # Compiler flags for Linux operating system on 64bit x86 CPU
