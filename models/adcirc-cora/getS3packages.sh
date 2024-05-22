@@ -3,8 +3,6 @@ set -e
 
 cd /save/$USERNAME || exit 1
 
-cd /save/testing
-
 files="2018.ioos_sb.tgz adcirc_built.tgz cora-runs.tgz"
 
 for f in $files

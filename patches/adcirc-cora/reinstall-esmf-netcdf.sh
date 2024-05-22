@@ -29,7 +29,7 @@ SPACK_CACHEONLY=1
 ##########################################################
 
 # source include the functions 
-Source ../../scripts/funcs-setup-instance.sh
+source ../../scripts/funcs-setup-instance.sh
 
 module use -a /save/environments/modulefiles
 source /opt/rh/gcc-toolset-11/enable
