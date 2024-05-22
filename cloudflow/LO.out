@@ -1,0 +1,206 @@
+JOBTYPE:  romshindcast
+[2024-03-08 17:35:55,145] INFO - flow_runner.run | Beginning Flow run for 'hindcast workflow'
+[2024-03-08 17:35:55,155] INFO - task_runner.run | Task 'cluster_init': Starting task run...
+ 2024-03-08 17:35:55,160  INFO - ClusterFactory.cluster | Attempting to make a new cluster : AWS
+ 2024-03-08 17:35:55,161  INFO - AWSCluster.__init__ | nodeCount: 2  PPN: 96
+ 2024-03-08 17:35:55,161  INFO - ClusterFactory.cluster | Created new AWS cluster
+{
+    "platform": "AWS",
+    "region": "us-east-2",
+    "nodeType": "hpc6a.48xlarge",
+    "nodeCount": 2,
+    "tags": [
+        {
+            "Key": "Name",
+            "Value": "IOOS-cloud-sandbox"
+        },
+        {
+            "Key": "Project",
+            "Value": "IOOS-cloud-sandbox"
+        },
+        {
+            "Key": "NAME",
+            "Value": "liveocean-fcst"
+        }
+    ],
+    "image_id": "ami-082e2e4e7ef1c6d77",
+    "key_name": "rsa_sandbox_key",
+    "sg_ids": [
+        "sg-05c044182398b2a27",
+        "sg-0e5148638d9196f69",
+        "sg-06ca6bc5d4b377dad"
+    ],
+    "subnet_id": "subnet-00075cfbfcbc8f2cf",
+    "placement_group": "ioos_cloud_sandbox_Terraform_Placement_Group"
+}
+{'platform': 'AWS', 'region': 'us-east-2', 'nodeType': 'hpc6a.48xlarge', 'nodeCount': 2, 'tags': [{'Key': 'Name', 'Value': 'IOOS-cloud-sandbox'}, {'Key': 'Project', 'Value': 'IOOS-cloud-sandbox'}, {'Key': 'NAME', 'Value': 'liveocean-fcst'}], 'image_id': 'ami-082e2e4e7ef1c6d77', 'key_name': 'rsa_sandbox_key', 'sg_ids': ['sg-05c044182398b2a27', 'sg-0e5148638d9196f69', 'sg-06ca6bc5d4b377dad'], 'subnet_id': 'subnet-00075cfbfcbc8f2cf', 'placement_group': 'ioos_cloud_sandbox_Terraform_Placement_Group'}
+[2024-03-08 17:35:55,164] INFO - task_runner.run | Task 'cluster_init': Finished task run for task with final state: 'Success'
+[2024-03-08 17:35:55,173] INFO - task_runner.run | Task 'job_init': Starting task run...
+{
+    "JOBTYPE": "romshindcast",
+    "OFS": "liveocean",
+    "CDATE": "20121008",
+    "SDATE": "20121008",
+    "EDATE": "20121009",
+    "HH": "00",
+    "COMROT": "/com/ec2-user",
+    "SAVE": "/save/ec2-user",
+    "PTMP": "/ptmp",
+    "EXEC": "",
+    "TIME_REF": "19700101",
+    "BUCKET": "ioos-cloud-sandbox",
+    "BCKTFLDR": "LiveOcean/output",
+    "NTIMES": "2160",
+    "ININAME": "auto",
+    "OUTDIR": "auto",
+    "OCEANIN": "auto",
+    "OCNINTMPL": "/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in"
+}
+{'JOBTYPE': 'romshindcast', 'OFS': 'liveocean', 'CDATE': '20121008', 'SDATE': '20121008', 'EDATE': '20121009', 'HH': '00', 'COMROT': '/com/ec2-user', 'SAVE': '/save/ec2-user', 'PTMP': '/ptmp', 'EXEC': '', 'TIME_REF': '19700101', 'BUCKET': 'ioos-cloud-sandbox', 'BCKTFLDR': 'LiveOcean/output', 'NTIMES': '2160', 'ININAME': 'auto', 'OUTDIR': 'auto', 'OCEANIN': 'auto', 'OCNINTMPL': '/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in'}
+[2024-03-08 17:35:55,180] INFO - task_runner.run | Task 'job_init': Finished task run for task with final state: 'Success'
+[2024-03-08 17:35:55,192] INFO - task_runner.run | Task 'get_forcing_multi': Starting task run...
+[2024-03-08 17:40:04,039] INFO - task_runner.run | Task 'get_forcing_multi': Finished task run for task with final state: 'Success'
+[2024-03-08 17:40:04,054] INFO - task_runner.run | Task 'cluster_start': Starting task run...
+ 2024-03-08 17:40:04,054  INFO - cluster_tasks.cluster_start | Starting 2 instances ...
+ 2024-03-08 17:40:04,054  INFO - cluster_tasks.cluster_start | Waiting for nodes to start ...
+Waiting for nodes to enter running state ...
+instance 1 : running
+instance 2 : running
+[2024-03-08 17:41:46,553] INFO - task_runner.run | Task 'cluster_start': Finished task run for task with final state: 'Success'
+[2024-03-08 17:41:46,564] INFO - task_runner.run | Task 'hindcast_run_multi': Starting task run...
++ set -a
++ ulimit -c unlimited
++ ulimit -s unlimited
++ '[' 8 -lt 7 ']'
++ export CDATE=20121008
++ CDATE=20121008
++ export HH=00
++ HH=00
++ export COMOUT=auto
++ COMOUT=auto
++ export NPROCS=192
++ NPROCS=192
++ export PPN=96
++ PPN=96
++ export HOSTS=10.26.36.96,10.26.37.127
++ HOSTS=10.26.36.96,10.26.37.127
++ export OFS=liveocean
++ OFS=liveocean
++ export EXEC=
++ EXEC=
++ [[ liveocean == \a\d\n\o\c ]]
++ [[ liveocean == \n\y\h\-\h\i\n\d\c\a\s\t ]]
++ openmpi=0
++ impi=1
++ '[' 0 -eq 1 ']'
++ '[' 1 -eq 1 ']'
++ export 'MPIOPTS=-launcher ssh -hosts 10.26.36.96,10.26.37.127 -np 192 -ppn 96'
++ MPIOPTS='-launcher ssh -hosts 10.26.36.96,10.26.37.127 -np 192 -ppn 96'
++ export I_MPI_OFI_LIBRARY_INTERNAL=1
++ I_MPI_OFI_LIBRARY_INTERNAL=1
++ export I_MPI_DEBUG=1
++ I_MPI_DEBUG=1
++ case $OFS in
++ export HOMEnos=/save/ec2-user/LiveOcean
++ HOMEnos=/save/ec2-user/LiveOcean
++ export JOBDIR=/save/ec2-user/LiveOcean/jobs
++ JOBDIR=/save/ec2-user/LiveOcean/jobs
++ export COMROT=/com/ec2-user
++ COMROT=/com/ec2-user
++ export JOBSCRIPT=/save/ec2-user/LiveOcean/jobs/fcstrun.sh
++ JOBSCRIPT=/save/ec2-user/LiveOcean/jobs/fcstrun.sh
++ export 'JOBARGS=20121008 /com/ec2-user'
++ JOBARGS='20121008 /com/ec2-user'
++ cd /save/ec2-user/LiveOcean/jobs
++ /save/ec2-user/LiveOcean/jobs/fcstrun.sh 20121008 /com/ec2-user
+Loading hdf5/1.14.3-intel-2021.9.0-4xskthb
+  Loading requirement: pkgconf/1.9.5-intel-2021.9.0-yzqxmv6
+Loading netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
+  Loading requirement: bzip2/1.0.8-intel-2021.9.0-jky2iw7 lz4/1.9.4-intel-2021.9.0-a7shfis snappy/1.1.10-intel-2021.9.0-67s3jwz
+    zstd/1.5.5-intel-2021.9.0-x3khtnn c-blosc/1.21.5-intel-2021.9.0-ltu7tzq netcdf-c/4.9.2-intel-2021.9.0-vznmeik
+HOMEnos is /save/ec2-user/LiveOcean
+Starting run at: Fri Mar  8 17:41:47 UTC 2024
+ ROMS/TOMS: DONE... Friday - March 8, 2024 -  6:26:52 PM
+Run finished at: Fri Mar  8 18:26:53 UTC 2024 with result 0
++ result=0
++ exit 0
++ set -a
++ ulimit -c unlimited
++ ulimit -s unlimited
++ '[' 8 -lt 7 ']'
++ export CDATE=20121009
++ CDATE=20121009
++ export HH=00
++ HH=00
++ export COMOUT=auto
++ COMOUT=auto
++ export NPROCS=192
++ NPROCS=192
++ export PPN=96
++ PPN=96
++ export HOSTS=10.26.36.96,10.26.37.127
++ HOSTS=10.26.36.96,10.26.37.127
++ export OFS=liveocean
++ OFS=liveocean
++ export EXEC=
++ EXEC=
++ [[ liveocean == \a\d\n\o\c ]]
++ [[ liveocean == \n\y\h\-\h\i\n\d\c\a\s\t ]]
++ openmpi=0
++ impi=1
++ '[' 0 -eq 1 ']'
++ '[' 1 -eq 1 ']'
++ export 'MPIOPTS=-launcher ssh -hosts 10.26.36.96,10.26.37.127 -np 192 -ppn 96'
++ MPIOPTS='-launcher ssh -hosts 10.26.36.96,10.26.37.127 -np 192 -ppn 96'
++ export I_MPI_OFI_LIBRARY_INTERNAL=1
++ I_MPI_OFI_LIBRARY_INTERNAL=1
++ export I_MPI_DEBUG=1
++ I_MPI_DEBUG=1
++ case $OFS in
++ export HOMEnos=/save/ec2-user/LiveOcean
++ HOMEnos=/save/ec2-user/LiveOcean
++ export JOBDIR=/save/ec2-user/LiveOcean/jobs
++ JOBDIR=/save/ec2-user/LiveOcean/jobs
++ export COMROT=/com/ec2-user
++ COMROT=/com/ec2-user
++ export JOBSCRIPT=/save/ec2-user/LiveOcean/jobs/fcstrun.sh
++ JOBSCRIPT=/save/ec2-user/LiveOcean/jobs/fcstrun.sh
++ export 'JOBARGS=20121009 /com/ec2-user'
++ JOBARGS='20121009 /com/ec2-user'
++ cd /save/ec2-user/LiveOcean/jobs
++ /save/ec2-user/LiveOcean/jobs/fcstrun.sh 20121009 /com/ec2-user
+Loading hdf5/1.14.3-intel-2021.9.0-4xskthb
+  Loading requirement: pkgconf/1.9.5-intel-2021.9.0-yzqxmv6
+Loading netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
+  Loading requirement: bzip2/1.0.8-intel-2021.9.0-jky2iw7 lz4/1.9.4-intel-2021.9.0-a7shfis snappy/1.1.10-intel-2021.9.0-67s3jwz
+    zstd/1.5.5-intel-2021.9.0-x3khtnn c-blosc/1.21.5-intel-2021.9.0-ltu7tzq netcdf-c/4.9.2-intel-2021.9.0-vznmeik
+HOMEnos is /save/ec2-user/LiveOcean
+Starting run at: Fri Mar  8 18:26:54 UTC 2024
+ ROMS/TOMS: DONE... Friday - March 8, 2024 -  7:11:26 PM
+Run finished at: Fri Mar  8 19:11:26 UTC 2024 with result 0
++ result=0
++ exit 0
+In hindcast_run_multi: CDATE 20121008 about to make_oceanin
+in __make_oceanin_lo: CDATE: 20121008
+In __make_oceanin_lo: /com/ec2-user/LO_roms/cas7_t0_x4b/f2012.10.08
+calling util.makeOceanin
+NtileI :  12  NtileJ  16
+in hindcast run multi: job.CDATE: 20121009
+In hindcast_run_multi: CDATE 20121009 about to make_oceanin
+in __make_oceanin_lo: CDATE: 20121009
+In __make_oceanin_lo: /com/ec2-user/LO_roms/cas7_t0_x4b/f2012.10.09
+calling util.makeOceanin
+NtileI :  12  NtileJ  16
+in hindcast run multi: job.CDATE: 20121010
+[2024-03-08 19:11:26,687] INFO - task_runner.run | Task 'hindcast_run_multi': Finished task run for task with final state: 'Success'
+[2024-03-08 19:11:26,694] INFO - task_runner.run | Task 'cluster_terminate': Starting task run...
+ 2024-03-08 19:11:26,694  INFO - AWSCluster.terminate | Terminating instances: [ec2.Instance(id='i-0b04b1de31875b18b'), ec2.Instance(id='i-0384b5088b63afeed')]
+ 2024-03-08 19:11:27,504  INFO - cluster_tasks.cluster_terminate | Responses from terminate: 
+[{'CurrentState': {'Code': 32, 'Name': 'shutting-down'},
+  'InstanceId': 'i-0b04b1de31875b18b',
+  'PreviousState': {'Code': 16, 'Name': 'running'}}]
+[{'CurrentState': {'Code': 32, 'Name': 'shutting-down'},
+  'InstanceId': 'i-0384b5088b63afeed',
+  'PreviousState': {'Code': 16, 'Name': 'running'}}]
+[2024-03-08 19:11:27,507] INFO - task_runner.run | Task 'cluster_terminate': Finished task run for task with final state: 'Success'
+[2024-03-08 19:11:27,508] INFO - flow_runner.determine_final_state | Flow run SUCCESS: all reference tasks succeeded
