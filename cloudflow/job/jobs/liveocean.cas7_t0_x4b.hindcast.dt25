@@ -1,9 +1,9 @@
 {
   "JOBTYPE"   : "romshindcast",
   "OFS"       : "liveocean",
-  "CDATE"     : "20150107",
-  "SDATE"     : "20150107",
-  "EDATE"     : "20201231",
+  "CDATE"     : "20141209",
+  "SDATE"     : "20141209",
+  "EDATE"     : "20141209",
   "HH"        : "00",
   "COMROT"    : "/com/ec2-user",
   "SAVE"      : "/save/ec2-user",
@@ -12,9 +12,9 @@
   "TIME_REF"  : "19700101",
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "LiveOcean/output",
-  "NTIMES"    : "2880",
+  "NTIMES"    : "3456",
   "ININAME"   : "auto",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b-dt30.in"
+  "OCNINTMPL" : "/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b-dt25.in"
 }

@@ -1301,6 +1301,8 @@ setup_aliases () {
 
   #git config user.name "Patrick Tripp"
   #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
+  #git config user.name "Michael Lalime"
+  #git config user.email "75450912+Michael-Lalime@users.noreply.github.com"
 
   cd $home
 }
