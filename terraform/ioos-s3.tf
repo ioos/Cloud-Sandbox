@@ -30,17 +30,20 @@ resource "aws_iam_policy" "input-policy" {
   })
 }
 
- resource "aws_s3_bucket" "noaa-ioos" {
-   bucket = "noaa-ioos"
-   tags = {
-     Name        = "noaa-ioos"
-   }
- }
+# resource "aws_s3_bucket" "noaa-ioos" {
+#   bucket = "noaa-ioos"
+#   tags = {
+#     Name        = "noaa-ioos"
+#   }
+# }
 
-#data "aws_s3_bucket" "noaa-ioos" {
-#  bucket = noaa-ioos
-#  # bucket = "lynker-noaa-ioos"
-#}
+data "aws_s3_bucket" "noaa-ioos" {
+  bucket = ioos-coastalsb-inputs
+   tags = {
+     Name        = "ioos-coastalsb-inputs"
+   }
+}
+
 
 resource "aws_iam_group" "noaa-ioos" {
   name = "noaa-ioos"
