@@ -1,8 +1,8 @@
 {
   "JOBTYPE"   : "romshindcast",
   "OFS"       : "liveocean",
-  "CDATE"     : "20150107",
-  "SDATE"     : "20150107",
+  "CDATE"     : "20160101",
+  "SDATE"     : "20160101",
   "EDATE"     : "20201231",
   "HH"        : "00",
   "COMROT"    : "/com/ec2-user",
