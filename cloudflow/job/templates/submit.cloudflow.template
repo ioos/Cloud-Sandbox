@@ -43,6 +43,7 @@ if [ $ERROVALUE == 0 ] ; then
    RUNSUFFIX="complete"
    cp PE0000/fort.6{7,8}* .
    rm -rf PE* metis* part* fort.80 rads.64.nc fort.90.nc
+   mv -f $RUNDIR/../2018 $RUNDIR/../2018.previous
 else
    RUNSUFFIX="failed"
 fi
@@ -50,4 +51,4 @@ fi
 DATETIME=`date +'%Y-%h-%d-T%H:%M:%S'`
 echo "${DATETIME}" > run.${RUNSUFFIX}
 
-
+exit $ERROVALUE
