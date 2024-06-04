@@ -1,6 +1,7 @@
 {
   "JOBTYPE"   : "romshindcast",
   "OFS"       : "liveocean",
+  "EXPNAME"   : "cas7_t0_x4b",
   "CDATE"     : "20160101",
   "SDATE"     : "20160101",
   "EDATE"     : "20160101",
