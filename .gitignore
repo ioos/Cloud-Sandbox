@@ -30,3 +30,4 @@ my.tfvars
 my.plan
 build/
 cloudflow/build/
+.nfs*

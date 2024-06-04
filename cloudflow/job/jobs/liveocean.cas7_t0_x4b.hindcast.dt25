@@ -1,9 +1,10 @@
 {
   "JOBTYPE"   : "romshindcast",
   "OFS"       : "liveocean",
-  "CDATE"     : "20141209",
-  "SDATE"     : "20141209",
-  "EDATE"     : "20141209",
+  "EXPNAME"   : "cas7_t0_x4b",
+  "CDATE"     : "20160101",
+  "SDATE"     : "20160101",
+  "EDATE"     : "20160101",
   "HH"        : "00",
   "COMROT"    : "/com/ec2-user",
   "SAVE"      : "/save/ec2-user",

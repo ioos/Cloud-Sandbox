@@ -4,7 +4,7 @@
 "nodeType"  : "r7iz.32xlarge",
 "nodeCount" : 4,
 "tags"      : [ 
-                { "Key": "Name", "Value": "IOOS-cloud-sandbox" },
+                { "Key": "Name", "Value": "LiveOcean" },
                 { "Key": "Project", "Value": "IOOS-cloud-sandbox" },
                 { "Key": "NAME", "Value": "liveocean-fcst" }
               ],

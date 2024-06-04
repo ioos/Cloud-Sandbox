@@ -1034,7 +1034,7 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-     SSFNAME == __COMROT__/LO_output/forcing/cas7/__FDATE__/traps00/rivers.nc
+     SSFNAME == __COMROT__/LO_output/forcing/cas7/__FDATE__/__TRAPSDIR__/rivers.nc
 
 ! Input tidal forcing file name.
 
