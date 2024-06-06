@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -u
 """ Collection of functions that provide pre-defined Prefect Flow contexts for use in the cloud """
 
 import os
@@ -137,20 +137,18 @@ def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
         # Create the cluster object
         cluster = ctasks.cluster_init(hcstconf)
 
-        # Setup the job and create the ocean.in
+        # Setup the job
         hcstjob = tasks.job_init(cluster, hcstjobfile)
 
         # Get forcing data
         forcing = jtasks.get_forcing_multi(hcstjob, sshuser)
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, hcstjob])
 
-
-        # Run the forecast
+        # Create the oceanin and run the forecasts
         # This will run in a loop to complete all forecasts 
         hcst_run = tasks.hindcast_run_multi(cluster, hcstjob, upstream_tasks=[cluster_start])
-
 
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])

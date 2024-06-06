@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 """ A driver to run workflows from provided job configuration files """
 
 ''' Usage:
@@ -24,8 +24,9 @@ from cloudflow.workflows import flows
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
-curdir = os.path.dirname(os.path.abspath(__file__))
+######################################################################
+############### Set these for your specific deployment ###############
+######################################################################
 
 #fcstconf = f'{curdir}/../cluster/configs/ioos.cora.config'
 fcstconf = f'{curdir}/../cluster/configs/noaa.cora.config'
@@ -36,6 +37,10 @@ postconf = f'{curdir}/../cluster/configs/local.config'
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
 sshuser = 'username@apogee.ocean.washington.edu'
+
+######################################################################
+
+curdir = os.path.dirname(os.path.abspath(__file__))
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')

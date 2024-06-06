@@ -169,7 +169,7 @@ class ROMSHindcast(Job):
 
         if self.OCNINTMPL == "auto":
             self.OCNINTMPL = f"{self.TEMPLPATH}/{self.OFS}.ocean.in"
-  
+
         return
 
 
@@ -200,24 +200,24 @@ class ROMSHindcast(Job):
         COMROT = self.COMROT
         PTMP = self.PTMP
         EXPNAME = self.EXPNAME
+        OUTDIR = self.OUTDIR
 
         if int(CDATE) >= 2016010101:
             TRAPSDIR = "trapsF00"
         else:
             TRAPSDIR = "traps00"
 
-        print(f'in __make_oceanin_lo: CDATE: {CDATE}')
-
         template = self.OCNINTMPL
 
-        # fdate = f"f{CDATE[0:4]}.{CDATE[4:6]}.{CDATE[6:8]}"
         fdate = util.lo_date(CDATE)
         prevdate = util.ndate(CDATE, -1)
         fprevdate = util.lo_date(prevdate)
 
         self.OUTDIR = f"{COMROT}/LO_roms/{EXPNAME}/{fdate}"
 
-        print(f'In __make_oceanin_lo: {self.OUTDIR}')
+        if debug:
+            print(f'self.OUTDIR: {self.OUTDIR}')
+            print(f'self.COMROT: {self.COMROT}')
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -239,7 +239,7 @@ class ROMSHindcast(Job):
             "__TRAPSDIR__" : TRAPSDIR
         }
 
-        # Create the ocean.in
+        # Create the ocean.in, decompose NTILEI x NTILEJ
         outfile = f"{self.OUTDIR}/liveocean.in"
         ratio = 0.5
         # ratio=0.375   # Testing 6 nodes (9x24) crashes, .444 crashes (12x18)
@@ -351,8 +351,8 @@ class ROMSHindcast(Job):
         self.NHOURS = int(int(self.NTIMES)/DT)
 
         # TODO: FIX THIS. It does not come out right for wrfroms
-        #       DSTART =  2064.25d0                      ! days
-        #       TIDE_START =  0.0d0                      ! days
+        #     DSTART =  2064.25d0                      ! days
+        #     TIDE_START =  0.0d0                      ! days
         #     "CDATE": "20110827",
         #     "HH": "06",
         #     "TIME_REF": "20060101.0d0",
@@ -486,7 +486,6 @@ class ROMSHindcast(Job):
         util.makeOceanin(self.NPROCS, settings, template, outfile)
 
         return
-
 
 
 if __name__ == '__main__':

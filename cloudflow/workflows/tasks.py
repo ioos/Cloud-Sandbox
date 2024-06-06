@@ -332,6 +332,7 @@ def forecast_run(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
+    SAVEDIR = job.SAVE
 
     runscript = f"{curdir}/fcst_launcher.sh"
 
@@ -345,11 +346,9 @@ def forecast_run(cluster: Cluster, job: Job):
 
         if OFS == "adnoc":
             time.sleep(60)
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
-                                    stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
         else:
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
-                                    stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -390,8 +389,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
+    SAVEDIR = job.SAVE
 
     runscript = f"{curdir}/fcst_launcher.sh"
+    print(f"In hindcast_run_multi: runscript: {runscript}")
 
     try:
         HOSTS = cluster.getHostsCSV()
@@ -403,13 +404,14 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
     while job.CDATE <= EDATE:
 
+        print(f'In hindcast run multi: job.CDATE: {job.CDATE}')
+
         # Create ocean in file
-        print(f'In hindcast_run_multi: CDATE {job.CDATE} about to make_oceanin')
         job.make_oceanin()
 
         try:
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], \
-                                    stderr=subprocess.STDOUT)
+            print('Launching model run ...')
+            result = subprocess.run([runscript, job.CDATE, HH, job.OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -419,8 +421,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL()
 
+        # Set the date for the next day run
         job.CDATE = util.ndate(job.CDATE, 1)
-        print(f'in hindcast run multi: job.CDATE: {job.CDATE}')
+
+    # end of while loop
 
 
 ###############################################################################
@@ -455,8 +459,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
         raise signals.FAIL()
 
     try:
-        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG], \
-                                    stderr=subprocess.STDOUT)
+        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG], universal_newlines=True, stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')

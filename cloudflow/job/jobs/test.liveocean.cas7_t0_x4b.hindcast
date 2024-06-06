@@ -13,7 +13,7 @@
   "TIME_REF"  : "19700101",
   "BUCKET"    : "ioos-cloud-sandbox",
   "BCKTFLDR"  : "LiveOcean/output",
-  "NTIMES"    : "540",
+  "NTIMES"    : "2160",
   "ININAME"   : "auto",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
