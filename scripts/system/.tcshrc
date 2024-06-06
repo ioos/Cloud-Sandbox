@@ -1,0 +1,21 @@
+alias lsl ls -al
+alias lst ls -altr
+alias h history
+alias cds cd /save/ec2-user
+alias cdc cd /com/ec2-user
+alias cdpt cd /ptmp/ec2-user
+alias cdsp cd /save/RPS/patrick
+alias cdcp cd /com/RPS/patrick
+
+source /usr/share/Modules/init/tcsh
+source /save/environments/spack/share/spack/setup-env.csh
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+# if ( -f "/save/ec2-user/miniconda3/etc/profile.d/conda.csh" ) then
+#    source "/save/ec2-user/miniconda3/etc/profile.d/conda.csh"
+# else
+#    setenv PATH "/save/ec2-user/miniconda3/bin:$PATH"
+# endif
+# <<< conda initialize <<<
+
