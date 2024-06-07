@@ -81,8 +81,9 @@ if [[ "$OFS" == "adcirc-cora" ]]; then
     touch "$TRACKSDIR/${YYYY}.trk"
     
     cd "$JOBDIR" || exit 1
+
     RUNSCRIPT="./bin/run_storms.sh --config $CONFIG --maxrun=1"
-    # #./bin/run_storms.sh -v --config ./configs/ec95d_prior_config.yml --maxrun=1
+    # example ./bin/run_storms.sh -v --config ./configs/ec95d_prior_config.yml --maxrun=1
 
     # Run it
     $RUNSCRIPT

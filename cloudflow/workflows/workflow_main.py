@@ -24,12 +24,15 @@ from cloudflow.workflows import flows
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
+curdir = os.path.dirname(os.path.abspath(__file__))
+
 ######################################################################
 ############### Set these for your specific deployment ###############
 ######################################################################
 
-#fcstconf = f'{curdir}/../cluster/configs/ioos.cora.config'
-fcstconf = f'{curdir}/../cluster/configs/noaa.cora.config'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
+fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
+
 
 #postconf = f'{curdir}/../cluster/configs/ioos.config'
 postconf = f'{curdir}/../cluster/configs/local.config'
@@ -39,8 +42,6 @@ postconf = f'{curdir}/../cluster/configs/local.config'
 sshuser = 'username@apogee.ocean.washington.edu'
 
 ######################################################################
-
-curdir = os.path.dirname(os.path.abspath(__file__))
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')

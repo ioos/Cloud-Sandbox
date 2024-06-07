@@ -85,6 +85,8 @@ class ADCIRCReanalysis(Job):
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
 
+        self.make_config()
+
         return
 
 
@@ -113,18 +115,18 @@ class ADCIRCReanalysis(Job):
         return
 
     def make_config(self):
-        if OFS == 'adcirc-cora':
+
+        if self.OFS == 'adcirc-cora':
             self.__make_cora_config()
         else:
-            raise Exception(f"I don't know how to create an config for {OFS}")
+            raise Exception(f"I don't know how to create a config for {OFS}")
 
 
     def __make_cora_config(self):
         """ Create the config file used by ADCIRC run_storms.sh """
         YYYY = self.YYYY
-        OFS = self.OFS
 
-        #print(f'in {__name__}: YYYY : {YYYY}')
+        print(f'in {__name__}: YYYY : {YYYY}')
 
         template = self.CONFIGTMPL
 

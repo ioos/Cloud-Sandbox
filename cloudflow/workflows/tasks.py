@@ -23,6 +23,7 @@ from prefect.triggers import all_finished
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
+
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from cloudflow.job.Job import Job
@@ -40,7 +41,6 @@ from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 pp = pprint.PrettyPrinter()
 debug = False
@@ -451,6 +451,9 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
     CONFIG=job.CONFIG
 
     runscript = f"{curdir}/cora_launcher.sh"
+
+    print(f'DEBUG: job.CONFIG: {job.CONFIG}')
+    print(f'runscript: {runscript}')
 
     try:
         HOSTS = cluster.getHostsCSV()

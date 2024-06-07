@@ -4,6 +4,7 @@ ADCIRCHome=/save/ec2-user/adcirc
 
 # NETCDFHOME Sets the home path for netCDF C and Fortran libraries. This assumes that the libraries are installed to the same location. This folder should contain the folders "lib" and "include
 # Need to create symlinks to netcdf-fortran include and lib files
+
 export NETCDFHOME="/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel"
 export I_MPI_F90=ifort
 export CMAKE_INSTALL_PREFIX="${ADCIRCHome}/work"
@@ -11,6 +12,8 @@ export CMAKE_INSTALL_PREFIX="${ADCIRCHome}/work"
 echo $PWD
 module use -a $PWD
 module load intel_x86_64
+
+cp cmplrflags.mk $ADCIRCHome/work
 
 cd "$ADCIRCHome" || exit 1
 
@@ -34,19 +37,19 @@ cmake .. -DBUILD_PADCIRC=ON \
          -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
 make
 
+# testing
 # cmake .. -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=mpiifort 
 # cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-xCORE-AVX2"
-#cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-axSSE4.2"
-#cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_C_COMPILER=icc  -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
+# cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-axSSE4.2"
+# cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_C_COMPILER=icc  -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
 # -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=mpiifort
 #cmake ..
 
+# gnu make testing
 #make clean
 #make compiler=intel
-# make all compiler=intel
-
+#make all compiler=intel
 #make padcirc compiler=intel
 #make compiler=intel
 #make padcirc compiler=intel
-
 #cmake .. -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=ifort -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-xCORE-AVX2"
