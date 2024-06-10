@@ -5,8 +5,7 @@ echo `date` > ~/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
-#BRANCH=origin/x86_64
-BRANCH=main
+BRANCH=formainpr
 
 EFS_VERS='v1.36.0'
 
