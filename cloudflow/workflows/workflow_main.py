@@ -30,11 +30,10 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 ############### Set these for your specific deployment ###############
 ######################################################################
 
-#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
 fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
 
-
-#postconf = f'{curdir}/../cluster/configs/ioos.config'
 postconf = f'{curdir}/../cluster/configs/local.config'
 
 # This is used for obtaining liveocean forcing data
