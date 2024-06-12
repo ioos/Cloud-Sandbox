@@ -6,8 +6,8 @@
   "SDATE"     : "20121008",
   "EDATE"     : "20121009",
   "HH"        : "00",
-  "COMROT"    : "/com/RPS/patrick",
-  "SAVE"      : "/save/RPS/patrick",
+  "COMROT"    : "/com/patrick",
+  "SAVE"      : "/save/patrick",
   "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",
@@ -17,5 +17,5 @@
   "ININAME"   : "auto",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/save/RPS/patrick/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in"
+  "OCNINTMPL" : "/save/patrick/forPR.Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in"
 }

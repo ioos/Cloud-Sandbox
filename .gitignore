@@ -2,6 +2,7 @@
 .DS_Store
 tmp
 *.egg-info/
+*.swp
 .ipynb_checkpoints
 **/*.ipynb
 .pytest_cache/

@@ -28,14 +28,16 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 ############### Set these for your specific deployment ###############
 ######################################################################
 
-#fcstconf = f'{curdir}/../cluster/configs/NOS/nos.liveocean.cfg'
-fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.liveocean.cfg'
+# NOS or IOOS(RPS)
+fcstconf = f'{curdir}/../cluster/configs/NOS/nos.liveocean.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.liveocean.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/test.liveocean.cfg'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
-# NOS or IOOS(RPS)
-#sshuser = 'mlalime@apogee.ocean.washington.edu'
-sshuser = 'notme@apogee.ocean.washington.edu'
+
+# NOTE: Your ssh public key will need to be added to apogee .ssh/authorized_keys file for passwordless scp.
+sshuser = 'username@apogee.ocean.washington.edu'
 
 ######################################################################
 
