@@ -25,6 +25,18 @@ resource "aws_iam_role" "sandbox_iam_role" {
           "Effect" : "Allow"
           "Action" : "sts:AssumeRole",
           "Principal" : { "Service" : "ec2.amazonaws.com" },
+        },
+        {
+            "Sid": "ListObjectsInBucket",
+            "Effect": "Allow",
+            "Action": ["s3:ListBucket"],
+            "Resource": ["arn:aws:s3:::ioos-coastalsb-*puts"]
+        },
+        {
+            "Sid": "AllObjectActions",
+            "Effect": "Allow",
+            "Action": "s3:*Object",
+            "Resource": ["arn:aws:s3:::ioos-coastalsb-*puts/*"]
         }
       ]
   })
