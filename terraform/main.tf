@@ -21,12 +21,10 @@ resource "aws_iam_role" "sandbox_iam_role" {
       "Version" : "2012-10-17",
       "Statement" : [
         {
+          "Sid" : "AttachedIAMRole",
+          "Effect" : "Allow"
           "Action" : "sts:AssumeRole",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          },
-          "Effect" : "Allow",
-          "Sid" : ""
+          "Principal" : { "Service" : "ec2.amazonaws.com" },
         },
         {
             "Sid": "ListObjectsInBucket",
@@ -288,8 +286,6 @@ resource "aws_instance" "head_node" {
 
   key_name             = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
-
-  # user_data = data.template_file.init_instance.rendered
 
   user_data            = templatefile("init_template.tpl", { efs_name = aws_efs_file_system.main_efs.dns_name, ami_name = "${var.name_tag}-${random_pet.ami_id.id}", aws_region = var.preferred_region, project = var.project_tag })
 

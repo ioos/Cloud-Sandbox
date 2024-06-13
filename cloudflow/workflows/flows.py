@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -u
 """ Collection of functions that provide pre-defined Prefect Flow contexts for use in the cloud """
 
 import os
@@ -43,8 +43,6 @@ prelog = prefect.utilities.logging.get_logger()
 #prelog.handler.formatter.converter = time.localtime
 # Use the same handler for all of them
 for handler in prelog.handlers:
-    #print('Setting the prefect log handler')
-    #print(handler)
     pformatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(module)s.%(funcName)s | %(message)s')
     pformatter.converter = time.localtime
     handler.setFormatter(pformatter)
@@ -139,20 +137,18 @@ def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
         # Create the cluster object
         cluster = ctasks.cluster_init(hcstconf)
 
-        # Setup the job and create the ocean.in
+        # Setup the job
         hcstjob = tasks.job_init(cluster, hcstjobfile)
 
         # Get forcing data
         forcing = jtasks.get_forcing_multi(hcstjob, sshuser)
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, hcstjob])
 
-
-        # Run the forecast
+        # Create the oceanin and run the forecasts
         # This will run in a loop to complete all forecasts 
         hcst_run = tasks.hindcast_run_multi(cluster, hcstjob, upstream_tasks=[cluster_start])
-
 
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])
@@ -241,6 +237,73 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
     return fcstflow
 
+######################################################################
+
+def reanalysis_flow(fcstconf, fcstjobfile) -> Flow:
+    """ Provides a Prefect Flow for a reanalysis workflow. e.g. CORA ADCIRC
+
+    Parameters
+    ----------
+    fcstconf : str
+        The JSON configuration file for the Cluster to create
+
+    fcstjobfile : str
+        The JSON configuration file for the forecast Job
+
+    sshuser : str
+        The user and host to use for retrieving data from a remote server.
+
+    Returns
+    -------
+    fcstflow : prefect.Flow
+    """
+
+    with Flow('reanalysis workflow') as raflow:
+        #####################################################################
+        # FORECAST
+        #####################################################################
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(fcstconf)
+
+        # Setup the job
+        fcstjob = tasks.job_init(cluster, fcstjobfile)
+
+        # Get forcing data
+        # Forcing should be retrieved external to this flow before running
+        # forcing = jtasks.get_forcing(fcstjob, sshuser)
+
+        # Start the cluster
+        #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster)
+
+        # Run the forecast
+        fcst_run = tasks.cora_reanalysis_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+
+        # Terminate the cluster nodes
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+
+        # Copy the results to /com (liveocean does not run in ptmp currently)
+        #cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
+
+        # Copy the results to S3 (optionally)
+        #cp2s3 = jtasks.cp2s3(fcstjob, upstream_tasks=[fcst_run])
+        #storage_service = tasks.storage_init(provider)
+        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
+        #pngtocloud.set_upstream(plots)
+
+        # Copy the results to S3 (optionally. currently only saves LiveOcean)
+        #storage_service = tasks.storage_init(provider)
+        #cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+
+        #pngtocloud.set_upstream(plots)
+
+        # If the fcst fails, then set the whole flow to fail
+        raflow.set_reference_tasks([fcst_run])
+
+    return raflow
+
+######################################################################
 
 def plot_flow(postconf, postjobfile) -> Flow:
     """ Provides a Prefect Flow for a plotting workflow. Also creates mpegs of sequential plots.

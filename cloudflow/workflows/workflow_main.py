@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 """ A driver to run workflows from provided job configuration files """
 
 ''' Usage:
@@ -24,17 +24,23 @@ from cloudflow.workflows import flows
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-#postconf = f'{curdir}/../cluster/configs/post.config'
+######################################################################
+############### Set these for your specific deployment ###############
+######################################################################
+
+fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
+
 postconf = f'{curdir}/../cluster/configs/local.config'
-#postconf = f'{curdir}/../cluster/configs/ioos.config'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
 sshuser = 'username@apogee.ocean.washington.edu'
+
+######################################################################
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
@@ -64,6 +70,10 @@ def main():
         # Add the forecast flow
             fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
+
+        elif jobtype == "adcircreanalysis":
+            raflow = flows.reanalysis_flow(fcstconf, jobfile)
+            flowdeq.appendleft(raflow)
 
         # Add the plot flow
         elif jobtype == "plotting":

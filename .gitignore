@@ -2,18 +2,16 @@
 .DS_Store
 tmp
 *.egg-info/
+*.swp
 .ipynb_checkpoints
-worflow/*.ipynb
+**/*.ipynb
 .pytest_cache/
-workflow/dist
-workflow/*.out
+cloudflow/*.out
+cloudflow/*.log
 **/worker-*.dirlock
 **/purge.lock
 **/global.lock
-workflow/workflows/lo.out
 .idea/
-workflow/.idea/
-workflow/venv/
 .eggs/
 dist/
 docs/build/
@@ -33,3 +31,4 @@ my.tfvars
 my.plan
 build/
 cloudflow/build/
+.nfs*
