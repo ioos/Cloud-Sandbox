@@ -3,7 +3,21 @@
 The IOOS Cloud Sandbox is a collaborative platform for running regional coastal models in the cloud.
 It provides repeatable configurations, model code and required libraries, input data, and analysis of model outputs. The Sandbox supports not only the development of services and models, but also Cloud HPC to run and validate the models. The sandbox is intended for use across industries and is inclusive to anyone who wants to develop, enhance, and run coastal models.
 
-The Cloud Sandbox has been used to run:
+### Deployment options
+
+- **Self deployed/hosted**: Deploy using your own cloud account and funding
+- **IOOS hosted**: NOAA AWS Government Cloud – Lynker contract
+- **RPS hosted**: Isolated/secure VPC
+
+### Common use cases
+- Inter-organization collaboration
+- University graduate courses
+- Hindcasts/Reanalysis
+- Research to Operations (R2O)
+- Quasi-operational fail-over (natural disasters, data-center problems)
+- AI/ML training
+
+### The Cloud Sandbox has been used to run:
 
 - Operational versions of the [NOSOFS ROMS and FVCOM Models](https://github.com/ioos/nosofs-NCO)
 - [LiveOcean model](https://comt.ioos.us/projects/liveocean) from the University of Washington
@@ -14,8 +28,7 @@ The Cloud Sandbox has been used to run:
 - [SCHISM](https://ccrm.vims.edu/schismweb/)
 - [National Water Model](https://water.noaa.gov/about/nwm)
 
-
-### I want to...
+## I want to...
 
 - Run a model in an existing cloud sandbox
     - [NOS OFS Models](NOSOFS-MODELS.md)
@@ -23,22 +36,21 @@ The Cloud Sandbox has been used to run:
 
 - [Deploy a new cloud sandbox](DEPLOYMENT.md)
 
-
 ## Software Stack
 
-The Cloud Sandbox uses **[CloudFlow](CLOUDFLOW.md)** to orchestrate the execution of the model. CloudFlow is a customized workflow for running models built on [Prefect Workflows](https://docs-v1.prefect.io/api/0.15.13/).
+The Cloud Sandbox uses [CloudFlow](CLOUDFLOW.md) to orchestrate the execution of the model. CloudFlow is a customized workflow for running models built on [Prefect Workflows](https://docs-v1.prefect.io/api/0.15.13/).
 
 ![Modeling Stack](./images/sandbox-stack.png)
 
 ## Software Architecture 
 
-The Cloud Sandbox uses [Terraform](https://www.terraform.io/) to deploy resources to the cloud. The sandbox currently only supports Amazon Web Services (AWS).
+The Cloud Sandbox uses [Terraform](https://www.terraform.io/) to deploy resources to the cloud. The sandbox currently only supports the Amazon Web Services (AWS) cloud platform.
 
 ![Software Architecture](./images/sandbox-architecture.png)
 
-- Head Node: The head node is the machine that runs the CloudFlow scheduler. Users can SSH into this machine to run CloudFlow tasks.
-- Preconfigured AMI: This Amazon Machine Image (AMI) contains all of the necessary code to run the model. This image will run on the worker nodes.
-- Worker Nodes: The worker nodes are provisioned by Terraform and run CloudFlow tasks. This runs the preconfigured AMI.
+- **Head Node**: The head node is the machine that runs the CloudFlow scheduler. Users can SSH into this machine to run CloudFlow tasks.
+- **Preconfigured AMI**: This Amazon Machine Image (AMI) contains all of the necessary code to run the model. This image will run on the worker nodes.
+- **Worker Nodes**: The worker nodes are provisioned by Terraform and run CloudFlow tasks. This runs the preconfigured AMI.
 
 ## Contributing to Cloud Sandbox
 
