@@ -28,7 +28,7 @@ timelog = logging.getLogger('qops_timing')
 timelog.setLevel(logging.DEBUG)
 timelog.propagate = False
 
-fh = logging.FileHandler(f"{homedir}/qops_forecast.log")
+fh = logging.FileHandler(f"{homedir}/cluster_runtime.log")
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)

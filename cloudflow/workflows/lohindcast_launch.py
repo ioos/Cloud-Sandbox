@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 """ A driver to run workflows from provided job configuration files """
 
 ''' Usage:
@@ -11,6 +11,8 @@ import sys
 import re
 from signal import signal, SIGINT
 
+sys.stdout.reconfigure(line_buffering=False)
+
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
@@ -22,12 +24,23 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-#fcstconf = f'{curdir}/../cluster/configs/liveocean.rps'
-fcstconf = f'{curdir}/../cluster/configs/liveocean.config'
+######################################################################
+############### Set these for your specific deployment ###############
+######################################################################
+
+# NOS or IOOS(RPS)
+fcstconf = f'{curdir}/../cluster/configs/NOS/nos.liveocean.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.liveocean.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/test.liveocean.cfg'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
-sshuser = 'ptripp@apogee.ocean.washington.edu'
+
+# NOTE: Your ssh public key will need to be added to apogee .ssh/authorized_keys file for passwordless scp.
+sshuser = 'username@apogee.ocean.washington.edu'
+
+######################################################################
+
 
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')

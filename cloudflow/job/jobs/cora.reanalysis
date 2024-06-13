@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "adcircreanalysis",
+  "OFS"       : "adcirc-cora",
+  "YYYY"      : "2018",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "OUTDIR"    : "",
+  "ProjectName" : "Reanalysis-test",
+  "ProjectHome" : "/save/ec2-user/cora-runs/ADCIRC",
+  "ADCIRCHome"  : "/save/ec2-user/adcirc/work",
+  "CONFIG"      : "/save/ec2-user/cora-runs/ADCIRC/configs/ec95d_prior_config.yml",
+  "CONFIGTMPL"  : "/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/ec95d_prior_config.in",
+  "contact"     : "notme@my.com",
+  "WRITERCORES" : "4"
+}

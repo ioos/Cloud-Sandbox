@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-# ssh -i ~/.ssh/ioos-sandbox.pem ec2-user@ec2-3-128-236-96.us-east-2.compute.amazonaws.com
-host='ec2-3-130-117-202.us-east-2.compute.amazonaws.com'
+# Patrick owns the secret key used for the mirror
 
+if [ $# -ne 1 ]; then
+  echo "Must provide hostname or IP"
+  exit 1
+fi
+
+host=$1
 user='ec2-user'
 
 scp -p -i ~/.ssh/ioos-sandbox.pem ~/OD/SPACK/spack.mirror.gpgkey.secret ${user}@${host}:/save/environments/spack/opt/spack/gpg

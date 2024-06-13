@@ -6,6 +6,7 @@ from cloudflow.job.ROMSHindcast import ROMSHindcast
 from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
+from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -13,14 +14,12 @@ __license__ = "BSD 3-Clause"
 
 debug = True
 
-
 # noinspection PyCallingNonCallable
 class JobFactory:
     """ Class factory for different Job implementations """
 
     def __init__(self):
         return
-
 
     def job(self, configfile: str, NPROCS: int) -> Job:
         """ Create a new specific type of Job instance
@@ -53,6 +52,8 @@ class JobFactory:
             newjob = ADCIRCForecast(configfile, NPROCS)
         elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
             newjob = Plotting(configfile, NPROCS)
+        elif (jobtype == 'adcircreanalysis'):
+            newjob = ADCIRCReanalysis(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
 

@@ -49,6 +49,7 @@ setup_environment () {
   sudo yum -y install automake
   sudo yum -y install vim-enhanced
   sudo yum -y install subversion
+  sudo yum -y install bc
 
   sudo yum -y install python3.11-devel
   sudo alternatives --set python3 /usr/bin/python3.11
@@ -1005,7 +1006,9 @@ install_python_modules_user () {
   #python3 -m venv /save/$USER/csvenv
   #source /save/$USER/csvenv/bin/activate
 
-  python3 -m pip install pip install prefect==0.15.13
+  # https://docs-v1.prefect.io/api/0.15.13/
+
+  python3 -m pip install prefect==0.15.13
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
   python3 -m pip install --upgrade dask
@@ -1301,6 +1304,8 @@ setup_aliases () {
 
   #git config user.name "Patrick Tripp"
   #git config user.email "44276748+patrick-tripp@users.noreply.github.com"
+  #git config user.name "Michael Lalime"
+  #git config user.email "75450912+Michael-Lalime@users.noreply.github.com"
 
   cd $home
 }

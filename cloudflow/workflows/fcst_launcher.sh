@@ -2,10 +2,10 @@
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
-WRKDIR=/save/$USER
-
-set -xa
+# WRKDIR=/save/$USER
+# set -xa
 set -a
+
 ulimit -c unlimited
 ulimit -s unlimited
 
@@ -13,14 +13,17 @@ ulimit -s unlimited
 #__license__ = "BSD 3-Clause"
 
 
-if [ $# -lt 7 ] ; then
-  echo "Usage: $0 YYYYMMDD HH COMOUT NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
+if [ $# -lt 8 ] ; then
+  echo "Usage: $0 YYYYMMDD HH COMOUT WRKDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
   exit 1
 fi
 
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
+
 #export I_MPI_DEBUG=${I_MPI_DEBUG:-0}
-#export I_MPI_FABRICS=${I_MPI_FABRICS:-shm:ofi}
+#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
 #export I_MPI_FABRICS=efa
+#export I_MPI_FABRICS=${I_MPI_FABRICS:-shm:ofi}
 #export FI_PROVIDER=efa
 #export FI_PROVIDER=tcp
 
@@ -32,11 +35,12 @@ fi
 export CDATE=$1
 export HH=$2
 export COMOUT=$3   # OUTDIR in caller
-export NPROCS=$4
-export PPN=$5
-export HOSTS=$6
-export OFS=$7
-export EXEC=$8
+export WRKDIR=$4
+export NPROCS=$5
+export PPN=$6
+export HOSTS=$7
+export OFS=$8
+export EXEC=$9
 
 #OpenMPI
 #mpirun --version
@@ -77,8 +81,7 @@ if [ $openmpi -eq 1 ]; then
   #export MPIOPTS="-launch-agent ssh -host $HOSTS -n $NPROCS -npernode $PPN"
 elif [ $impi -eq 1 ]; then
   export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
-  export I_MPI_OFI_LIBRARY_INTERNAL=1   # Using AWS EFA Fabric on AWS
-  export I_MPI_DEBUG=1
+  export I_MPI_DEBUG=0
 else
   echo "ERROR: Unsupported mpirun version ..."
   exit 1
@@ -92,10 +95,11 @@ case $OFS in
   liveocean)
     export HOMEnos=$WRKDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
-    export COMROT=/com/$USER
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
-    export JOBARGS="$CDATE $COMROT"
+    export JOBARGS="$CDATE $COMOUT"
     cd "$JOBDIR" || exit 1
+
+    echo "About to run $JOBSCRIPT $JOBDIR"
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
