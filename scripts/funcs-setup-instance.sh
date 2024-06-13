@@ -1006,7 +1006,9 @@ install_python_modules_user () {
   #python3 -m venv /save/$USER/csvenv
   #source /save/$USER/csvenv/bin/activate
 
-  python3 -m pip install pip install prefect==0.15.13
+  # https://docs-v1.prefect.io/api/0.15.13/
+
+  python3 -m pip install prefect==0.15.13
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
   python3 -m pip install --upgrade dask
