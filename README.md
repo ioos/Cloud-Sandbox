@@ -1,7 +1,8 @@
 # IOOS Cloud Sandbox
 
 The IOOS Cloud Sandbox is a collaborative platform for running regional coastal models in the cloud.
-It provides repeatable configurations, model code and required libraries, input data, and analysis of model outputs. The Sandbox supports not only the development of services and models, but also Cloud HPC to run and validate the models. The sandbox is intended for use across industries and is inclusive to anyone who wants to develop, enhance, and run coastal models.
+
+It provides repeatable configurations, model code and required libraries, input data, and analysis of model outputs. The Sandbox provisions Cloud HPC to aid in the development of services and models, and also supports running and validating models. The Sandbox is intended for use across industries and is inclusive to anyone who wants to develop, enhance, and run coastal models.
 
 ### Use cases
 - Inter-organization collaboration
@@ -14,9 +15,9 @@ It provides repeatable configurations, model code and required libraries, input 
 
 ### Deployment options
 
-- **Self deployed/hosted**: Deploy using your own cloud account and funding
+- **Self deployed/hosted**: Deploy using your own AWS cloud account
 - **IOOS hosted**: NOAA AWS Government Cloud – Lynker contract
-- **RPS hosted**: Isolated/secure VPC
+- **RPS hosted**: Isolated secure Virtual Private Cloud (VPC)
 
 ### The Cloud Sandbox has been used to run:
 
