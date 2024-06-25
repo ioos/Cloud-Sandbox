@@ -34,7 +34,6 @@ export GRID=$7
 #IntelMPI
 #mpirun --version
 
-
 # TODO: put the following back in
 # mpirun --version | grep Intel
 # impi=$?
@@ -74,9 +73,8 @@ if [[ "$OFS" == "adcirc-cora" ]]; then
     
     export JOBDIR=$PROJHOME
 
-    # TODO: parameterize ec95d/hsofs below
-
     export RUNDIR=$PROJHOME/ERA5/$GRID/$YYYY
+
     TRACKSDIR=$PROJHOME/TracksToRun
 
     cp ./job/templates/submit.cloudflow.template "$JOBDIR/common"

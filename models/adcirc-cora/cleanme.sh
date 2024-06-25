@@ -9,6 +9,7 @@ if [ ! $ADCIRCHome ]; then
 fi
 
 cd $ADCIRCHome/build || exit 1
+
 make clean
 
 rm -Rf CMake*

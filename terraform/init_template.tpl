@@ -5,13 +5,17 @@ echo `date` > ~/setup.log
 
 # RHEL8+
 RUNUSER="ec2-user"
-#BRANCH=origin/x86_64
-BRANCH=main
 
 EFS_VERS='v1.36.0'
 
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
+
+BRANCH=main
+#BRANCH=origin/x86_64
+#BRANCH=origin/formainpr
+
+EFS_VERS='v1.36.0'
 
 # Mount the EFS volume
 
