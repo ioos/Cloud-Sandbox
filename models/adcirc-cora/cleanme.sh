@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-cd /save/ec2-user/adcirc/build || exit 1
+#ADCIRCHome=/save/ec2-user/adcirc
+#ADCIRCHome=/save/patrick/adcirc
+
+if [ ! $ADCIRCHome ]; then
+  echo "Set ADCIRCHome variable before running"
+  exit
+fi
+
+cd $ADCIRCHome/build || exit 1
 make clean
 
 rm -Rf CMake*

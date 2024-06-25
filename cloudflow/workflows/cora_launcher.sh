@@ -11,8 +11,8 @@ ulimit -s unlimited
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-if [ $# -lt 6 ] ; then
-  echo "Usage: $0 YYYY PROJHOME NPROCS PPN HOSTS CONFIG"
+if [ $# -ne 7 ] ; then
+  echo "Usage: $0 YYYY PROJHOME NPROCS PPN HOSTS CONFIG GRID"
   exit 1
 fi
 
@@ -26,6 +26,7 @@ export NPROCS=$3
 export PPN=$4
 export HOSTS=$5
 export CONFIG=$6
+export GRID=$7
 
 #OpenMPI
 #mpirun --version
@@ -73,8 +74,9 @@ if [[ "$OFS" == "adcirc-cora" ]]; then
     
     export JOBDIR=$PROJHOME
 
-    # TODO: parameterize ec95d below
-    export RUNDIR=$PROJHOME/ERA5/ec95d/$YYYY
+    # TODO: parameterize ec95d/hsofs below
+
+    export RUNDIR=$PROJHOME/ERA5/$GRID/$YYYY
     TRACKSDIR=$PROJHOME/TracksToRun
 
     cp ./job/templates/submit.cloudflow.template "$JOBDIR/common"

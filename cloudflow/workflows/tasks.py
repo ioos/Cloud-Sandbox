@@ -449,6 +449,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
     NPROCS = job.NPROCS
     ProjectHome = job.ProjectHome
     CONFIG=job.CONFIG
+    GRID = job.GRID
 
     runscript = f"{curdir}/cora_launcher.sh"
 
@@ -462,7 +463,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
         raise signals.FAIL()
 
     try:
-        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG], universal_newlines=True, stderr=subprocess.STDOUT)
+        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG, GRID], universal_newlines=True, stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
