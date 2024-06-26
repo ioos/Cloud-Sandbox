@@ -10,7 +10,7 @@
   "ADCIRCHome"  : "/save/patrick/adcirc/work",
   "GRID"        : "hsofs",
   "CONFIG"      : "/save/patrick/cora-runs/ADCIRC/configs/hsofs_prior_config.yml",
-  "CONFIGTMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config.in",
+  "CONFIGTMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config_short.in",
   "contact"     : "notme@my.com",
   "WRITERCORES" : "4"
 }
