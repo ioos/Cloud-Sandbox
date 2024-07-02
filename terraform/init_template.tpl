@@ -20,6 +20,11 @@ EFS_VERS='v1.36.0'
 mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 
+#Install mountpoint-s3 and mount buckets:
+sudo yum -y install https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
+sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-inputs /inputs_bucket
+sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-outputs /outputs_bucket
+
 sudo yum -y install amazon-efs-utils
 
 if [ $? -ne 0 ]; then
