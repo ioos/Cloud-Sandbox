@@ -25,6 +25,9 @@ sudo yum -y install https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64
 sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-inputs /inputs_bucket
 sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-outputs /outputs_bucket
 
+#Install AWS Utils
+sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
 sudo yum -y install amazon-efs-utils
 
 if [ $? -ne 0 ]; then
