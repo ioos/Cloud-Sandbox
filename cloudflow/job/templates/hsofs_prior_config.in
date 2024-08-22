@@ -21,7 +21,7 @@ Main:
 
 netCDF:
   title: "NOS-Prior-test" 
-  institution: "RPS"
+  institution: "NOAA"
   source: "IOOS_SB"
   history: "none"
   references: "tbd"
@@ -50,7 +50,7 @@ Fort15:
   # NBFR if true, expects to fill <TidalElevationBlock1> and <TidalElevationBlock2>.  If false, assumes template file specifies as needed.
   NBFR: true  
   # Winds
-  NWS: "-12"
+  NWS: "-14"
   # "hbl" | "owi" | "gahm"
   WinPreSrc: "owi" 
   WithBasin: 1
@@ -66,7 +66,7 @@ Fort15:
   # model time step, secs
   DT: 2.0
   # use padcswan (1), or not (0)
-  Coupled: 0
+  Coupled: 1
   # Output
   StationFile: hsofs.stationfile.dat
   #sets output SPOOLing, secs
