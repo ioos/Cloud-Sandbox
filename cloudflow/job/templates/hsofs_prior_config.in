@@ -50,7 +50,7 @@ Fort15:
   # NBFR if true, expects to fill <TidalElevationBlock1> and <TidalElevationBlock2>.  If false, assumes template file specifies as needed.
   NBFR: true  
   # Winds
-  NWS: "-14"
+  NWS: "-12"
   # "hbl" | "owi" | "gahm"
   WinPreSrc: "owi" 
   WithBasin: 1

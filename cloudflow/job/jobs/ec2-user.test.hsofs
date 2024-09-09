@@ -1,7 +1,7 @@
 {
   "JOBTYPE"   : "adcircreanalysis",
   "OFS"       : "adcirc-cora",
-  "YYYY"      : "2023",
+  "YYYY"      : "2020",
   "BUCKET"    : "",
   "BCKTFLDR"  : "",
   "OUTDIR"    : "",
