@@ -21,8 +21,14 @@ mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 
 #Install mountpoint-s3 and mount buckets:
+
+for a in ioos-coastalsb-inputs  ioos-transfers  ioos-und-transfer
+do
+  sudo mkdir -p /inputs/$a
+  sudo mount-s3 --read-only --allow-other $a /inputs/$a
+done
+sudo mkdir -p /outputs_bucket
 sudo yum -y install https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
-sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-inputs /inputs_bucket
 sudo mount-s3 --allow-delete --allow-overwrite --allow-other ioos-coastalsb-outputs /outputs_bucket
 
 #Install AWS Utils
