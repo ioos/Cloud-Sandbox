@@ -1,0 +1,160 @@
+output: web
+# this property is useful for conditional filtering of content that is separate from the PDF.
+
+##### IOOS edit: replace this field with the documentation site name to appear on the top navigation bar next to the home button #####
+topnav_title: IOOS Cloud Sandbox Documentation
+
+site_title: IOOS Cloud Sandbox Documentation
+# this appears in the html browser tab for the site title (seen mostly by search engines, not users)
+
+company_name: US IOOS
+# this appears in the footer
+
+host: 127.0.0.1
+# the preview server used. Leave as is.
+
+port: 4000
+# the port where the preview is rendered. You can leave this as is unless you have other Jekyll builds using this same port that might cause conflicts. in that case, use another port such as 4006.
+
+# Reading Files
+include:
+  - .htaccess
+  #- _pages
+exclude:
+  - .idea/
+  - .devcontainer/
+  - *.sh
+  - .gitignore
+  - Gemfile*
+  - theme/pages
+  #- theme/posts
+  - theme/Dockerfile
+  - theme/Gemfile
+  - theme/Gemfile.lock
+  - theme/search.json
+  - theme/update.sh
+  - theme/pdf-*
+  #- theme/
+
+
+##### IOOS edit: replace this field with the documentation site name to be included in feedback email subject line #####
+feedback_subject_line: IOOS Cloud Sandbox Documentation Feedback
+
+##### IOOS edit: replace this field with the contact email to submit to via the feedback link #####
+feedback_email: data.ioos@noaa.gov
+
+
+# feedback_disable: true
+# if you uncomment the previous line, the Feedback link gets removed
+
+# feedback_text: "Need help?"
+# if you uncomment the previous line, it changes the Feedback text
+
+# feedback_link: "http://helpy.io/"
+# if you uncomment the previous line, it changes where the feedback link points to
+
+highlighter: rouge
+# library used for syntax highlighting
+
+markdown: kramdown
+kramdown:
+ input: GFM
+ auto_ids: true
+ hard_wrap: false
+ syntax_highlighter: rouge
+
+# filter used to process markdown. note that kramdown differs from github-flavored markdown in some subtle ways
+
+collections:
+  tooltips:
+    output: false
+  docs:
+    output: true
+    # using /docs/:name causes many link/path failures in hard-coded paths or values
+    #  written into the templates (search, nav menu, etc).  Instead just output :name
+    #permalink: /docs/:name
+    permalink: :name:output_ext
+
+# collections are declared here. this renders the content in _tooltips and processes it, but doesn't output it as actual files in the output unless you change output to true
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+      comments: true
+      search: true
+      sidebar: sidebar_ioos
+      topnav: topnav_ioos
+  -
+    scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "page"
+      comments: true
+      search: true
+      sidebar: sidebar_ioos
+      topnav: topnav_ioos
+
+  -
+    scope:
+      path: ""
+      type: "tooltips"
+    values:
+      layout: "page"
+      comments: true
+      search: true
+      tooltip: true
+
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      comments: true
+      search: true
+      sidebar: sidebar_ioos
+      topnav: topnav_ioos
+
+# these are defaults used for the frontmatter for these file types
+
+sidebars:
+- sidebar_ioos
+
+description: "A Jekyll-based documentation theme for data management documentation, software and other technical documentation needs.  This is a skeleton repository for IOOS technical documentation projects to use as a starting point to develop new pages for the https://ioos.github.io site."
+# the description is used in the feed.xml file
+
+#disqus_shortname: idrbwjekyll
+# if you're using disqus for comments, add the shortname here. if not, leave this value blank.
+
+
+################################################################################################################
+# IOOS EDIT HERE! Added settings for IOOS (replace 'Cloud-Sandbox' with your GitHub repo name):#
+################################################################################################################
+# url/baseurl: modify baseurl so that url + baseurl combine to point to the full GitHub repo URL the site will be served from (replace 'your-documentation-repo-name')
+# repository: modify to point to the GitHub repo shorthand name (replace 'your-documentation-repo-name')
+# github_editme_path: provide the basepath to the branch containing source files for this site (replace 'your-documentation-repo-name').  'blob/gh-pages/_docs' is standard and should remain as is
+
+url                      : "https://ioos.github.io"
+
+#baseurl                  : "/your-documentation-repo-name"
+baseurl                  : "/Cloud-Sandbox"
+
+#repository               : "ioos/your-documentation-repo-name"
+repository               : "ioos/Cloud-Sandbox"
+
+#github_editme_path       : "ioos/your-documentation-repo-name/blob/gh-pages/_docs"
+github_editme_path       : "ioos/Cloud-Sandbox/blob/gh-pages/_docs"
+
+
+#Setup/config for 'ioos_documentation_theme_jekyll' git submodule (do not alter):
+source                   : .
+destination              : _site
+plugins_dir              : theme/_plugins
+layouts_dir              : theme/_layouts
+data_dir                 : _data
+includes_dir             : theme/_includes

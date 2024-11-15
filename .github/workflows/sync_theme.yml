@@ -1,0 +1,52 @@
+name: sync theme submodules
+
+on:
+  push:
+    branches: gh-pages
+    
+  schedule:
+     - cron: "00 14 * * *" 
+     
+  workflow_dispatch:
+
+
+jobs:
+  sync_theme_submodules:
+    if: github.repository_owner == 'ioos' # only run if ioos owns repo
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+ 
+    - name: submodule checkout
+      run: |
+           git submodule update --init
+    - name: check submodule status
+      run: |
+          git submodule status
+          
+    - name: Update theme from submodules
+      run: | 
+           git submodule update --remote --merge
+          
+    - name: check submodule status 2
+      run: |
+           git submodule status
+    - name: Commit and push if it changed
+      run: |
+           git config user.name "Automated"
+           git config user.email "actions@users.noreply.github.com"
+           git add -A
+           timestamp=$(date -u)
+           git commit -m "Update theme on: ${timestamp}" || exit 0
+           git push
+
+  keepalive-job:
+    name: Keepalive Workflow
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: gautamkrishnar/keepalive-workflow@3eb47f21355191080dca0f7662d45c192d2ef64d # 2.0.7
