@@ -23,7 +23,7 @@ include:
 exclude:
   - .idea/
   - .devcontainer/
-  - *.sh
+  - debug.sh
   - .gitignore
   - Gemfile*
   - theme/pages
