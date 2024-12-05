@@ -26,12 +26,9 @@ class ADCIRCReanalysis(Job):
         Always 'adcircforecast' for this class.
 
     configfile : str
-<<<<<<< HEAD
+
         A JSON configuration file containing the required parameters for this job.
         Usually in job/jobs folder. 
-=======
-        A JSON configuration file containing the required parameters for this class.
->>>>>>> main
 
     NPROCS : int
         Total number of processors in this cluster.
@@ -51,7 +48,6 @@ class ADCIRCReanalysis(Job):
     OUTDIR : str
         The full path to the output folder
 
-<<<<<<< HEAD
     ProjectName
 
     ProjectHome
@@ -60,21 +56,8 @@ class ADCIRCReanalysis(Job):
 
     GRID
 
-    CONFIG : str
-        The model configuration file. This is created automatically by CONFIGTMPL below.
-
     CONFIGTMPL : str
         The model configuration template file.
-=======
-    CONFIG : str
-        The ocean.in file to use or "AUTO" to use a template
-
-    CONFIGTMPL : str
-        The ocean.in template to use or "AUTO" to use the default template
-
-    TEMPLPATH : str
-        The full path to the templates to use
->>>>>>> main
 
     """
 

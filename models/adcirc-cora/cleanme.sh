@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #ADCIRCHome=/save/ec2-user/adcirc
-#ADCIRCHome=/save/patrick/adcirc
+ADCIRCHome=/save/patrick/adcirc
 
 if [ ! $ADCIRCHome ]; then
   echo "Set ADCIRCHome variable before running"

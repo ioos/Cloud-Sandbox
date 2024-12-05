@@ -205,6 +205,7 @@ class AWSCluster(Cluster):
         return self.PPN
 
 
+    # TODO: use gp3 volume instead of default gp2
     def start(self):
         """ Provision the configured cluster in the cloud.
 
