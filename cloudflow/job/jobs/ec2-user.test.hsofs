@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "adcircreanalysis",
+  "OFS"       : "adcirc-cora",
+  "YYYY"      : "2020",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "OUTDIR"    : "",
+  "ProjectName" : "Reanalysis-test",
+  "ProjectHome" : "/save/ec2-user/cora-runs/ADCIRC",
+  "ADCIRCHome"  : "/save/ec2-user/adcirc/work",
+  "GRID"        : "hsofs",
+  "CONFIG"      : "/save/ec2-user/cora-runs/ADCIRC/configs/hsofs_prior_config.yml",
+  "CONFIGTMPL"  : "/save/ec2-user/hsofs.Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config.in",
+  "contact"     : "john.ratcliff@noaa.gov",
+  "WRITERCORES" : "2"
+}
