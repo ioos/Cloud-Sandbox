@@ -65,6 +65,8 @@ output "aws_placement_group" {
   value       = aws_placement_group.cloud_sandbox_placement_group.id
 }
 
+# If an elastic ip (public ip) is specified, use the public_dns name, otherwise use the private_dns name
+# 
 output "login_command" {
    description = "SSH Login"
    value = one(aws_eip.head_node[*]) != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${one(aws_eip.head_node[*]).public_dns}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"
