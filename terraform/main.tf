@@ -22,7 +22,7 @@ resource "aws_iam_role" "sandbox_iam_role" {
       "Statement" : [
         {
           "Sid" : "AttachedIAMRole",
-          "Effect" : "Allow"
+          "Effect" : "Allow",
           "Action" : "sts:AssumeRole",
           "Principal" : { "Service" : "ec2.amazonaws.com" },
         },
