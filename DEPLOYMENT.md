@@ -192,7 +192,8 @@ You can log into the newly created EC2 instance and watch the installation progr
 ```
 Example:
 ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
-tail -f /tmp/setup.log
+sudo -i
+tail -f /root/setup.log
 ```
 
 
