@@ -1,0 +1,30 @@
+###AWS NOS/IOOS Cloud Sandbox (Intel/AMD no avx512
+
+set (SCHISM_EXE_BASENAME pschism_IOOSSB CACHE STRING "Base name (modules and file extension to be added of the executable. If you want a machine name, add it here")
+
+###Relative paths won't work
+#set(CMAKE_Fortran_COMPILER mpiifort CACHE PATH "Path to serial Fortran compiler")
+set(CMAKE_Fortran_COMPILER ifort CACHE PATH "Path to serial Fortran compiler")
+set(NetCDF_FORTRAN_DIR "$ENV{NETCDF}" CACHE PATH "Path to NetCDF Fortran library")
+set(NetCDF_C_DIR  "$ENV{NETCDFC}"  CACHE PATH "Path to NetCDF C library")
+set(CMAKE_C_COMPILER icc CACHE STRING "Path to serial C compiler")
+set(CMAKE_CXX_COMPILER icc CACHE STRING "Path to serial C++ compiler")
+#set(C_PREPROCESS_FLAG "-no-cpp" CACHE STRING "cpp is automatic with intel compiler")
+set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
+
+###Compile flags
+#set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -mcmodel=medium -assume byterecl -axCORE-AVX2 -xSSE4.2" CACHE STRING "Fortran flags" FORCE)
+
+# set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+
+#Hybrid (remember to add OMP in the name above)
+#set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl -qopenmp" CACHE STRING "Fortran flags" FORCE)
+#
+## -march=core-avx2" 
+# set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+#
+# Testing O1 builds faster
+#set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O1 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+
+set(CMAKE_Fortran_FLAGS_RELEASE "-march=x86-64 -O0 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+
