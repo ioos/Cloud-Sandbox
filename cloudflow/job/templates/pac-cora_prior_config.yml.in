@@ -52,7 +52,7 @@ Fort15:
   # Winds
   NWS: "14"
   # "hbl" | "owi" | "gahm"
-  WinPreSrc: "owi" 
+  WinPreSrc: "netcdf" 
   WithBasin: 1
   WithRegion: 0
   BasinPreFile: "fort.221.nc"

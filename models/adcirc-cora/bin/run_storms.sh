@@ -155,6 +155,8 @@ elif [ "$Fort15_WinPreSrc" == "hbl" ] ; then
     WindFac="1.00"
 elif [ "$Fort15_WinPreSrc" == "wrf" ] ; then
     WindFac="1.00"
+elif [ "$Fort15_WinPreSrc" == "netcdf" ] ; then
+    WindFac="1.09"
 else
     red "Unknown WinPreSrc type ($Fort15_WinPreSrc)\n"
     exit 1
@@ -535,7 +537,7 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
 
 	if [ $Fort15_NWS = "14" ]; then
 	    echo "&nws14control" > fort.22
-            echo "NWS14NC_WindMultiplier=1.09," >> fort.22
+            echo "NWS14NC_WindMultiplier=$WindFac," >> fort.22
 	    echo "/" >> fort.22
         fi
 
