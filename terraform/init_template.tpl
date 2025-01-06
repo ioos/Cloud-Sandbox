@@ -6,8 +6,6 @@ echo `date` > ~/setup.log
 # RHEL8+
 RUNUSER="ec2-user"
 
-EFS_VERS='v1.36.0'
-
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
 

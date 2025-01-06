@@ -38,6 +38,7 @@ resource "aws_iam_role" "sandbox_iam_role" {
     Project = var.project_tag
   }
 }
+
 resource "aws_iam_role_policy" "sandbox_iam_role_policy" {
   name   = "${var.nameprefix}-${var.availability_zone}_terraform_role_policy"
   policy = jsonencode(
@@ -61,7 +62,6 @@ resource "aws_iam_role_policy" "sandbox_iam_role_policy" {
   )
   role   = aws_iam_role.sandbox_iam_role.id
 }
-
 
 resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
   count      = length(var.managed_policies)
