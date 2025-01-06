@@ -2,22 +2,27 @@
 
 ### Prerequisites
 
-Install the AWS CLI: <br>
+Install the AWS CLI:  
 https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
 
-Make sure the CLI is configured to use your AWS account: <br>
+Make sure the CLI is configured to use your AWS account:  
 https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config
 
-**AWS credentials with the neccessary permissions:**<br>
+**AWS credentials with the neccessary permissions:**  
 If you are the owner of the AWS account and/or have full admin permissions this shouldn't be a problem. Otherwise, talk to your AWS admin about obtaining the needed permissions.
 
-Install the Terraform CLI: <br>
-https://www.terraform.io/downloads.html
+Install the Terraform CLI:  
+***Use Terraform version 1.5.7***   
+Newer versions are NOT open source for commercial use.
 
+Download and install the package that matches your desktop computer's architecture.  
+https://releases.hashicorp.com/terraform/1.5.7/  
 
+On a Mac you can also install it using brew:
+```brew install terraform```
 
-#### Clone this repository: <br>
-*(e.g. using the default path ./Cloud-Sandbox)*
+#### Clone this repository:
+(e.g. using the default path ./Cloud-Sandbox)  
 ```
 git clone https://github.com/ioos/Cloud-Sandbox.git
 ```
@@ -38,6 +43,7 @@ Terraform tracks internal resource state separately from the project state.  Clo
 
 Initialize the resources in the remote-state module (S3 bucket) by running the following commands in the Cloud-Sandbox/terraform/remote-state directory.  Running the `terraform apply` command verbatim as follows will use the default bucket configuration as provided by `s3.defaults.tfvars`.  Supply a different `.tfvars` file to override the defaults.  
 
+**First time only**
 ```
 cd ./Cloud-Sandbox/terraform/remote-state
 [Edit the s3.defaults.tfvars file and specify a unique bucket name.]
@@ -109,7 +115,7 @@ The private key file must have permissions that allows access only to you, e.g. 
 chmod 600 <b><i>your-key-pair.pem</i></b> 
 </pre>
 
-**To obtain the public key from the private key:**<br>
+**To obtain the public key from the private key:**
 _You will need to cut and paste the key into the public_key variable mentioned below._
 
 <pre>
@@ -167,20 +173,18 @@ If this happens, change the "nameprefix" variable to something unique and re-run
 ---
 
 ### Install all of the required software and libraries
-This is done automatically in `init_template.tpl` <br>
-
-Some of the things it installs:<br>
-
+This is done automatically in `init_template.tpl`  
+Some of the things it installs:  
 - GNU Fortran, C++, and C compilers
 - IntelOne API Fortran, C++, and C compilers
 - IntelOne API MPI libraries
 - NetCDF, HDF5, and other libraries needed by the models.
 
-It takes around 45 minutes for the entire setup to complete,<br>
-and about another 10 minutes for the machine image/snapshot creation.<br>
+It takes around 45 minutes for the entire setup to complete,
+and about another 10 minutes for the machine image/snapshot creation.  
 Wait a few minutes before logging in, it takes a minute or two for the instance to boot up.
 
-Details about the created instance and how to login will be output when completed.<br>
+Details about the created instance and how to login will be output when completed.
 
 Terraform output can also be viewed any time by running the following command from the ./terraform directory:
 ```
@@ -206,9 +210,9 @@ tail -f /root/setup.log
 ```
 
 
-### AMI for the compute nodes
+### Amazon Machine Image (AMI) for the compute nodes
 This is done automatically.
-The AMI ID will be found at the end of the log at /tmp/setup.log
+The AMI ID will be found at the end of the setup.log file.
 It can also be found in the AWS console or via the AWS CLI. This AMI ID will be needed to run the models.
 
 ### Optional: After setting everything up, you can change the instance type to something smaller
@@ -234,4 +238,4 @@ terraform destroy -var-file="mysettings.tfvars"
 
 In case you've already deployed cloud resources but your local copy of Cloud Sandbox is destroyed or you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init -backend-config=config.s3.tfbackend` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
 
-*Copyright © 2023 RPS Group, Inc. All rights reserved.*
+*© Copyright 2025 RPS Group. All rights reserved.*

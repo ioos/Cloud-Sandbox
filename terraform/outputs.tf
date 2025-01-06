@@ -65,11 +65,12 @@ output "aws_placement_group" {
   value       = aws_placement_group.cloud_sandbox_placement_group.id
 }
 
-/* If an elastic ip (EIP) is specified, use the public_dns name, otherwise use the private_dns name
+/* This is just a little helper output: See the "./login" script. 
+   If an elastic ip (EIP) is specified, use the public_dns name, otherwise use the private_dns name
    An EIP is not used when an existing pre-provisioned subnet is specified, e.g. NOAA/NOS environments do not allow public IPs.
-   TODO: Better logic for this, a subnet with public visibility might be specified
+   TODO: Better logic for this, an existing subnet with public visibility might be specified, breaking this.
 */
 output "login_command" {
    description = "SSH Login"
-   value = one(aws_eip.head_node[*]) != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${one(aws_eip.head_node[*]).public_dns}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_dns}"
+   value = one(aws_eip.head_node[*]) != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${one(aws_eip.head_node[*]).public_dns}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"
 }
