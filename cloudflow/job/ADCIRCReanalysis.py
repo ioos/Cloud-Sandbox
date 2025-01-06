@@ -26,7 +26,9 @@ class ADCIRCReanalysis(Job):
         Always 'adcircforecast' for this class.
 
     configfile : str
-        A JSON configuration file containing the required parameters for this class.
+
+        A JSON configuration file containing the required parameters for this job.
+        Usually in job/jobs folder. 
 
     NPROCS : int
         Total number of processors in this cluster.
@@ -46,14 +48,16 @@ class ADCIRCReanalysis(Job):
     OUTDIR : str
         The full path to the output folder
 
-    CONFIG : str
-        The ocean.in file to use or "AUTO" to use a template
+    ProjectName
+
+    ProjectHome
+
+    ADCIRCHome
+
+    GRID
 
     CONFIGTMPL : str
-        The ocean.in template to use or "AUTO" to use the default template
-
-    TEMPLPATH : str
-        The full path to the templates to use
+        The model configuration template file.
 
     """
 
@@ -107,6 +111,7 @@ class ADCIRCReanalysis(Job):
         self.ProjectName = cfDict['ProjectName']
         self.ProjectHome = cfDict['ProjectHome']
         self.ADCIRCHome = cfDict['ADCIRCHome']
+        self.GRID = cfDict['GRID']
         self.CONFIG = cfDict['CONFIG']
         self.CONFIGTMPL = cfDict['CONFIGTMPL']
         self.contact    = cfDict['contact']
@@ -135,6 +140,7 @@ class ADCIRCReanalysis(Job):
            "__ProjectHome__": self.ProjectHome,
            "__ADCIRCHome__": self.ADCIRCHome,
            "__contact__": self.contact,
+           "__GRID__": self.GRID,
            "__NPROCS__": self.NPROCS,
            "__WRITERCORES__": self.WRITERCORES
         }

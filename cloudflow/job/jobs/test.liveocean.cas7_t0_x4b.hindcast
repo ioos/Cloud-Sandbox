@@ -17,5 +17,5 @@
   "ININAME"   : "auto",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/save/patrick/forPR.Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in"
+  "OCNINTMPL" : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/liveocean.cas7_t0_x4b.in"
 }

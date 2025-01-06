@@ -1,10 +1,10 @@
 # Project-level definitions
 Main:
-  ProjectName: __ProjectName__
-  ProjectHome: __ProjectHome__
-  ADCIRCHome: __ADCIRCHome__
-  ExtraTag: ""
-  Experiment: "prior"
+  ProjectName: NOAA-Reanalysis
+  ProjectHome: /projects/reanalysis/ADCIRC
+  ADCIRCHome: /home/bblanton/ADCIRC/v56.dev_da/work
+  ExtraTag: "-post"
+  Experiment: "post"
   OutputFormat: "netCDF"
   # Processing definitions
   PackageOnly: 0
@@ -20,16 +20,14 @@ Main:
   ClobberRuns: 0
 
 netCDF:
-  title: "GECtestruns" 
-  institution: "RPS"
-  source: "IOOS SB"
-  history: "none"
-  references: "tbd"
+  title: "NOAA-Reanalysis-Posterior"
+  institution: "RENCI"
+  source: "RENCI_HPC"
+  history: "RENCI"
+  references: "http://www.renci.org, http://renci.org/reanalysis"
   convention: "CF-UGRID_0.90"
-  #contact: "patrick.tripp@tetratech.com"
-  contact: __contact__
-  #basedate replaced at runtime
-  basedate: "TBD"  
+  contact: "Brian_Blanton@Renci.Org"
+  basedate: "TBD"   
 
 ## ADCIRC/SWAN grid definition (files must be in $GridDir)
 Grid:
@@ -73,18 +71,18 @@ Fort15:
   #sets output SPOOLing, secs
   GlobalOutputInterval: 3600.0
   LocalOutputInterval: 3600.0
-  RNDAY: 31.0
+  RNDAY: 400.0
   TOUTSE: 30.958333333333333
-  DynWatLevCor: None
+  DynWatLevCor: true
 
 Job:
-  Manager: cloudflow
-  NumberOfCores: __NPROCS__
-  NumberOfWriterCores: __WRITERCORES__
-  Partition: None
-  ProcessorsPerNode: None
+  Manager: slurm
+  NumberOfCores: 64
+  NumberOfWriterCores: 4
+  Partition: batch
+  ProcessorsPerNode: 1
   Queue: None
   Reservation: None
-  StatusCommand: None
-  SubmitCommand: None
-  WallTime: None
+  StatusCommand: "squeue --noheader --format=\"%i %j %u %C\""
+  SubmitCommand: sbatch
+  WallTime: 6:00:00

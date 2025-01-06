@@ -1,41 +1,38 @@
 # Project-level definitions
 Main:
-  ProjectName: __ProjectName__
-  ProjectHome: __ProjectHome__
-  ADCIRCHome: __ADCIRCHome__
+  ProjectName: NOAA-Reanalysis
+  ProjectHome: /projects/reanalysis/ADCIRC
+  ADCIRCHome: /home/bblanton/ADCIRC/v56.dev/work
   ExtraTag: ""
   Experiment: "prior"
   OutputFormat: "netCDF"
   # Processing definitions
   PackageOnly: 0
   DontPrep: 0
-  PrepInSubmit: 1
   # submit run to scheduler
-  Submit: 1             
+  Submit: 1
   # invokes a cleanup script in BinDir/cleanup.sh
-  CleanUpDoneRuns: 0    
+  CleanUpDoneRuns: 0 
   CleanUpOnly: 0
   # assumes grid already decomposed (deprecated)
-  AssumeDecomp: 0       
+  AssumeDecomp: 0
   ClobberRuns: 0
 
 netCDF:
-  title: "GECtestruns" 
-  institution: "RPS"
-  source: "IOOS SB"
-  history: "none"
-  references: "tbd"
+  title: "NOAA-Reanalysis-Prior" 
+  institution: "RENCI"
+  source: "RENCI_HPC"
+  history: "RENCI"
+  references: "http://www.renci.org, http://renci.org/reanalysis"
   convention: "CF-UGRID_0.90"
-  #contact: "patrick.tripp@tetratech.com"
-  contact: __contact__
-  #basedate replaced at runtime
-  basedate: "TBD"  
+  contact: "Brian_Blanton@Renci.Org"
+  basedate: "TBD"   
 
 ## ADCIRC/SWAN grid definition (files must be in $GridDir)
 Grid:
-  Name: "ec95d"
-  NameAbbrev: "ec95d"
-  Extension: "14"
+  Name: "hsofs"
+  NameAbbrev: "hsofs"
+  Extension: "grd"
 
 MetSource:
   Model: "ERA5"
@@ -65,26 +62,26 @@ Fort15:
   # forcing rampup length, days
   DRAMP: 15.0 
   # model time step, secs
-  DT: 15.0
+  DT: 2.0
   # use padcswan (1), or not (0)
-  Coupled: 0
+  Coupled: 1
   # Output
-  StationFile: None
+  StationFile: hsofs.stationfile.dat
   #sets output SPOOLing, secs
   GlobalOutputInterval: 3600.0
   LocalOutputInterval: 3600.0
-  RNDAY: 31.0
+  RNDAY: 400.0
   TOUTSE: 30.958333333333333
   DynWatLevCor: None
 
 Job:
-  Manager: cloudflow
-  NumberOfCores: __NPROCS__
-  NumberOfWriterCores: __WRITERCORES__
-  Partition: None
-  ProcessorsPerNode: None
+  Manager: slurm
+  NumberOfCores: 512
+  NumberOfWriterCores: 2 
+  ProcessorsPerNode: 1
   Queue: None
+  Partition: lowpri
   Reservation: None
-  StatusCommand: None
-  SubmitCommand: None
-  WallTime: None
+  SubmitCommand: sbatch
+  StatusCommand: "squeue --noheader --format=\"%i %j %u %C\""
+  WallTime: 120:00:00

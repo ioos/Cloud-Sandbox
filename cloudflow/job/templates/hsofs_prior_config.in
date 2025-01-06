@@ -20,21 +20,20 @@ Main:
   ClobberRuns: 0
 
 netCDF:
-  title: "GECtestruns" 
-  institution: "RPS"
-  source: "IOOS SB"
+  title: "NOS-Prior-test" 
+  institution: "NOAA"
+  source: "IOOS_SB"
   history: "none"
   references: "tbd"
   convention: "CF-UGRID_0.90"
-  #contact: "patrick.tripp@tetratech.com"
   contact: __contact__
   #basedate replaced at runtime
   basedate: "TBD"  
 
 ## ADCIRC/SWAN grid definition (files must be in $GridDir)
 Grid:
-  Name: "ec95d"
-  NameAbbrev: "ec95d"
+  Name: __GRID__
+  NameAbbrev: __GRID__
   Extension: "14"
 
 MetSource:
@@ -65,15 +64,15 @@ Fort15:
   # forcing rampup length, days
   DRAMP: 15.0 
   # model time step, secs
-  DT: 15.0
+  DT: 2.0
   # use padcswan (1), or not (0)
-  Coupled: 0
+  Coupled: 1
   # Output
-  StationFile: None
+  StationFile: hsofs.stationfile.dat
   #sets output SPOOLing, secs
   GlobalOutputInterval: 3600.0
   LocalOutputInterval: 3600.0
-  RNDAY: 31.0
+  RNDAY: 400.0
   TOUTSE: 30.958333333333333
   DynWatLevCor: None
 

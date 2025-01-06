@@ -11,7 +11,7 @@ awsTypes = {'c5.large': 1, 'c5.xlarge': 2, 'c5.2xlarge': 4, 'c5.4xlarge': 8, 'c5
             'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
             't3.large': 1, 't3.xlarge': 2, 't3.2xlarge': 4,
             'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
-            'hpc6a.48xlarge': 96, 'hpc7a.96xlarge': 192, 'hpc7a.48xlarge': 96, 'c7i.48xlarge': 96, 'r7iz.32xlarge': 64 }
+            'hpc6id.32xlarge': 64, 'hpc6a.48xlarge': 96, 'hpc7a.96xlarge': 192, 'hpc7a.48xlarge': 96, 'c7i.48xlarge': 96, 'r7iz.32xlarge': 64 }
 
 
 def getPPN(instance_type):

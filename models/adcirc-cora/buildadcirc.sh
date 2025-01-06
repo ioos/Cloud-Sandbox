@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-ADCIRCHome=/save/ec2-user/adcirc
+#ADCIRCHome=/save/ec2-user/adcirc
+#ADCIRCHome=/save/patrick/adcirc
+
+if [ ! $ADCIRCHome ]; then
+  echo "Set ADCIRCHome variable before running"
+  exit
+fi
+
+ls "$ADCIRCHome/work" || exit 1
+cp cmplrflags.mk $ADCIRCHome/work
 
 # NETCDFHOME Sets the home path for netCDF C and Fortran libraries. This assumes that the libraries are installed to the same location. This folder should contain the folders "lib" and "include
 # Need to create symlinks to netcdf-fortran include and lib files
@@ -31,25 +40,11 @@ cd build
 #         -DCMAKE_Fortran_FLAGS="-mtune=native"
 
 cmake .. -DBUILD_PADCIRC=ON \
+	 -DBUILD_PADCSWAN=ON \
          -DBUILD_ADCPREP=ON \
+	 -DBUILD_ADCSWAN=OFF \
          -DENABLE_OUTPUT_NETCDF=ON \
          -DBUILD_UTILITIES=ON \
          -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
 make
 
-# testing
-# cmake .. -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=mpiifort 
-# cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-xCORE-AVX2"
-# cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-axSSE4.2"
-# cmake .. -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_C_COMPILER=icc  -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
-# -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=mpiifort
-#cmake ..
-
-# gnu make testing
-#make clean
-#make compiler=intel
-#make all compiler=intel
-#make padcirc compiler=intel
-#make compiler=intel
-#make padcirc compiler=intel
-#cmake .. -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicc -DCMAKE_Fortran_COMPILER=ifort -DBUILD_ADCIRC=ON -DBUILD_PADCIRC=ON -DENABLE_OUTPUT_NETCDF=ON -DCMAKE_Fortran_FLAGS_RELEASE="-xCORE-AVX2"
