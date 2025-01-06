@@ -32,20 +32,29 @@ Optionally: terraform can use existing VPC, subnet, and security groups by speci
 #### Initialize S3 Resources for the Terraform Backend 
 Terraform tracks internal resource state separately from the project state.  Cloud-Sandbox is configured to use a Terraform S3 backend for tracking resource state.  These resources are created within the `remote-state` module.  
 
- **This only needs to be performed once per AWS account!**  
+ **This step only needs to be performed once per AWS account!**
+ 
+***------------------------------------------------------------***
 
 Initialize the resources in the remote-state module (S3 bucket) by running the following commands in the Cloud-Sandbox/terraform/remote-state directory.  Running the `terraform apply` command verbatim as follows will use the default bucket configuration as provided by `s3.defaults.tfvars`.  Supply a different `.tfvars` file to override the defaults.  
 
 ```
 cd ./Cloud-Sandbox/terraform/remote-state
+[Edit the s3.defaults.tfvars file and specify a unique bucket name.]
 terraform init
 terraform apply -var-file=s3.defaults.tfvars
 ```
 
 The S3 bucket created in this step will then be used by the main Cloud-Sandbox project as the Terraform backend to store the resource state. If your local folder or state is deleted, the state can be retrieved from S3.
 
+***------------------------------------------------------------***
+
 #### Initialize the Cloud-Sandbox project
-Once the resources from the remote-state module are deployed you can initialize the main Cloud-Sandbox project.  Run the following command: 
+Once the resources from the remote-state module are deployed you can initialize the main Cloud-Sandbox project.
+
+Make sure the bucket name in config.s3.tfbackend file is the same as specified in the previous step.
+
+Then run the following command: 
 ```
 cd ./Cloud-Sandbox/terraform
 terraform init -backend-config=config.s3.tfbackend
@@ -192,7 +201,8 @@ You can log into the newly created EC2 instance and watch the installation progr
 ```
 Example:
 ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
-tail -f /tmp/setup.log
+sudo -i
+tail -f /root/setup.log
 ```
 
 
