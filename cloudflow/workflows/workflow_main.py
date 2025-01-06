@@ -31,15 +31,15 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 ######################################################################
 
 #fcstconf = f'{curdir}/../cluster/configs/NOS/cora.hsofs.cfg'
-#fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
 #fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
-fcstconf = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
+#fcstconf = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
+fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
 
 postconf = f'{curdir}/../cluster/configs/local.config'
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
-sshuser = 'username@apogee.ocean.washington.edu'
+sshuser = 'username@ocean.washington.edu'
 
 ######################################################################
 
