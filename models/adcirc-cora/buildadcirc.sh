@@ -15,6 +15,7 @@ cp cmplrflags.mk $ADCIRCHome/work
 # Need to create symlinks to netcdf-fortran include and lib files
 
 export NETCDFHOME="/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel"
+#export I_MPI_F90=mpiifort
 export I_MPI_F90=ifort
 export CMAKE_INSTALL_PREFIX="${ADCIRCHome}/work"
 
