@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "dflowfmhindcast",
+  "OFS"       : "dflowfm",
+  "SDATE"     : "2018091100",
+  "EDATE"     : "2018091900",
+  "HH"        : "00",
+  "COMROT"    : "/com/ec2-user",
+  "SAVE"      : "/save/ec2-user",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "/save/ec2-user/OWP/DFlow/delft3d/install/bin/dflowfm",
+  "DFLOW_LIB" : "/save/ec2-user/OWP/DFlow/delft3d/install/lib",
+  "MODEL_DIR" : "/save/ec2-user/OWP/DFlowFM_Florence_GAHM",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/output",
+  "OUTDIR"    : "auto"
+}

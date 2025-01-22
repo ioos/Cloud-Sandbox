@@ -1,0 +1,12 @@
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "gomofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/gomofs",
+  "FSPEC"     : "nos.gomofs.fields.f*t00z.nc"
+}

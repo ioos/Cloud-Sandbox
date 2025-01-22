@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "dbofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VERIFDIR"  : "auto",
+  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/dbofs",
+  "FSPEC"     : "nos.dbofs.fields.f*t00z.nc"
+}

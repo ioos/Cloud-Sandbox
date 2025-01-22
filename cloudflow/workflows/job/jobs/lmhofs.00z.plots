@@ -1,0 +1,12 @@
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "lmhofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VARS"      : ["zeta", "temp", "salinity"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/lmhofs",
+  "FSPEC"     : "nos.lmhofs.fields.f*t00z.nc"
+}

@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "fvcomforecast",
+  "OFS"       : "ngofs",
+  "CDATE"     : "today",
+  "HH"        : "03",
+  "NHOURS"    : "54",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "DATE_REF"  : "2012-01-01 00:00:00",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/ngofs/output",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "auto",
+  "INTMPL"    : "auto"
+}

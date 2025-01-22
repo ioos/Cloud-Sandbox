@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "fvcomforecast",
+  "OFS"       : "leofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "NHOURS"    : "120",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "DATE_REF"  : "2015-01-01 00:00:00",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/leofs/output",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "auto",
+  "INTMPL"    : "auto"
+}

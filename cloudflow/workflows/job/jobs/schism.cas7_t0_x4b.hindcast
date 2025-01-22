@@ -1,0 +1,16 @@
+{
+  "JOBTYPE"   : "schismhindcast",
+  "OFS"       : "schism",
+  "SDATE"     : "2020082400",
+  "EDATE"     : "2020090300",
+  "HH"        : "00",
+  "COMROT"    : "/com/ec2-user",
+  "SAVE"      : "/save/ec2-user",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "/save/ec2-user/OWP/schism/build/bin/pschism_DEBUG_DEBUG_BLD_STANDALONE_SH_MEM_COMM_TVD-VL",
+  "MODEL_DIR" : "/save/ec2-user/OWP/laura",
+  "NSCRIBES"  : "2",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/output",
+  "OUTDIR"    : "auto"
+}

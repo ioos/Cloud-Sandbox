@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "gomofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/gomofs/output",
+  "NTIMES"    : "5760",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

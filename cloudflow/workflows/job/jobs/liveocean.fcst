@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "liveocean",
+  "CDATE"     : "20170601",
+  "HH"        : "00",
+  "COMROT"    : "/com/ec2-user",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "",
+  "TIME_REF"  : "19700101",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/output",
+  "NTIMES"    : "2880",
+  "ININAME"   : "auto",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

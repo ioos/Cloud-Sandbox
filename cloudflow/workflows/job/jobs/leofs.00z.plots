@@ -1,0 +1,12 @@
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "leofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VARS"      : ["zeta","temp"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/leofs",
+  "FSPEC"     : "nos.leofs.fields.f*t00z.nc"
+}

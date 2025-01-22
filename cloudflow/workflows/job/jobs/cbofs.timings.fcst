@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "cbofs",
+  "CDATE"     : "20191001",
+  "HH"        : "00",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/cbofs/output",
+  "NTIMES"    : "34560",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "/home/centos/Cloud-Sandbox/cloudflow/job/templates/cbofs.timings.ocean.in"
+}

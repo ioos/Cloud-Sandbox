@@ -1,0 +1,12 @@
+{
+  "JOBTYPE"   : "plotting",
+  "OFS"       : "ciofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/ciofs",
+  "FSPEC"     : "nos.ciofs.fields.f*t00z.nc"
+}

@@ -1,0 +1,19 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "wrfroms",
+  "CDATE"     : "20110827",
+  "HH"        : "06",
+  "COMROT"    : "/com",
+  "PTMP"      : "/ptmp",
+  "EXEC"      : "",
+  "TIME_REF"  : "20060101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/wrfroms/output",
+  "NTIMES"    : "2520",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto",
+  "CPLINTMPL" : "auto",
+  "WRFINTMPL" : "auto"
+}

@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "liveocean",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VERIFDIR"  : "auto",
+  "VARS"      : ["temp", "zeta", "w", "salt"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "LiveOcean/plots",
+  "FSPEC"     : "ocean_his_*.nc"
+}

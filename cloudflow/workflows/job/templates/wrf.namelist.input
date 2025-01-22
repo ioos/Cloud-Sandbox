@@ -1,0 +1,139 @@
+! Check run/README.namelist in WRF root directory for description of namelist
+! variables.
+
+ &time_control
+ run_days                            = 0,
+ run_hours                           = __NHOURS__,
+ run_minutes                         = 0,
+ run_seconds                         = 0,
+ start_year                          = __STARTYEAR__,
+ start_month                         = __STARTMO__,
+ start_day                           = __STARTDY__,
+ start_hour                          = __STARTHR__,
+ start_minute                        = 00,
+ start_second                        = 00,
+ end_year                            = __STOPYEAR__,
+ end_month                           = __STOPMO__,
+ end_day                             = __STOPDY__,
+ end_hour                            = __STOPHR__,
+ end_minute                          = 00,   00,   00,
+ end_second                          = 00,   00,   00,
+ interval_seconds                    = 21600    ! incomming OBC data (every 6 hours)
+ input_from_file                     = .true., .false., .false.,
+ force_use_old_data                  = .false.,
+ input_inname                        = "irene_wrf_inp_d<domain>.nc"
+ bdy_inname                          = "irene_wrf_bdy_d<domain>.nc" 
+ history_outname                     = "irene_wrf_his_d<domain>_<date>.nc" 
+ history_interval                    = 60,   60,   60,       ! minutes
+ frames_per_outfile                  = 1000, 1000, 1000,
+ restart                             = .false.,
+ rst_outname                         = "irene_wrf_rst_d<domain>_<date>.nc"
+ restart_interval_d                  = 2,     ! days
+ io_form_history                     = 2      ! 1: binary, 2: NetCDF, 5: GRIB1
+ io_form_restart                     = 2      ! 1: binary, 2: NetCDF, 5: GRIB1
+ io_form_input                       = 2      ! 1: binary, 2: NetCDF, 5: GRIB1
+ io_form_boundary                    = 2      ! 1: binary, 2: NetCDF, 5: GRIB1
+ debug_level                         = 0
+ nocolons                            = .true.
+ auxinput4_inname                    = "irene_wrf_sst_d<domain>.nc"
+ auxinput4_interval                  = 360, 360, 360,  ! minutes (6 hours), only used if sst_update=1
+ io_form_auxinput4                   = 2
+ mean_diag                           = 1      ! RAMS averaged diagnostics (1:yes 0:no)
+ mean_diag_interval                  = 0      ! time-averaged interval (minutes)
+ mean_diag_interval_s                = 60     ! (1 ocean DT is 60 seconds)
+ mean_diag_interval_m                = 0
+ mean_diag_interval_h                = 0
+ mean_diag_interval_d                = 0
+ mean_diag_interval_mo               = 0
+ auxhist5_outname                    = "irene_wrf_mean_d<domain>_<date>.nc"
+ io_form_auxhist5                    = 2      ! 0: no file, 2: NetCDF
+! iofields_filename                  = "add_wrf_output_vars.d01"
+ /
+
+ &domains
+ time_step                           = 20,                ! seconds
+ time_step_fract_num                 = 0,
+ time_step_fract_den                 = 1,
+ time_step_dfi                       = 60
+ max_dom                             = 1,                 ! number of nested grids
+ e_we                                = 320,
+ e_sn                                = 280,
+ e_vert                              = 40,      40,      40,
+ dx                                  = 6000.0,  3000.0,  1000.0,
+ dy                                  = 6000.0,  3000.0,  1000.0,
+ p_top_requested                     = 10000,
+ num_metgrid_levels                  = 27,
+ num_metgrid_soil_levels             = 4,
+ grid_id                             = 1,       2,       3,
+ parent_id                           = 0,       1,       2,
+ i_parent_start                      = 1,       63,      30,
+ j_parent_start                      = 1,       49,      30,
+ parent_grid_ratio                   = 1,       3,       3,
+ parent_time_step_ratio              = 1,       3,       3,
+ feedback                            = 1,    ! 0: no feeback, 1: two-way
+ smooth_option                       = 0     ! 0: no, smoothing parent domain aroud nest area
+ smooth_option                       = 0
+ corral_dist                         = 2,       2,       2,
+ nproc_x                             = -1    ! number of processors in x for decomposition
+ nproc_y                             = -1    ! number of processors in y for decomposition
+ /
+
+ &physics
+ mp_physics                          = 6,     6,     6,
+ cu_physics                          = 0,     0,     0,
+ ra_lw_physics                       = 4,     4,     4,
+ ra_sw_physics                       = 4,     4,     4,
+ bl_pbl_physics                      = 1,     1,     1,
+ sf_sfclay_physics                   = 1,     1,     1,
+ sf_surface_physics                  = 2,     2,     2,
+ radt                                = 6,     6,     6,
+ bldt                                = 0,     0,     0,
+ cudt                                = 0,     0,     0,
+ icloud                              = 1,    !  cloud fraction for radiation; only works ra_sw_physics=1,4 abd ra_lw_physics=1,4
+ isftcflx                            = 2,    !  Added for Garrett Hurricane Flux
+ surface_input_source                = 3,
+ num_soil_layers                     = 4,
+ num_land_cat                        = 21,
+ sf_urban_physics                    = 0,     0,     0,
+ sst_skin                            = 0     !  adds diurnal cycle to SST
+ sst_update                          = 1,    !  uses time-varyng SST data from auxinput4_inname
+ /
+
+ &fdda
+ /
+
+ &dynamics
+ hybrid_opt                          = 2,
+ w_damping                           = 0,
+ diff_opt                            = 1,      1,      1,
+ km_opt                              = 4,      4,      4,
+ diff_6th_opt                        = 0,      0,      0,
+ diff_6th_factor                     = 0.12,   0.12,   0.12,
+ base_temp                           = 290.
+ damp_opt                            = 3,
+ zdamp                               = 5000.,  5000.,  5000.,
+ dampcoef                            = 0.2,    0.2,    0.2,
+ khdif                               = 0,      0,      0,
+ kvdif                               = 0,      0,      0,
+ non_hydrostatic                     = .true., .true., .true.,
+ moist_adv_opt                       = 1,      1,      1,
+ scalar_adv_opt                      = 1,      1,      1,
+ gwd_opt                             = 0,
+ iso_temp                            = 0,
+ /
+
+ &bdy_control
+ spec_bdy_width                      = 5,
+ spec_zone                           = 1,
+ relax_zone                          = 4,
+ specified                           = .true.,  .false., .false.,
+ nested                              = .false., .false., .false.,
+ /
+
+ &grib2
+ /
+
+ &namelist_quilt
+ nio_tasks_per_group = 0,
+ nio_groups = 1,
+ /

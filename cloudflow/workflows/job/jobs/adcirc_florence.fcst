@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "adcircforecast",
+  "OFS"       : "adcircofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "EXEC"      : "",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "ADCIRC/output",
+  "COMROT"    : "/mnt/efs/fs1/com/adcirc",
+  "EXEC"      : "",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

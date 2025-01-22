@@ -1,0 +1,13 @@
+{
+  "JOBTYPE"   : "plotting_diff",
+  "OFS"       : "sfbofs",
+  "CDATE"     : "today",
+  "HH"        : "03",
+  "INDIR"     : "auto",
+  "OUTDIR"    : "auto",
+  "VERIFDIR"  : "auto",
+  "VARS"      : ["zeta", "temp", "salinity"],
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "public/nosofs/plots/sfbofs",
+  "FSPEC"     : "nos.sfbofs.fields.f*t03z.nc"
+}

@@ -1,0 +1,15 @@
+{
+  "JOBTYPE"   : "fvcomforecast",
+  "OFS"       : "lmhofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "NHOURS"    : "120",
+  "COMROT"    : "/com/nos",
+  "PTMP"      : "/ptmp",
+  "DATE_REF"  : "2018-01-01 00:00:00",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nos/lmhofs/output",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "auto",
+  "INTMPL"    : "auto"
+}

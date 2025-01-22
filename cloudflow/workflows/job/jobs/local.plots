@@ -1,0 +1,8 @@
+{
+  "OFS"       : "liveocean",
+  "CDATE"     : "20191106",
+  "HH"        : "00",
+  "INDIR"     : "/Users/patrick.tripp/NOSOFS/COMROT/liveocean/f2019.11.06",
+  "OUTDIR"    : "/Users/patrick.tripp/NOSOFS/COMROT/liveocean/plots/f2019.11.06",
+  "VARS"      : ["temp"]
+}

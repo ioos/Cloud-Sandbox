@@ -1,0 +1,17 @@
+{
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "tbofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "COMROT"    : "/com/patrick.tripp/nosofs",
+  "PTMP"      : "/ptmp/patrick.tripp",
+  "EXEC"      : "",
+  "TIME_REF"  : "20090101.0d0",
+  "BUCKET"    : "ioos-cloud-sandbox",
+  "BCKTFLDR"  : "nosofs/patrick.tripp/tbofs/output",
+  "NTIMES"    : "34560",
+  "ININAME"   : "",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

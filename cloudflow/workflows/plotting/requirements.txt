@@ -1,0 +1,8 @@
+pyproj==2.6
+dask
+distributed
+cmocean
+numpy
+matplotlib
+netCDF4
+Pillow
