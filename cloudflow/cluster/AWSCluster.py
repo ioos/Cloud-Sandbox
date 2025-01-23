@@ -11,6 +11,8 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 
+from haikunator import Haikunator
+
 from cloudflow.cluster import nodeInfo
 from cloudflow.cluster.Cluster import Cluster
 
@@ -140,6 +142,32 @@ class AWSCluster(Cluster):
         self.__state = state
         return self.__state
 
+
+
+    def memorable_tags(tags : list):
+
+        haikumaker = Haikunator()
+
+        # Return a random two words, example: "shiny-wave"
+        haiku = haikumaker.haikunate(token_length=0)
+        prefix=f"{haiku}-"
+
+        if not any(tag["Key"] == "Name" for tag in tags):
+            raise ValueError("No 'Name' tag found")
+
+        for tag in tags:
+            if tag["Key"] == "Name":
+                tag["Value"] = prefix + tag["Value"]
+                print(f"Your cluster Name: {tag['Value']}")
+                log.info(f"Your cluster Name: {tag['Value']}")
+
+        return tags
+
+
+
+
+    """ Implemented abstract methods """
+
     ########################################################################
 
     def readConfig(self, configfile):
@@ -168,6 +196,7 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
+
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
 
@@ -181,7 +210,11 @@ class AWSCluster(Cluster):
         self.region = cfDict['region']
         self.nodeType = cfDict['nodeType']
         self.nodeCount = cfDict['nodeCount']
-        self.tags = cfDict['tags']
+
+        # Hacky way to force unique Name tags
+        # self.tags = cfDict['tags']
+        self.tags = memorable_tags(cfDict['tags'])
+
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
         self.sg_ids = cfDict['sg_ids']
@@ -192,7 +225,6 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
-    """ Implemented abstract methods """
 
     def getCoresPN(self):
         """ Get the number of cores per node in this cluster.

@@ -4,6 +4,9 @@
 import os
 import sys
 import time
+
+# TODO: add additional signal handlers for more robust cleanup of failed runs
+
 from signal import signal, SIGINT
 import logging
 from distributed import Client
@@ -23,7 +26,6 @@ from cloudflow.workflows import job_tasks as jtasks
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 provider = 'AWS'
 
@@ -48,7 +50,7 @@ for handler in prelog.handlers:
     handler.setFormatter(pformatter)
 
 
-def test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
+def local_test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 
     with Flow('fcst workflow') as fcstflow:
         #####################################################################
@@ -63,20 +65,15 @@ def test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 
         # Get forcing data here
 
-        # Start the cluster
-        #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
-
         # Run the forecast
         fcst_run = tasks.forecast_run(cluster, fcstjob)
-
-        # Terminate the cluster nodes
-        #cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
 
         # If the fcst fails, then set the whole flow to fail
         fcstflow.set_reference_tasks([fcst_run])
 
     return fcstflow
 
+######################################################################
 
 def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
 
@@ -109,7 +106,7 @@ def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
 
 ######################################################################
 
-def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow: 
+def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow: 
 
     """ Provides a Prefect Flow for a hindcast workflow.
 
@@ -129,7 +126,7 @@ def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
     hindcastflow : prefect.Flow
     """
 
-    with Flow('hindcast workflow') as hcstflow:
+    with Flow('multi hindcast workflow') as multiflow:
         #####################################################################
         # HINDCAST
         #####################################################################
@@ -169,11 +166,12 @@ def hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
         #pngtocloud.set_upstream(plots)
 
         # If the hcst fails, then set the whole flow to fail
-        hcstflow.set_reference_tasks([hcst_run])
+        multiflow.set_reference_tasks([hcst_run])
 
-    return hcstflow
+    return multiflow
 
 ######################################################################
+
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.
@@ -626,14 +624,10 @@ def handler(signal_received, frame):
 
 if __name__ == '__main__':
 
-    signal(SIGINT, handler)
+    #signal(SIGINT, handler)
+    pass
 
-    conf = f'./cluster/configs/debug.config'
-    jobfile = f'./job/jobs/ngofs.03z.fcst'
-
-    # Test the notebook flow
-    #nbflow = notebook_flow(postconf, jobfile)
-    #nbflow.run()
-
-    testflow = debug_model(conf, jobfile, 'none')
-    testflow.run()
+    # conf = f'./cluster/configs/debug.config'
+    # jobfile = f'./job/jobs/ngofs.03z.fcst'
+    # testflow = debug_model(conf, jobfile, 'none')
+    # testflow.run()
