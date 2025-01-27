@@ -6,6 +6,8 @@ import time
 import json
 import logging
 import math
+import inspect
+
 from pathlib import Path
 
 import boto3
@@ -104,6 +106,8 @@ class AWSCluster(Cluster):
             An initialized instance of this class.
         """
 
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.platform = 'AWS'
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
@@ -142,9 +146,11 @@ class AWSCluster(Cluster):
         self.__state = state
         return self.__state
 
+    ########################################################################
 
+    def memorable_tags(self, tags : list):
 
-    def memorable_tags(tags : list):
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         haikumaker = Haikunator()
 
@@ -158,16 +164,16 @@ class AWSCluster(Cluster):
         for tag in tags:
             if tag["Key"] == "Name":
                 tag["Value"] = prefix + tag["Value"]
-                print(f"Your cluster Name: {tag['Value']}")
+                print("\n***************************************************************")
+                print(f"Your cluster name: {tag['Value']}")
+                print("***************************************************************\n")
                 log.info(f"Your cluster Name: {tag['Value']}")
 
         return tags
 
 
-
-
+    ########################################################################
     """ Implemented abstract methods """
-
     ########################################################################
 
     def readConfig(self, configfile):
@@ -183,6 +189,8 @@ class AWSCluster(Cluster):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         with open(configfile, 'r') as cf:
             cfDict = json.load(cf)
@@ -206,6 +214,9 @@ class AWSCluster(Cluster):
           Dictionary containing this cluster parameterized settings.
 
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.platform = cfDict['platform']
         self.region = cfDict['region']
         self.nodeType = cfDict['nodeType']
@@ -213,8 +224,9 @@ class AWSCluster(Cluster):
 
         # Hacky way to force unique Name tags
         # self.tags = cfDict['tags']
-        self.tags = memorable_tags(cfDict['tags'])
-
+        print("running memorable_tags")
+        self.tags = self.memorable_tags(cfDict['tags'])
+        print(f"self.tags: {self.tags}")
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
         self.sg_ids = cfDict['sg_ids']
@@ -246,12 +258,14 @@ class AWSCluster(Cluster):
         self.__instances : list of EC2.Intance
             the list of Instances started. See boto3 documentation.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         ec2 = boto3.resource('ec2', region_name=self.region)
 
         try:
 
             if self.nodeType == 'hpc6a.48xlarge':
-
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -339,6 +353,9 @@ class AWSCluster(Cluster):
         responses : list of dict
             a list of the responses from EC2.Instance.terminate(). See boto3 documentation.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.terminateDaskWorker()
 
         # Terminate any running dask scheduler
@@ -374,6 +391,7 @@ class AWSCluster(Cluster):
             list of private dns names
         """
         hosts = []
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         for instance in self.__instances:
             # hosts.append(instance.private_dns_name)

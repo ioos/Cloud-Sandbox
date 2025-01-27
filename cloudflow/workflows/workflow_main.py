@@ -54,23 +54,28 @@ def main():
     joblist = []
 
     # TODO: require a cluster config file when starting a job, provide job-specific node Name tag
-    # if lenargs < 2:
-    #     print(f"Usage: {os.path.basename(__file__)} cluster_config job [job2 job3 ...]")
-    #     print(f"    example: {os.path.basename(__file__)} cluster/configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
-    #     sys.exit(1)
-    # idx = 2
-
-    if lenargs < 1:
-        print(f"Usage: {os.path.basename(__file__)} job_config [job2_config job3_config ...]")
-        print(f"    example: {os.path.basename(__file__)} myjobs/cora.reanalysis")
+    print(f"lenargs: {lenargs}")
+    if lenargs < 2:
+        print(f"Usage: {os.path.basename(__file__)} cluster_config job [job2 job3 ...]")
+        print(f"    example: {os.path.basename(__file__)} cluster/configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
         sys.exit(1)
+    else:
+        idx = 1
+        fcstconf = os.path.abspath(sys.argv[idx])
 
-    idx = 1
 
+    #if lenargs < 1:
+    #    print(f"Usage: {os.path.basename(__file__)} job_config [job2_config job3_config ...]")
+    #    print(f"    example: {os.path.basename(__file__)} myjobs/cora.reanalysis")
+    #    sys.exit(1)
+
+    idx = 2
     while idx <= lenargs:
         ajobfile = os.path.abspath(sys.argv[idx])
         joblist.append(ajobfile)
         idx += 1
+
+    print(f"joblist: {joblist}")
 
     flowdeq = collections.deque()
 
@@ -78,6 +83,8 @@ def main():
         jobdict = util.readConfig(jobfile)
         jobtype = jobdict["JOBTYPE"]
         print('JOBTYPE: ', jobtype)
+
+        print(f"jobtype")
 
         if re.search("forecast", jobtype):
             # Add the forecast flow
@@ -108,15 +115,15 @@ def main():
             sys.exit()
 
     qlen = len(flowdeq)
+
     idx = 0
-
-
     # Run all of the flows in the queue
     while idx < qlen:
         aflow = flowdeq.pop()
         idx += 1
 
         # Stop if the flow failed
+        print(f"Starting aflow.run() for {aflow}")
         state = aflow.run()
         if state.is_successful():
             continue
