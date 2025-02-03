@@ -31,7 +31,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 # model deployment on the cloud environment
 ######################################################################
 
-template_conf = f'{curdir}/../cluster/configs/dflowfm.ioos'
+template_conf = f'{curdir}/../cluster/configs/OWP/dflowfm.ioos'
 
 ######################################################################
 
