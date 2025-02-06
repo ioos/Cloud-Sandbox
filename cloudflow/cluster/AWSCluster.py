@@ -265,7 +265,24 @@ class AWSCluster(Cluster):
 
         try:
 
-            if self.nodeType == 'hpc6a.48xlarge':
+            if self.nodeType.startswith('hpc7a'):
+              self.__instances = ec2.create_instances(
+                ImageId=self.image_id,
+                InstanceType=self.nodeType,
+                KeyName=self.key_name,
+                MinCount=self.nodeCount,
+                MaxCount=self.nodeCount,
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'instance',
+                        'Tags': self.tags
+                    }
+                ],
+                Placement=self.__placementGroup(),
+                NetworkInterfaces=self.__netInterfaceDuo()
+              )
+
+            elif self.nodeType == 'hpc6a.48xlarge':
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -460,6 +477,39 @@ class AWSCluster(Cluster):
             interface['InterfaceType'] = 'efa'
 
         return interface
+
+    ########################################################################
+
+    def __netInterfaceDuo(self):
+        """ Specify an efa enabled network interface if supported by node type.
+            Also attaches security groups """
+
+        interface0 = {
+            'AssociatePublicIpAddress': False,
+            'DeleteOnTermination': True,
+            'Description': 'Network adaptor via cloudflow boto3 api',
+            'DeviceIndex': 0,
+            'Groups': self.sg_ids,
+            'SubnetId': self.subnet_id
+        }
+        if self.nodeType.startswith(tuple(efatypes)):
+            interface0['InterfaceType'] = 'efa'
+
+        # naive testing
+        interface1 = {
+            'AssociatePublicIpAddress': False,
+            'DeleteOnTermination': True,
+            'Description': 'Network adaptor via cloudflow boto3 api',
+            'DeviceIndex': 1,
+            'Groups': self.sg_ids,
+            'SubnetId': self.subnet_id
+        }
+        if self.nodeType.startswith(tuple(efatypes)):
+            interface1['InterfaceType'] = 'efa'
+
+        interfaces = [ interface0, interface1 ]
+
+        return interfaces
 
     ########################################################################
 
