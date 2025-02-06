@@ -67,8 +67,8 @@ def main():
         print('JOBTYPE: ', jobtype)
 
         if re.search("hindcast", jobtype):
-        # Add the hindcast flow
-            hindcastflow = flows.hindcast_flow(fcstconf, jobfile, sshuser)
+           # Add the hindcast flow
+            hindcastflow = flows.multi_hindcast_flow(fcstconf, jobfile, sshuser)
             flowdeq.appendleft(hindcastflow)
 
         else:

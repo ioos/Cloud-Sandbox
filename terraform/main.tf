@@ -15,17 +15,36 @@ provider "aws" {
 }
 
 resource "aws_iam_role" "sandbox_iam_role" {
-  name = "${var.nameprefix}-${var.availability_zone}_terraform_role"
+  name               = "${var.nameprefix}-${var.availability_zone}_terraform_role"
   assume_role_policy = jsonencode(
     {
-      "Version" : "2012-10-17",
-      "Statement" : [
+      Version = "2012-10-17",
+      Statement = [
         {
-          "Sid" : "AttachedIAMRole",
-          "Effect" : "Allow"
-          "Action" : "sts:AssumeRole",
-          "Principal" : { "Service" : "ec2.amazonaws.com" },
-        },
+          Action = "sts:AssumeRole",
+          Sid    = "AttachedIAMRole",
+          Principal = {
+            Service = [
+              "ec2.amazonaws.com"
+            ]
+          },
+          Effect = "Allow"
+        }
+      ]
+    }
+  )
+  tags = {
+    Name    = "${var.name_tag} IAM Role"
+    Project = var.project_tag
+  }
+}
+
+resource "aws_iam_role_policy" "sandbox_iam_role_policy" {
+  name   = "${var.nameprefix}-${var.availability_zone}_terraform_role_policy"
+  policy = jsonencode(
+    {
+      Version = "2012-10-17",
+      Statement = [
         {
             "Sid": "ListObjectsInBucket",
             "Effect": "Allow",
@@ -39,11 +58,9 @@ resource "aws_iam_role" "sandbox_iam_role" {
             "Resource": ["arn:aws:s3:::ioos-coastalsb-*puts/*"]
         }
       ]
-  })
-  tags = {
-    Name    = "${var.name_tag} IAM Role"
-    Project = var.project_tag
-  }
+    }
+  )
+  role   = aws_iam_role.sandbox_iam_role.id
 }
 
 resource "aws_iam_role_policy_attachment" "sandbox_role_policy_attach" {
@@ -56,7 +73,6 @@ resource "aws_iam_instance_profile" "cloud_sandbox_iam_instance_profile" {
   name = "${var.nameprefix}-${var.availability_zone}_terraform_instance_profile"
   role = aws_iam_role.sandbox_iam_role.name
 }
-
 
 resource "aws_placement_group" "cloud_sandbox_placement_group" {
   name     = "${var.nameprefix}-${var.availability_zone}_Terraform_Placement_Group"

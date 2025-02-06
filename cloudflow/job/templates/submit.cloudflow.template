@@ -4,6 +4,8 @@
 echo "RUNDIR: $RUNDIR"
 cd $RUNDIR
 echo "PWD: $PWD"
+export YYYY=`basename $PWD`
+echo "YYYY: $YYYY"
 
 PHOME=<ProjectHome>
 
@@ -19,7 +21,6 @@ module purge
 module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
 module load intel-oneapi-mpi/2021.9.0-intel-2021.9.0-egjrbfg
-setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
 module load zlib-ng/2.1.4-intel-2021.9.0-57ptxrw
 module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
@@ -43,7 +44,7 @@ if [ $ERROVALUE == 0 ] ; then
    RUNSUFFIX="complete"
    cp PE0000/fort.6{7,8}* .
    rm -rf PE* metis* part* fort.80 rads.64.nc fort.90.nc
-   mv -f $RUNDIR/../2018 $RUNDIR/../2018.previous
+   mv -f $RUNDIR/../$YYYY $RUNDIR/../$YYYY.previous
 else
    RUNSUFFIX="failed"
 fi

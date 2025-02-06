@@ -1,0 +1,57 @@
+#!/bin/bash -l
+
+#SBATCH -J <JobName>
+#SBATCH -t <WallTime>
+#SBATCH -n <NumberOfCores> 
+#SBATCH -p <Partition>
+#SBATCH --reservation=<Reservation>
+#SBATCH --mem-per-cpu=1Gb
+
+cd $SLURM_SUBMIT_DIR
+
+PHOME=<ProjectHome>
+
+echo "Job Run on Nodes"
+echo "----------------"
+echo $SLURM_JOB_NODELIST
+echo "----------------"
+
+hostname > "CONTROL.TXT"
+echo "Job Run on Nodes" >> "CONTROL.TXT"
+echo "----------------" >> "CONTROL.TXT"
+echo $SLURM_JOB_NODELIST >> "CONTROL.TXT"
+echo "----------------" >> "CONTROL.TXT"
+
+hostname
+
+# Load modules
+module purge
+module load icc/2022.0.2
+module load env_icc/any
+module load hdf5/1.12.1-intel
+module load netcdf-c/4.8.1-intel
+module load netcdf-fortran/4.5.4-intel
+module load mvapich2/2.3.7-intel
+
+DATETIME=`date +'%Y-%h-%d-T%H:%M:%S'`
+echo "${DATETIME}    $SLURM_JOB_ID" > run.start
+
+#PrepLine1
+#PrepLine2
+
+srun $PHOME/<ModelName>  <WriterCores>
+
+ERROVALUE=$?
+if [ $ERROVALUE == 0 ] ; then
+   RUNSUFFIX="complete"
+   cp PE0000/fort.6{7,8}* .
+   #rm -rf PE* metis* part* fort.80 rads.64.nc fort.90.nc
+else
+   RUNSUFFIX="failed"
+fi
+
+
+DATETIME=`date +'%Y-%h-%d-T%H:%M:%S'`
+echo "${DATETIME}    $SLURM_JOB_ID" > run.${RUNSUFFIX}
+
+

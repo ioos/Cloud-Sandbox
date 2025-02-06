@@ -2,6 +2,7 @@
 
 import json
 import logging
+import inspect
 
 from prefect.engine import signals
 
@@ -10,7 +11,6 @@ from cloudflow.cluster.LocalCluster  import LocalCluster
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 debug = True
 
@@ -21,6 +21,7 @@ class ClusterFactory:
 
     def __init__(self):
         """ Constructor """
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
         return
 
 
@@ -37,6 +38,8 @@ class ClusterFactory:
         newcluster : Cluster
             Returns a new instance of a Cluster implementation.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         cfdict = self.readconfig(configfile)
 
@@ -71,6 +74,8 @@ class ClusterFactory:
         cfdict : dict
             Dictionary representation of JSON configfile
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         with open(configfile, 'r') as cf:
             cfdict = json.load(cf)
