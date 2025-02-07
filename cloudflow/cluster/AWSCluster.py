@@ -6,10 +6,14 @@ import time
 import json
 import logging
 import math
+import inspect
+
 from pathlib import Path
 
 import boto3
 from botocore.exceptions import ClientError
+
+from haikunator import Haikunator
 
 from cloudflow.cluster import nodeInfo
 from cloudflow.cluster.Cluster import Cluster
@@ -102,6 +106,8 @@ class AWSCluster(Cluster):
             An initialized instance of this class.
         """
 
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.platform = 'AWS'
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
@@ -142,6 +148,34 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
+    def memorable_tags(self, tags : list):
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        haikumaker = Haikunator()
+
+        # Return a random two words, example: "shiny-wave"
+        haiku = haikumaker.haikunate(token_length=0)
+        prefix=f"{haiku}-"
+
+        if not any(tag["Key"] == "Name" for tag in tags):
+            raise ValueError("No 'Name' tag found")
+
+        for tag in tags:
+            if tag["Key"] == "Name":
+                tag["Value"] = prefix + tag["Value"]
+                print("\n***************************************************************")
+                print(f"Your cluster name: {tag['Value']}")
+                print("***************************************************************\n")
+                log.info(f"Your cluster Name: {tag['Value']}")
+
+        return tags
+
+
+    ########################################################################
+    """ Implemented abstract methods """
+    ########################################################################
+
     def readConfig(self, configfile):
         """ Reads a JSON configuration file into a dictionary.
 
@@ -156,6 +190,8 @@ class AWSCluster(Cluster):
           Dictionary containing this cluster parameterized settings.
         """
 
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         with open(configfile, 'r') as cf:
             cfDict = json.load(cf)
 
@@ -168,6 +204,7 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
+
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
 
@@ -177,11 +214,19 @@ class AWSCluster(Cluster):
           Dictionary containing this cluster parameterized settings.
 
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.platform = cfDict['platform']
         self.region = cfDict['region']
         self.nodeType = cfDict['nodeType']
         self.nodeCount = cfDict['nodeCount']
-        self.tags = cfDict['tags']
+
+        # Hacky way to force unique Name tags
+        # self.tags = cfDict['tags']
+        print("running memorable_tags")
+        self.tags = self.memorable_tags(cfDict['tags'])
+        print(f"self.tags: {self.tags}")
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
         self.sg_ids = cfDict['sg_ids']
@@ -192,7 +237,6 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
-    """ Implemented abstract methods """
 
     def getCoresPN(self):
         """ Get the number of cores per node in this cluster.
@@ -205,6 +249,7 @@ class AWSCluster(Cluster):
         return self.PPN
 
 
+    # TODO: use gp3 volume instead of default gp2
     def start(self):
         """ Provision the configured cluster in the cloud.
 
@@ -213,12 +258,14 @@ class AWSCluster(Cluster):
         self.__instances : list of EC2.Intance
             the list of Instances started. See boto3 documentation.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         ec2 = boto3.resource('ec2', region_name=self.region)
 
         try:
 
             if self.nodeType in ['hpc6a.48xlarge','x2idn.24xlarge', 'x2idn.32xlarge']:
-
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -306,6 +353,9 @@ class AWSCluster(Cluster):
         responses : list of dict
             a list of the responses from EC2.Instance.terminate(). See boto3 documentation.
         """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         self.terminateDaskWorker()
 
         # Terminate any running dask scheduler
@@ -341,6 +391,7 @@ class AWSCluster(Cluster):
             list of private dns names
         """
         hosts = []
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
         for instance in self.__instances:
             # hosts.append(instance.private_dns_name)

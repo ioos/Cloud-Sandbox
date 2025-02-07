@@ -190,6 +190,8 @@ endif
 # jgf: The -i-dynamic flag defers the inclusion of the library with
 # feupdateenv until run time, thus avoiding the error message:
 # "feupdateenv is not implemented and will always fail"
+#
+#
 # HERE
 ifeq ($(compiler),intel)
   PPFC          :=  ifort

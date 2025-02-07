@@ -1,0 +1,89 @@
+# Project-level definitions
+Main:
+  ProjectName: __ProjectName__
+  ProjectHome: __ProjectHome__
+  ADCIRCHome: __ADCIRCHome__
+  ExtraTag: ""
+  Experiment: "prior"
+  OutputFormat: "netCDF"
+  # Processing definitions
+  PackageOnly: 0
+  DontPrep: 0
+  PrepInSubmit: 1
+  # submit run to scheduler
+  Submit: 1             
+  # invokes a cleanup script in BinDir/cleanup.sh
+  CleanUpDoneRuns: 0    
+  CleanUpOnly: 0
+  # assumes grid already decomposed (deprecated)
+  AssumeDecomp: 0       
+  ClobberRuns: 0
+
+netCDF:
+  title: "NOS-Prior-test" 
+  institution: "NOAA"
+  source: "IOOS_SB"
+  history: "none"
+  references: "tbd"
+  convention: "CF-UGRID_0.90"
+  contact: __contact__
+  #basedate replaced at runtime
+  basedate: "TBD"  
+
+## ADCIRC/SWAN grid definition (files must be in $GridDir)
+Grid:
+  Name: __GRID__
+  NameAbbrev: __GRID__
+  Extension: "14"
+
+MetSource:
+  Model: "ERA5"
+
+Fort15:
+  #  568   # | 568 etc... 
+  IHOT: "0" 
+  SpinupLength: "31.0"  # days
+  # NTIP if true, compute tidal potential nodal/equilibrium values, 
+  # expects <TidalPotentialBlock> as a tag in template file.  If false, 
+  # assumes the template fort.15 file takes care of tidal potential.
+  NTIP: true
+  # NBFR if true, expects to fill <TidalElevationBlock1> and <TidalElevationBlock2>.  If false, assumes template file specifies as needed.
+  NBFR: true  
+  # Winds
+  NWS: "-12"
+  # "hbl" | "owi" | "gahm"
+  WinPreSrc: "owi" 
+  WithBasin: 1
+  WithRegion: 0
+  BasinPreFile: "fort.221"
+  BasinWinFile: "fort.222"
+  RegionPreFile: "fort.223"
+  RegionWinFile: "fort.224"
+  IncludeRivers: 0
+  #DRAMP: "7. 0.25 0. 0. 7. 7. 1. 0. <RndayOffset>"
+  # forcing rampup length, days
+  DRAMP: 15.0 
+  # model time step, secs
+  DT: 2.0
+  # use padcswan (1), or not (0)
+  Coupled: 1
+  # Output
+  StationFile: hsofs.stationfile.dat
+  #sets output SPOOLing, secs
+  GlobalOutputInterval: 3600.0
+  LocalOutputInterval: 3600.0
+  RNDAY: 400.0
+  TOUTSE: 30.958333333333333
+  DynWatLevCor: None
+
+Job:
+  Manager: cloudflow
+  NumberOfCores: __NPROCS__
+  NumberOfWriterCores: __WRITERCORES__
+  Partition: None
+  ProcessorsPerNode: None
+  Queue: None
+  Reservation: None
+  StatusCommand: None
+  SubmitCommand: None
+  WallTime: None
