@@ -1,0 +1,6 @@
+{
+  "JOBTYPE"   : "XXX_MODEL_RUNTYPE",
+  "OFS"       : "XXX_MODEL",
+  "EXEC"      : "/pathway/to/model/executable/on/head/node",
+  "MODEL_DIR" : "/pathway/to/model/run/directory"
+}

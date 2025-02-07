@@ -265,7 +265,7 @@ class AWSCluster(Cluster):
 
         try:
 
-            if self.nodeType == 'hpc6a.48xlarge':
+            if self.nodeType in ['hpc6a.48xlarge','x2idn.24xlarge', 'x2idn.32xlarge']:
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,

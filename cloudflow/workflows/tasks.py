@@ -475,6 +475,103 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 
     log.info('Forecast finished successfully')
 
+
+###############################################################################
+# model baseline template
+
+@task
+def template_run(cluster: Cluster, job: Job):
+    """ Run the forecast
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+    PPN = cluster.getCoresPN()
+
+    # Easier to read the user
+    # defined variables withing
+    # the Python job class reading
+    # in the job configuration file
+    OFS = job.OFS
+    NPROCS = job.NPROCS
+    MODEL_DIR = job.MODEL_DIR
+    EXEC = job.EXEC
+
+    # template shell launcher script
+    runscript = f"{curdir}/template_launcher.sh"
+    print(f'runscript: {runscript}')
+
+    # Extract the AWS cloud cluster environment
+    # information to inform the compilers the 
+    # information of the cluster's environment
+    # for the given model execution
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('In driver: execption retrieving list of hostnames:' + str(e))
+        raise signals.FAIL()
+
+    ###### If a new model requires more arguments than just simply the  ######
+    ###### model executable and location of model run directory, then   ######
+    ###### a user will need to add a elif block of code to specify the  ######
+    ###### extra option/s in the launcher script and include that extra ######
+    ###### argument within the launcher script itself as well           ######
+    
+   
+    # SCHISM needs to know the number of scribes as well
+    # for it's model execution, so we have a special section
+    if(OFS=='schism'):
+        NSCRIBES = job.NSCRIBES
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'SCHISM model run failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        log.info('SCHISM model run finished successfully')
+
+    # For D-Flow FM model execution, we will need to define and append the location of 
+    # the model library suite within the shell launcher script to properly run the model
+    elif(OFS=='dflowfm'):
+        DFLOW_LIB = job.DFLOW_LIB
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'Forecast failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        log.info('Forecast finished successfully')
+
+    # Template setup for a model run if the model simply only needs the executable
+    # information to run the model
+    else:
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'{OFS} model run failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        log.info(f'{OFS} model run finished successfully')
+
 ###############################################################################
 
 @task

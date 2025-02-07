@@ -1,0 +1,15 @@
+{
+"platform"  : "AWS",
+"region"    : "us-east-2",
+"nodeType"  : "hpc6a.48xlarge",
+"nodeCount" : 6,
+"tags"      : [ 
+                { "Key": "Name", "Value": "DFLOWFM" },
+                { "Key": "Project", "Value": "OWP" }
+              ],
+"image_id"  : "ami-082e2e4e7ef1c6d77",
+"key_name"  : "rsa_sandbox_key",
+"sg_ids"    : ["sg-05c044182398b2a27", "sg-0e5148638d9196f69", "sg-06ca6bc5d4b377dad"],
+"subnet_id" : "subnet-00075cfbfcbc8f2cf",
+"placement_group" : "ioos_cloud_sandbox_Terraform_Placement_Group"
+}
