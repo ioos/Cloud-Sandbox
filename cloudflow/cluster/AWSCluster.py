@@ -480,6 +480,7 @@ class AWSCluster(Cluster):
 
     ########################################################################
 
+    # Still testing setup
     def __netInterfaceDuo(self):
         """ Specify an efa enabled network interface if supported by node type.
             Also attaches security groups """
@@ -489,6 +490,7 @@ class AWSCluster(Cluster):
             'DeleteOnTermination': True,
             'Description': 'Network adaptor via cloudflow boto3 api',
             'DeviceIndex': 0,
+            'NetworkCardIndex': 0,
             'Groups': self.sg_ids,
             'SubnetId': self.subnet_id
         }
@@ -501,6 +503,7 @@ class AWSCluster(Cluster):
             'DeleteOnTermination': True,
             'Description': 'Network adaptor via cloudflow boto3 api',
             'DeviceIndex': 1,
+            'NetworkCardIndex': 1,
             'Groups': self.sg_ids,
             'SubnetId': self.subnet_id
         }

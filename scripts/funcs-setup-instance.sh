@@ -1014,7 +1014,8 @@ install_python_modules_user () {
   python3 -m pip install --upgrade dask
   python3 -m pip install --upgrade distributed
   python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
-  python3 -m pip install --upgrade paramiko   # needed for dask-ssh
+  python3 -m pip install --upgrade paramiko         # needed for dask-ssh
+  python3 -m pip install --upgrade haikunator       # memorable Name tags
 
   # SPACK has problems with botocore newer than below
   python3 -m pip install --upgrade botocore==1.23.46
