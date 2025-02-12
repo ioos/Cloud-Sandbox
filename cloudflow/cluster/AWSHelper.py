@@ -79,7 +79,7 @@ def supportsThreadsPerCoreOption(instance_type: str, region: str) -> bool:
 
 
 
-
+# Done programmatically now
 def supportsEFA(instance_type : str, region: str) -> bool:
     """
     Check if the specified EC2 instance type supports Elastic Fabric Adapter (EFA).
