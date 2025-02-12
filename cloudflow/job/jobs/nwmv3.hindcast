@@ -1,0 +1,6 @@
+{
+  "JOBTYPE"   : "nwmv3hindcast",
+  "OFS"       : "nwmv3",
+  "EXEC"      : "/save/ec2-user/OWP/chps-wrf-hydro/trunk/NWC/nwm.vX.X/sorc/nwm.fd/build/Run/wrf_hydro_NoahMP.exe",
+  "MODEL_DIR" : "/save/ec2-user/OWP/NWM_v3_retrospective_run"
+}

@@ -15,12 +15,12 @@ from botocore.exceptions import ClientError
 
 from haikunator import Haikunator
 
-from cloudflow.cluster import nodeInfo
+# from cloudflow.cluster import AWSHelper
+from cloudflow.cluster import AWSHelper
 from cloudflow.cluster.Cluster import Cluster
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 debug = False
 
@@ -37,7 +37,33 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)
 
-efatypes=['c5', 'hpc' ]
+#####  Includes recommended or tested types only  !!!!!!!
+#      Should be number of physical CPU cores, not vCPUs,
+#          Graviton and AMD CPUs do not support SMT (simultaneous multi-threading)
+""" Defines supported types of instances and the number of cores of each. Currently only certain AWS EC2 types are
+    supported.
+"""
+awsTypes = {
+            'c5.large': 1,      'c5.xlarge': 2, 'c5.2xlarge': 4, 'c5.4xlarge': 8, 'c5.9xlarge': 18,
+            'c5.12xlarge': 24,  'c5.18xlarge': 36, 'c5.24xlarge': 48, 'c5.metal': 36,
+
+            'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
+
+            'c5n.large': 1,     'c5n.xlarge': 2, 'c5n.2xlarge': 4, 'c5n.4xlarge': 8, 'c5n.9xlarge': 18,
+            'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
+
+            'c7i.48xlarge': 96,
+
+            'hpc6a.48xlarge': 96,
+
+            'hpc6id.32xlarge': 64,
+
+            'hpc7a.96xlarge': 192, 'hpc7a.48xlarge': 96,
+
+            'r7iz.32xlarge': 64,
+
+            # The below are in vCPUs not CPU cores
+            'x2idn.24xlarge': 96, 'x2idn.32xlarge': 128 }
 
 # To avoid duplicate entries, only have one handler
 # This log might have a handler in one of their higher level scripts
@@ -70,7 +96,7 @@ class AWSCluster(Cluster):
     tags      : list of dictionary/s of str
         Specific tags to attach to the resources provisioned.
 
-    image_id  : str
+    image_id  : str/
         AWS EC2 AMI - Amazon Machine Image
 
     key_name  : str
@@ -128,7 +154,7 @@ class AWSCluster(Cluster):
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
 
-        self.PPN = nodeInfo.getPPN(self.nodeType)
+        self.PPN = AWSHelper.getPPN(self.nodeType, awsTypes)
         self.NPROCS = self.nodeCount * self.PPN
 
         self.daskscheduler = None
@@ -263,9 +289,15 @@ class AWSCluster(Cluster):
 
         ec2 = boto3.resource('ec2', region_name=self.region)
 
+        # Programmatically determine these options
+        max_network_cards = AWSHelper.maxNetworkCards(self.nodeType, self.region)
+        smt_supported = AWSHelper.supportsThreadsPerCoreOption(self.nodeType, self.region)
+        # hpc6a and hpc7a and some others do not support the CpuOptions={ 'ThreadsPerCore': option }
+
         try:
 
-            if self.nodeType.startswith('hpc7a'):
+          if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
+          # EFA supported:           NO                  YES
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -279,10 +311,14 @@ class AWSCluster(Cluster):
                     }
                 ],
                 Placement=self.__placementGroup(),
-                NetworkInterfaces=self.__netInterfaceDuo()
+                NetworkInterfaces=self.__netInterfaces(count = 1)
+                # Using default
+                # CpuOptions={
+                #     'CoreCount': self.PPN,
+                #     'ThreadsPerCore': 1
+                # }
               )
-
-            elif self.nodeType == 'hpc6a.48xlarge':
+          elif not smt_supported: # Does NOT support the ThreadsPerCore option
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -296,9 +332,9 @@ class AWSCluster(Cluster):
                     }
                 ],
                 Placement=self.__placementGroup(),
-                NetworkInterfaces=[self.__netInterface()]
+                NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
               )
-            else:
+          else:  # supports the ThreadsPerCore option and setting it to 1
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -306,13 +342,13 @@ class AWSCluster(Cluster):
                 MinCount=self.nodeCount,
                 MaxCount=self.nodeCount,
                 TagSpecifications=[
-                    {   
+                    {
                         'ResourceType': 'instance',
                         'Tags': self.tags
                     }
                 ],
                 Placement=self.__placementGroup(),
-                NetworkInterfaces=[self.__netInterface()],
+                NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
                 CpuOptions={
                     'CoreCount': self.PPN,
                     'ThreadsPerCore': 1
@@ -442,75 +478,49 @@ class AWSCluster(Cluster):
 
 
     def __placementGroup(self):
-        """ This is a bit of a hack to satisfy AWS. Only some instances support placement group """
+        """ most current generation instance types support placement groups now """
 
         group = {}
 
+        """ instance types are being used that do not support EFA,
+            but support placement group, removing this restriction"""
+        #if self.nodeType.startswith(tuple(efatypes)):
 
-        if self.nodeType.startswith(tuple(efatypes)):
-            group = {'GroupName': self.placement_group}
-
+        group = {'GroupName': self.placement_group}
 
         return group
 
 
-    ########################################################################
 
-    #
-
-    def __netInterface(self):
+    def __netInterfaces(self, count=1):
         """ Specify an efa enabled network interface if supported by node type.
             Also attaches security groups """
 
-        interface = {
-            'AssociatePublicIpAddress': False,
-            'DeleteOnTermination': True,
-            'Description': 'Network adaptor via cloudflow boto3 api',
-            'DeviceIndex': 0,
-            'Groups': self.sg_ids,
-            'SubnetId': self.subnet_id
-        }
+        # Some newer types require 2 network devices for EFA 
+        if count > 2 or count == 0:
+            raise Exception(f"__netInterfaces: not expecting {count} network cards")
 
-        # if self.nodeType == 'c5n.18xlarge':
+        efa_supported = AWSHelper.supportsEFA(self.nodeType, self.region)
 
-        if self.nodeType.startswith(tuple(efatypes)):
-            interface['InterfaceType'] = 'efa'
+        interfaces = []
 
-        return interface
+        for idx in range(count):
+        
+            interface = {
+              'AssociatePublicIpAddress': False,
+              'DeleteOnTermination': True,
+              'Description': 'Sandbox node network adaptor via cloudflow boto3 api',
+              'DeviceIndex': idx,
+              'NetworkCardIndex': idx,
+              'Groups': self.sg_ids,
+              'SubnetId': self.subnet_id
+            }
 
-    ########################################################################
+            # otherwise will use default
+            if efa_supported:
+                interface['InterfaceType'] = 'efa'
 
-    # Still testing setup
-    def __netInterfaceDuo(self):
-        """ Specify an efa enabled network interface if supported by node type.
-            Also attaches security groups """
-
-        interface0 = {
-            'AssociatePublicIpAddress': False,
-            'DeleteOnTermination': True,
-            'Description': 'Network adaptor via cloudflow boto3 api',
-            'DeviceIndex': 0,
-            'NetworkCardIndex': 0,
-            'Groups': self.sg_ids,
-            'SubnetId': self.subnet_id
-        }
-        if self.nodeType.startswith(tuple(efatypes)):
-            interface0['InterfaceType'] = 'efa'
-
-        # naive testing
-        interface1 = {
-            'AssociatePublicIpAddress': False,
-            'DeleteOnTermination': True,
-            'Description': 'Network adaptor via cloudflow boto3 api',
-            'DeviceIndex': 1,
-            'NetworkCardIndex': 1,
-            'Groups': self.sg_ids,
-            'SubnetId': self.subnet_id
-        }
-        if self.nodeType.startswith(tuple(efatypes)):
-            interface1['InterfaceType'] = 'efa'
-
-        interfaces = [ interface0, interface1 ]
+            interfaces.append(interface)
 
         return interfaces
 

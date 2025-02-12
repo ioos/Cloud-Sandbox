@@ -7,6 +7,9 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
+from cloudflow.job.NWMv3Hindcast import NWMv3Hindcast
+from cloudflow.job.DFLOWFMHindcast import DFLOWFMHindcast
+from cloudflow.job.SCHISMHindcast import SCHISMHindcast
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -54,6 +57,12 @@ class JobFactory:
             newjob = Plotting(configfile, NPROCS)
         elif (jobtype == 'adcircreanalysis'):
             newjob = ADCIRCReanalysis(configfile, NPROCS)
+        elif (jobtype == 'dflowfmhindcast'):
+            newjob = DFLOWFMHindcast(configfile, NPROCS)
+        elif (jobtype == 'schismhindcast'):
+            newjob = SCHISMHindcast(configfile, NPROCS)
+        elif (jobtype == 'nwmv3hindcast'):
+            newjob = NWMv3Hindcast(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
 

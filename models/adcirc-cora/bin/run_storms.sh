@@ -100,8 +100,7 @@ RiverDir="$Main_ProjectHome/Rivers/runs/<Track_Name>"
 HotStartDir="$Main_ProjectHome/HotStarts/$Main_Experiment"
 MainArch="$Main_ProjectHome"
 WorkDir=$MainArch
-
-DWLCDir="$Main_ProjectHome/../Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
+DWLCDir="$Main_ProjectHome/Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
 ExperimentDir="ERA5/$GridNameAbbrev"
 
 # Runtime template files
