@@ -37,7 +37,7 @@ from cloudflow.services.ScratchDisk import ScratchDisk
 from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"

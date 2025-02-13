@@ -19,7 +19,7 @@ from xarray import open_mfdataset
 
 from cloudflow.services.S3Storage import S3Storage
 from cloudflow.job.Plotting import Plotting
-from cloudflow.utils import romsUtil as utils
+from cloudflow.utils import modelUtil as utils
 
 DEBUG = True
 

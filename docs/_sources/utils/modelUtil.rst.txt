@@ -1,7 +1,7 @@
-romsUtil module
+modelUtil module
 ===============
 
-.. automodule:: romsUtil
+.. automodule:: modelUtil
    :members:
    :undoc-members:
    :show-inheritance:

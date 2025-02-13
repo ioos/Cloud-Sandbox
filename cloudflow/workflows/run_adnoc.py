@@ -11,7 +11,7 @@ if os.path.abspath('..') not in sys.path:
 
 from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 
 # 3rd party dependencies
 from prefect import Flow

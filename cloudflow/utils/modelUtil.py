@@ -50,7 +50,7 @@ def scrub_liveocean():
 def readConfig(configfile):
     """ converts a JSON document to a python dictionary """
 
-    if debug: print(f"DEBUG: in romsUtil : configfile is: {configfile}")
+    if debug: print(f"DEBUG: in modelUtil : configfile is: {configfile}")
 
     with open(configfile, 'r') as cf:
         cfDict = json.load(cf)

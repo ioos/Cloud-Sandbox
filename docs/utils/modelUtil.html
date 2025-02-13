@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>romsUtil module &mdash; CloudFlow 1.1.0 documentation</title>
+  <title>modelUtil module &mdash; CloudFlow 1.1.0 documentation</title>
   
 
   
@@ -87,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../plotting/modules.html">plotting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/modules.html">services</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">utils</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">romsUtil module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">modelUtil module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../workflows/modules.html">workflows</a></li>
@@ -138,7 +138,7 @@
         
           <li><a href="modules.html">utils</a> &raquo;</li>
         
-      <li>romsUtil module</li>
+      <li>modelUtil module</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -155,13 +155,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-romsUtil">
-<span id="romsutil-module"></span><h1>romsUtil module<a class="headerlink" href="#module-romsUtil" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-modelUtil">
+<span id="modelUtil-module"></span><h1>modelUtil module<a class="headerlink" href="#module-modelUtil" title="Permalink to this headline">¶</a></h1>
 <p>Various routines, not just for ROMS models anymore.
 TODO: Rename this module.</p>
 <dl class="py function">
-<dt id="romsUtil.getTiling">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">getTiling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">totalCores</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.getTiling" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.getTiling">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">getTiling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">totalCores</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.getTiling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines the ROMS tiling to use based on the number of cores available.
 Sets NtileI and NtileJ</p>
 <dl class="field-list simple">
@@ -175,70 +175,70 @@ Sets NtileI and NtileJ</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.get_ICs_lo">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">get_ICs_lo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">localpath</span></em>, <em class="sig-param"><span class="n">sshuser</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.get_ICs_lo" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.get_ICs_lo">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">get_ICs_lo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">localpath</span></em>, <em class="sig-param"><span class="n">sshuser</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.get_ICs_lo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the atmospheric forcing and boundary layer conditions and ICs
 for LiveOcean ROMS model.</p>
 <p>This requires an account on the remote server with private key authentication.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.get_ICs_roms">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">get_ICs_roms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ofs</span></em>, <em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">cycle</span></em>, <em class="sig-param"><span class="n">localpath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.get_ICs_roms" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.get_ICs_roms">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">get_ICs_roms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ofs</span></em>, <em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">cycle</span></em>, <em class="sig-param"><span class="n">localpath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.get_ICs_roms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.get_baseline_lo">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">get_baseline_lo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">vdir</span></em>, <em class="sig-param"><span class="n">sshuser</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.get_baseline_lo" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.get_baseline_lo">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">get_baseline_lo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">vdir</span></em>, <em class="sig-param"><span class="n">sshuser</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.get_baseline_lo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve operational LiveOcean forecast data from UW</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.lo_date">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">lo_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.lo_date" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.lo_date">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">lo_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.lo_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the LiveOcean format of date e.g. f2019.11.06</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.makeOceanin">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">makeOceanin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">NPROCS</span></em>, <em class="sig-param"><span class="n">settings</span></em>, <em class="sig-param"><span class="n">template</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.makeOceanin" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.makeOceanin">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">makeOceanin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">NPROCS</span></em>, <em class="sig-param"><span class="n">settings</span></em>, <em class="sig-param"><span class="n">template</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">ratio</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.makeOceanin" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates the ocean.in file for ROMS forecasts using templated variables</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.ndate">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">ndate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">days</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.ndate" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.ndate">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">ndate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span></em>, <em class="sig-param"><span class="n">days</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.ndate" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the YYYYMMDD for CDATE +/- days</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.ndate_hrs">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">ndate_hrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">hours</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.ndate_hrs" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.ndate_hrs">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">ndate_hrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">hours</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.ndate_hrs" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the YYYYMMDDHH for CDATE +/- hours</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.ndays">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">ndays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate1</span></em>, <em class="sig-param"><span class="n">cdate2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.ndays" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.ndays">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">ndays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cdate1</span></em>, <em class="sig-param"><span class="n">cdate2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.ndays" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the number of days between two dates</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.readConfig">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.readConfig" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.readConfig">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">readConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configfile</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.readConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>converts a JSON document to a python dictionary</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.scrub_liveocean">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">scrub_liveocean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.scrub_liveocean" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.scrub_liveocean">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">scrub_liveocean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.scrub_liveocean" title="Permalink to this definition">¶</a></dt>
 <dd><p>scrubs the disk - removes forcings/ICs and forecast data
 older than x days</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="romsUtil.sedoceanin">
-<code class="sig-prename descclassname">romsUtil.</code><code class="sig-name descname">sedoceanin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">template</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#romsUtil.sedoceanin" title="Permalink to this definition">¶</a></dt>
+<dt id="modelUtil.sedoceanin">
+<code class="sig-prename descclassname">modelUtil.</code><code class="sig-name descname">sedoceanin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">template</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modelUtil.sedoceanin" title="Permalink to this definition">¶</a></dt>
 <dd><p>substitues the templated fields with specified settings, like sed</p>
 </dd></dl>
 
