@@ -5,7 +5,7 @@ import sys
 import shutil
 
 from cloudflow.job.Job import Job
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
