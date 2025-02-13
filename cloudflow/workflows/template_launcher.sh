@@ -123,6 +123,7 @@ elif [[ "$OFS" == "schism" ]]; then
     # Run it
     $RUNSCRIPT
     result=$?
+
 elif [[ "$OFS" == "dflowfm" ]]; then
 
     # location of model shell launch script

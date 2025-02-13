@@ -1,5 +1,6 @@
 #!/bin/bash
 # redirect stdout/stderr to a file
+# This was for an ADCIRC hurricane Florence test case
 exec &> /save/adcirc-ClusterRPS/fcst_adcirc_log.txt
 
 set -x

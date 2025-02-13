@@ -10,7 +10,6 @@ set -x       # verbose with command expansion
 set -u       # forces exit on undefined variables
 
 
-
 module purge
 module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
 
@@ -49,10 +48,12 @@ echo "---"
 
 ##### Example model executable syntax required
 #mpiexec $MPIOPTS $EXEC
+result=$?
 
-
-if [ $? -ne 0 ]; then
+# Capture the exit/end result and propagate it down the stack.
+if [ $result -ne 0 ]; then
   echo "ERROR returned from mpirun"
+  exit $result
 else
   echo "XXX model has succesfully completed on the cloud!"
   duration=$SECONDS

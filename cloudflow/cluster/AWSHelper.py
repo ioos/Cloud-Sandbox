@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 __copyright__ = "Copyright © 2025 RPS Group. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-def getPPN(instance_type, AWSTypes: dict ):
+def getPPN(instance_type, awsTypes: dict ):
     """ Get the number of processors per node for the given instance type.
 
     Parameters

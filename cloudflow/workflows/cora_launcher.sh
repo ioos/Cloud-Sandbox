@@ -40,7 +40,6 @@ export GRID=$7
 #
 # mpirun --version | grep "Open MPI"
 # openmpi=$?
-
 # for openMPI openmpi=1
 # for Intel MPI set impi=1
 
