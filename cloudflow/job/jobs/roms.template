@@ -1,0 +1,7 @@
+{
+  "JOBTYPE"   : "roms_template",
+  "OFS"       : "roms",
+  "EXEC"      : "/save/ec2-user/OWP/roms/My_ROMS_Build/romsO",
+  "MODEL_DIR" : "/save/ec2-user/OWP/roms/My_ROMS_Build/test_run",
+  "IN_FILE"   : "roms_upwelling.in"
+}

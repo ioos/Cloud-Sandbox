@@ -1,5 +1,5 @@
 {
-  "JOBTYPE"   : "dflowfmhindcast",
+  "JOBTYPE"   : "dflowfm_template",
   "OFS"       : "dflowfm",
   "EXEC"      : "/save/ec2-user/OWP/DFlow/delft3d/install/bin/dflowfm",
   "DFLOW_LIB" : "/save/ec2-user/OWP/DFlow/delft3d/install/lib",
