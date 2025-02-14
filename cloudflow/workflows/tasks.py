@@ -539,7 +539,7 @@ def template_run(cluster: Cluster, job: Job):
 
         log.info('SCHISM model run finished successfully')
 
-    # For D-Flow FM model execution, we will need to define and append the location of 
+    # For D-Flow FM model execution, we will need to define and append the location of
     # the model library suite within the shell launcher script to properly run the model
     elif(OFS=='dflowfm'):
         DFLOW_LIB = job.DFLOW_LIB
@@ -547,14 +547,48 @@ def template_run(cluster: Cluster, job: Job):
             result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'Forecast failed ... result: {result.returncode}')
+                log.exception(f'DFlowFM model run failed ... result: {result.returncode}')
                 raise signals.FAIL()
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL()
 
-        log.info('Forecast finished successfully')
+        log.info('DFlowFM model run finished successfully')
+
+    # For ROMS model execution, we need to know the name and location of the
+    # master file ".in" input that tells ROMS the model run configuration
+    elif(OFS=='roms'):
+        IN_FILE = job.IN_FILE
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'ROMS model run failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        log.info('ROMS model run finished successfully')
+
+    # For FVCOM model execution, we need to know the casename of the master
+    # .nml file that tells FVCOM the model run configuration
+    elif(OFS=='fvcom'):
+        CASE_FILE = job.CASE_FILE
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(CASE_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'FVCOM model run failed ... result: {result.returncode}')
+                raise signals.FAIL()
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL()
+
+        log.info('FVCOM model run finished successfully')
 
     # Template setup for a model run if the model simply only needs the executable
     # information to run the model

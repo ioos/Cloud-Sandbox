@@ -1,0 +1,7 @@
+{
+  "JOBTYPE"   : "fvcom_template",
+  "OFS"       : "fvcom",
+  "EXEC"      : "/save/ec2-user/OWP/FVCOM_v4.5/FVCOM/src/fvcom",
+  "MODEL_DIR" : "/save/ec2-user/OWP/Inlets/run",
+  "CASE_FILE" : "inlet"
+}

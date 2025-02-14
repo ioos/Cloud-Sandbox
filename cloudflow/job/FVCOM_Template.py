@@ -8,7 +8,6 @@ if os.path.abspath('..') not in sys.path:
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from cloudflow.job.Job import Job
-from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -17,13 +16,13 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class SCHISMHindcast(Job):
-    """ Implementation of Job class for SCHISM simulations
+class FVCOM_Template(Job):
+    """ Implementation of Job class for a simple FVCOM model template
 
     Attributes
     ----------
     jobtype : str
-        Always 'schismhindcast' for this class.
+        User defined job type based on model of interest, should always be fvcom_template
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -32,16 +31,17 @@ class SCHISMHindcast(Job):
         Total number of processors in this cluster.
 
     OFS : str
-        The schism model to run
+        The model setup type to run
 
     EXEC : str
         The model executable to run.
     
     MODEL_DIR : str
-        The location of the SCHISM model run to execute
+        The location of the model run directory to execute
 
-    NSCRIBES: str
-        The number of cpus dedicated to SCHISM I/O procedures
+    CASE_FILE : str
+        The input FVCOM case file name required to execute the model. For example, if the
+        fvcom case file inlet_run.nml then CASE_FILE=inlet
     """
 
 
@@ -58,14 +58,12 @@ class SCHISMHindcast(Job):
 
         """
 
-        self.jobtype = 'schismhindcast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
-        self.TEMPLPATH = f"{curdir}/templates"
 
         if debug:
-            print(f"DEBUG: in SCHISMHindcast init")
+            print(f"DEBUG: in FVCOM Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -82,12 +80,12 @@ class SCHISMHindcast(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-        
+
+        self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.NSCRIBES = cfDict['NSCRIBES']
-
+        self.CASE_FILE = cfDict['CASE_FILE']
         return
 
 

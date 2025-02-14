@@ -43,6 +43,16 @@ if [[ "$OFS" == "dflowfm" ]]; then
   export DFLOW_LIB=$7
 fi
 
+#Unique extra option required for ROMS
+if [[ "$OFS" == "roms" ]]; then
+  export IN_FILE=$7
+fi
+
+#Unique extra option required for FVCOM
+if [[ "$OFS" == "fvcom" ]]; then
+  export CASE_FILE=$7
+fi
+
 #OpenMPI
 #mpirun --version
 
@@ -69,7 +79,16 @@ impi=1
 if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
 elif [ $impi -eq 1 ]; then
-  export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
+  # Since the current Cloud-Sandbox module compatibility with ROMS
+  # main branch only allows for the OPENMP parallelization option,
+  # we will need to include special MPI options for the model to
+  # correctly run OPENMP code structure within the allocated AWS
+  # cloud resources specified by the given user
+  if [[ "$OFS" == "roms" ]]; then
+    export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
+  else
+    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
+  fi
   #export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
   export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
   export I_MPI_DEBUG=0
@@ -93,10 +112,7 @@ echo "**********************************************************"
 ###### for you properly within the cloud cluster initilaized   ######
 
 
-# Section to call a specific model launcher script, where
-# the shell scripts loads up compilers, modules, and libraries
-# required to execute the given model of interest
-if [[ "$OFS" == "nwmv3" ]]; then
+if [[ "$OFS" == "nwmv3_wrf_hydro" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -104,7 +120,7 @@ if [[ "$OFS" == "nwmv3" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./nwmv3_hindcastrun.sh $MODEL_DIR $EXEC"
+    RUNSCRIPT="./nwmv3_wrf_hydro_template_run.sh $MODEL_DIR $EXEC"
 
     # Run it
     $RUNSCRIPT
@@ -118,11 +134,12 @@ elif [[ "$OFS" == "schism" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./schism_hindcastrun.sh $MODEL_DIR $NSCRIBES $EXEC"
+    RUNSCRIPT="./schism_template_run.sh $MODEL_DIR $NSCRIBES $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
+
 elif [[ "$OFS" == "dflowfm" ]]; then
 
     # location of model shell launch script
@@ -131,7 +148,49 @@ elif [[ "$OFS" == "dflowfm" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./dflowfm_hindcastrun.sh $MODEL_DIR $DFLOW_LIB $EXEC"
+    RUNSCRIPT="./dflowfm_template_run.sh $MODEL_DIR $DFLOW_LIB $EXEC"
+
+    # Run it
+    $RUNSCRIPT
+    result=$?
+
+elif [[ "$OFS" == "adcirc" ]]; then
+
+    # location of model shell launch script
+    export JOBDIR=$PWD/workflows
+
+    # TODO:
+    cd "$JOBDIR" || exit 1
+
+    RUNSCRIPT="./adcirc_template_run.sh $MODEL_DIR $EXEC"
+
+    # Run it
+    $RUNSCRIPT
+    result=$?
+
+elif [[ "$OFS" == "roms" ]]; then
+
+    # location of model shell launch script
+    export JOBDIR=$PWD/workflows
+
+    # TODO:
+    cd "$JOBDIR" || exit 1
+
+    RUNSCRIPT="./roms_template_run.sh $MODEL_DIR $IN_FILE $EXEC"
+
+    # Run it
+    $RUNSCRIPT
+    result=$?
+
+elif [[ "$OFS" == "fvcom" ]]; then
+
+    # location of model shell launch script
+    export JOBDIR=$PWD/workflows
+
+    # TODO:
+    cd "$JOBDIR" || exit 1
+
+    RUNSCRIPT="./fvcom_template_run.sh $MODEL_DIR $CASE_FILE $EXEC"
 
     # Run it
     $RUNSCRIPT

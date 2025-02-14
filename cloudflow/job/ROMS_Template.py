@@ -8,7 +8,6 @@ if os.path.abspath('..') not in sys.path:
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 from cloudflow.job.Job import Job
-from cloudflow.utils import romsUtil as util
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -17,13 +16,13 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class DFLOWFMHindcast(Job):
-    """ Implementation of Job class for DFlowFM model runs
+class ROMS_Template(Job):
+    """ Implementation of Job class for a simple ROMS model template
 
     Attributes
     ----------
     jobtype : str
-        Always 'dflowfmhindcast' for this class.
+        User defined job type based on model of interest, should always be roms_template
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -32,16 +31,16 @@ class DFLOWFMHindcast(Job):
         Total number of processors in this cluster.
 
     OFS : str
-        The DFlowFM model to run
+        The model setup type to run
 
     EXEC : str
         The model executable to run.
-
-    DFLOW_LIB : str
-        The pathway to the DFlowFM compiled library suite for executable to link with.
     
     MODEL_DIR : str
-        The location of the DFlowFM model run directory to execute
+        The location of the model run directory to execute
+
+    IN_FILE : str
+        The ROMS .in input file for a given model configuration
     """
 
 
@@ -58,13 +57,12 @@ class DFLOWFMHindcast(Job):
 
         """
 
-        self.jobtype = 'dflowfmhindcast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in DFLOWFM init")
+            print(f"DEBUG: in ROMS Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -81,12 +79,12 @@ class DFLOWFMHindcast(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-        
+
+        self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
-        self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-
+        self.IN_FILE = cfDict['IN_FILE']
         return
 
 
