@@ -24,7 +24,9 @@ log.setLevel(logging.DEBUG)
 class FSxScratchDisk(ScratchDisk):
     """ AWS FSx for Lustre implementation of scratch disk.
         Can only have one at a time. Assumes all jobs will use the same scratch disk and path
+
     """
+        ### PT 2/13/2025 - HERE - why can we only have one at a time?
 
     ''' Note: df  /ptmp provides the following details:
         df /ptmp | grep -v 'Filesystem' | grep tcp | awk '{print $1}'
@@ -34,7 +36,7 @@ class FSxScratchDisk(ScratchDisk):
     ''' TODO: Reuse the existing scratch disk if one exists 
         This will be needed if running multiple forecasts at once, otherwise make the ptmp parameter different
         Possible solution:
-q
+
             Create a unique identifier for this instance : use a class attribute to store this
             Also place a file at /ptmp of this unique id e.g. user.{self.id}
             When done, remove the user.{self.id} file 

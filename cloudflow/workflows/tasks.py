@@ -52,7 +52,7 @@ log.setLevel(logging.DEBUG)
 ##############
 
 @task
-def create_scratch(provider: str, configfile: str, mountpath: str = '/ptmp') -> ScratchDisk:
+def create_scratch(provider: str, jobconfigfile: str, mountpath: str = '/ptmp') -> ScratchDisk:
     """ Provides a high speed scratch disk if available. Creates and mounts the disk.
 
     Parameters
@@ -60,7 +60,7 @@ def create_scratch(provider: str, configfile: str, mountpath: str = '/ptmp') -> 
     provider : str
       Name of an implemented provider.
 
-    configfile : str
+    jobconfigfile : str
         The Job configuration file
       
 
@@ -71,6 +71,7 @@ def create_scratch(provider: str, configfile: str, mountpath: str = '/ptmp') -> 
 
     """
 
+    ### PT 2/13/2025 - HERE
     if provider == 'FSx':
         scratch = FSxScratchDisk(configfile)
     elif provider == 'NFS':
@@ -95,7 +96,7 @@ def mount_scratch(scratch: ScratchDisk, cluster: Cluster):
     scratch : ScratchDisk
       The scratch disk object
     cluster : Cluster
-      The cluster object that contains the hostnames
+      The cluster object that contains the hostnames and tags
     """ 
 
     hosts = cluster.getHosts() 
