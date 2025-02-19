@@ -4,7 +4,7 @@
 import os
 import sys
 import time
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
 import logging
 from distributed import Client
 import prefect

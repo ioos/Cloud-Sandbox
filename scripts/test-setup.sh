@@ -8,9 +8,13 @@ GCC_VER=11.2.1
 # Current versions
 ONEAPI_VER=2023.1.0
 
-# There is no oneapi mpi version 2023.1.0
-INTEL_VER=2021.9.0
-# MPI_VER=2021.9.0
+# Note: There is no oneapi mpi version 2023.1.0
+INTEL_COMPILER_VER=2021.9.0
+
+# MPI v 2021.12.0+ supports multiple EFA adaptors
+# spack version 0.22.3
+INTEL_MPI_VER=2021.12.1
+
 ESMF_VER=8.5.0
 
 #SPACK_VER='releases/v0.18'
@@ -30,7 +34,8 @@ SPACKTARGET="arch=linux-rhel8-x86_64"
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 #SPACK_CACHEONLY=1
-SPACK_CACHEONLY=-1
+
+SPACK_CACHEONLY=0
 
 ##########################################################
 
@@ -58,6 +63,7 @@ module use -a /save/environments/modulefiles
 #install_gcc_toolset_yum
 
 source /opt/rh/gcc-toolset-11/enable
+spack load intel-oneapi-compilers@2023.1.0
 
 #install_spack
 #install_intel_oneapi_spack
@@ -65,8 +71,11 @@ install_esmf_spack
 
 exit
 
-install_base_rpms
-install_ncep_rpms
+# install_base_rpms
+# install_ncep_rpms
+
+# ami_name must be unique - unique name is provided during initial deployment
+ami_name=mpi-2021.14.1-ioos-cloud-sandbox-2
 
 # install_ffmpeg
 

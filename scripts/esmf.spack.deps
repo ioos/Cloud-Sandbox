@@ -1,0 +1,59 @@
+# spack find -d --format "{name}-{version}-{hash}" esmf
+
+esmf-8.5.0-5sphkv4uq4zbuov4z567723i4eupb7pn
+    glibc-2.28-2uwzqhmprowfl2cm2khpzd2otvfnrprb
+    gmake-4.4.1-jnchw2k2xavtpl32ahalooanbbsregyy
+    intel-oneapi-mpi-2021.12.1-6nra3z4zqx5yvtxykhbeueq64da6xvmu
+    netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque
+        bzip2-1.0.8-cupkwjhys7nnid5qyvjpvf3cv36n4p5w
+            diffutils-3.7-s2iv7d5ygdtobyztltabzczw5qtigfn4
+                libiconv-1.17-g63ay6neuujsr77qwkyfk6szp2es7xmw
+        c-blosc-1.21.5-ln4dv7kxpwbm4q6tdveedm4nqbyw32rk
+            lz4-1.9.4-cu6cmc3o5rto2755p5nhxcxvpewnazg2
+            snappy-1.1.10-bxusyvy4w4c4v4si7invpoa3fiqapjvb
+        hdf5-1.14.3-jjst2zszbb56s6p662favryxttbtosfn
+            pkgconf-2.2.0-s7445l2q5cz26gzstp7foewsb3isf5ii
+        libaec-1.0.6-hqfpltzb6l6ssyrlh62ykotxw6phdoch
+        zlib-ng-2.1.6-mwrleelhkwomhd3f4tjx5guvnshu6bsf
+        zstd-1.5.6-6okpm43mn46dhwtb55lapllabh4lklne
+    netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt
+    parallelio-2.6.2-mznk65va76hfjl5pyefuxxpkhbfqweiu
+        cmake-3.27.9-eaubfplefl7imai44447tmbdqlgbo6xo
+            curl-8.7.1-e6ddz4ocfqrtd5aoe27w3tlhhhxjnpta
+                nghttp2-1.57.0-qn6ijmfr6gst3q3et43s3hj27bzaw3dt
+                openssl-3.3.0-gvoyy2vr6w2ebr2dorv3hiayeezw7lyf
+                    ca-certificates-mozilla-2023-05-30-xrxtjjdzazzevuobqqons553dckib3xg
+                perl-5.38.0-bwzl5f5rhwxdhetaxmszcxsong6zfg7m
+                    berkeley-db-18.1.40-zwe2eho3wm2o37jww4gn7rz64jzp7fzr
+                    gdbm-1.23-nvzve2ko4jq7ilulegbqdwiqtqrifyz5
+                        readline-8.2-6aoaezalj6rvhnuvo6frgahi4sc6ursb
+            ncurses-6.5-z2nbulgmrh4u5pz2qeirc7o7rcwppamx
+
+esmf-8.5.0-nlafsydrlio5jawl7lbfo7i5yqpvmaeo
+    gmake-4.4.1-i4ebvvkwdmu5bxlpp5olqndpxuqkakdu
+    intel-oneapi-mpi-2021.9.0-egjrbfgil6gjzqlkz265edcecbx7q2c5
+    netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel
+        bzip2-1.0.8-jky2iw7ut2h2odrs66jaqo2f3yu4qmqx
+            diffutils-3.7-55jbk32ymiqcnezrrpftjvim3kpzeepr
+                libiconv-1.17-dnibigojnu4ndl7j6nolo6q4rjxjnxaq
+        c-blosc-1.21.5-ltu7tzqbtgvjyfguj5uf776x7hyvoxld
+            lz4-1.9.4-a7shfisczoq5ghzwxr2yrizakfnehwwa
+            snappy-1.1.10-67s3jwz2ftv6nfubednmawkdqvye4dhz
+        hdf5-1.14.3-4xskthbugzqyyucngb3gqbbhkfjrdlwo
+            pkgconf-1.9.5-yzqxmv62os3wlnl26kj5kjrgflmvunzy
+        libszip-2.1.1-s3p3pglahbjxnw5z6yvniahwli577xsy
+        zlib-ng-2.1.4-57ptxrwpck7rrhyv5icnlue5kqx5ssjl
+        zstd-1.5.5-x3khtnngvnp445dkol6lwp72r4wxs52f
+    netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6
+    parallelio-2.6.2-csz55zrres25s2m7347ssvxq6kicbv55
+        cmake-3.27.8-yeuklir5fhghygghjkmy4k7vfevig6w7
+            curl-8.4.0-a64fesnf6vlvl7rodfwcxtoh4h23a6o6
+                nghttp2-1.57.0-mb2z7i6sx7wtzcxarszkcwgvaegalnau
+                openssl-3.1.3-r2cxcwegfqqu7uy2ddveci7ymg7kj4vm
+                    ca-certificates-mozilla-2023-05-30-6rvu4jo4p6enbw36r3ywyyhysu5p5ind
+                    perl-5.38.0-wxdzkjioeknn5apeug5rljuquw2uqagi
+                        berkeley-db-18.1.40-7icy5gzkbjvh2ycdbesallhuh47hhdao
+                        gdbm-1.23-5ir4yi33novuarw2szgsnoqhcsnxjbst
+                            readline-8.2-5qklx7ser6jcd3tvrb7ojcbkrfvepqua
+            ncurses-6.4-frznrpd2k53jdn43syc7pvi5hof2vrqp
+

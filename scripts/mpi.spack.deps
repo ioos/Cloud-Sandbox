@@ -1,0 +1,7 @@
+spack find -d --format "{name}-{version}-{hash}" intel-oneapi-mpi
+
+intel-oneapi-mpi-2021.9.0-egjrbfgil6gjzqlkz265edcecbx7q2c5
+
+intel-oneapi-mpi-2021.12.1-6nra3z4zqx5yvtxykhbeueq64da6xvmu
+    glibc-2.28-2uwzqhmprowfl2cm2khpzd2otvfnrprb
+

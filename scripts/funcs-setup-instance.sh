@@ -14,10 +14,9 @@ fi
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
+# This has been tested on RHEL8 
 
 setup_environment () {
-
-# This has been tested on RHEL8 
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -100,6 +99,7 @@ setup_environment () {
 
 }
 
+#-----------------------------------------------------------------------------#
 
 setup_paths () {
 
@@ -184,22 +184,28 @@ install_efa_driver() {
     sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
   done
 
-  # Default version is needed to build the kernel driver
-  # If gcc has already been upgraded, this will likely fail
-
+  # System default gcc version is needed to build the kernel driver
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
   rm $tarfile
 
   cd aws-efa-installer
 
-  # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-  sudo ./efa_installer.sh -y --minimal
+  EFA_MINAMAL="NO"
 
-  # If it installed openmpi 
-  # sudo yum erase openmpi40-aws-4.1.4-3.x86_64
+  if [[ $EFA_MINIMAL == "NO" ]]; then
+    # Install with AWS libfabric and OpenMPI, need to fix PATH prefix the forces OpenMPI mpirun and mpifort.
+    sudo ./efa_installer.sh -y
 
-  # Put old kernels back in original location
+    # If it installed openmpi, undo the profile.d change the installer made
+    sudo cp $home/system/profile.d.zippy_efa.sh /etc/profile.d/zippy_efa.sh
+
+  else
+    # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+    sudo ./efa_installer.sh -y --minimal
+  fi
+
+  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
   if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
     sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
     sudo rmdir /usr/lib/oldkernel
@@ -209,7 +215,7 @@ install_efa_driver() {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_gcc_toolset_yum() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -227,7 +233,7 @@ install_gcc_toolset_yum() {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - needs work
 install_spack-stack() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -299,9 +305,11 @@ install_spack() {
   cd $home
 }
 
-
 #-----------------------------------------------------------------------------#
 
+
+#-----------------------------------------------------------------------------#
+# Not currently used, using gcc toolset
 install_gcc_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -326,7 +334,7 @@ install_gcc_spack () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - needs work
 install_intel_oneapi-spack-stack () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -350,7 +358,7 @@ install_intel_oneapi-spack-stack () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_intel_oneapi_yum () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -404,6 +412,8 @@ install_intel_oneapi_spack () {
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
   spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
 
+
+  # Testing and debugging notes
   # MPI will be built with ESMF
   # MKL
 
@@ -434,7 +444,6 @@ install_intel_oneapi_spack () {
 
 #-----------------------------------------------------------------------------#
 # Not currently used, netcdf is installed with esmf
-
 install_netcdf () {
 
 
@@ -466,7 +475,7 @@ install_netcdf () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
@@ -492,7 +501,7 @@ install_hdf5-gcc8 () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_munge_s3 () {
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -583,8 +592,9 @@ add_module_sbin_path () {
   return 0
 }
 
-#-----------------------------------------------------------------------------#
 
+#-----------------------------------------------------------------------------#
+# Not currently used - and currently not planning on using slurm
 install_slurm () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -648,7 +658,7 @@ install_slurm () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - slurm dependency
 _install_munge () {
 
   # https://github.com/dun/munge/wiki/Installation-Guide
@@ -704,7 +714,7 @@ _install_munge () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - and currently not planning on using slurm
 configure_slurm () { 
 
   if [ $# -ne 1 ]; then
@@ -784,7 +794,9 @@ configure_slurm () {
 #-----------------------------------------------------------------------------#
 
 
+# Not currently used - and currently not planning on using slurm
 install_slurm-epel7 () {
+
 #-----------------------------------------------------------------------------#
 # NOTE: In the beginning of 2021, a version of Slurm was added to the EPEL repository. This version is not supported or maintained by SchedMD, and is not currently recommend for customer use. Unfortunately, this inclusion could cause Slurm to be updated to a newer version outside of a planned maintenance period. In order to prevent Slurm from being updated unintentionally, we recommend you modify the EPEL Repository configuration to exclude all Slurm packages from automatic updates.
 
@@ -866,7 +878,7 @@ install_slurm-epel7 () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - and currently not planning on using slurm
 install_slurm-s3() {
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -894,12 +906,19 @@ install_esmf_spack () {
 
   spack load intel-oneapi-compilers@${ONEAPI_VER}
 
-  COMPILER=intel@${INTEL_VER}
-  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
+  COMPILER=intel@${INTEL_COMPILER_VER}
+
+  # oneapi mpi spack build option
+      # external-libfabric [false]        false, true
+      #  Enable external libfabric dependency
+
+  # diffutils 3.10 build fails
+  #    ^diffutils@3.7
+  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
   # Install fails with the following probably because mpi isn't installed with oneapi build
   #COMPILER=oneapi@${ONEAPI_VER}
-  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }

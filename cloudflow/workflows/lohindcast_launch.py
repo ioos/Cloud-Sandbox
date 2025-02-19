@@ -9,7 +9,8 @@ import collections
 import os
 import sys
 import re
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
+
 
 sys.stdout.reconfigure(line_buffering=False)
 
@@ -41,14 +42,17 @@ sshuser = 'username@apogee.ocean.washington.edu'
 
 ######################################################################
 
-
 def handler(signal_received, frame):
-    print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signal.FAIL()
+    msg=f"{signal_received} detected. Exiting."
+    print(msg)
+    raise Exception(f"{signal_received} detected. Exiting gracefully.")
+
 
 def main():
 
-    signal(SIGINT, handler)
+    signals_to_handle = [SIGINT, SIGTERM, SIGQUIT]
+    for sig in signals_to_handle:
+        signal(sig, handler)
 
     lenargs = len(sys.argv) - 1
     joblist = []

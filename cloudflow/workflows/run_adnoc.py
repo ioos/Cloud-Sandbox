@@ -4,7 +4,7 @@
 import os
 import sys
 import re
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -23,8 +23,9 @@ __license__ = "BSD 3-Clause"
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 def handler(signal_received, frame):
-    print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signal.FAIL()
+    msg=f"{signal_received} detected. Exiting."
+    print(msg)
+    raise Exception(f"{signal_received} detected. Exiting gracefully.")
 
 
 def fcst_flow(fcstconf, fcstjobfile ) -> Flow:
@@ -75,10 +76,11 @@ def fcst_flow(fcstconf, fcstjobfile ) -> Flow:
 
 #######################################################################
 
-
 def main():
 
-    signal(SIGINT, handler)
+    signals_to_handle = [SIGINT, SIGTERM, SIGQUIT]
+    for sig in signals_to_handle:
+        signal(sig, handler)
 
     lenargs = len(sys.argv) - 1
 

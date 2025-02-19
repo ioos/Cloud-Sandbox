@@ -7,18 +7,19 @@ GCC_VER=11.2.1
 
 # Current versions
 ONEAPI_VER=2023.1.0
+# The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
+INTEL_COMPILER_VER=2021.9.0
 
-# There is no oneapi mpi version 2023.1.0
-INTEL_VER=2021.9.0
-# MPI_VER=2021.9.0
+# Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
+# MPI v 2021.12.0+ supports multiple EFA adaptors
+# spack v0.22.3 and higher has that spec
+# problems with spoack v23
+INTEL_MPI_VER=2021.12.1
+
 ESMF_VER=8.5.0
 
-#SPACK_VER='releases/v0.18'
-#SPACK_DIR='/save/environments/spack-stack/spack'
-
-SPACK_VER='v0.21.0'
+SPACK_VER='v0.22.3'
 SPACK_DIR='/save/environments/spack'
-
 SPACKOPTS='-v -y'
 
 #SPACKTARGET='target=skylake_avx512'        # default on skylake intel instances t3.xxxx
@@ -60,7 +61,7 @@ source /opt/rh/gcc-toolset-11/enable
 
 install_spack
 install_intel_oneapi_spack
-install_esmf_spack
+install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 
 install_base_rpms
 install_ncep_rpms

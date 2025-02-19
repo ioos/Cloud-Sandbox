@@ -31,6 +31,7 @@ fi
 
 spack gpg trust $SECRET
 
+# Public Key
 KEY=F525C05B06DCA266
 
 spack buildcache --rebuild-index  $SPACK_MIRROR

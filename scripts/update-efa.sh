@@ -8,9 +8,10 @@ GCC_VER=11.2.1
 # Current versions
 ONEAPI_VER=2023.1.0
 
-# There is no oneapi mpi version 2023.1.0
-INTEL_VER=2021.9.0
-# MPI_VER=2021.9.0
+# Note: There is no oneapi mpi version 2023.1.0
+INTEL_COMPILER_VER=2021.9.0
+INTEL_MPI_VER=2021.14.1
+
 ESMF_VER=8.5.0
 
 #SPACK_VER='releases/v0.18'
@@ -43,7 +44,7 @@ sudo setenforce 0
 
 module use -a /save/environments/modulefiles
 
-install_efa_driver
+# install_efa_driver
 
 # source /opt/rh/gcc-toolset-11/enable
 
@@ -52,7 +53,7 @@ install_efa_driver
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
-ami_name=${ami_name:='2025-02-13-IOOS-Cloud-Sandbox'}
+ami_name=${ami_name:='2025-02-13-0751-IOOS-Cloud-Sandbox'}
 
 # TODO: pass this in via Terraform init template
 project_tag=${project_tag:="IOOS-Cloud-Sandbox"}

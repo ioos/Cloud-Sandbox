@@ -58,7 +58,14 @@ awsTypes = {
 
             'hpc6id.32xlarge': 64,
 
-            'hpc7a.96xlarge': 192, 'hpc7a.48xlarge': 96,
+            'hpc7a.48xlarge': 96,
+
+            #'hpc7a.96xlarge': 192, # fails
+            #'hpc7a.96xlarge': 184, # fails
+            #'hpc7a.96xlarge': 128, # 128 works with internal libfabric  1.13.2rc1-impi
+            'hpc7a.96xlarge': 160, 
+            #'hpc7a.96xlarge': 156, # failed with intel fabric
+            # 128 hangs with upgraded fabric, 96 works with upgraded fabric, works, # 98 works, (7x14 tiles)
 
             'r7iz.32xlarge': 64,
 
@@ -291,7 +298,10 @@ class AWSCluster(Cluster):
 
         # Programmatically determine these options
         max_network_cards = AWSHelper.maxNetworkCards(self.nodeType, self.region)
+        log.debug(f"max_network_cards: {max_network_cards}")
+
         smt_supported = AWSHelper.supportsThreadsPerCoreOption(self.nodeType, self.region)
+        log.debug(f"smt_supported: {smt_supported}")
         # hpc6a and hpc7a and some others do not support the CpuOptions={ 'ThreadsPerCore': option }
 
         try:
@@ -312,13 +322,9 @@ class AWSCluster(Cluster):
                 ],
                 Placement=self.__placementGroup(),
                 NetworkInterfaces=self.__netInterfaces(count = 1)
-                # Using default
-                # CpuOptions={
-                #     'CoreCount': self.PPN,
-                #     'ThreadsPerCore': 1
-                # }
               )
-          elif not smt_supported: # Does NOT support the ThreadsPerCore option
+
+          elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
                 InstanceType=self.nodeType,
@@ -332,8 +338,9 @@ class AWSCluster(Cluster):
                     }
                 ],
                 Placement=self.__placementGroup(),
-                NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
+                NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
               )
+
           else:  # supports the ThreadsPerCore option and setting it to 1
               self.__instances = ec2.create_instances(
                 ImageId=self.image_id,
@@ -376,7 +383,7 @@ class AWSCluster(Cluster):
             )
 
         # Wait a little more. sshd is sometimes slow to come up
-        time.sleep(90)
+        time.sleep(60)
         # Assume the nodes are ready, set to False if not
         ready = True
 
@@ -521,6 +528,8 @@ class AWSCluster(Cluster):
                 interface['InterfaceType'] = 'efa'
 
             interfaces.append(interface)
+
+        log.debug(f"net.interfaces: {json.dumps(interfaces, indent=4)}")
 
         return interfaces
 
