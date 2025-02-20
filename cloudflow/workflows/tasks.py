@@ -78,10 +78,10 @@ def create_scratch(provider: str, jobconfigfile: str, mountpath: str = '/ptmp') 
         scratch = NFSScratchDisk(configfile)
     elif provider == 'Local':
         log.error('Coming soon ...')
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
     else:
         log.error('Unsupported provider')
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     scratch.create(mountpath)
     return scratch
@@ -153,10 +153,10 @@ def storage_init(provider: str) -> StorageService:
 
     elif provider == 'Local':
         log.error('Coming soon ...')
-        raise signals.FAIL()
+        raise signals.FAIL('storage service not supported yet')
     else:
-        log.error('Unsupported provider')
-        raise signals.FAIL()
+        log.error('Unsupported storage provider')
+        raise signals.FAIL('Unsupported storage provider')
 
     return service
 
@@ -341,7 +341,7 @@ def forecast_run(cluster: Cluster, job: Job):
         HOSTS = cluster.getHostsCSV()
     except Exception as e:
         log.exception('In driver: execption retrieving list of hostnames:' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     try:
 
@@ -353,11 +353,11 @@ def forecast_run(cluster: Cluster, job: Job):
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
-            raise signals.FAIL()
+            raise signals.FAIL(f'Forecast failed ... result: {result.returncode}')
 
     except Exception as e:
         log.exception('In driver: Exception during subprocess.run :' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('In driver: Exception during subprocess.run :' + str(e))
 
     log.info('Forecast finished successfully')
 
@@ -399,7 +399,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
         HOSTS = cluster.getHostsCSV()
     except Exception as e:
         log.exception('In driver: execption retrieving list of hostnames:' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     job.CDATE = SDATE
 
@@ -416,11 +416,11 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
-                raise signals.FAIL()
+                raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
         # Set the date for the next day run
         job.CDATE = util.ndate(job.CDATE, 1)
@@ -461,18 +461,18 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
         HOSTS = cluster.getHostsCSV()
     except Exception as e:
         log.exception('In driver: execption retrieving list of hostnames:' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     try:
         result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG, GRID], universal_newlines=True, stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
     except Exception as e:
         log.exception('In driver: Exception during subprocess.run :' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     log.info('Forecast finished successfully')
 
@@ -514,7 +514,7 @@ def template_run(cluster: Cluster, job: Job):
         HOSTS = cluster.getHostsCSV()
     except Exception as e:
         log.exception('In driver: execption retrieving list of hostnames:' + str(e))
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     ###### If a new model requires more arguments than just simply the  ######
     ###### model executable and location of model run directory, then   ######
@@ -532,11 +532,11 @@ def template_run(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'SCHISM model run failed ... result: {result.returncode}')
-                raise signals.FAIL()
+                raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
         log.info('SCHISM model run finished successfully')
 
@@ -549,11 +549,11 @@ def template_run(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
-                raise signals.FAIL()
+                raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
         log.info('Forecast finished successfully')
 
@@ -565,11 +565,11 @@ def template_run(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'{OFS} model run failed ... result: {result.returncode}')
-                raise signals.FAIL()
+                raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
         log.info(f'{OFS} model run finished successfully')
 
@@ -592,12 +592,12 @@ def run_pynotebook(pyfile: str):
         if result.returncode != 0:
             log.exception(f'{pyfile} returned non zero exit ...')
             traceback.print_stack()
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
     except Exception as e:
         log.exception(f'{pyfile} caused an exception ...')
         traceback.print_stack()
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     return
 
@@ -658,12 +658,12 @@ def fetchpy_and_run(job: Job, service: StorageService, notebook = ''):
         result = subprocess.run(['python3', pyfile, arg1, arg2, arg3], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'{pyfile} returned non zero exit ...')
-            raise signals.FAIL()
+            raise signals.FAIL('FAILED')
 
     except Exception as e:
         log.exception(f'{pyfile} caused an exception ...')
         traceback.print_stack()
-        raise signals.FAIL()
+        raise signals.FAIL('FAILED')
 
     os.chdir(curdir)
 

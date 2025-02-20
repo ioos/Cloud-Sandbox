@@ -83,28 +83,32 @@ eval $(parse_yaml $configfile "")
 netCDF_comments="$Main_ProjectName.$Main_Experiment"
 netCDF_host="`uname -n`"
 
-# ADCIRC/SWAN grid definition (files must be in $GridDir)
-GridName=$Grid_Name
-GridNameAbbrev=$Grid_NameAbbrev    # THIS IS THE SAME AS GridName - see job/templates .in, e.g. hsofs_prior_config.in 
-GridExtension=$Grid_Extension
-
 ## Directory and File locations
 CommDir="$Main_ProjectHome/common"           ## master/template model files (fort.15, fort.26, ...)
 BinDir="$Main_ProjectHome/bin"
 AdcBinDir="$Main_ADCIRCHome"
 GridDir="$Main_ProjectHome/Grids"
 TrackDir="$Main_ProjectHome/TracksToRun"
-WindDir="$Main_ProjectHome/Forcing/Winds/ERA5/<Track_Name>" # ln -s REAL_FOLDER ./Forcing
-# WindDir="$Main_ProjectHome/Forcing/Winds/ERA5/$GridName/<Track_Name>" # ln -s REAL_FOLDER ./Forcing
-# WindDir="$Main_ProjectHome/../Forcing/Winds/ERA5/$GridNameAbbrev/<Track_Name>"
+#WindDir="$Main_ProjectHome/Winds/runs/<Track_Name>"
+WindDir="$Main_ProjectHome/../Forcing/Winds/ERA5/<Track_Name>"
 RiverDir="$Main_ProjectHome/Rivers/runs/<Track_Name>"
+#HotStartDir="None"
+#HotStartDir="$ProjectHome/Tides/$Experiment"
 HotStartDir="$Main_ProjectHome/HotStarts/$Main_Experiment"
 MainArch="$Main_ProjectHome"
 WorkDir=$MainArch
-DWLCDir="$Main_ProjectHome/Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
+
+# ADCIRC/SWAN grid definition (files must be in $GridDir)
+GridName=$Grid_Name
+GridExtension=$Grid_Extension
+GridNameAbbrev=$Grid_NameAbbrev
+
+DWLCDir="$Main_ProjectHome/../Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
+#ExperimentDir="ERA5/$GridNameAbbrev"".V2"
 ExperimentDir="ERA5/$GridNameAbbrev"
 
 # Runtime template files
+#Fort15FileMaster="$CommDir/fort.15.$GridName.""V2"".template"
 Fort15FileMaster="$CommDir/fort.15.$GridName.template"
 Fort26FileMaster="$CommDir/fort.26.master"
 SwanInitFileMaster="$CommDir/swaninit.master"
@@ -156,8 +160,6 @@ elif [ "$Fort15_WinPreSrc" == "hbl" ] ; then
     WindFac="1.00"
 elif [ "$Fort15_WinPreSrc" == "wrf" ] ; then
     WindFac="1.00"
-elif [ "$Fort15_WinPreSrc" == "netcdf" ] ; then
-    WindFac="1.09"
 else
     red "Unknown WinPreSrc type ($Fort15_WinPreSrc)\n"
     exit 1
@@ -340,7 +342,6 @@ if [ "$Main_CleanUpDoneRuns" -eq "1" ] ; then
                     find ./ -name 'adcprep*' -o -name 'partmesh.txt'| xargs rm -rf
                     find ./ -name 'metis_graph.txt' -o -name 'fort.80' | xargs rm -rf
                     find ./ -name 'fort.221' -o -name 'fort.222' | xargs rm -rf
-                    find ./ -name 'fort.221.nc' -o -name 'fort.222.nc' | xargs rm -rf
                     find ./ -name 'PE*' | xargs rm -rf
                     cd ../
                     echo '   Copying ...'
@@ -496,19 +497,49 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
     fi
 
     white "*** Wind/Pre prepping...\n"
-    if [ $Fort15_NWS = "-12" ] || [ $Fort15_NWS = "14" ] ; then
-        
-	if [ $Fort15_NWS = "-12" ]; then
-            white "****** Using HBL winds (NWS=-12) ...\n"
-        fi
-        if [ $Fort15_NWS = "14" ]; then
-            white "****** Using netCDF winds (NWS=14) ...\n"
-        fi
+    if [ $Fort15_NWS = "-12" ] ; then
+        white "****** Using HBL winds (NWS=-12) ...\n"
 
-    	src=`echo $WindDir | sed "s/<Track_Name>/$ThisTrack/"`
+        #        src=`echo $WindHostDir | sed "s/<TrackName>/$ThisTrack/"`
+        #        scp -q $WindHost:$src/fort.22*gz .
 
+        #                if ${ThisTrack:0:1} = "E" ] ; then
+        #            WinPreSrc="owi"
+        #            StormType="$WinPreSrc\/runs"
+        #        else
+        #            WinPreSrc="hbl"
+        #            StormType="$WinPreSrc\/RoundTwo"
+        #        fi
+
+        src=`echo $WindDir | sed "s/<Track_Name>/$ThisTrack/"`
+
+        # redefine src if NSF project
+        #        if [ $Main_ProjectName = "NSF-HSEES" ] ; then
+        #            p1=`echo  $ThisTrack| awk -F_ '{print $1}'`
+        #            p2=`echo  $ThisTrack| awk -F_ '{print $2}'`
+        #            p3=`echo  $ThisTrack| awk -F_ '{print $3}'`
+        #            res=`echo  $ThisTrack| awk -F_ '{print $4}'`
+        # #                       res='12km'
+        #            ens=`echo  $ThisTrack| awk -F_ '{print $5}'`
+        #            temptrkname=`printf "%s_%s_%s\/%s\/%s" $p1 $p2 $p3 $res $ens`
+        #            srcBasin=`echo $WindDir | sed "s/<Track_Name>/$temptrkname/"`
+        #                white "****** Linking Basin wind/pre files ($p1,$p2,$p3,$res,$ens) from $srcBasin to here ...\n"
+        #                ln -fs $srcBasin/* .
+        #
+        #                if [ $Fort15_WithRegion == "1" ] ; then
+        #                    res='4km'
+        #                    temptrkname=`printf "%s_%s_%s\/%s\/%s" $p1 $p2 $p3 $res $ens`
+        #                    srcRegion=`echo $WindDir | sed "s/<Track_Name>/$temptrkname/"`
+        #                        white "****** Linking Region wind/pre files from $srcRegion to here ...\n"
+        #                        ln -fs $srcRegion/* .
+        #                        fi
+        #                else
         white "****** Linking wind/pre files from $src to here ...\n"
         ln -fs $src/fort.* .
+        #        fi
+        #cp $src/*gz .
+        #echo "   Gunzipping wind/pre files ..."
+        #nice gunzip *gz
 
         if [ $Fort15_WithBasin == "1" ] ; then
             if [ ! -e $Fort15_BasinPreFile ] ; then
@@ -530,17 +561,9 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
         fi
 
         # write out a fort.22 control file
-	if [ $Fort15_NWS = "-12" ]; then
-            echo $(($Fort15_WithBasin+$Fort15_WithRegion)) > fort.22
-            echo 0 >> fort.22
-            echo $WindFac >> fort.22
-	fi
-
-	if [ $Fort15_NWS = "14" ]; then
-	    echo "&nws14control" > fort.22
-            echo "NWS14NC_WindMultiplier=$WindFac," >> fort.22
-	    echo "/" >> fort.22
-        fi
+        echo $(($Fort15_WithBasin+$Fort15_WithRegion)) > fort.22
+        echo 0 >> fort.22
+        echo $WindFac >> fort.22
 
         if [ $Fort15_WithBasin == "1" ] ; then
             # check times in win,pre files

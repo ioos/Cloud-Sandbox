@@ -1,8 +1,8 @@
 # Project-level definitions
 Main:
-  ProjectName: __ProjectName__
-  ProjectHome: __ProjectHome__
-  ADCIRCHome: __ADCIRCHome__
+  ProjectName: Reanalysis-test
+  ProjectHome: /save/patrick/cora-runs/ADCIRC
+  ADCIRCHome: /save/patrick/adcirc/work
   ExtraTag: ""
   Experiment: "prior"
   OutputFormat: "netCDF"
@@ -20,21 +20,22 @@ Main:
   ClobberRuns: 0
 
 netCDF:
-  title: "NOS-Prior-test" 
+  title: "NOAA-Reanalysis-Prior-testruns" 
   institution: "RPS"
-  source: "IOOS_SB"
+  source: "IOOS SB"
   history: "none"
   references: "tbd"
   convention: "CF-UGRID_0.90"
-  contact: __contact__
+  #contact: "patrick.tripp@tetratech.com"
+  contact: notme@my.com
   #basedate replaced at runtime
   basedate: "TBD"  
 
 ## ADCIRC/SWAN grid definition (files must be in $GridDir)
 Grid:
-  Name: __GRID__
-  NameAbbrev: __GRID__
-  Extension: "14"
+  Name: "hsofs"
+  NameAbbrev: "hsofs"
+  Extension: "grd"
 
 MetSource:
   Model: "ERA5"
@@ -62,24 +63,24 @@ Fort15:
   IncludeRivers: 0
   #DRAMP: "7. 0.25 0. 0. 7. 7. 1. 0. <RndayOffset>"
   # forcing rampup length, days
-  DRAMP: 1.0 
+  DRAMP: 15.0 
   # model time step, secs
   DT: 2.0
   # use padcswan (1), or not (0)
-  Coupled: 0
+  Coupled: 1
   # Output
-  StationFile: hsofs.stationfile.dat
+  StationFile: None
   #sets output SPOOLing, secs
   GlobalOutputInterval: 3600.0
   LocalOutputInterval: 3600.0
-  RNDAY: 4.0
+  RNDAY: 400.0
   TOUTSE: 30.958333333333333
   DynWatLevCor: None
 
 Job:
   Manager: cloudflow
-  NumberOfCores: __NPROCS__
-  NumberOfWriterCores: __WRITERCORES__
+  NumberOfCores: 96
+  NumberOfWriterCores: 4
   Partition: None
   ProcessorsPerNode: None
   Queue: None

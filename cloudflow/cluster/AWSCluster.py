@@ -437,7 +437,13 @@ class AWSCluster(Cluster):
         hrs = mins / 60.0
         nodetype = self.nodeType
         nodecnt = self.nodeCount
-        timelog.info(f"Cluster Run Time: {mins} minutes - {nodecnt} x {nodetype}")
+
+        #for tag in self.tags:
+        #   if tag["Key"] == "Name":
+        #       nametag = tag["Value"]
+
+        nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
+        timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
 
         return responses
 
