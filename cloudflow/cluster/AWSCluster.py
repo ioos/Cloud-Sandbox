@@ -60,10 +60,10 @@ awsTypes = {
 
             'hpc7a.48xlarge': 96,
 
-            #'hpc7a.96xlarge': 192, # fails
+            'hpc7a.96xlarge': 192,
             #'hpc7a.96xlarge': 184, # fails
             #'hpc7a.96xlarge': 128, # 128 works with internal libfabric  1.13.2rc1-impi
-            'hpc7a.96xlarge': 160, 
+            #'hpc7a.96xlarge': 160, 
             #'hpc7a.96xlarge': 156, # failed with intel fabric
             # 128 hangs with upgraded fabric, 96 works with upgraded fabric, works, # 98 works, (7x14 tiles)
 

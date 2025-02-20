@@ -36,7 +36,7 @@ fi
 cd build
 
 # Might need to clean first
-# make clean
+make clean
 
 cmake .. -DBUILD_PADCIRC=ON \
 	 -DBUILD_PADCSWAN=ON \
