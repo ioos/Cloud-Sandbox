@@ -165,7 +165,9 @@ install_efa_driver() {
 
   home=$PWD
 
-  version=latest
+  version=$EFA_INSTALLER_VER
+
+  # version=latest
   # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
@@ -191,7 +193,8 @@ install_efa_driver() {
 
   cd aws-efa-installer
 
-  EFA_MINAMAL="NO"
+  # hpc7a did not work with intel MPI and the AWS libfabric
+  EFA_MINAMAL="YES"
 
   if [[ $EFA_MINIMAL == "NO" ]]; then
     # Install with AWS libfabric and OpenMPI, need to fix PATH prefix the forces OpenMPI mpirun and mpifort.
@@ -910,13 +913,32 @@ install_esmf_spack () {
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
-      #  Enable external libfabric dependency
+      # Enable external libfabric dependency
 
   # diffutils 3.10 build fails
-  #    ^diffutils@3.7
+  #    using ^diffutils@3.7
   spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
-  # Install fails with the following probably because mpi isn't installed with oneapi build
+# TODO: programatically create symbolic links for netcdff libraries in netcdf-c lib path
+# Example:
+# setenv NETCDF "/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6"
+# setenv NETCDFC "/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel"
+#
+# libnetcdff.a -> ../../netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6/lib/libnetcdff.a
+# libnetcdff.settings -> ../../netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6/lib/libnetcdff.settings
+# libnetcdff.so -> ../../netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6/lib/libnetcdff.so
+# libnetcdff.so.7 -> ../../netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6/lib/libnetcdff.so.7
+# libnetcdff.so.7.2.0 -> ../../netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6/lib/libnetcdff.so.7.2.0
+# libnetcdf.la
+# libnetcdf.settings
+# libnetcdf.so -> libnetcdf.so.19.2.2
+# libnetcdf.so.19 -> libnetcdf.so.19.2.2
+# libnetcdf.so.19.2.2
+#
+# 
+
+
+  # Install fails with the following maybe because mpi isn't installed with oneapi build
   #COMPILER=oneapi@${ONEAPI_VER}
   #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 

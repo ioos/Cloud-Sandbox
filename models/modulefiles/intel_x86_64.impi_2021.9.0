@@ -3,14 +3,15 @@
 ##############################################################
 ###     Machuan Peng and Aijun Zhang Aijun.Zhang@noaa.gov
 ###     NOS' Center for Operational Oceanographic Products and Services (CO-OPS)
-### NOS_SHARED
+###     Patrick Tripp RPS/Tetratech for Sandbox
 ##############################################################
+
 proc ModulesHelp { } {
-puts stderr "Set environment veriables for NOSOFS"
+puts stderr "Set environment veriables for Cloud Sandbox"
 }
 
 module-whatis "This module sets the environment variables for \
-               nosofs_shared production utilities:"
+               IOOS/NOS Cloud Sandboxes:"
 
 setenv COMP_F ifort
 setenv COMP_F_MPI90 mpif90
@@ -20,26 +21,19 @@ setenv COMP_CC  icc
 setenv COMP_CPP cpp
 setenv COMP_MPCC "mpicc -fc=icc"
 
-module purge
-module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
-module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-
-module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
-module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
-module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
-
+module load intel-oneapi-mpi/2021.9.0-intel-2021.9.0-egjrbfg
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
-#module load zlib-ng/2.1.4-intel-2021.9.0-57ptxrw
-#module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
-#module load hdf5/1.14.3-intel-2021.9.0-4xskthb
-#module load netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
-#module load netcdf-c/4.9.2-intel-2021.9.0-vznmeik
+module load zlib-ng/2.1.4-intel-2021.9.0-57ptxrw
+module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
+module load hdf5/1.14.3-intel-2021.9.0-4xskthb
+module load netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
+module load netcdf-c/4.9.2-intel-2021.9.0-vznmeik
 
-module use -a /usrx/modulefiles
 
 # Loding nceplibs modules
+#module use -a /usrx/modulefiles
 #module load produtil/1.0.18
 #module load wgrib2
 #module load bacio/v2.1.0
@@ -59,6 +53,5 @@ prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
 prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
 
 setenv NETCDF_INCDIR  "$env(NETCDF)/include"
-
 setenv JASPER_LIB "-L/lib64 -ljasper"
 

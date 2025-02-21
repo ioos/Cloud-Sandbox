@@ -5,24 +5,21 @@
 
 GCC_VER=11.2.1
 
-# Current versions
+# Current used versions
 ONEAPI_VER=2023.1.0
-
-# Note: There is no oneapi mpi version 2023.1.0
+# The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 INTEL_COMPILER_VER=2021.9.0
 
+# Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
-# spack version 0.22.3
+# spack v0.22.3 and higher has that spec
+# problems with spack v23
 INTEL_MPI_VER=2021.12.1
 
 ESMF_VER=8.5.0
 
-#SPACK_VER='releases/v0.18'
-#SPACK_DIR='/save/environments/spack-stack/spack'
-
-SPACK_VER='v0.21.0'
+SPACK_VER='v0.22.3'
 SPACK_DIR='/save/environments/spack'
-
 SPACKOPTS='-v -y'
 
 #SPACKTARGET='target=skylake_avx512'        # default on skylake intel instances t3.xxxx
@@ -30,14 +27,24 @@ SPACKOPTS='-v -y'
 #SPACKTARGET='target=x86_64'                 # works on anything
 SPACKTARGET="arch=linux-rhel8-x86_64"
 
+#EFA_INSTALLER_VER='1.32.0'
+EFA_INSTALLER_VER='1.38.0'
+
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-#SPACK_CACHEONLY=1
+SPACK_CACHEONLY=1
 
-SPACK_CACHEONLY=0
+# SPACK_CACHEONLY=0
 
 ##########################################################
+
+# Need to upgrade spack version. 0.22.3 is non-breaking
+# save current location first
+home=$PWD
+cd $SPACK_DIR
+git checkout $SPACK_VER
+cd $home
 
 # source include the functions 
 . funcs-setup-instance.sh
@@ -45,42 +52,41 @@ SPACK_CACHEONLY=0
 # calling sudo from cloud init adds 25 second delay for each sudo command
 sudo setenforce 0
 
-# Use caution when changing the order of the following
-
-# System stuff
-#setup_paths
-#setup_aliases
-#setup_environment
-
-module use -a /save/environments/modulefiles
-
-## install_jupyterhub # Requires some manual work
-#setup_ssh_mpi
-#install_efa_driver
-
-# Compilers and libraries
-#install_python_modules_user
-#install_gcc_toolset_yum
+install_efa_driver
 
 source /opt/rh/gcc-toolset-11/enable
+
 spack load intel-oneapi-compilers@2023.1.0
 
-#install_spack
-#install_intel_oneapi_spack
+# netcdf, hdf5, and other dependencies will be installed with ESMF
 install_esmf_spack
 
-exit
+# Create symbolic links to netcdf libraries
+# Some makefiles expect netcdfc and netcdff to be in same folder
+# 
+NC_FORTRAN=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/lib
+NC_C=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/lib
 
-# install_base_rpms
-# install_ncep_rpms
+if [ -d $NC_FORTRAN ] && [ -d $NC_C ]; then
+    cd $NC_C
+    ln -s $NC_FORTRAN/libnetcdff* .
 
-# ami_name must be unique - unique name is provided during initial deployment
-ami_name=mpi-2021.14.1-ioos-cloud-sandbox-2
+    #cp -p \
+        #/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/lib/libnetcdff* \
+        #/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/lib/
+else
+    echo "WARNING: Could not create symbolic links for netcdf libraries"
+fi
 
-# install_ffmpeg
-
-# TODO: create an output file to contain all of this state info - json
-# TODO: re-write in Python ?
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# !! ami_names must be unique - unique name is provided during initial deployment
+#------------------------------------------------------------------------------
+ami_name=nos-cloud-sandbox_mpi-${INTEL_MPI_VER}
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 # create node image
 ###################################
@@ -95,6 +101,8 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
+echo "Creating new image for compute nodes.\nThe old image might still work,\nif not, use this new image in your cluster configs."
+
 ./create_image.sh $ami_name $project_tag
 
-echo "Setup completed!"
+echo "Upgrade completed!"

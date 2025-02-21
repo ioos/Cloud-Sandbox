@@ -26,14 +26,6 @@ module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 
-
-# module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-# module load zlib-ng/2.1.4-intel-2021.9.0-57ptxrw
-# module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
-# module load hdf5/1.14.3-intel-2021.9.0-4xskthb
-# module load netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
-# module load netcdf-c/4.9.2-intel-2021.9.0-vznmeik
-
 DATETIME=`date +'%Y-%h-%d-T%H:%M:%S'`
 echo "${DATETIME}" > run.start
 

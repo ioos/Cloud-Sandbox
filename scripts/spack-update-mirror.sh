@@ -17,8 +17,6 @@ spack buildcache update-index $SPACK_MIRROR
 #SPEC=%intel@2021.3.0
 #SPEC='%gcc@8.5'
 
-
-#SPEC_LIST='%dpcpp@2023.1.0 %gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
 SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0'
 
 SECRET=/mnt/efs/fs1/save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.secret
@@ -39,7 +37,7 @@ spack buildcache --update-index   $SPACK_MIRROR
 
 # Rebuild
 PKGLIST=`spack find --format "{name}@{version}%{compiler}/{hash}" $SPEC`
-#echo "$PKGLIST"
+echo "$PKGLIST"
 
 for SPEC in $SPEC_LIST
 do
