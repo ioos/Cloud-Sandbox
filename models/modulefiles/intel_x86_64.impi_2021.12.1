@@ -21,27 +21,11 @@ setenv COMP_CC  icc
 setenv COMP_CPP cpp
 setenv COMP_MPCC "mpicc -fc=icc"
 
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
 module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
-
-# Load all of the following
-#intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
-# glibc/2.28-intel-2021.9.0-2uwzqhm
-# intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-# pkgconf/2.2.0-intel-2021.9.0-s7445l2
-# zlib-ng/2.1.6-intel-2021.9.0-mwrleel
-# hdf5/1.14.3-intel-2021.9.0-jjst2zs
-# bzip2/1.0.8-intel-2021.9.0-cupkwjh
-# lz4/1.9.4-intel-2021.9.0-cu6cmc3
-# snappy/1.1.10-intel-2021.9.0-bxusyvy
-# zstd/1.5.6-intel-2021.9.0-6okpm43
-# c-blosc/1.21.5-intel-2021.9.0-ln4dv7k
-# libaec/1.0.6-intel-2021.9.0-hqfpltz
-# netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
-# netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 

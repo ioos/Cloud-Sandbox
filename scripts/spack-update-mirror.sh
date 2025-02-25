@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -x
+# set -x
 
 SPACK_DIR='/save/environments/spack'
-SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+SPACK_MIRROR=s3://ioos-cloud-sandbox/public/spack/mirror
 SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
 SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 JOBS=4
@@ -32,9 +32,6 @@ spack gpg trust $SECRET
 # Public Key
 KEY=F525C05B06DCA266
 
-spack buildcache --rebuild-index  $SPACK_MIRROR
-spack buildcache --update-index   $SPACK_MIRROR
-
 # Rebuild
 PKGLIST=`spack find --format "{name}@{version}%{compiler}/{hash}" $SPEC`
 echo "$PKGLIST"
@@ -46,6 +43,5 @@ do
   do
     echo "PACKAGE: $PKG"
     spack buildcache push -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
-    #spack buildcache push -f -k $KEY -j $JOBS  $SPACK_MIRROR $PKG
   done
 done

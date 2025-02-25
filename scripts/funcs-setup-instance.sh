@@ -158,6 +158,8 @@ setup_environment_osx () {
 install_efa_driver() {
 
   echo "Running ${FUNCNAME[0]} ..."
+  echo "!!!!!!!!!               INSTALLING EFA DRIVER                !!!!!!!!!"
+  echo "!!!!!!!!!     DO NOT KILL OR PRESS CTL-C UNTIL COMPLETED     !!!!!!!!!"
 
 # This must be installed before the rest
 
@@ -215,6 +217,7 @@ install_efa_driver() {
   fi
 
   cd $home
+  echo "!!!!!!!!!    EFA INSTALLER COMPLETED    !!!!!!!!!"
 }
 
 #-----------------------------------------------------------------------------#
@@ -280,8 +283,12 @@ install_spack() {
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
   git checkout -q $SPACK_VER
-  echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
-  echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+
+  # Don't add this if it is already there
+  if [ grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null ]; then
+      echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
+      echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+  fi
 
   # Location for overriding default configurations
   sudo mkdir /etc/spack
@@ -300,16 +307,51 @@ install_spack() {
   spack buildcache keys --install --trust --force
   spack buildcache update-index $SPACK_MIRROR
 
+  #     update-index (rebuild-index)
+  #               update a buildcache index
+
   spack compiler find --scope system
 
-  # Note to recreate modulefiles
+  # Note: to recreate modulefiles
   # spack module tcl refresh -y
 
   cd $home
 }
 
 #-----------------------------------------------------------------------------#
+# Uninstalls everything
+remove_spack() {
+  if [ ! -d /etc/spack ] ; then
+    echo "WARNING: /etc/spack not found, nothing to clean "
+  else
+    cd /etc/spack || exit 1
+    sudo rm -f compilers.yaml
+    cd ..
+    sudo rmdir spack
+    cd $home
+  fi
 
+  if [ ! -d ~/.spack ] ; then
+    echo "WARNING: ~/.spack not found, nothing to clean"
+  else
+    cd ~/.spack || exit 1
+    rm -f *
+    rm -Rf bootstrap/
+    rm -Rf cache/
+    cd $home
+  fi
+
+  if [ ! $SPACK_DIR ] || [ ! -d $SPACK_DIR ] ; then
+    echo "WARNING: $SPACK_DIR not found, nothing to clean"
+  else
+    cd $SPACK_DIR || exit 1
+    rm -Rf *
+    rm -Rf .[a-Z]*
+    cd ..
+    sudo rmdir $SPACK_DIR
+    cd $home
+  fi
+}
 
 #-----------------------------------------------------------------------------#
 # Not currently used, using gcc toolset
@@ -410,45 +452,36 @@ install_intel_oneapi_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh 
 
+  source /opt/rh/gcc-toolset-11/enable
+
+  GCC_COMPILER=`spack compilers | grep "gcc@11\."`
+
   spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
-
-
-  # Testing and debugging notes
-  # MPI will be built with ESMF
-  # MKL
+  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
   # MKL is not installing, a lot of build issues! frustrating!
   # sudo yum -y install libxml2
   # sudo yum -y install libxml2-devel
 
   # Build with Intel Classic compilers
-  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
+  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
   #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
-
-  # >> 1958    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.17-tw27f45fy4bot6t3an5drrrwdakaewtj/spack-src/lib/fseeko.c(109): error: #error directive: "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
 
   # Build with Intel OneApi compilers
   #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
   #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
 
-  # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
-  # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
-  # 3278    WARNING: 'makeinfo' is missing on your system.
-
   # MKL fails with intel classic compiler
-  # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
-  # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 
   cd $home
 }
 
+
 #-----------------------------------------------------------------------------#
 # Not currently used, netcdf is installed with esmf
 install_netcdf () {
-
 
   echo "Running ${FUNCNAME[0]} ..."
   echo "Out of date ... returning"
@@ -917,7 +950,10 @@ install_esmf_spack () {
 
   # diffutils 3.10 build fails
   #    using ^diffutils@3.7
-  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+
+  # spack --debug install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
 # TODO: programatically create symbolic links for netcdff libraries in netcdf-c lib path
 # Example:
@@ -936,7 +972,6 @@ install_esmf_spack () {
 # libnetcdf.so.19.2.2
 #
 # 
-
 
   # Install fails with the following maybe because mpi isn't installed with oneapi build
   #COMPILER=oneapi@${ONEAPI_VER}
