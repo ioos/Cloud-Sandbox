@@ -16,13 +16,13 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class NWMv3Hindcast(Job):
-    """ Implementation of Job class for NWMv3 WRF-Hydro simulations
+class DFLOWFM_Template(Job):
+    """ Implementation of Job class for DFlowFM model runs
 
     Attributes
     ----------
     jobtype : str
-        Always 'nwmv3hindcast' for this class.
+        Job type configuration description for NWM WRF Hydro simulation. Should always be dflowfm_template
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -31,13 +31,16 @@ class NWMv3Hindcast(Job):
         Total number of processors in this cluster.
 
     OFS : str
-        The ocean forecast to run
+        The DFlowFM model to run
 
     EXEC : str
         The model executable to run.
+
+    DFLOW_LIB : str
+        The pathway to the DFlowFM compiled library suite for executable to link with.
     
     MODEL_DIR : str
-        The location of the NWMv3 model run to execute
+        The location of the DFlowFM model run directory to execute
     """
 
 
@@ -54,13 +57,12 @@ class NWMv3Hindcast(Job):
 
         """
 
-        self.jobtype = 'nwmv3hindcast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in NWMv3Hindcast init")
+            print(f"DEBUG: in DFLOWFM Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -78,8 +80,10 @@ class NWMv3Hindcast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
+        self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']
 
         return

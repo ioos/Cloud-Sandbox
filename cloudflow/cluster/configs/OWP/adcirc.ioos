@@ -4,7 +4,7 @@
 "nodeType"  : "hpc6a.48xlarge",
 "nodeCount" : 1,
 "tags"      : [ 
-                { "Key": "Name", "Value": "NWMv3" },
+                { "Key": "Name", "Value": "ADCIRC" },
                 { "Key": "Project", "Value": "OWP" }
               ],
 "image_id"  : "ami-082e2e4e7ef1c6d77",

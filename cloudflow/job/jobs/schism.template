@@ -1,5 +1,5 @@
 {
-  "JOBTYPE"   : "schismhindcast",
+  "JOBTYPE"   : "schism_template",
   "OFS"       : "schism",
   "EXEC"      : "/save/ec2-user/OWP/schism/build/bin/pschism_DEBUG_DEBUG_BLD_STANDALONE_SH_MEM_COMM_TVD-VL",
   "MODEL_DIR" : "/save/ec2-user/OWP/laura",

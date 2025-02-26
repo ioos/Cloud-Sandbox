@@ -16,13 +16,13 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class SCHISMHindcast(Job):
+class SCHISM_Template(Job):
     """ Implementation of Job class for SCHISM simulations
 
     Attributes
     ----------
     jobtype : str
-        Always 'schismhindcast' for this class.
+        Job type configuration description for NWM WRF Hydro simulation. Should always be schism_template
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -57,14 +57,12 @@ class SCHISMHindcast(Job):
 
         """
 
-        self.jobtype = 'schismhindcast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
-        self.TEMPLPATH = f"{curdir}/templates"
 
         if debug:
-            print(f"DEBUG: in SCHISMHindcast init")
+            print(f"DEBUG: in SCHISM Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -81,7 +79,8 @@ class SCHISMHindcast(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-        
+
+        self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']

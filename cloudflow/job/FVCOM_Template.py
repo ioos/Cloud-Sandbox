@@ -16,13 +16,13 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class DFLOWFMHindcast(Job):
-    """ Implementation of Job class for DFlowFM model runs
+class FVCOM_Template(Job):
+    """ Implementation of Job class for a simple FVCOM model template
 
     Attributes
     ----------
     jobtype : str
-        Always 'dflowfmhindcast' for this class.
+        User defined job type based on model of interest, should always be fvcom_template
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -31,16 +31,17 @@ class DFLOWFMHindcast(Job):
         Total number of processors in this cluster.
 
     OFS : str
-        The DFlowFM model to run
+        The model setup type to run
 
     EXEC : str
         The model executable to run.
-
-    DFLOW_LIB : str
-        The pathway to the DFlowFM compiled library suite for executable to link with.
     
     MODEL_DIR : str
-        The location of the DFlowFM model run directory to execute
+        The location of the model run directory to execute
+
+    CASE_FILE : str
+        The input FVCOM case file name required to execute the model. For example, if the
+        fvcom case file inlet_run.nml then CASE_FILE=inlet
     """
 
 
@@ -57,13 +58,12 @@ class DFLOWFMHindcast(Job):
 
         """
 
-        self.jobtype = 'dflowfmhindcast'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in DFLOWFM init")
+            print(f"DEBUG: in FVCOM Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -80,12 +80,12 @@ class DFLOWFMHindcast(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-        
+
+        self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
-        self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-
+        self.CASE_FILE = cfDict['CASE_FILE']
         return
 
 
