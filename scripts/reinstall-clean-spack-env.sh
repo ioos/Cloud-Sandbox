@@ -3,9 +3,22 @@
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-source environment-vars.sh
+##########################################################
+
+echo "WARNING: this will completely remove the current spack environment."
+echo "Are you sure you want to continue? (y/n)"
+read -p "Your choice: " choice
+
+if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+    echo "continuing with installation ..."
+else
+    echo "installation cancelled."
+    exit 1
+fi
 
 ##########################################################
+
+source environment-vars.sh
 
 home=$PWD
 

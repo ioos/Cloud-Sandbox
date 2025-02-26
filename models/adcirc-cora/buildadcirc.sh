@@ -42,5 +42,5 @@ cmake .. -DBUILD_PADCIRC=ON \
          -DENABLE_OUTPUT_NETCDF=ON \
          -DBUILD_UTILITIES=ON \
          -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icc -DCMAKE_Fortran_COMPILER=ifort
-# make
+make
 
