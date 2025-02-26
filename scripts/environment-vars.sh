@@ -11,12 +11,12 @@ INTEL_COMPILER_VER=2021.9.0
 # MPI v 2021.12.0+ supports multiple EFA adaptors
 # spack v0.22.3 and higher has that spec
 # problems with spack v23
+
 INTEL_MPI_VER=2021.12.1
 
 ESMF_VER=8.5.0
 
-# SPACK_VER='v0.22.5'   # does not work - hangs indefinitely
-SPACK_VER='v0.22.3'
+SPACK_VER='v0.22.5'
 
 SPACK_DIR='/save/environments/spack'
 SPACKOPTS='-v -y'
@@ -31,9 +31,8 @@ EFA_INSTALLER_VER='1.38.0'
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
-#SPACK_CACHEONLY=0
 
-SPACK_CACHEONLY=1
+SPACK_CACHEONLY=0
 
 SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 
@@ -42,18 +41,13 @@ SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 #------------------------------------------------------------------------------
 # !! ami_names must be unique
 #------------------------------------------------------------------------------
-# ami_name=test-cloud-sandbox_mpi-${INTEL_MPI_VER}-test
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
 
-ami_name=${ami_name:='2025-02-25-18-02-IOOS-Cloud-Sandbox'}
+now=`date -u +\%Y\%m\%d_\%H-\%M`
+ami_name=${ami_name:="${now}-IOOS-Cloud-Sandbox"}
 project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
-
-# TODO: test if ami_name already exists - if so, append or prepend a unique identifier
-
-
 

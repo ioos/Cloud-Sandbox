@@ -306,8 +306,7 @@ install_spack() {
 
   spack buildcache keys --install --trust --force
   spack buildcache update-index $SPACK_MIRROR
-
-  #     update-index (rebuild-index)
+  #     update-index (same as rebuild-index)
   #               update a buildcache index
 
   spack compiler find --scope system
@@ -321,6 +320,8 @@ install_spack() {
 #-----------------------------------------------------------------------------#
 # Uninstalls everything
 remove_spack() {
+  set -x
+
   if [ ! -d /etc/spack ] ; then
     echo "WARNING: /etc/spack not found, nothing to clean "
   else
@@ -335,9 +336,12 @@ remove_spack() {
     echo "WARNING: ~/.spack not found, nothing to clean"
   else
     cd ~/.spack || exit 1
-    rm -f *
     rm -Rf bootstrap/
     rm -Rf cache/
+    rm -Rf linux/
+    rm -f *
+    cd ..
+    rmdir .spack
     cd $home
   fi
 
@@ -351,6 +355,8 @@ remove_spack() {
     sudo rmdir $SPACK_DIR
     cd $home
   fi
+
+  set +x
 }
 
 #-----------------------------------------------------------------------------#
