@@ -1,5 +1,4 @@
-#!/bin/bash -l
-# set -x
+#!/bin/env bash
 
 echo "RUNDIR: $RUNDIR"
 cd $RUNDIR
@@ -20,16 +19,23 @@ hostname
 module purge
 module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
 
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
 module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 
+# WTH!? need to explicitly set this now
+NETCDF=`nc-config --prefix`
+export LD_LIBRARY_PATH="$NETCDF/lib:$LD_LIBRARY_PATH"
+
 DATETIME=`date +'%Y-%h-%d-T%H:%M:%S'`
 echo "${DATETIME}" > run.start
 
 echo "MPIOPTS: $MPIOPTS"
+
+#echo "PT DEBUGGING link errors"
+#ldd $PHOME/adcprep
 
 #PrepLine1
 #PrepLine2

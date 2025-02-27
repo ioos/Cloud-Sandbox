@@ -61,15 +61,16 @@ fi
 # spack location -i gcc@$GCC_VER
 # spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
 # nctest=`spack location -i netcdf-fortran \%intel\@${INTEL_COMPILER_VER}`
+#
+# THIS IS HARDCODED for the current version - UPDATE if needed - so far only needed by adcirc cmake build
 #####################################################################
 
-NC_FORTRAN=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/lib
-NC_C=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/lib
+NC_FORTRAN=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt
+NC_C=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque
 
 if [ -d $NC_FORTRAN ] && [ -d $NC_C ]; then
-    cd $NC_C
-    ln -s $NC_FORTRAN/libnetcdff* .
-
+    ln -s $NC_FORTRAN/lib/libnetcdff* $NC_C/lib >& /dev/null
+    ln -s $NC_FORTRAN/include/* $NC_C/include >& /dev/null
     cd $home
 else
     echo "WARNING: Could not create symbolic links for netcdf libraries"

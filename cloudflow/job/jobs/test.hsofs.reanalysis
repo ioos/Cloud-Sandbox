@@ -6,11 +6,11 @@
   "BCKTFLDR"  : "",
   "OUTDIR"    : "",
   "ProjectName" : "Reanalysis-test",
-  "ProjectHome" : "/save/patrick/cora-runs/ADCIRC",
+  "ProjectHome" : "/save/patrick/CORA-ADCIRC",
   "ADCIRCHome"  : "/save/patrick/adcirc/work",
   "GRID"        : "hsofs",
-  "CONFIG"      : "/save/patrick/cora-runs/ADCIRC/configs/hsofs_prior_config.yml",
-  "CONFIGTMPL"  : "/save/patrick/hsofs.Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config.in",
+  "CONFIG"      : "/save/patrick/CORA-ADCIRC/configs/hsofs_prior_config.yml",
+  "CONFIGTMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config.in",
   "contact"     : "notme@my.com",
   "WRITERCORES" : "4"
 }

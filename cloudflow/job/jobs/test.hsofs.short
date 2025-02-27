@@ -7,7 +7,7 @@
   "OUTDIR"    : "",
   "ProjectName" : "Reanalysis-test",
   "ProjectHome" : "/save/patrick/CORA-ADCIRC",
-  "ADCIRCHome"  : "/save/patrick/adcirc/work",
+  "ADCIRCHome"  : "/save/patrick/adcirc/work/bin",
   "GRID"        : "hsofs",
   "CONFIG"      : "/save/patrick/CORA-ADCIRC/configs/hsofs_prior_config.yml",
   "CONFIGTMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/hsofs_prior_config_short.in",

@@ -15,8 +15,6 @@ sudo setenforce 0
 # source include the functions 
 . funcs-setup-instance.sh
 
-
-
 install_efa_driver
 
 source /opt/rh/gcc-toolset-11/enable
@@ -44,22 +42,21 @@ if [ $retval -ne 0 ]; then
   exit $retval
 fi
 
-
 #####################################################################
 # Create symbolic links to netcdf libraries
 # Some makefiles expect netcdfc and netcdff to be in same folder
 # THIS IS HARDCODED for the current version - UPDATE if needed
 #####################################################################
-NC_FORTRAN=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/lib
-NC_C=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/lib
+NC_FORTRAN=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt
+NC_C=/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque
 
 if [ -d $NC_FORTRAN ] && [ -d $NC_C ]; then
-    cd $NC_C
-    ln -s $NC_FORTRAN/libnetcdff* .
-    cd $home
+    ln -s $NC_FORTRAN/lib/libnetcdff* $NC_C/lib >& /dev/null
+    ln -s $NC_FORTRAN/include/* $NC_C/include >& /dev/null
 else
     echo "WARNING: Could not create symbolic links for netcdf libraries"
 fi
+
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
