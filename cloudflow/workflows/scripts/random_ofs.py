@@ -13,7 +13,7 @@ if os.path.abspath('../..') not in sys.path:
 if os.path.abspath('../../..') not in sys.path:
     sys.path.append(os.path.abspath('../../..'))
 
-from cloudflow.utils import romsUtil as utils
+from cloudflow.utils import modelUtil as utils
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"

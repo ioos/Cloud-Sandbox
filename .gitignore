@@ -32,3 +32,4 @@ my.plan
 build/
 cloudflow/build/
 .nfs*
+cloudflow/cluster/SAVE.AWSCluster.py

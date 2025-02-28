@@ -6,8 +6,8 @@ import sys
 import time
 
 # TODO: add additional signal handlers for more robust cleanup of failed runs
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
 
-from signal import signal, SIGINT
 import logging
 from distributed import Client
 import prefect
@@ -662,14 +662,13 @@ def inject_notebook() :
         nbutils.inject(pyfile, storage_provider)
 
 
+# Not being referenced anywhere here - unused
 def handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     raise signals.FAIL()
 
-
 if __name__ == '__main__':
-
-    #signal(SIGINT, handler)
+    # signal(SIGINT, handler)
     pass
 
     # conf = f'./cluster/configs/debug.config'

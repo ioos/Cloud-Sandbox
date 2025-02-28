@@ -8,7 +8,7 @@ import sys
 import time
 import math
 from pathlib import Path
-from signal import signal
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
 
 if os.path.abspath('.') not in sys.path:
     sys.path.append(os.path.abspath('.'))
@@ -17,7 +17,7 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 # Local dependencies
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 from cloudflow.workflows import flows
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
@@ -45,12 +45,19 @@ ch.setFormatter(formatter)
 if not log.hasHandlers():
     log.addHandler(ch)
 
+
 def handler(signal_received, frame):
-    print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signal.FAIL()
+    msg=f"{signal_received} detected. Exiting."
+    print(msg)
+    raise Exception(f"{signal_received} detected. Exiting gracefully.")
 
 
 def main():
+
+    signals_to_handle = [SIGINT, SIGTERM, SIGQUIT]
+    for sig in signals_to_handle:
+        signal(sig, handler)
+
     lenargs = len(sys.argv) - 1
     joblist = []
 

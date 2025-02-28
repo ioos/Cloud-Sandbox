@@ -14,10 +14,9 @@ fi
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
+# This has been tested on RHEL8 
 
 setup_environment () {
-
-# This has been tested on RHEL8 
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -100,6 +99,7 @@ setup_environment () {
 
 }
 
+#-----------------------------------------------------------------------------#
 
 setup_paths () {
 
@@ -158,6 +158,8 @@ setup_environment_osx () {
 install_efa_driver() {
 
   echo "Running ${FUNCNAME[0]} ..."
+  echo "!!!!!!!!!               INSTALLING EFA DRIVER                !!!!!!!!!"
+  echo "!!!!!!!!!     DO NOT KILL OR PRESS CTL-C UNTIL COMPLETED     !!!!!!!!!"
 
 # This must be installed before the rest
 
@@ -165,7 +167,9 @@ install_efa_driver() {
 
   home=$PWD
 
-  version=latest
+  version=$EFA_INSTALLER_VER
+
+  # version=latest
   # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
@@ -184,32 +188,40 @@ install_efa_driver() {
     sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
   done
 
-  # Default version is needed to build the kernel driver
-  # If gcc has already been upgraded, this will likely fail
-
+  # System default gcc version is needed to build the kernel driver
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
   tar -xf $tarfile
   rm $tarfile
 
   cd aws-efa-installer
 
-  # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-  sudo ./efa_installer.sh -y --minimal
+  # hpc7a did not work with intel MPI and the AWS libfabric
+  EFA_MINAMAL="YES"
 
-  # If it installed openmpi 
-  # sudo yum erase openmpi40-aws-4.1.4-3.x86_64
+  if [[ $EFA_MINIMAL == "NO" ]]; then
+    # Install with AWS libfabric and OpenMPI, need to fix PATH prefix the forces OpenMPI mpirun and mpifort.
+    sudo ./efa_installer.sh -y
 
-  # Put old kernels back in original location
+    # If it installed openmpi, undo the profile.d change the installer made
+    sudo cp $home/system/profile.d.zippy_efa.sh /etc/profile.d/zippy_efa.sh
+
+  else
+    # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+    sudo ./efa_installer.sh -y --minimal
+  fi
+
+  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
   if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
     sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
     sudo rmdir /usr/lib/oldkernel
   fi
 
   cd $home
+  echo "!!!!!!!!!    EFA INSTALLER COMPLETED    !!!!!!!!!"
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_gcc_toolset_yum() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -227,7 +239,7 @@ install_gcc_toolset_yum() {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - needs work
 install_spack-stack() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -271,8 +283,12 @@ install_spack() {
   git clone -q https://github.com/spack/spack.git $SPACK_DIR
   cd $SPACK_DIR
   git checkout -q $SPACK_VER
-  echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
-  echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+
+  # Don't add this if it is already there
+  if [ grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null ]; then
+      echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
+      echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
+  fi
 
   # Location for overriding default configurations
   sudo mkdir /etc/spack
@@ -290,18 +306,61 @@ install_spack() {
 
   spack buildcache keys --install --trust --force
   spack buildcache update-index $SPACK_MIRROR
+  #     update-index (same as rebuild-index)
+  #               update a buildcache index
 
   spack compiler find --scope system
 
-  # Note to recreate modulefiles
+  # Note: to recreate modulefiles
   # spack module tcl refresh -y
 
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
+# Uninstalls everything
+remove_spack() {
+  set -x
+
+  if [ ! -d /etc/spack ] ; then
+    echo "WARNING: /etc/spack not found, nothing to clean "
+  else
+    cd /etc/spack || exit 1
+    sudo rm -f compilers.yaml
+    cd ..
+    sudo rmdir spack
+    cd $home
+  fi
+
+  if [ ! -d ~/.spack ] ; then
+    echo "WARNING: ~/.spack not found, nothing to clean"
+  else
+    cd ~/.spack || exit 1
+    rm -Rf bootstrap/
+    rm -Rf cache/
+    rm -Rf linux/
+    rm -f *
+    cd ..
+    rmdir .spack
+    cd $home
+  fi
+
+  if [ ! $SPACK_DIR ] || [ ! -d $SPACK_DIR ] ; then
+    echo "WARNING: $SPACK_DIR not found, nothing to clean"
+  else
+    cd $SPACK_DIR || exit 1
+    rm -Rf *
+    rm -Rf .[a-Z]*
+    cd ..
+    sudo rmdir $SPACK_DIR
+    cd $home
+  fi
+
+  set +x
+}
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used, using gcc toolset
 install_gcc_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -326,7 +385,7 @@ install_gcc_spack () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - needs work
 install_intel_oneapi-spack-stack () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -350,7 +409,7 @@ install_intel_oneapi-spack-stack () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_intel_oneapi_yum () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -399,44 +458,36 @@ install_intel_oneapi_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh 
 
+  source /opt/rh/gcc-toolset-11/enable
+
+  GCC_COMPILER=`spack compilers | grep "gcc@11\."`
+
   spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin/intel64
-  spack compiler add `spack location -i intel-oneapi-compilers`/compiler/latest/linux/bin
-
-  # MPI will be built with ESMF
-  # MKL
+  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
+  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
   # MKL is not installing, a lot of build issues! frustrating!
   # sudo yum -y install libxml2
   # sudo yum -y install libxml2-devel
 
   # Build with Intel Classic compilers
-  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
+  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
   #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
-
-  # >> 1958    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.17-tw27f45fy4bot6t3an5drrrwdakaewtj/spack-src/lib/fseeko.c(109): error: #error directive: "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
 
   # Build with Intel OneApi compilers
   #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
   #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
 
-  # cmp: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
-  # 3277    /tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-ty2xeyj2g3cs2jgqukady5zyod4of6eh/spack-src/build-aux/missing: line 81: makeinfo: command not found
-  # 3278    WARNING: 'makeinfo' is missing on your system.
-
   # MKL fails with intel classic compiler
-  # cpx: warning: use of 'dpcpp' is deprecated and will be removed in a future release. Use 'icpx -fsycl' [-Wdeprecated]
-  # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 
   cd $home
 }
 
+
 #-----------------------------------------------------------------------------#
 # Not currently used, netcdf is installed with esmf
-
 install_netcdf () {
-
 
   echo "Running ${FUNCNAME[0]} ..."
   echo "Out of date ... returning"
@@ -466,7 +517,7 @@ install_netcdf () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_hdf5-gcc8 () {
 
   # This installs the gcc built hdf5
@@ -492,7 +543,7 @@ install_hdf5-gcc8 () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used
 install_munge_s3 () {
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -583,8 +634,9 @@ add_module_sbin_path () {
   return 0
 }
 
-#-----------------------------------------------------------------------------#
 
+#-----------------------------------------------------------------------------#
+# Not currently used - and currently not planning on using slurm
 install_slurm () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -648,7 +700,7 @@ install_slurm () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - slurm dependency
 _install_munge () {
 
   # https://github.com/dun/munge/wiki/Installation-Guide
@@ -704,7 +756,7 @@ _install_munge () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - and currently not planning on using slurm
 configure_slurm () { 
 
   if [ $# -ne 1 ]; then
@@ -784,7 +836,9 @@ configure_slurm () {
 #-----------------------------------------------------------------------------#
 
 
+# Not currently used - and currently not planning on using slurm
 install_slurm-epel7 () {
+
 #-----------------------------------------------------------------------------#
 # NOTE: In the beginning of 2021, a version of Slurm was added to the EPEL repository. This version is not supported or maintained by SchedMD, and is not currently recommend for customer use. Unfortunately, this inclusion could cause Slurm to be updated to a newer version outside of a planned maintenance period. In order to prevent Slurm from being updated unintentionally, we recommend you modify the EPEL Repository configuration to exclude all Slurm packages from automatic updates.
 
@@ -866,7 +920,7 @@ install_slurm-epel7 () {
 }
 
 #-----------------------------------------------------------------------------#
-
+# Not currently used - and currently not planning on using slurm
 install_slurm-s3() {
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -894,12 +948,22 @@ install_esmf_spack () {
 
   spack load intel-oneapi-compilers@${ONEAPI_VER}
 
-  COMPILER=intel@${INTEL_VER}
-  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
+  COMPILER=intel@${INTEL_COMPILER_VER}
 
-  # Install fails with the following probably because mpi isn't installed with oneapi build
+  # oneapi mpi spack build option
+      # external-libfabric [false]        false, true
+      # Enable external libfabric dependency
+
+  # diffutils 3.10 build fails
+  #    using ^diffutils@3.7
+  spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+
+  # spack --debug install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+
+  # Install fails with the following maybe because mpi isn't installed with oneapi build
   #COMPILER=oneapi@${ONEAPI_VER}
-  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_VER} %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }
@@ -1014,7 +1078,8 @@ install_python_modules_user () {
   python3 -m pip install --upgrade dask
   python3 -m pip install --upgrade distributed
   python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
-  python3 -m pip install --upgrade paramiko   # needed for dask-ssh
+  python3 -m pip install --upgrade paramiko         # needed for dask-ssh
+  python3 -m pip install --upgrade haikunator       # memorable Name tags
 
   # SPACK has problems with botocore newer than below
   python3 -m pip install --upgrade botocore==1.23.46
@@ -1127,6 +1192,7 @@ setup_ssh_mpi () {
   home=$PWD
 
   # MPI needs key to ssh into cluster nodes
+  # TODO: DOUBLE CHECK: DO NOT OVERWRITE EXISTING KEY
   sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/id_rsa
   sudo -u $USER cat /home/$USER/.ssh/id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 

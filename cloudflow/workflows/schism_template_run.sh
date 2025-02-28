@@ -36,10 +36,12 @@ echo "--- Running SCHISM -----------------"
 echo "---"
 
 mpiexec $MPIOPTS $EXEC $NSCRIBES
+result=$?
 
-
-if [ $? -ne 0 ]; then
+# Capture the exit/end result and propagate it down the stack.
+if [ $result -ne 0 ]; then
   echo "ERROR returned from mpirun"
+  exit $result
 else
   echo "SCHISM model has succesfully completed on the cloud!"
   duration=$SECONDS

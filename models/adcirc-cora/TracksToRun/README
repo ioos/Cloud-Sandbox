@@ -1,0 +1,4 @@
+Put empty files in TracksToRun named <year>.trk
+
+run_storms looks for files in TracksToRun to prep/submit
+

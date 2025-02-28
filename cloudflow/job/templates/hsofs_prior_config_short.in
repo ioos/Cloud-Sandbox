@@ -72,7 +72,7 @@ Fort15:
   #sets output SPOOLing, secs
   GlobalOutputInterval: 3600.0
   LocalOutputInterval: 3600.0
-  RNDAY: 2.0
+  RNDAY: 4.0
   TOUTSE: 30.958333333333333
   DynWatLevCor: None
 

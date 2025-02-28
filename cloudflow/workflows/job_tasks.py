@@ -23,7 +23,7 @@ from cloudflow.plotting import plot_roms
 
 from cloudflow.plotting import plot_fvcom
 from cloudflow.plotting import shared as plot_shared
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"

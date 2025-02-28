@@ -13,12 +13,12 @@ import collections
 import os
 import sys
 import re
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGTERM, SIGQUIT
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from cloudflow.utils import romsUtil as util
+from cloudflow.utils import modelUtil as util
 from cloudflow.workflows import flows
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
@@ -36,14 +36,17 @@ template_conf = f'{curdir}/../cluster/configs/OWP/dflowfm.ioos'
 ######################################################################
 
 def handler(signal_received, frame):
-    print('SIGINT or CTRL-C detected. Exiting gracefully')
-    raise signal.FAIL()
+    msg=f"{signal_received} detected. Exiting."
+    print(msg)
+    raise Exception(f"{signal_received} detected. Exiting gracefully.")
 
 
 ## The template workflow driver script for any model run in Cloud-Sandbox ##
 def main():
 
-    signal(SIGINT, handler)
+    signals_to_handle = [SIGINT, SIGTERM, SIGQUIT]
+    for sig in signals_to_handle:
+        signal(sig, handler)
 
     # Read in user defined job file
     jobfile = os.path.abspath(sys.argv[1])

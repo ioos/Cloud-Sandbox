@@ -40,16 +40,22 @@ echo "--- Partitioning DFlowFM domain-----------------"
 echo "---"
 
 $EXEC --partition:ndomains=$NPROCS:icgsolver=7: FlowFM.mdu
+result=$?
+if [ $result -ne 0 ]; then
+  echo "ERROR returned from $EXEC"
+  exit $result
+fi
 
 echo "--- " 
 echo "--- Running DFlowFM -----------------"
 echo "---"
 
 mpirun $MPIOPTS $EXEC FlowFM.mdu -autostartstop
+result=$?
 
-
-if [ $? -ne 0 ]; then
+if [ $result -ne 0 ]; then
   echo "ERROR returned from mpirun"
+  exit $result
 else
   echo "DFlowFM model has succesfully completed on the cloud!"
   duration=$SECONDS

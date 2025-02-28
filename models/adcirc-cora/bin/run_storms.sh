@@ -83,24 +83,25 @@ eval $(parse_yaml $configfile "")
 netCDF_comments="$Main_ProjectName.$Main_Experiment"
 netCDF_host="`uname -n`"
 
+# ADCIRC/SWAN grid definition (files must be in $GridDir)
+GridName=$Grid_Name
+GridNameAbbrev=$Grid_NameAbbrev    # THIS IS THE SAME AS GridName - see job/templates .in, e.g. hsofs_prior_config.in 
+GridExtension=$Grid_Extension
+
 ## Directory and File locations
 CommDir="$Main_ProjectHome/common"           ## master/template model files (fort.15, fort.26, ...)
 BinDir="$Main_ProjectHome/bin"
 AdcBinDir="$Main_ADCIRCHome"
 GridDir="$Main_ProjectHome/Grids"
 TrackDir="$Main_ProjectHome/TracksToRun"
-WindDir="$Main_ProjectHome/../Forcing/Winds/ERA5/<Track_Name>"
+WindDir="$Main_ProjectHome/Forcing/Winds/ERA5/<Track_Name>" # ln -s REAL_FOLDER ./Forcing
+# WindDir="$Main_ProjectHome/Forcing/Winds/ERA5/$GridName/<Track_Name>" # ln -s REAL_FOLDER ./Forcing
+# WindDir="$Main_ProjectHome/../Forcing/Winds/ERA5/$GridNameAbbrev/<Track_Name>"
 RiverDir="$Main_ProjectHome/Rivers/runs/<Track_Name>"
 HotStartDir="$Main_ProjectHome/HotStarts/$Main_Experiment"
 MainArch="$Main_ProjectHome"
 WorkDir=$MainArch
-
-# ADCIRC/SWAN grid definition (files must be in $GridDir)
-GridName=$Grid_Name
-GridExtension=$Grid_Extension
-GridNameAbbrev=$Grid_NameAbbrev
-
-DWLCDir="$Main_ProjectHome/../Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
+DWLCDir="$Main_ProjectHome/Forcing/DynWatLevCor/ERA5/$GridNameAbbrev/<Year>"
 ExperimentDir="ERA5/$GridNameAbbrev"
 
 # Runtime template files

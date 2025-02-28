@@ -48,7 +48,9 @@ The Cloud Sandbox uses [CloudFlow](CLOUDFLOW.md) to orchestrate the execution of
 
 The Cloud Sandbox uses [Terraform](https://www.terraform.io/) to deploy resources to the cloud. The sandbox currently only supports the Amazon Web Services (AWS) cloud platform.
 
-![Software Architecture](./images/sandbox-architecture.png)
+<!-- TODO update graph
+    ![Software Architecture](./images/sandbox-architecture.png)
+-->
 
 - **Head Node**: The head node is the machine that runs the CloudFlow scheduler. Users can SSH into this machine to run CloudFlow tasks.
 - **Preconfigured AMI**: This Amazon Machine Image (AMI) contains all of the necessary code to run the model. This image will run on the worker nodes.

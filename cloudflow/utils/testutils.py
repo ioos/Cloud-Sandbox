@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import romsUtil as utils
+import modelUtil as utils
 
 def test_get_baseline_lo():
 
