@@ -103,7 +103,7 @@ class AWSCluster(Cluster):
     tags      : list of dictionary/s of str
         Specific tags to attach to the resources provisioned.
 
-    image_id  : str/
+    image_id  : str
         AWS EC2 AMI - Amazon Machine Image
 
     key_name  : str
