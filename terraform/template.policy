@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowRunInstancesInApprovedSubnet",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": [
+        "arn:aws:ec2:<region>:<account-id>:instance/*",
+        "arn:aws:ec2:<region>:<account-id>:network-interface/*",
+        "arn:aws:ec2:<region>:<account-id>:volume/*",
+        "arn:aws:ec2:<region>:<account-id>:subnet/<subnet-id>",
+        "arn:aws:ec2:<region>:<account-id>:security-group/<sg-id>",
+        "arn:aws:ec2:<region>:<account-id>:key-pair/<key-pair-name>"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "ec2:Subnet": "arn:aws:ec2:<region>:<account-id>:subnet/<subnet-id>"
+        }
+      }
+    },
+    {
+      "Sid": "RestrictOtherEC2ActionsToApprovedInstances",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:TerminateInstances",
+        "ec2:StopInstances",
+        "ec2:StartInstances"
+      ],
+      "Resource": "arn:aws:ec2:<region>:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/ApprovedSubnet": "<subnet-id>"
+        }
+      }
+    }
+  ]
+}
+
