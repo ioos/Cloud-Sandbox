@@ -1,39 +1,53 @@
-######## Installing Anaconda environment for local ec2-user on ioos Cloud-Sandbox ########
+# Installing Anaconda environment for local ec2-user on ioos Cloud-Sandbox 
 
-Step #1 (Setup and create a unique directory for installation
-cd /save/ec2-user/Affiliation; mkdir FirstName_LastName_Anaconda_Installation; cd FirstName_LastName_Anaconda_Installation
+## Setup 
 
-Step #2 (Downloading latest Anaconda installation shell script)
-wget https://repo.continuum.io/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
+You need to create a unique directory to install your local version of conda, and thus, python.
 
-Step #3 (Open executable permissions to the Anaconda installation shell script)
-chmod +x Anaconda3-2024.10-1-Linux-x86_64.sh
+### Change Directory to Your Affiliation
+```bash
+cd /save/ec2-user/Affiliation
+```
+Replace `Affiliation` above with your working group.
 
-Step #5 (Execute the Anaconda installation shell script and follow instructions)
-./Anaconda3-2024.10-1-Linux-x86_64.sh
+### Create Your Personal Installation Directory
 
-  Sub-step #1
-  Hit enter to scroll through the Anaconda license agreement until you go to “yes” or “no” command line inquiry. Then answer "yes" in the command line
+```bash
+mkdir FirstName_LastName_Anaconda_Installation; 
+```
+Replace the `FirstName` and `LastName` above with your first and last name.
 
-  Sub-step #2
-  Next Step here, you will want to specify your specific pathway to your own affiliation directory on the Cloud-Sandbox that you will know it’s your own Anaconda environment e.g. /pathway/to/FirstName_LastName_Anaconda_Installation/anaconda3
+### Change To Your Personal Installation Directory
+```bash
+cd FirstName_LastName_Anaconda_Installation
+export WORKINGDIR=$(pwd)
+```
+> [!IMPORTANT]
+> Do not log out after this step!  The `WORKINGDIR` environment variable is used
+in later steps.  If, for some reason, you do log out or your shell gets killed, just change to your affiliation directory and then repeat the steps in this section.
 
-  Sub-step #3
-  After the installation is complete of all the Python libraries, modules, etc. for the baseline Anaconda environment, it will ask you whether or not you want to modify the .bashrc script to automatically point to your installation when you log in. You answer "no" to this question so other ec2-users don't also automatically point to your Anaconda environment when they log in as well.
+## Install Conda and Libraries
 
-Step #6 (Go into your new Anaconda installation bin directory)
-cd /pathway/to/FirstName_LastName_Anaconda_Installation/anaconda3/bin
+> [!WARNING]
+> The following script takes quite a while to run (approximately 85 minutes).  You need to make sure that you don't get logged off during the execution.
 
-Step #7 (Execute Anaconda commands to properly install the archive libraries since this installation was not installed in a root environment. This gets around issues with installing Anaconda into a seperate local directory and breaking the conda executable)
-
-  Sub-step #1
-  ./conda install -n base libarchive -c main --force-reinstall --solver classic
-
-  Sub-step #2
-  ./conda update --all --solver=classic
-
-Step #8 (Finally, install the default library dependencies to run the ioos Cloud-Sandbox code base for your Python executable. The libraries listed here are the default requirements to run the code base. Users can choose to just install pip and use that method instead to install libraries in their own unqiue methods if so desired)
+```bash
+# ~1-2 minutes
+wget --no-verbose https://repo.continuum.io/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
+# ~45 minutes
+time bash ./Anaconda3-2024.10-1-Linux-x86_64.sh -b -p ${WORKINGDIR}/anaconda3
+cd ${WORKINGDIR}/anaconda3/bin
+# ~ 3 minutes
+./conda update -n base -c main conda
+# ~2 minutes
+./conda install -n base libarchive -c main --force-reinstall --solver classic
+# 
+./conda update --all --solver=classic
 ./conda install -c conda-forge pip boto3 prefect=0.15.13 dask distributed Pillow matplotlib netCDF4 numpy pyproj haikunator
 
+echo "Your python3 executable is:\n\t ${WORKINGDIR}/anaconda3/bin/python3"
+```
 
-######## You are now all done and ready to go as a ec2-user with their own seperate Python installation to utilize! ########
+## Done
+
+You are now all done and ready to go as a ec2-user with their own seperate Python installation to utilize!
