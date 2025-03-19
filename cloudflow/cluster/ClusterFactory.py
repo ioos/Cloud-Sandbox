@@ -15,7 +15,6 @@ __license__ = "BSD 3-Clause"
 debug = True
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 
 class ClusterFactory:
 
