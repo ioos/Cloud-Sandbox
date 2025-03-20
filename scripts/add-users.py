@@ -4,6 +4,8 @@ import subprocess
 import pwd
 import grp
 import os
+import boto3
+from create_image import create_snapshot, create_image_from_snapshot
 
 
 def change_file_ownership(file_path, username):
@@ -161,23 +163,29 @@ def setup_user_env(full_name, email, username, public_key):
 
     setup_shell_configs(username)
 
+    # TODO: add git config ??
     #  git config --global user.name full_name
     #  git config --global user.email email
 
-    # Create user save directory
-    try:
-        path = f"/save/{username}"
-        os.mkdir(path, mode=0o755)
-    except FileExistsError:
-        print(f"Directory '{path}' already exists.")
-    except FileNotFoundError:
-        print(f"Parent directory does not exist.")
-    
     pw_record = pwd.getpwnam(username)
     uid = pw_record.pw_uid
     gid = pw_record.pw_gid
-    os.chown(path, uid, gid)
 
+    # create /save
+    # create /com
+    # create /ptmp
+    workdirs = [ "/save", "/com", "/ptmp" ]
+
+    for work in workdirs:
+        try:
+            path = f"{work}/{username}"
+            os.mkdir(path, mode=0o755)
+            os.chown(path, uid, gid)
+        except FileExistsError:
+            print(f"Directory '{path}' already exists.")
+        except FileNotFoundError:
+            print(f"Parent directory does not exist.")
+    
     # Create key used for mpirun 
     #sudo -u $USERNAME ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USERNAME/.ssh/id_rsa.mpi
     #sudo -u $USERNAME sh -c "cat /home/$USERNAME/.ssh/id_rsa.mpi.pub >> /home/$USERNAME/.ssh/authorized_keys"
@@ -196,32 +204,109 @@ def setup_user_env(full_name, email, username, public_key):
         subprocess.run(['cat', f"/home/{username}/.ssh/id_rsa.mpi.pub"], stdout=dest)
 
 
+# Problem, add user requires sudo, add_ingress rule requires aws sso
+# Need to sudo -i and export or setenv AWS_PROFILE
+
+def add_ssh_ingress_rule(sg_id, ip_address, description="Allow SSH access from specified IP"):
+    """
+    Adds an SSH ingress rule to the specified security group using a single IP address.
+    
+    Parameters:
+        sg_id (str): The ID of the security group.
+        ip_address (str): The IP address to allow SSH access from (without CIDR suffix).
+        description (str): A description for the rule (optional).
+    
+    Returns:
+        dict: The response from the EC2 authorize_security_group_ingress call.
+    """
+    # Append '/32' to form the correct CIDR notation
+    cidr_ip = f"{ip_address}/32"
+    
+    # Create an EC2 client
+    ec2 = boto3.client('ec2')
+    
+    # Define the ingress rule for SSH (TCP port 22)
+    ip_permissions = [
+        {
+            'FromPort': 22,
+            'IpProtocol': 'tcp',
+            'IpRanges': [
+                {
+                    'CidrIp': cidr_ip,
+                    'Description': description
+                }
+            ],
+            'ToPort': 22,
+        },
+    ]
+
+    # Add the ingress rule to the security group
+    response = ec2.authorize_security_group_ingress(
+        GroupId=sg_id,
+        IpPermissions=ip_permissions,
+    )
+    return response
+
+
+def create_ami(instance_id, image_name, project_tag):
+    ''' AMI names must be between 3 and 128 characters long, and may contain letters, numbers, 
+       '(', ')', '.', '-', '/' and '_'
+    '''
+    #print (f"DEBUG: instance_id: {instance_id}, image_name: {image_name}, project_tag: {project_tag}")
+
+    print("Creating a snapshot of current root volume ...")
+
+    try:
+        subprocess.run(['sync'], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running sync': {e}")
+
+    snapshot_id = create_snapshot(instance_id, image_name, project_tag)
+    if snapshot_id == None:
+      print("ERROR: could not create snapshot")
+      sys.exit(1)
+
+    print(f"snapshot_id: {snapshot_id}")
+
+    print("Creating AMI from snapshot ...")
+    image_id  = create_image_from_snapshot(snapshot_id, image_name)
+    print("image_id: ", str(image_id))
+
+
 
 def main():
+
+    # Check if the script is being run as root (uid 0)
+    if os.geteuid() != 0:
+        print("Error: This script must be run as root.")
+        sys.exit(1)
+
+    # This script also requires extra AWS permissions
+    if not os.environ.get("AWS_PROFILE"):
+        print("Error: AWS_PROFILE must be set.")
+        sys.exit(1)
+
     filename = "system/ioos.sb.users"
     print(filename)
 
-    fieldnames = ['FullName', 'email', 'username', 'uid', 'groups', 'gids', 'public_key']
+    fieldnames = ['FullName', 'email', 'username', 'uid', 'groups', 'gids', 'public_key', 'ip_address']
 
     with open(filename, newline='') as csvfile:
 
-        # Skip lines starting with '#' and read the CSV header.
+        # Skip lines starting with '#'
         filtered_lines = [line for line in csvfile if not line.startswith('#')]
-        print("Filtered lines:")
-        for line in filtered_lines:
-            print(line.strip())
+        # print("Filtered lines:")
+        # for line in filtered_lines:
+        #    print(line.strip())
 
         reader = csv.DictReader(filtered_lines, fieldnames=fieldnames)
 
+        if len(filtered_lines) == 0:
+            print("No users to add")
+
         #Convert reader to a list to see all rows
-        #rows = list(reader)
-        #print("CSV Rows:")
-        #for row in rows:
-        #    print(row)
-
         for row in list(reader):
-
-            # Extract fields using the new header names.
+            print(f"row: {row}")
             full_name = row['FullName'].strip()
             email = row['email'].strip()
             username = row['username'].strip()
@@ -229,12 +314,11 @@ def main():
             groups_str = row['groups'].strip()
             gids_str = row['gids'].strip()
             public_key = row['public_key'].strip()
+            ip_address = row['ip_address'].strip()
 
             # Process additional groups and their gids (if provided).
             additional_groups = [g.strip() for g in groups_str.split(';') if g.strip()]
             gids = [g.strip() for g in gids_str.split(';') if g.strip()]
-
-            print(gids)
 
             # Create additional groups with corresponding gids.
             for i, group in enumerate(additional_groups):
@@ -244,9 +328,29 @@ def main():
             # Create the user with the personal group as primary.
             create_user(full_name, email, username, uid, additional_groups, public_key)
 
-            setup_user_env(full_name, email, username, public_key) 
-        # Create new AMI for root volume after all users are added
+            # Add user IP address(s) to security group - requires admin aws permissions
 
+            sg_id = 'sg-046f683021585a25f'  # Replace with your security group ID
+
+            ips = [ip.strip() for ip in ip_address.split(';') if ip.strip()]
+            print(f"ips: {ips}")
+
+            for ip in ips:
+                description = f"{full_name} IP {email}"
+                result = add_ssh_ingress_rule(sg_id, ip, description)
+
+
+        if len(filtered_lines) != 0:
+            print("Finished adding users, creating new ami image")
+
+        # Create new AMI for root volume after all users are added
+        instance_id = "i-070b64b46dd7aef33"
+
+        # TODO: use datetime instead of hardcode
+        now = "2025-03-20_22-17"
+        image_name = f"{now}-ioos-sandbox-ami"
+        project_tag = "IOOS-Cloud-Sandbox"
+        create_ami(instance_id, image_name, project_tag)
 
 
 if __name__ == "__main__":
