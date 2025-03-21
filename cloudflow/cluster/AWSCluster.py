@@ -182,14 +182,14 @@ class AWSCluster(Cluster):
 
         # Return a random two words, example: "shiny-wave"
         haiku = haikumaker.haikunate(token_length=0)
-        prefix=f"{haiku}-"
+        suffix=f"-{haiku}"
 
         if not any(tag["Key"] == "Name" for tag in tags):
             raise ValueError("No 'Name' tag found")
 
         for tag in tags:
             if tag["Key"] == "Name":
-                tag["Value"] = prefix + tag["Value"]
+                tag["Value"] = tag["Value"] + suffix
                 print("\n***************************************************************")
                 print(f"Your cluster name: {tag['Value']}")
                 print("***************************************************************\n")
