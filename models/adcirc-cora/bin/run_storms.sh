@@ -496,14 +496,9 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
     fi
 
     white "*** Wind/Pre prepping...\n"
-    if [ $Fort15_NWS = "-12" ] || [ $Fort15_NWS = "14" ] ; then
+    if [ $Fort15_NWS = "-12" ]; then
         
-	if [ $Fort15_NWS = "-12" ]; then
-            white "****** Using HBL winds (NWS=-12) ...\n"
-        fi
-        if [ $Fort15_NWS = "14" ]; then
-            white "****** Using netCDF winds (NWS=14) ...\n"
-        fi
+        white "****** Using HBL winds (NWS=-12) ...\n"
 
     	src=`echo $WindDir | sed "s/<Track_Name>/$ThisTrack/"`
 
@@ -530,19 +525,12 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
         fi
 
         # write out a fort.22 control file
-	if [ $Fort15_NWS = "-12" ]; then
-            echo $(($Fort15_WithBasin+$Fort15_WithRegion)) > fort.22
-            echo 0 >> fort.22
-            echo $WindFac >> fort.22
-	fi
+        echo $(($Fort15_WithBasin+$Fort15_WithRegion)) > fort.22
+        echo 0 >> fort.22
+        echo $WindFac >> fort.22
+	
 
-	if [ $Fort15_NWS = "14" ]; then
-	    echo "&nws14control" > fort.22
-            echo "NWS14NC_WindMultiplier=$WindFac," >> fort.22
-	    echo "/" >> fort.22
-        fi
-
-        if [ $Fort15_WithBasin == "1" ] ; then
+        if [ $Fort15_WithBasin == "1" ]; then
             # check times in win,pre files
             white "****** Checking times in Basin win/pre files... \n"
             temp=`$BinDir/OwiTimes.sh $Fort15_BasinPreFile`
@@ -576,7 +564,7 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
             white "****** Basin files OK.\n"
         fi
 
-        if [ $Fort15_WithRegion == "1" ] ; then
+        if [ $Fort15_WithRegion == "1" ]; then
             # check times in win,pre files
             white "****** Checking times in Region win/pre files...\n"
             temp=`$BinDir/OwiTimes.sh $Fort15_RegionPreFile`
@@ -635,6 +623,143 @@ for ((k=1; k <= ${#ListToRun[*]} ; k++)) ;  do
             white  "****** RSTIMINC=$RSTIMINC\n"
             WRSTIMINC="$WTIMINC $RSTIMINC"
         fi
+
+    #################################################################
+    # netCDF forcing files NWS=14
+    #################################################################
+    elif [ $Fort15_NWS = "14" ] ; then
+        
+        white "****** Using netCDF winds (NWS=14) ...\n"
+
+        src=`echo $WindDir | sed "s/<Track_Name>/$ThisTrack/"`
+
+        white "****** Linking wind/pre files from $src to here ...\n"
+        ln -fs $src/fort.* .
+
+        if [ $Fort15_WithBasin == "1" ] ; then
+            if [ ! -e $Fort15_BasinPreFile ] ; then
+                red "Basin Pre file $Fort15_BasinPreFile DNE. Terminal.\n"
+                exit 1
+            elif [ ! -e $Fort15_BasinWinFile ] ; then
+                red "Basin Win file $Fort15_BasinWinFile DNE. Terminal.\n"
+                exit 1
+            fi
+        fi
+        if [ $Fort15_WithRegion == "1" ] ; then
+            if [ ! -e $Fort15_RegionPreFile ] ; then
+                red "Region Pre file $Fort15_RegionPreFile DNE. Terminal.\n"
+                exit 1
+            elif [ ! -e $Fort15_RegionWinFile ] ; then
+                red "Region Win file $Fort15_RegionWinFile DNE. Terminal.\n"
+                exit 1
+            fi
+        fi
+
+        # write out a fort.22 control file
+        echo "&nws14control" > fort.22
+        echo "NWS14NC_WindMultiplier=$WindFac," >> fort.22
+        echo "/" >> fort.22
+
+
+        # TODO: This needs to be fixed for netcdf files
+        if [ $Fort15_WithBasin == "1" ]; then
+            # check times in win,pre files
+            white "****** Checking times in Basin win/pre files... \n"
+
+
+            temp=`$BinDir/OwiTimes.sh $Fort15_BasinPreFile`
+            set -- $temp
+            BasinPreStartDate=$2
+            BasinPreEndDate=$3
+            BasinPreInc=$4
+            BasinPreLength=$5
+
+            temp=`$BinDir/OwiTimes.sh $Fort15_BasinWinFile`
+            set -- $temp
+            BasinWinStartDate=$2
+            BasinWinEndDate=$3
+            BasinWinInc=$4
+            BasinWinLength=$5
+
+
+            white "****** Basin Pre,Win Time Increments = $BasinPreInc, $BasinWinInc\n"
+            white "****** Basin Pre,Win Time Lengths = $BasinPreLength, $BasinWinLength\n"
+            white "****** Basin Pre,Win StartDates = $BasinPreStartDate, $BasinWinStartDate\n"
+
+            if [ "$BasinPreInc" != "$BasinWinInc" ] ; then
+                red "Time increment in Basin files not equal.\n"
+                exit 1
+            elif [ "$BasinPreLength" != "$BasinWinLength" ] ; then
+                red "Time Length in Basin files not equal.\n"
+                exit 1
+            elif [ "$BasinPreStartDate" != "$BasinWinStartDate" ] ; then
+                red "Start Date in Basin files not equal.\n"
+                exit 1
+            fi
+            white "****** Basin files OK.\n"
+        fi
+
+        # TODO: This needs to be fixed for netcdf files
+        if [ $Fort15_WithRegion == "1" ]; then
+            # check times in win,pre files
+            white "****** Checking times in Region win/pre files...\n"
+            temp=`$BinDir/OwiTimes.sh $Fort15_RegionPreFile`
+            set -- $temp
+            RegionPreStartDate=$2
+            RegionPreEndDate=$3
+            RegionPreInc=$4
+            RegionPreLength=$5
+
+            temp=`$BinDir/OwiTimes.sh $Fort15_RegionWinFile`
+            set -- $temp
+            RegionWinStartDate=$2
+            RegionWinEndDate=$3
+            RegionWinInc=$4
+            RegionWinLength=$5
+
+            white "****** Region Pre,Win Time Increments = $RegionPreInc, $RegionWinInc\n"
+            white "****** Region Pre,Win Time Lengths = $RegionPreLength, $RegionWinLength\n"
+            white "****** Region Pre,Win StartDates = $RegionPreStartDate, $RegionWinStartDate\n"
+
+            if [ "$RegionPreInc" != "$RegionWinInc" ] ; then
+                red "Time increment in Region files not equal.\n"
+                exit 1
+            elif [ "$RegionPreLength" != "$RegionWinLength" ] ; then
+                red "Time Length in Region files not equal.\n"
+                exit 1
+            elif [ "$RegionPreStartDate" != "$RegionWinStartDate" ] ; then
+                red "Start Date in Region files not equal.\n"
+                exit 1
+            fi
+            green "****** Region files OK.\n"
+
+            if [ "$BasinPreLength" != "$RegionPreLength" ] ; then
+                red "Time Length in Pre files not equal. \n"
+                exit 1
+            elif [ "$BasinWinLength" != "$RegionWinLength" ] ; then
+                red "Time Length in Win files not equal. \n"
+                exit 1
+            fi
+            green "****** Time parameters in Basin and Region files are consistent.\n"
+        fi
+
+        if [ "x$Fort15_RNDAY" == "x" ]; then
+            # compute RNDAY from length of wind/pre files
+            RNDAY=$(echo "scale=6; $BasinPreLength + $RndayOffset" | bc)
+        else
+            RNDAY=$Fort15_RNDAY
+        fi
+        white "****** RNDAY=$RNDAY\n"
+
+        WTIMINC=$(echo "scale=6; $BasinPreInc * 60" | bc)
+        RSTIMINC=$WTIMINC
+        WRSTIMINC="$WTIMINC"
+        white  "****** WTIMINC=$WTIMINC\n"
+        if [ "$Fort15_Coupled" -eq "1" ] ; then
+            white  "****** RSTIMINC=$RSTIMINC\n"
+            WRSTIMINC="$WTIMINC $RSTIMINC"
+        fi
+
     else
         white "Using symmetric Holland model (NWS=16)\n"
 

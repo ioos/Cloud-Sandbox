@@ -25,7 +25,6 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 
 homedir = Path.home()
 timelog = logging.getLogger('qops_timing')
@@ -33,7 +32,6 @@ timelog.setLevel(logging.DEBUG)
 timelog.propagate = False
 
 fh = logging.FileHandler(f"{homedir}/cluster_runtime.log")
-fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)
 
@@ -61,11 +59,6 @@ awsTypes = {
             'hpc7a.48xlarge': 96,
 
             'hpc7a.96xlarge': 192,
-            #'hpc7a.96xlarge': 184, # fails
-            #'hpc7a.96xlarge': 128, # 128 works with internal libfabric  1.13.2rc1-impi
-            #'hpc7a.96xlarge': 160, 
-            #'hpc7a.96xlarge': 156, # failed with intel fabric
-            # 128 hangs with upgraded fabric, 96 works with upgraded fabric, works, # 98 works, (7x14 tiles)
 
             'r7iz.32xlarge': 64,
 
@@ -103,7 +96,7 @@ class AWSCluster(Cluster):
     tags      : list of dictionary/s of str
         Specific tags to attach to the resources provisioned.
 
-    image_id  : str/
+    image_id  : str
         AWS EC2 AMI - Amazon Machine Image
 
     key_name  : str
@@ -189,14 +182,14 @@ class AWSCluster(Cluster):
 
         # Return a random two words, example: "shiny-wave"
         haiku = haikumaker.haikunate(token_length=0)
-        prefix=f"{haiku}-"
+        suffix=f"-{haiku}"
 
         if not any(tag["Key"] == "Name" for tag in tags):
             raise ValueError("No 'Name' tag found")
 
         for tag in tags:
             if tag["Key"] == "Name":
-                tag["Value"] = prefix + tag["Value"]
+                tag["Value"] = tag["Value"] + suffix
                 print("\n***************************************************************")
                 print(f"Your cluster name: {tag['Value']}")
                 print("***************************************************************\n")
@@ -256,16 +249,16 @@ class AWSCluster(Cluster):
         self.nodeCount = cfDict['nodeCount']
 
         # Hacky way to force unique Name tags
-        # self.tags = cfDict['tags']
         print("running memorable_tags")
         self.tags = self.memorable_tags(cfDict['tags'])
-        print(f"self.tags: {self.tags}")
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
         self.sg_ids = cfDict['sg_ids']
         self.subnet_id = cfDict['subnet_id']
         self.placement_group = cfDict['placement_group']
 
+        self.tags.append({ "Key": "ApprovedSubnet", "Value": f"{self.subnet_id}" })
+        print(f"self.tags: {self.tags}")
         return
 
     ########################################################################

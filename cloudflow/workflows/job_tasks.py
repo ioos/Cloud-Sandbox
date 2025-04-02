@@ -28,11 +28,8 @@ from cloudflow.utils import modelUtil as util
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
 debug = False
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
-
 
 @task
 def ncfiles_glob(SOURCE, filespec: str = "*.nc"):

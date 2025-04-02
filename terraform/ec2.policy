@@ -1,0 +1,74 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:DescribeInstanceTypes",
+				"ec2:DescribeInstances"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:CreateTags"
+			],
+			"Resource": "arn:aws:ec2:us-east-2:579273261343:instance/*",
+			"Condition": {
+				"StringLike": {
+					"aws:RequestTag/ApprovedSubnet": "subnet-0be869ddbf3096968"
+				}
+			}
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:CreateTags"
+			],
+			"Resource": [
+				"arn:aws:ec2:us-east-2:579273261343:network-interface/*",
+				"arn:aws:ec2:us-east-2::image/*",
+				"arn:aws:ec2:us-east-2:579273261343:volume/*",
+				"arn:aws:ec2:us-east-2:579273261343:snapshot/*"
+			]
+		},
+		{
+			"Sid": "RestrictTerminationToApprovedSubnetTag",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:TerminateInstances",
+				"ec2:StopInstances",
+				"ec2:StartInstances"
+			],
+			"Resource": "arn:aws:ec2:us-east-2:579273261343:instance/*",
+			"Condition": {
+				"StringEquals": {
+					"aws:ResourceTag/ApprovedSubnet": "subnet-0be869ddbf3096968"
+				}
+			}
+		},
+		{
+			"Sid": "AllowRunInstancesOnlyOnSpecifiedSubnet",
+			"Effect": "Allow",
+			"Action": "ec2:RunInstances",
+			"Resource": [
+				"arn:aws:ec2:us-east-2:579273261343:subnet/subnet-0be869ddbf3096968",
+				"arn:aws:ec2:us-east-2:579273261343:instance/*"
+			]
+		},
+		{
+			"Sid": "AllowRunInstancesOnlyForSpecifiedKeyAndPlacementGroup",
+			"Effect": "Allow",
+			"Action": "ec2:RunInstances",
+			"Resource": [
+				"arn:aws:ec2:us-east-2:579273261343:placement-group/forPR-cloud-sandbox-us-east-2b_Terraform_Placement_Group",
+				"arn:aws:ec2:us-east-2:579273261343:key-pair/ioos-sandbox",
+				"arn:aws:ec2:us-east-2:579273261343:network-interface/*",
+				"arn:aws:ec2:us-east-2:579273261343:security-group/*",
+				"arn:aws:ec2:us-east-2::image/*",
+				"arn:aws:ec2:us-east-2:579273261343:volume/*"
+			]
+		}
+	]
+}
