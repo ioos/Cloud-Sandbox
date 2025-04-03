@@ -43,7 +43,7 @@ class NetCDFDataReader:
             keys=list(kwargs.get('features'))
             values=list(kwargs.get('columns'))
             subset = self.dataset.sel(**{keys[0]:slice(values[0], values[1])})
-            subset = self.dataset.sel(
+
             
             print("Subset extracted successfully.")
             return subset
