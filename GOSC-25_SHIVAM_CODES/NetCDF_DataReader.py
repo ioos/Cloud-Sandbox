@@ -1,5 +1,5 @@
 """
-NetCDFDataReader.py
+NetCDF_DataReader.py
 Purpose: Load and manipulate netCDF data (e.g., CBOFS) using xarray for ocean model analysis. 
 Explore data attributes, variables, and perform basic data manipulation.
 
