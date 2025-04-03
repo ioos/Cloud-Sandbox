@@ -33,3 +33,4 @@ build/
 cloudflow/build/
 .nfs*
 cloudflow/cluster/SAVE.AWSCluster.py
+scripts/system/ioos.sb.users

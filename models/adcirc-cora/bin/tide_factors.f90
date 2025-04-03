@@ -1,0 +1,715 @@
+      PROGRAM Tide_Factors
+
+c PROGRAM TO COMPUTE AMP/PHASE ADJ from EQU. TIDE
+c BRIAN BLANTON, May 2003, adapted from RL code.
+c modified to output parameters in exactly fort.15 format
+c ifort -fixed -132 -o tide_factors tide_factors.f90 
+c xlf90 -qfixed=132 -o tide_factors tide_factors.f90
+
+      IMPLICIT NONE
+
+c.....TIDAL DATA BASE VARIABLES, FOR SYNTHESIZING TIDAL BCS
+      INTEGER NFREQ
+      
+      character(LEN=8), allocatable :: FREQNAME(:)
+
+      REAL,ALLOCATABLE ::  PHAFAC(:),AMPFAC(:),FREQ(:),ETRF(:),SPD(:),TPK(:)
+      REAL :: FTRASH,PER,RLEN
+      DOUBLE PRECISION :: TIME
+      INTEGER I,J,K
+      INTEGER DD1,MM1,YY1,DD2,MM2,YY2,KD1,KD2,KDNOW,ADCDD,ADCMM,ADCYY,ADCKD,IADC,ADCHR
+      DOUBLE PRECISION :: PI,TWOPI,DEG2RAD
+
+      PI=ACOS(-1.D0)
+      TWOPI=2.D0*PI
+      DEG2RAD=PI/180.D0
+
+      OPEN(35,FILE='temp.1',status='old')
+      READ(35,*)ADCDD,ADCMM,ADCYY,ADCHR
+      READ(35,*)RLEN
+      READ(35,*)NFREQ
+
+      ALLOCATE (FREQNAME(NFREQ))
+      ALLOCATE (PHAFAC(NFREQ),AMPFAC(NFREQ),ETRF(NFREQ),TPK(NFREQ),SPD(NFREQ))
+
+      DO J=1,NFREQ
+         READ(35,'(a2)')FREQNAME(J)
+         WRITE(*,*)J,NFREQ,FREQNAME(J)
+      END DO
+      CLOSE(35)
+      
+c.....GET TIDE FACTORS
+      CALL TIDE_FAC_SUB(RLEN,ADCHR,ADCDD,ADCMM,ADCYY,FREQNAME,NFREQ,AMPFAC,PHAFAC,ETRF,TPK,SPD)
+      
+      DO I=1,NFREQ
+            WRITE(2,'(i2,1x,f6.3,1x,f8.3,1x,a1,1x,a2)')I,
+     +          AMPFAC(I),PHAFAC(I),'%',FREQNAME(I)
+      END DO
+
+      OPEN(35,FILE='fort.15.tpf',status='unknown')
+
+      write(*,'(//A)')'Tidal Potential Forcing:'
+      WRITE(35,'(I2,"  ! NTIF - TOTAL NUMBER OF TIDAL POTENTIAL CONSTITUENTS")')NFREQ
+      DO I=1,NFREQ
+          WRITE(*,'(a2)')FREQNAME(I)
+          WRITE(*,'(f9.6,1x,e16.8,1x,f10.5,1x,f8.4,1x,f8.3)')TPK(I),SPD(I)*2*PI/360/3600,ETRF(I),AMPFAC(I),PHAFAC(I)
+          WRITE(35,'(a2)')FREQNAME(I)
+          WRITE(35,'(f9.6,1x,e16.8,1x,f10.5,1x,f8.4,1x,f8.3)')TPK(I),SPD(I)*2*PI/360/3600,ETRF(I),AMPFAC(I),PHAFAC(I)
+      END DO
+      close(35)
+
+      OPEN(35,FILE='fort.15.obc',status='unknown')
+      write(*,'(//A)')'Tidal Boundary Forcing:'
+      WRITE(35,'(I2,"  !  NBFR - TOTAL NUMBER OF FORCING FREQUENCIES ON OPEN BOUNDARIES")')NFREQ
+      DO I=1,NFREQ
+          WRITE(*,'(a2)')FREQNAME(I)
+          WRITE(*,'(e16.8,1x,f8.4,1x,f8.3)')SPD(I)*2*PI/360/3600,AMPFAC(I),PHAFAC(I)
+          WRITE(35,'(a2)')FREQNAME(I)
+          WRITE(35,'(e16.8,1x,f8.4,1x,f8.3)')SPD(I)*2*PI/360/3600,AMPFAC(I),PHAFAC(I)
+      END DO
+      close(35)
+
+      END
+
+C*********************************************************************
+C*********************************************************************
+      SUBROUTINE GDAY(IDD,IMM,IYear,KD)
+C!
+C!  GIVEN DAY,MONTH,(EACH 2 DIGITS) and year (four digits), GDAY RETURNS
+C!  THE DAY#, KD BASED ON THE GREGORIAN CALENDAR.
+C!  THE GREGORIAN CALENDAR, CURRENTLY 'UNIVERSALLY' IN USE WAS
+C!  INITIATED IN EUROPE IN THE SIXTEENTH CENTURY. NOTE THAT GDAY
+C!  IS VALID ONLY FOR GREGORIAN CALENDAR DATES.
+C
+C   KD=1 CORRESPONDS TO JANUARY 1, 0000
+C       
+c       Note that the Gregorian reform of the Julian calendar 
+c       omitted 10 days in 1582 in order to restore the date
+c       of the vernal equinox to March 21 (the day after
+c       Oct 4, 1582 became Oct 15, 1582), and revised the leap 
+c       year rule so that centurial years not divisible by 400
+c       were not leap years.
+c
+C   THIS ROUTINE WAS WRITTEN BY EUGENE NEUFELD, AT IOS, IN JUNE 1990.
+C
+      INTEGER NDP(13)
+      INTEGER NDM(12)
+        
+      DATA NDP/0,31,59,90,120,151,181,212,243,273,304,334,365/
+      DATA NDM/31,28,31,30,31,30,31,31,30,31,30,31/
+C!
+        lp=6
+c make iyy and icc variables
+        icc=iyear/100
+        iyy=iyear-icc*100
+
+C!  TEST FOR INVALID INPUT:
+      IF(ICC.LT.0)THEN
+         WRITE(LP,5000)ICC
+         STOP
+      ENDIF
+      IF(IYY.LT.0.OR.IYY.GT.99)THEN
+         WRITE(LP,5010)IYY
+         STOP
+      ENDIF
+      IF(IMM.LE.0.OR.IMM.GT.12)THEN
+         WRITE(LP,5020)IMM
+         STOP
+      ENDIF
+      IF(IDD.LE.0)THEN
+         WRITE(LP,5030)IDD
+         STOP
+      ENDIF
+      IF(IMM.NE.2.AND.IDD.GT.NDM(IMM))THEN
+         WRITE(LP,5030)IDD
+         STOP
+      ENDIF
+      IF(IMM.EQ.2.AND.IDD.GT.29)THEN
+         WRITE(LP,5030)IDD
+         STOP
+      ENDIF
+      IF(IMM.EQ.2.AND.IDD.GT.28.AND.((IYY/4)*4-IYY.NE.0.OR.(IYY.EQ.0.AND
+     .    .(ICC/4)*4-ICC.NE.0)))THEN
+         WRITE(LP,5030)IDD
+         STOP
+      ENDIF
+5000  FORMAT(' INPUT ERROR. ICC = ',I7)
+5010  FORMAT(' INPUT ERROR. IYY = ',I7)
+5020  FORMAT(' INPUT ERROR. IMM = ',I7)
+5030  FORMAT(' INPUT ERROR. IDD = ',I7)
+C!
+C!  CALCULATE DAY# OF LAST DAY OF LAST CENTURY:
+      KD = ICC*36524 + (ICC+3)/4
+C!
+C!  CALCULATE DAY# OF LAST DAY OF LAST YEAR:
+      KD = KD + IYY*365 + (IYY+3)/4
+C!
+C!  ADJUST FOR CENTURY RULE:
+C!  (VIZ. NO LEAP-YEARS ON CENTURYS EXCEPT WHEN THE 2-DIGIT
+C!  CENTURY IS DIVISIBLE BY 4.)
+      IF(IYY.GT.0.AND.(ICC-(ICC/4)*4).NE.0) KD=KD-1
+C!  KD NOW TRULY REPRESENTS THE DAY# OF THE LAST DAY OF LAST YEAR.
+C!
+C!  CALCULATE DAY# OF LAST DAY OF LAST MONTH:
+      KD = KD + NDP(IMM)
+C!
+C!  ADJUST FOR LEAP YEARS:
+      IF(IMM.GT.2.AND.((IYY/4)*4-IYY).EQ.0.AND.((IYY.NE.0).OR.
+     .   (((ICC/4)*4-ICC).EQ.0)))   KD=KD+1
+C!  KD NOW TRULY REPRESENTS THE DAY# OF THE LAST DAY OF THE LAST
+C!  MONTH.
+C!
+C!  CALCULATE THE CURRENT DAY#:
+      KD = KD + IDD
+      RETURN
+C!
+C!
+      ENTRY DMY(IDD,IMM,IYear,KD)
+C!
+C!  GIVEN THE (GREGORIAN) DAY#, KD, AS CALCULATED ABOVE IN THIS ROUTINE,
+C!  ENTRY DMY RETURNS THE (GREGORIAN) DAY, MONTH, YEAR AND CENTURY.
+C!
+C!  TEST FOR VALID INPUT:
+      IF(KD.LE.0) WRITE(LP,5040)KD
+5040  FORMAT(' KD = ',I7,'  INVALID INPUT. DMY STOP.')
+C!
+C!  SAVE KD
+      KKD=KD
+C!  CALCULATE ICC AND SUBTRACT THE NUMBER OF DAYS REPRESENTED BY ICC
+C!  FROM KKD
+C!  JFH IS THE NUMBER OF 400 YEAR INTERVALS UP TO KKD
+C!  JCC IS THE NUMBER OF ADDITIONAL CENTURIES UP TO KKD
+      JFH = KKD/146097
+      KKD = KKD - JFH*146097
+      IF(KKD.LT.36525)THEN
+         JCC = 0
+      ELSE
+         KKD = KKD - 36525
+         JCC = 1 + KKD/36524
+         KKD = KKD - (JCC-1)*36524
+      END IF
+      ICC = 4*JFH + JCC
+      IF(KKD.EQ.0)THEN
+         ICC = ICC-1
+         IYY = 99
+         IMM = 12
+         IDD = 31
+c        RETURN
+        go to 110
+      ENDIF
+C!
+C!  CALCULATE IYY. JFY IS THE NUMBER OF FOUR YEAR INTERVALS IN THE
+C!  CURRENT CENTURY. THE FIRST FOUR YEAR INTERVAL IS SHORT (1460 DAYS
+C!  RATHER THAN 1461)IF THE CURRENT CENTURY IS NOT DIVISIBLE BY 4, AND
+C!  IN THIS CASE JCC.NE.0 AS CALCULATED ABOVE.
+C!
+C!  CALCULATE JFY:
+      JFY = 0
+      IF(JCC.EQ.0)GOTO 10
+      IF(KKD.LT.1460)GOTO 10
+      JFY = 1
+      KKD = KKD - 1460
+10    KK = KKD/1461
+      JFY = JFY + KK
+      KKD = KKD - KK*1461
+C!
+C!  CALCULATE JYY, THE REMAINING YEARS OF THE CURRENT CENTURY UP TO THE
+C!  CURRENT DAY:
+      JYY = 0
+C!  THE NEXT YEAR IS NOT A LEAP YEAR IF JFY=0 AND JCC.NE.0.
+      IF(JFY.EQ.0.AND.JCC.NE.0)GOTO 20
+      IF(KKD.LT.366)GOTO 30
+      JYY = 1
+      KKD = KKD - 366
+20    JYYY = KKD/365
+      JYY = JYY + JYYY
+      KKD = KKD - JYYY*365
+30    IYY = 4*JFY + JYY
+      IF(KKD.EQ.0) THEN
+         IYY=IYY-1
+         IMM=12
+         IDD=31
+c        RETURN
+        go to 110
+      END IF
+C!
+C!  SET L=1 IF WE HAVE A LEAP YEAR.
+      L=0
+      IF(IYY-(IYY/4)*4.NE.0)GOTO 40
+      IF(IYY.EQ.0.AND.(ICC-(ICC/4)*4).NE.0)GOTO 40
+      L=1
+C!
+C!  CALCULATE IMM AND IDD
+40    IF(KKD.GT.31) GOTO 50
+      IMM=1
+      IDD=KKD
+c      RETURN
+       go to 110
+C!
+50    IF(KKD.GT.59)GOTO 60
+      IMM = 2
+      IDD = KKD-31
+c      RETURN
+        go to 110
+C!
+60    IF(KKD.GT.60)GOTO 70
+      IF(L.EQ.0)GOTO 70
+      IMM = 2
+      IDD = 29
+c      RETURN
+        go to 110
+C!
+70    IF(L.EQ.1) KKD=KKD-1
+      DO 80 I=4,13
+         IF(KKD.GT.NDP(I))GOTO 80
+         IMM = I-1
+         IDD = KKD - NDP(I-1)
+c        RETURN
+        go to 110
+C!
+80    CONTINUE
+
+ 110    iyear=icc*100+iyy
+        return
+
+90    WRITE(LP,5050)
+5050  FORMAT(' ERROR IN DMY.')
+      STOP
+      END
+
+        Subroutine Up_date(kd,ssec)
+C 
+C this subroutine updates the current gregorian day number kd
+C and resets the time, ssec, accordingly
+C it inherently assumes that the variable is updated every day!
+
+      integer kd
+      real ssec
+        
+      kd=kd+aint(ssec/86400.0)
+      ssec=MOD(ssec,86400.0)
+ 
+      return
+      end
+
+C PROGRAM TO COMPUTE NODAL FACTORS AND EQUILIBRIUM ARGUEMENTS
+C
+C
+      SUBROUTINE TIDE_FAC_SUB(XDAYS,BHR,IDAY,IMO,IYR,FREQS,NFREQ,
+     +            NODFAC2,GRTERM2,ETRF2,TPK2,SPEED2)
+      PARAMETER(NCNST=37)
+
+      REAL NODFAC2(NFREQ),GRTERM2(NFREQ),ETRF2(NFREQ),TPK2(NFREQ),SPEED2(NFREQ)
+      CHARACTER FREQS(NFREQ)*8,TEST1*8,TEST2*8
+
+      CHARACTER CNAME(NCNST)*8
+      COMMON /CNSNAM/ CNAME
+      REAL NODFAC,MONTH
+      DIMENSION NCON(NCNST)
+      COMMON /CNST/ NODFAC(NCNST),GRTERM(NCNST),SPEED(NCNST),P(NCNST),ETRF(NCNST),TPK(NCNST)
+
+      OPEN(UNIT=311,FILE='tide_fac.out',STATUS='UNKNOWN')
+
+CBOB      WRITE(*,*) 'ENTER LENGTH OF RUN TIME (DAYS)'
+CBOB      READ(*,*) XDAYS
+      RHRS=XDAYS*24.
+
+CBOB      WRITE(*,*)' ENTER START TIME - BHR,IDAY,IMO,IYR (IYR e.g. 1992)'
+CBOB      READ(*,*) BHR,IDAY,IMO,IYR
+      YR=IYR
+      MONTH=IMO
+      DAY=IDAY
+      HRM=BHR+RHRS/2.
+      WRITE(311,10) BHR,IDAY,IMO,IYR
+      WRITE(*,10) BHR,IDAY,IMO,IYR
+  10  FORMAT(' TIDAL FACTORS STARTING: ', 
+     &       ' HR-',F5.2,',  DAY-',I3,',  MONTH-',I3,'  YEAR-',I5,/)
+      WRITE(*,11) XDAYS
+      WRITE(311,11) XDAYS
+  11  FORMAT(' FOR A RUN LASTING ',F8.2,' DAYS',//)
+
+C-- DETERMINE THE JULIAN TIME AT BEGINNING AND MIDDLE OF RECORD
+      DAYJ=DAYJUL(YR,MONTH,DAY)
+
+C-- DETERMINE NODE FACTORS AT MIDDLE OF RECORD
+      CALL NFACS(YR,DAYJ,HRM)
+
+C-- DETERMINE GREENWICH EQUIL. TERMS AT BEGINNING OF RECORD
+      CALL GTERMS(YR,DAYJ,BHR,DAYJ,HRM)
+
+C determine which constits are to be returned
+      DO I=1,NFREQ
+         TEST1=FREQS(I)
+         INDX1=INDEX(FREQS(I),' ')-1
+	 TEST1=TEST1(1:INDX1)
+         DO J=1,NCNST
+            TEST2=CNAME(J)
+            INDX2=INDEX(TEST2,' ')-1
+	    TEST2=TEST2(1:INDX2)
+	    IF (TEST1.eq.TEST2)THEN
+	       WRITE(*,*)TEST1, 'MATCH FOUND AT J=',J
+	       NCON(I)=J 
+               TPK2(I)=TPK(J)
+               SPEED2(I)=SPEED(J)
+               ETRF2(I)=ETRF(J)
+               NODFAC2(I)=NODFAC(J)
+	       GRTERM2(I)=GRTERM(J)
+	    END IF
+	 END DO      
+      END DO
+     
+      
+      NUMCON=I-1
+
+
+      WRITE(311,*) 'CONST   NODE     EQ ARG (ref GM)'
+      WRITE(311,1300)
+ 1300 FORMAT(' NAME   FACTOR    (DEG) ',//)
+
+      DO 20 NC=1,NUMCON
+        IC=NCON(NC)
+        print*,NC,IC,NUMCON
+C EQUILIBRIUM ARGUEMENT IS REFERENCED TO THE GRENWICH MERIDIAN
+
+        WRITE(311,2001) CNAME(IC),NODFAC(IC),GRTERM(IC)
+ 2001   FORMAT(1X,A4,2x,F7.5,4x,F7.2,2x,F7.4)
+   20   CONTINUE
+
+      close(311)            
+
+      END
+
+
+
+      SUBROUTINE NFACS(YR,DAYJ,HR)
+
+C-- CALCULATES NODE FACTORS FOR CONSTITUENT TIDAL SIGNAL
+
+C-- THE EQUATIONS USED IN THIS ROUTINE COME FROM:
+C         "MANUAL OF HARMONIC ANALYSIS AND PREDICTION OF TIDES"
+C         BY PAUL SCHUREMAN, SPECIAL PUBLICATION #98, US COAST
+C         AND GEODETIC SURVEY, DEPARTMENT OF COMMERCE (1958).
+
+C-- IF DAYM AND HRM CORRESPOND TO MIDYEAR, THEN THIS ROUTINE
+C-- RETURNS THE SAME VALUES AS FOUND IN TABLE 14 OF SCHUREMAN.
+C---------------------------------------------------------------------
+
+      CHARACTER*8   CST(37)
+      REAL          I,N,NU
+
+      COMMON/ORBITF/DS,DP,DH,DP1,DN,DI,DNU,DXI,DNUP,DNUP2,DPC
+      COMMON/ CNST /FNDCST(37),EQCST(37),ACST(37),PCST(37),ETRF(37),TPK(37)
+      COMMON/CNSNAM/CST
+
+C-- CONSTITUENT NAMES:
+      DATA CST     /'M2      ','S2      ','N2      ','K1      ',
+     *              'M4      ','O1      ','M6      ','MK3     ',
+     *              'S4      ','MN4     ','NU2     ','S6      ',
+     *              'MU2     ','2N2     ','OO1     ','LAMBDA2 ',
+     *              'S1      ','M1      ','J1      ','MM      ',
+     *              'SSA     ','SA      ','MSF     ','MF      ',
+     *              'RHO1    ','Q1      ','T2      ','R2      ',
+     *              '2Q1     ','P1      ','2SM2    ','M3      ',
+     *              'L2      ','2MK3    ','K2      ','M8      ',
+     *              'MS4     '/
+
+C--- Tidal Potential Amplitude [m]
+!Ssa 0.019446
+      DATA TPK/ 0.242334, 0.112841, 0.046398, 0.141565,
+     $              999., 0.100514,    -999.,    -999., 
+     $             -999.,    -999.,    -999.,    -999., 
+     $             -999.,    -999.,    -999.,    -999., 
+     $             -999.,    -999.,    -999., 0.022026, 
+     $             -999.,    -999.,    -999., 0.041742, 
+     $             -999., 0.019256,    -999.,    -999., 
+     $             -999., 0.046843,    -999.,    -999., 
+     $             -999.,    -999., 0.030704,    -999., 
+     $             -999./ 
+
+C-- ORBITAL SPEEDS (DEGREES/HOUR):
+      DATA ACST/ 28.9841042, 30.0000000, 28.4397295, 15.0410686,
+     $           57.9682084, 13.9430356, 86.9523127, 44.0251729,
+     $           60.0000000, 57.4238337, 28.5125831, 90.0000000,
+     $           27.9682084, 27.8953548, 16.1391017, 29.4556253,
+     $           15.0000000, 14.4966939, 15.5854433,  0.5443747,
+     $           0.08213730,  0.0410686,  1.0158958,  1.0980331,
+     $          13.47151405, 13.3986609, 29.9589333, 30.0410667,
+     $          12.8542862,  14.9589314, 31.0158958, 43.4761563,
+     $          29.5284789,  42.9271398, 30.0821373,115.9364169,
+     $          58.9841042/
+
+C-- NUMBER OF TIDE CYCLES PER DAY PER CONSTITUENT:
+      DATA PCST/2.,2.,2.,1.,
+     $          4.,1.,6.,3.,
+     $          4.,4.,2.,6.,
+     $          2.,2.,1.,2.,
+     $          1.,1.,1.,0.,
+     $          0.,0.,0.,0.,
+     $          1.,1.,2.,2.,
+     $          1.,1.,2.,3.,
+     $          2.,3.,2.,8.,
+     $          4./
+
+C--- Earth Tide Reduction Factor
+      DATA ETRF/0.693,0.693,0.693,0.736,
+     $          0.693,0.695,0.693,0.693,
+     $          0.693,0.693,0.693,0.693,
+     $          0.693,0.693,0.693,0.693,
+     $          0.693,0.693,0.693,0.693,
+     $          0.693,0.693,0.693,0.693,
+     $          0.693,0.695,0.693,0.693,
+     $          0.693,0.706,0.693,0.693,
+     $          0.693,0.693,0.693,0.693,
+     $          0.693/
+
+
+      PI180=3.14159265/180.
+      CALL ORBIT(YR,DAYJ,HR)
+      N=DN*PI180
+      I=DI*PI180
+      NU=DNU*PI180
+      XI=DXI*PI180
+      P=DP*PI180
+      PC=DPC*PI180
+      SINI=SIN(I)
+      SINI2=SIN(I/2.)
+      SIN2I=SIN(2.*I)
+      COSI2=COS(I/2.)
+      TANI2=TAN(I/2.)
+C-- EQUATION 197, SCHUREMAN
+      QAINV=SQRT(2.310+1.435*COS(2.*PC))
+C-- EQUATION 213, SCHUREMAN
+      RAINV=SQRT(1.-12.*TANI2**2*COS(2.*PC)+36.*TANI2**4)
+C-- VARIABLE NAMES REFER TO EQUATION NUMBERS IN SCHUREMAN
+      EQ73=(2./3.-SINI**2)/.5021
+      EQ74=SINI**2/.1578
+      EQ75=SINI*COSI2**2/.37988
+      EQ76=SIN(2*I)/.7214
+      EQ77=SINI*SINI2**2/.0164
+      EQ78=(COSI2**4)/.91544
+      EQ149=COSI2**6/.8758
+      EQ207=EQ75*QAINV
+      EQ215=EQ78*RAINV
+      EQ227=SQRT(.8965*SIN2I**2+.6001*SIN2I*COS(NU)+.1006)
+      EQ235=.001+SQRT(19.0444*SINI**4+2.7702*SINI**2*COS(2.*NU)+.0981)
+C-- NODE FACTORS FOR 37 CONSTITUENTS:
+      FNDCST(1)=EQ78
+      FNDCST(2)=1.0
+      FNDCST(3)=EQ78
+      FNDCST(4)=EQ227
+      FNDCST(5)=FNDCST(1)**2
+      FNDCST(6)=EQ75
+      FNDCST(7)=FNDCST(1)**3
+      FNDCST(8)=FNDCST(1)*FNDCST(4)
+      FNDCST(9)=1.0
+      FNDCST(10)=FNDCST(1)**2
+      FNDCST(11)=EQ78
+      FNDCST(12)=1.0
+      FNDCST(13)=EQ78
+      FNDCST(14)=EQ78
+      FNDCST(15)=EQ77
+      FNDCST(16)=EQ78
+      FNDCST(17)=1.0
+C** EQUATION 207 NOT PRODUCING CORRECT ANSWER FOR M1
+C**SET NODE FACTOR FOR M1 = 0 UNTIL CAN FURTHER RESEARCH
+      FNDCST(18)=0.
+C     FNDCST(18)=EQ207
+      FNDCST(19)=EQ76
+      FNDCST(20)=EQ73
+      FNDCST(21)=1.0
+      FNDCST(22)=1.0
+      FNDCST(23)=EQ78
+      FNDCST(24)=EQ74
+      FNDCST(25)=EQ75
+      FNDCST(26)=EQ75
+      FNDCST(27)=1.0
+      FNDCST(28)=1.0
+      FNDCST(29)=EQ75
+      FNDCST(30)=1.0
+      FNDCST(31)=EQ78
+      FNDCST(32)=EQ149
+C** EQUATION 215 NOT PRODUCING CORRECT ANSWER FOR L2
+C** SET NODE FACTOR FOR L2 = 0 UNTIL CAN FURTHER RESEARCH
+      FNDCST(33)=0.
+C     FNDCST(33)=EQ215
+      FNDCST(34)=FNDCST(1)**2*FNDCST(4)
+      FNDCST(35)=EQ235
+      FNDCST(36)=FNDCST(1)**4
+      FNDCST(37)=EQ78
+      END
+
+      SUBROUTINE GTERMS(YR,DAYJ,HR,DAYM,HRM)
+C-- CALCULATES EQUILIBRIUM ARGUMENTS V0+U FOR CONSTITUENT TIDE
+
+C-- THE EQUATIONS USED IN THIS ROUTINE COME FROM:
+C         "MANUAL OF HARMONIC ANALYSIS AND PREDICTION OF TIDES"
+C         BY PAUL SCHUREMAN, SPECIAL PUBLICATION #98, US COAST
+C         AND GEODETIC SURVEY, DEPARTMENT OF COMMERCE (1958).
+
+C-- IF DAYM AND HRM CORRESPOND TO MIDYEAR, THEN THIS ROUTINE
+C-- RETURNS THE SAME VALUES AS FOUND IN TABLE 15 OF SCHUREMAN.
+C---------------------------------------------------------------------
+      REAL NU,NUP,NUP2,I
+      COMMON /ORBITF/DS,DP,DH,DP1,DN,DI,DNU,DXI,DNUP,DNUP2,DPC
+      COMMON /CNST/ FNDCST(37),EQCST(37),ACST(37),PCST(37)
+      PI180=3.14159265/180.
+C* OBTAINING ORBITAL VALUES AT BEGINNING OF SERIES FOR V0
+      CALL ORBIT(YR,DAYJ,HR)
+      S=DS
+      P=DP
+      H=DH
+      P1=DP1
+      T=ANGLE(180.+HR*(360./24.))
+C** OBTAINING ORBITAL VALUES AT MIDDLE OF SERIES FOR U
+      CALL ORBIT(YR,DAYM,HRM)
+      NU=DNU
+      XI=DXI
+      NUP=DNUP
+      NUP2=DNUP2
+C* SUMMING TERMS TO OBTAIN EQUILIBRIUM ARGUMENTS
+      EQCST(1)=2.*(T-S+H)+2.*(XI-NU)
+      EQCST(2)=2.*T
+      EQCST(3)=2.*(T+H)-3.*S+P+2.*(XI-NU)
+      EQCST(4)=T+H-90.-NUP
+      EQCST(5)=4.*(T-S+H)+4.*(XI-NU)
+      EQCST(6)=T-2.*S+H+90.+2.*XI-NU
+      EQCST(7)=6.*(T-S+H)+6.*(XI-NU)
+      EQCST(8)=3.*(T+H)-2.*S-90.+2.*(XI-NU)-NUP
+      EQCST(9)=4.*T
+      EQCST(10)=4.*(T+H)-5.*S+P+4.*(XI-NU)
+      EQCST(11)=2.*T-3.*S+4.*H-P+2.*(XI-NU)
+      EQCST(12)=6.*T
+      EQCST(13)=2.*(T+2.*(H-S))+2.*(XI-NU)
+      EQCST(14)=2.*(T-2.*S+H+P)+2.*(XI-NU)
+      EQCST(15)=T+2.*S+H-90.-2.*XI-NU
+      EQCST(16)=2.*T-S+P+180.+2.*(XI-NU)
+      EQCST(17)=T
+      I=DI*PI180
+      PC=DPC*PI180
+      TOP=(5.*COS(I)-1.)*SIN(PC)
+      BOTTOM=(7.*COS(I)+1.)*COS(PC)
+      Q=ARCTAN(TOP,BOTTOM,1)
+      EQCST(18)=T-S+H-90.+XI-NU+Q
+      EQCST(19)=T+S+H-P-90.-NU
+      EQCST(20)=S-P
+      EQCST(21)=2.*H
+      EQCST(22)=H
+      EQCST(23)=2.*(S-H)
+      EQCST(24)=2.*S-2.*XI
+      EQCST(25)=T+3.*(H-S)-P+90.+2.*XI-NU
+      EQCST(26)=T-3.*S+H+P+90.+2.*XI-NU
+      EQCST(27)=2.*T-H+P1
+      EQCST(28)=2.*T+H-P1+180.
+      EQCST(29)=T-4.*S+H+2.*P+90.+2.*XI-NU
+      EQCST(30)=T-H+90.
+      EQCST(31)=2.*(T+S-H)+2.*(NU-XI)
+      EQCST(32)=3.*(T-S+H)+3.*(XI-NU)
+      R=SIN(2.*PC)/((1./6.)*(1./TAN(.5*I))**2-COS(2.*PC))
+      R=ATAN(R)/PI180
+      EQCST(33)=2.*(T+H)-S-P+180.+2.*(XI-NU)-R
+      EQCST(34)=3.*(T+H)-4.*S+90.+4.*(XI-NU)+NUP
+      EQCST(35)=2.*(T+H)-2.*NUP2
+      EQCST(36)=8.*(T-S+H)+8.*(XI-NU)
+      EQCST(37)=2.*(2.*T-S+H)+2.*(XI-NU)
+      DO 1 IH=1,37
+    1 EQCST(IH)=ANGLE(EQCST(IH))
+      END
+
+
+      SUBROUTINE ORBIT(YR,DAYJ,HR)
+
+C-- DETERMINATION OF PRIMARY AND SECONDARY ORBITAL FUNCTIONS
+
+C-- THE EQUATIONS PROGRAMMED HERE ARE NOT REPRESENTED BY EQUATIONS IN
+C   SCHUREMAN.  THE CODING IN THIS ROUTINE DERIVES FROM A PROGRAM BY
+C   THE NATIONAL OCEANIC AND ATMOSPHERIC ADMINISTRATION (NOAA).
+C   HOWEVER, TABULAR VALUES OF THE ORBITAL FUNCTIONS CAN BE FOUND IN
+C   TABLE 1 OF SCHUREMAN.
+
+
+C---------------------------------------------------------------------
+      REAL I,N,NU,NUP,NUP2
+      COMMON /ORBITF/DS,DP,DH,DP1,DN,DI,DNU,DXI,DNUP,DNUP2,DPC
+
+      PI180=3.14159265/180.
+      X=AINT((YR-1901.)/4.)
+      DYR=YR-1900.
+      DDAY=DAYJ+X-1.
+C-- DN IS THE MOON'S NODE (CAPITAL N, TABLE 1, SCHUREMAN)
+      DN=259.1560564-19.328185764*DYR-.0529539336*DDAY-.0022064139*HR
+      DN=ANGLE(DN)
+      N=DN*PI180
+C-- DP IS THE LUNAR PERIGEE (SMALL P, TABLE 1)
+      DP=334.3837214+40.66246584*DYR+.111404016*DDAY+.004641834*HR
+      DP=ANGLE(DP)
+      P=DP*PI180
+      I=ACOS(.9136949-.0356926*COS(N))
+      DI=ANGLE(I/PI180)
+      NU=ASIN(.0897056*SIN(N)/SIN(I))
+      DNU=NU/PI180
+      XI=N-2.*ATAN(.64412*TAN(N/2.))-NU
+      DXI=XI/PI180
+      DPC=ANGLE(DP-DXI)
+C-- DH IS THE MEAN LONGITUDE OF THE SUN (SMALL H, TABLE 1)
+      DH=280.1895014-.238724988*DYR+.9856473288*DDAY+.0410686387*HR
+      DH=ANGLE(DH)
+C-- DP1 IS THE SOLAR PERIGEE (SMALL P1, TABLE 1)
+      DP1=281.2208569+.01717836*DYR+.000047064*DDAY+.000001961*HR
+      DP1=ANGLE(DP1)
+C-- DS IS THE MEAN LONGITUDE OF THE MOON (SMALL S, TABLE 1)
+      DS=277.0256206+129.38482032*DYR+13.176396768*DDAY+.549016532*HR
+      DS=ANGLE(DS)
+      NUP=ATAN(SIN(NU)/(COS(NU)+.334766/SIN(2.*I)))
+      DNUP=NUP/PI180
+      NUP2=ATAN(SIN(2.*NU)/(COS(2.*NU)+.0726184/SIN(I)**2))/2.
+      DNUP2=NUP2/PI180
+      END
+
+      FUNCTION ANGLE(ARG)
+C
+C*** THIS ROUTINE PLACES AN ANGLE IN 0-360 (+) FORMAT
+C
+      M=-IFIX(ARG/360.)
+      ANGLE=ARG+FLOAT(M)*360.
+      IF(ANGLE .LT. 0.) ANGLE=ANGLE+360.
+      END
+      FUNCTION ARCTAN(TOP,BOTTOM,KEY)
+C** DETERMINE ARCTANGENT AND PLACE IN CORRECT QUADRANT
+C   IF KEY EQ 0  NO QUADRANT SELECTION MADE
+C   IF KEY .NE. 0 PROPER QUADRANT IS SELECTED
+
+      IF(BOTTOM .NE. 0.0) GO TO 4
+      IF(TOP) 2,9,3
+    2 ARCTAN=270.
+      RETURN
+    3 ARCTAN=90.
+      RETURN
+    4 ARCTAN=ATAN(TOP/BOTTOM)*57.2957795
+      IF(KEY.EQ.0) RETURN
+      IF(TOP) 5,5,7
+    5 IF(BOTTOM) 6,9,8
+    6 ARCTAN=ARCTAN+180.
+      RETURN
+    7 IF(BOTTOM) 6,3,10
+    8 ARCTAN=ARCTAN+360.
+      RETURN
+    9 ARCTAN=0.
+   10 RETURN
+      END
+
+
+      FUNCTION DAYJUL(YR,XMONTH,DAY)
+C
+C*** THIS ROUTINE COMPUTES THE JULIAN DAY (AS A REAL VARIABLE)
+C
+      DIMENSION DAYT(12),DAYS(12)
+      DATA DAYT/0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334./
+      DATA DAYS(1),DAYS(2) /0.,31./
+      DINC=0.
+      YRLP=MOD((YR-1900.),4.)
+      IF(YRLP .EQ. 0.) DINC=1.
+      DO 1 I=3,12
+    1 DAYS(I)=DAYT(I)+DINC
+      DAYJUL=DAYS(IFIX(XMONTH))+DAY
+      END
+

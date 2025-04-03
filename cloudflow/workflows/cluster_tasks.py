@@ -31,7 +31,6 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 pp = pprint.PrettyPrinter()
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 
 #######################################################################
 

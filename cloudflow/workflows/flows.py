@@ -31,9 +31,10 @@ provider = 'AWS'
 
 # Our workflow log
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+# log.setLevel(logging.DEBUG)
+# ch.setLevel(logging.DEBUG)
+
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcName)s | %(message)s')
 formatter.converter = time.localtime
 ch.setFormatter(formatter)

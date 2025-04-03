@@ -46,7 +46,6 @@ pp = pprint.PrettyPrinter()
 debug = False
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 
 # Scratch disk
 ##############
