@@ -46,6 +46,11 @@ class Eval():
         
         # Calculate RMSE
         return np.sqrt(((pred_subset_df - actual_subset_df) ** 2).mean())
+
+    # abstract class for computing any metric provided by user
+     def Metric(Self,filter) : 
+         pass
+
         
 
 
