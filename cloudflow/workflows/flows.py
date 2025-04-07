@@ -14,6 +14,8 @@ import prefect
 from prefect import Flow
 from prefect.engine import signals
 
+from cloudflow.utils.cloudwatch_handler import CloudWatchHandler
+from haikunator import Haikunator
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -29,6 +31,9 @@ __license__ = "BSD 3-Clause"
 
 provider = 'AWS'
 
+# Initializing haikunator used for generating memorable names
+haikunator = Haikunator()
+
 # Our workflow log
 log = logging.getLogger('workflow')
 ch = logging.StreamHandler()
@@ -40,6 +45,9 @@ formatter.converter = time.localtime
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
+# CloudWatch handler to be initialized in the flow functions
+cloudwatch_handler = None
+
 # Fix the prefect logger to output local time instead of gmtime
 # Prefect uses this: formatter.converter = time.gmtime
 prelog = prefect.utilities.logging.get_logger()
@@ -50,6 +58,79 @@ for handler in prelog.handlers:
     pformatter.converter = time.localtime
     handler.setFormatter(pformatter)
 
+def setup_cloudwatch_logging(job_name, haiku_name) -> None:
+    """
+    Parameters
+    ----------
+    job_name : str
+        Name of the job from configuration.
+    haiku_name : str
+        Generates a haikunator name for the run.
+
+    Raises
+    -------
+    Exception
+        If CloudWatch setup fails.
+    """
+    global cloudwatch_handler
+    try:
+        # Initialize CloudWatch handler
+        cloudwatch_handler = CloudWatchHandler(
+            user_id=os.getenv('USER', 'unknown'),
+            job_id=job_name,
+            haiku_name=haiku_name
+        )
+        
+        # Log initialization
+        cloudwatch_handler.info("CloudWatch logging initialized", {
+            "job_name": job_name,
+            "haiku_name": haiku_name
+        })
+        
+    except Exception as e:
+        log.error(f"Failed to setup CloudWatch logging: {str(e)}")
+        raise
+
+def cleanup_cloudwatch_logging() -> None:
+    """
+    Clean up CloudWatch logging resources.
+    
+    Raises:
+        Exception: If cleanup fails.
+    """
+    global cloudwatch_handler
+    try:
+        if cloudwatch_handler:
+            cloudwatch_handler.cleanup()
+            cloudwatch_handler = None
+    except Exception as e:
+        log.error(f"Failed to cleanup CloudWatch logging: {str(e)}")
+        raise
+
+def get_job_name_from_config(jobfile: str) -> str:
+    """
+    Parameters
+    ----------
+    jobfile : str
+        Path to the job configuration file.
+
+    Returns
+    -------
+    str
+        Job name from configuration.
+
+    Returns
+    -------
+    Exception
+        If job name cannot be determined.
+    """
+    try:
+        # Using a random haikunator default name for now
+        # TODO: Read from actual configuration
+        return "adcirc-run"
+    except Exception as e:
+        log.error(f"Failed to get job name from config: {str(e)}")
+        raise
 
 def local_test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 
@@ -77,38 +158,124 @@ def local_test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 ######################################################################
 
 def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
+    """
+    Parameters
+    ----------
+    fcstconf : str
+        The JSON configuration file for the Cluster to create.
 
+    fcstjobfile : str
+        The JSON configuration file for the forecast Job.
+
+    Returns
+    -------
+    fcstflow: prefect.Flow
+    Raises
+    -------
+    Exception
+        If any critical step in the workflow initialization fails.
+    """
+    try:
+        # Generate haiku name for this run
+        haiku_name = haikunator.haikunate()
+        if not haiku_name:
+            raise ValueError("Failed to generate haiku name")
+            
+        # Get job name from configuration
+        job_name = get_job_name_from_config(fcstjobfile)
+        
+        # Initialize CloudWatch logging
+        cloudwatch_handler = CloudWatchHandler(
+            user_id=os.getenv('USER', 'default_user'),
+            job_id=job_name,
+            haiku_name=haiku_name
+        )
+        
+        # Log flow initialization
+        cloudwatch_handler.info("Starting simple forecast flow", {
+            "config": str(fcstconf),
+            "job_file": fcstjobfile
+        })
+            
+    except Exception as e:
+        log.error(f"Failed to setup forecast flow: {str(e)}")
+        raise
+         
     with Flow('fcst workflow') as fcstflow:
-        #####################################################################
-        # FORECAST
-        #####################################################################
+        try:
+            #####################################################################
+            # FORECAST
+            #####################################################################
 
-        # Create the cluster object
-        cluster = ctasks.cluster_init(fcstconf)
+            # Create the cluster object
+            cluster = ctasks.cluster_init(fcstconf)
+            
+            # Add CloudWatch logging to cluster
+            try:
+                cluster.logger = cloudwatch_handler.setup_logger('cluster')
+                cloudwatch_handler.log(cluster.logger, logging.INFO, "Cluster initialized", {
+                    "cluster_config": str(fcstconf)
+                })
+            except Exception as e:
+                log.error(f"Failed to setup cluster logging: {str(e)}")
+                # Continue without CloudWatch logging for cluster
 
-        # Setup the job
-        fcstjob = tasks.job_init(cluster, fcstjobfile)
+            # Setup the job
+            fcstjob = tasks.job_init(cluster, fcstjobfile)
+            try:
+                cloudwatch_handler.log(cluster.logger, logging.INFO, "Job initialized", {
+                    "job_file": fcstjobfile
+                })
+            except Exception as e:
+                log.error(f"Failed to log job initialization: {str(e)}")
 
-        # Get forcing data here
+            # Get forcing data here
 
-        # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
+            # Start the cluster
+            cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
+            try:
+                cloudwatch_handler.log(cluster.logger, logging.INFO, "Cluster starting", {
+                    "node_count": cluster.node_count,
+                    "node_type": cluster.node_type
+                })
+            except Exception as e:
+                log.error(f"Failed to log cluster start: {str(e)}")
 
-        # Run the forecast
-        fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+            # Run the forecast
+            fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+            try:
+                cloudwatch_handler.log(cluster.logger, logging.INFO, "Forecast started", {
+                    "job_id": fcstjob.job_id
+                })
+            except Exception as e:
+                log.error(f"Failed to log forecast start: {str(e)}")
 
-        # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+            # Terminate the cluster nodes
+            cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+            try:
+                cloudwatch_handler.log(cluster.logger, logging.INFO, "Cluster termination scheduled", {
+                    "termination_time": str(cluster.termination_time)
+                })
+            except Exception as e:
+                log.error(f"Failed to log cluster termination: {str(e)}")
 
-        # If the fcst fails, then set the whole flow to fail
-        fcstflow.set_reference_tasks([fcst_run])
+            # If the fcst fails, then set the whole flow to fail
+            fcstflow.set_reference_tasks([fcst_run])
+            
+            # Cleanup CloudWatch logging when flow completes
+            fcstflow.on_complete(cloudwatch_handler.cleanup)
+
+        except Exception as e:
+            log.error(f"Error in forecast flow execution: {str(e)}")
+            # Ensures cleanup happens even if flow fails
+            cloudwatch_handler.cleanup()
+            raise
 
     return fcstflow
 
 ######################################################################
 
-def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow: 
-
+def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a hindcast workflow.
 
     Parameters
@@ -172,7 +339,6 @@ def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
     return multiflow
 
 ######################################################################
-
 
 def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
     """ Provides a Prefect Flow for a forecast workflow.
