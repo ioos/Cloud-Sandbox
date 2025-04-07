@@ -82,3 +82,27 @@ class CloudDataHandler:
 
 
 # %%
+ print("Starting In-Situ Processing...")
+    start_time = time.time()
+    
+    # Initialize CloudDataHandler
+    handler = CloudDataHandler(s3_bucket, s3_key, aws_access_key, aws_secret_key)
+    ds_in_situ = handler.inSituLoad(variables=['temperature'], 
+                                   time_slice=slice(0, 10),  # First 10 time steps
+                                   lat_slice=slice(0, 5),    # First 5 latitude points
+                                   lon_slice=slice(0, 5))    # First 5 longitude points
+    if handler.integrityCheck(ds_in_situ):
+        mean_temp_in_situ = ds_in_situ['temperature'].mean().values
+    
+    in_situ_time = time.time() - start_time
+    print(f"In-Situ Processing Time: {in_situ_time:.2f} seconds")
+    
+    # Plot result
+    plt.figure(figsize=(6, 4))
+    plt.plot(mean_temp_in_situ, label="In-Situ Mean Temp")
+    plt.title("In-Situ Processing Result")
+    plt.legend()
+    plt.show()
+
+    # Compare
+    print(f"Time Difference: {trad_time - in_situ_time:.2f} seconds saved")
