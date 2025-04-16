@@ -11,38 +11,19 @@ packer {
   }
 }
 
-variable "aws_region" {
-  type    = string
-  default = "us-east-2"
-}
-
-variable "instance_type" {
-  type    = string
-  default = "t3.large"
-}
-
-variable "ami_name" {
-  type    = string
-  default = "skills-image-{{timestamp}}"
-}
-
-variable "ssh_username" {
-  type    = string
-  default = "ec2-user"
-}
 
 source "amazon-ebs" "skills" {
-  profile       = "lcsb-admin"
+  profile       = var.aws_profile
   region        = var.aws_region
   instance_type = var.instance_type
   ssh_username  = var.ssh_username
-  vpc_id        = "vpc-0b008988bcc9ce636"
-  subnet_id     = "subnet-0db88d9c9d9a1621c"
+  vpc_id        = var.vpc
+  subnet_id     = var.subnet
 
   launch_block_device_mappings {
-    device_name = "/dev/sda1"
-    volume_size = 60
-    volume_type = "gp2"
+    device_name           = "/dev/sda1"
+    volume_size           = var.volume_size
+    volume_type           = "gp2"
     delete_on_termination = true
   }
 
@@ -56,7 +37,16 @@ source "amazon-ebs" "skills" {
   }
 
   ami_name        = var.ami_name
-  ami_description = "Skills image with users added via Ansible"
+  ami_description = var.ami_description
+  tags = {
+    Name        = var.ami_name
+    CreatedBy   = "Packer"
+    Description = var.ami_description
+  }
+  aws_polling {
+    delay_seconds = 30
+    max_attempts  = 200
+  }
 }
 
 build {
