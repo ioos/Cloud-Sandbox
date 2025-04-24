@@ -39,3 +39,8 @@ variable "ami_description" {
   type    = string
   default = "Skills image created by Packer"
 }
+
+variable "ssh_interface" {
+  type = string
+  default = "public_ip"
+}

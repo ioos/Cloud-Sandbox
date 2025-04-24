@@ -47,6 +47,8 @@ source "amazon-ebs" "skills" {
     delay_seconds = 30
     max_attempts  = 200
   }
+  ssh_interface = var.ssh_interface
+  ssh_timeout   = "2m"
 }
 
 build {

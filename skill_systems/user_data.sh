@@ -8,3 +8,4 @@ sudo systemctl enable amazon-ssm-agent
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-cloudwatch-agent
 sudo systemctl start amazon-cloudwatch-agent
+sudo dnf -y install git
