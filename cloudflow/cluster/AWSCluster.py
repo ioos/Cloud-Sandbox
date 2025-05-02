@@ -28,12 +28,16 @@ log = logging.getLogger('workflow')
 
 homedir = Path.home()
 timelog = logging.getLogger('qops_timing')
-timelog.setLevel(logging.DEBUG)
+timelog.setLevel(logging.INFO)
 timelog.propagate = False
 
 fh = logging.FileHandler(f"{homedir}/cluster_runtime.log")
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)
+
+# To avoid duplicate entries, only have one handler
+if not timelog.hasHandlers():
+    timelog.addHandler(fh)
 
 #####  Includes recommended or tested types only  !!!!!!!
 #      Should be number of physical CPU cores, not vCPUs,
@@ -45,7 +49,7 @@ awsTypes = {
             'c5.large': 1,      'c5.xlarge': 2, 'c5.2xlarge': 4, 'c5.4xlarge': 8, 'c5.9xlarge': 18,
             'c5.12xlarge': 24,  'c5.18xlarge': 36, 'c5.24xlarge': 48, 'c5.metal': 36,
 
-            'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
+            'c5a.large': 1, 'c5a.xlarge': 2, 'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
 
             'c5n.large': 1,     'c5n.xlarge': 2, 'c5n.2xlarge': 4, 'c5n.4xlarge': 8, 'c5n.9xlarge': 18,
             'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
@@ -59,17 +63,12 @@ awsTypes = {
             'hpc7a.48xlarge': 96,
 
             'hpc7a.96xlarge': 192,
+            #'hpc7a.96xlarge': 190,
 
             'r7iz.32xlarge': 64,
 
             # The below are in vCPUs not CPU cores
             'x2idn.24xlarge': 96, 'x2idn.32xlarge': 128 }
-
-# To avoid duplicate entries, only have one handler
-# This log might have a handler in one of their higher level scripts
-# This didn't work - still got duplicates, even when also added in main caller
-if not timelog.hasHandlers():
-    timelog.addHandler(fh)
 
 
 class AWSCluster(Cluster):
@@ -376,7 +375,10 @@ class AWSCluster(Cluster):
             )
 
         # Wait a little more. sshd is sometimes slow to come up
-        time.sleep(60)
+        sleeptime=60
+        log.info(f"Waiting an additional {sleeptime} seconds for nodes to fully initialize ...")
+        time.sleep(sleeptime)
+
         # Assume the nodes are ready, set to False if not
         ready = True
 
@@ -390,7 +392,7 @@ class AWSCluster(Cluster):
             inum += 1
 
         if not (ready):
-            self.__terminateCluster()
+            self.terminate()
             raise Exception('Nodes did not start within time limit... terminating them...')
 
         return self.__instances
@@ -436,6 +438,7 @@ class AWSCluster(Cluster):
         #       nametag = tag["Value"]
 
         nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
+        print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
         timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
 
         return responses

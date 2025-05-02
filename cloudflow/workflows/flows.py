@@ -32,8 +32,8 @@ provider = 'AWS'
 # Our workflow log
 log = logging.getLogger('workflow')
 ch = logging.StreamHandler()
-# log.setLevel(logging.DEBUG)
-# ch.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
+ch.setLevel(logging.INFO)
 
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcName)s | %(message)s')
 formatter.converter = time.localtime
@@ -107,7 +107,7 @@ def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
 
 ######################################################################
 
-def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow: 
+def multi_hindcast_flow(hcstconf, jobfile, sshuser) -> Flow: 
 
     """ Provides a Prefect Flow for a hindcast workflow.
 
@@ -116,7 +116,7 @@ def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
     hcstconf : str
         The JSON configuration file for the Cluster to create
 
-    hcstjobfile : str
+    jobfile : str
         The JSON configuration file for the hindcast Job
 
     sshuser : str
@@ -136,33 +136,38 @@ def multi_hindcast_flow(hcstconf, hcstjobfile, sshuser) -> Flow:
         cluster = ctasks.cluster_init(hcstconf)
 
         # Setup the job
-        hcstjob = tasks.job_init(cluster, hcstjobfile)
+        job = tasks.job_init(cluster, jobfile)
 
         # Get forcing data
-        forcing = jtasks.get_forcing_multi(hcstjob, sshuser)
+        forcing = jtasks.get_forcing_multi(job, sshuser)
+
+        # scratch = tasks.create_scratch('FSx',jobfile,'/ptmp', upstream_tasks=[forcing])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, hcstjob])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, job])
+
+        # Mount the scratch disk
+        #scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
 
         # Create the oceanin and run the forecasts
         # This will run in a loop to complete all forecasts 
-        hcst_run = tasks.hindcast_run_multi(cluster, hcstjob, upstream_tasks=[cluster_start])
+        hcst_run = tasks.hindcast_run_multi(cluster, job, upstream_tasks=[cluster_start])
 
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])
 
         # Copy the results to /com (liveocean does not run in ptmp currently)
-        #cp2com = jtasks.ptmp2com(hcstjob, upstream_tasks=[hcst_run])
+        #cp2com = jtasks.ptmp2com(job, upstream_tasks=[hcst_run])
 
         # Copy the results to S3 (optionally)
-        #cp2s3 = jtasks.cp2s3(hcstjob, upstream_tasks=[hcst_run])
+        #cp2s3 = jtasks.cp2s3(job, upstream_tasks=[hcst_run])
         #storage_service = tasks.storage_init(provider)
         #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
         #pngtocloud.set_upstream(plots)
 
         # Copy the results to S3 (optionally. currently only saves LiveOcean)
         #storage_service = tasks.storage_init(provider)
-        #cp2cloud = tasks.save_history(hcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+        #cp2cloud = tasks.save_history(job, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
 
         #pngtocloud.set_upstream(plots)
 

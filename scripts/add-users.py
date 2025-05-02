@@ -5,8 +5,16 @@ import pwd
 import grp
 import os
 import boto3
+from datetime import datetime
+from botocore.exceptions import ClientError
 from create_image import create_snapshot, create_image_from_snapshot
 
+"""
+    To run this with the needed permissions:
+    1. sudo -i
+    2. aws sso login --profile ioos-sb-admin
+    3. run it
+"""
 
 def change_file_ownership(file_path, username):
     try:
@@ -192,7 +200,7 @@ def setup_user_env(full_name, email, username, public_key):
 
     cmd = [ 'sudo', '-u', username, 'ssh-keygen', 
             '-t', 'rsa', '-N', "", 
-            '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/id_rsa.mpi" ]
+            '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/id_rsa" ]
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
@@ -201,7 +209,7 @@ def setup_user_env(full_name, email, username, public_key):
     # add public key  and mpi key to authorized_keys
     with open(f"/home/{username}/.ssh/authorized_keys", "a") as dest:
         subprocess.run(['echo', f"{public_key}"], stdout=dest)
-        subprocess.run(['cat', f"/home/{username}/.ssh/id_rsa.mpi.pub"], stdout=dest)
+        subprocess.run(['cat', f"/home/{username}/.ssh/id_rsa.pub"], stdout=dest)
 
 
 # Problem, add user requires sudo, add_ingress rule requires aws sso
@@ -241,11 +249,19 @@ def add_ssh_ingress_rule(sg_id, ip_address, description="Allow SSH access from s
     ]
 
     # Add the ingress rule to the security group
-    response = ec2.authorize_security_group_ingress(
-        GroupId=sg_id,
-        IpPermissions=ip_permissions,
-    )
-    return response
+    try:
+        response = ec2.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpPermissions=ip_permissions,
+        )
+    except ClientError as err:
+        print(err)
+        return
+    except Exception as err:
+        print(f"exception: {err}")
+        return
+
+    #return response
 
 
 def create_ami(instance_id, image_name, project_tag):
@@ -337,7 +353,7 @@ def main():
 
             for ip in ips:
                 description = f"{full_name} IP {email}"
-                result = add_ssh_ingress_rule(sg_id, ip, description)
+                add_ssh_ingress_rule(sg_id, ip, description)
 
 
         if len(filtered_lines) != 0:
@@ -346,8 +362,7 @@ def main():
         # Create new AMI for root volume after all users are added
         instance_id = "i-070b64b46dd7aef33"
 
-        # TODO: use datetime instead of hardcode
-        now = "2025-03-20_22-17"
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M")
         image_name = f"{now}-ioos-sandbox-ami"
         project_tag = "IOOS-Cloud-Sandbox"
         create_ami(instance_id, image_name, project_tag)

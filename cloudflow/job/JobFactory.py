@@ -7,6 +7,8 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
+from cloudflow.job.SCHISMHindcast import SCHISMHindcast
+
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
 from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
 from cloudflow.job.SCHISM_Template import SCHISM_Template
@@ -60,6 +62,9 @@ class JobFactory:
             newjob = Plotting(configfile, NPROCS)
         elif (jobtype == 'adcircreanalysis'):
             newjob = ADCIRCReanalysis(configfile, NPROCS)
+        elif (jobtype == 'schism_hindcast'):
+            newjob = SCHISMHindcast(configfile, NPROCS)
+
         elif (jobtype == 'dflowfm_template'):
             newjob = DFLOWFM_Template(configfile, NPROCS)
         elif (jobtype == 'schism_template'):
@@ -78,7 +83,6 @@ class JobFactory:
         return newjob
 
 
-    # TODO: this is so frequently used, don't need multiple definitions of it
     def readconfig(self,configfile):
         """ Reads a JSON configuration file into a dictionary.
 

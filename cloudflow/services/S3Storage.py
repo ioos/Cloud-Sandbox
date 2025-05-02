@@ -12,7 +12,6 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
 
 
 class S3Storage(StorageService):

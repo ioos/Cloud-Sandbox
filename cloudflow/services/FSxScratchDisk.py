@@ -5,28 +5,30 @@ import traceback
 import json
 import os
 import re
+import inspect
 
 import boto3
 from botocore.exceptions import ClientError
 from prefect.engine import signals
 
+from cloudflow.job.Job import Job
+from cloudflow.cluster.Cluster import Cluster
+
 from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
+
 import cloudflow.services.ScratchDisk as ScratchDiskModule
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
-
 
 class FSxScratchDisk(ScratchDisk):
     """ AWS FSx for Lustre implementation of scratch disk.
         Can only have one at a time. Assumes all jobs will use the same scratch disk and path
-
     """
-        ### PT 2/13/2025 - HERE - why can we only have one at a time?
+
+    ### PT 2/13/2025 - HERE - why can we only have one at a time?
 
     ''' Note: df  /ptmp provides the following details:
         df /ptmp | grep -v 'Filesystem' | grep tcp | awk '{print $1}'
@@ -43,23 +45,29 @@ class FSxScratchDisk(ScratchDisk):
             If there are no other user.files then the scratch disk can be unmounted and deleted
     '''
 
-    def __init__(self, config: str):
+    def __init__(self, cluster: Cluster, job: Job):
         """ Constructor """
 
         self.mountname: str = None
         self.dnsname: str = None
         self.filesystemid: str = None
         self.status: str = 'uninitialized'
-        self.mountpath: str = '/ptmp'  # default can be reset in create()
 
         self.provider: str = 'AWS'
         self.capacity: int = 1200   # The smallest is 1.2 TB
 
-        cfDict = readConfig(config)
-        self.tags = cfDict['tags']
-        self.sg_ids = cfDict['sg_ids']
-        self.subnet_id = cfDict['subnet_id']
-        self.region = cfDict['region']
+        #cfDict = readConfig(config)
+        #self.tags = cfDict['tags']
+        #self.sg_ids = cfDict['sg_ids']
+        #self.subnet_id = cfDict['subnet_id']
+        #self.region = cfDict['region']
+
+        self.tags = cluster.tags
+        self.sg_ids = cluster.sg_ids
+        self.subnet_id = cluster.subnet_id
+        self.region = cluster.region
+        #self.mountpath: str = '/ptmp'  # default can be reset in create()
+        self.mountpath = job.PTMP
 
         return
 
@@ -78,7 +86,7 @@ class FSxScratchDisk(ScratchDisk):
             return False   
  
 
-    def create(self, mountpath: str = '/ptmp'):
+    def create(self):
         """ Create a new FSx scratch disk and mount it locally 
 
         Parameters
@@ -87,11 +95,11 @@ class FSxScratchDisk(ScratchDisk):
             The path where the disk will be mounted. Default = /ptmp" (optional)
         """
 
-        # Check to see if an FSx scratch disk already exists on the system at mountpath
-        # Add an additional lock to it
-        self.lockid = ScratchDiskModule.addlock(mountpath)
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
-        self.mountpath = mountpath
+        # Check to see if an FSx scratch disk already exists on the system at mountpath
+        # Add an additional lock to it, since multiple runs might be using the same FSx disk
+        self.lockid = ScratchDiskModule.addlock(self.mountpath)
 
         client = boto3.client('fsx', region_name=self.region)
 
@@ -106,8 +114,10 @@ class FSxScratchDisk(ScratchDisk):
             # Need FileSystemId': 'string',
             # we can get mountname from df
         
-            result = subprocess.run(['df', '--output=source', '/ptmp'], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            #result = subprocess.run(['df', '--output=source', '/ptmp'], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            result = subprocess.run(['df', '--output=source', self.mountpath], encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             dfmountname = result.stdout.split()[1].split('/')[1]
+            print(f"dfmountname: {dfmountname}")
 
             # search existing FileSystems list for mountname
             filesystems = client.describe_file_systems()['FileSystems']
@@ -123,7 +133,7 @@ class FSxScratchDisk(ScratchDisk):
                 else:
                     index += 1
                     if index == len(filesystems):
-                        log.exception('ERROR: Unable to locate a matching FSx disk')
+                        log.exception('ERROR: a mount exists, but unable to locate a matching FSx disk') 
                         raise signals.FAIL()
                     continue
             return  # scratch disk already exists, don't create a new one
@@ -131,6 +141,9 @@ class FSxScratchDisk(ScratchDisk):
         elif ScratchDiskModule.get_lockcount(self.mountpath) == 1: 
             # Mount does not exist, but another process might be creating it 
             # We just created a lock for this, so lock count must be == 1 if we are the only one starting it
+
+            log.debug(f"Using boto3 to create FSx scratch: in get_lockount == 1")
+            
             try:
                 response = client.create_file_system(
                     FileSystemType='LUSTRE',
@@ -142,24 +155,31 @@ class FSxScratchDisk(ScratchDisk):
                         'DeploymentType': 'SCRATCH_2'
                     }
                 )
+
+                print(response)
                 self.status='creating'
+                self.filesystemid = response['FileSystem']['FileSystemId']
+                self.dnsname = response['FileSystem']['DNSName']
+                self.mountname = response['FileSystems']['LustreConfiguration']['MountName']
+                log.debug(f"filesystemid: {self.filesystemid}, dnsname: {self.dnsname}, mountname: {self.mountname}")
+
             except ClientError as e:
-                log.exception('ClientError exception in createCluster' + str(e))
+                log.exception('ClientError exception in create FSx mount' + str(e))
                 raise signals.FAIL()
         
                 '''
-                  'FileSystem': {
+                  'FileSystems': {
                       FileSystemId': 'string',
                       'DNSName': 'string',
                       'LustreConfiguration': {
                            'MountName': 'string'
             
                 '''
-            log.info("FSx drive creation in progress...")
-            self.filesystemid = response['FileSystem']['FileSystemId']
-            self.dnsname = response['FileSystem']['DNSName']
-            self.mountname = response['FileSystem']['LustreConfiguration']['MountName']
 
+            log.info("FSx drive creation in progress...")
+
+            # TODO: wait for scratch to become available here instead of in __mount
+            log.debug(f"Attempting to mount scratch ... {self}")
             # Now mount it
             self.__mount()
         return
@@ -167,6 +187,9 @@ class FSxScratchDisk(ScratchDisk):
 
     def __mount(self):
         """ Mount the disk when it is ready """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
         # sudo mount -t lustre -o 'noatime,flock' fs-037d74a7524d3e1d3.fsx.us-east-1.amazonaws.com@tcp:/gcuupbmv /ptmp
 
         client = boto3.client('fsx', region_name=self.region)
@@ -185,6 +208,7 @@ class FSxScratchDisk(ScratchDisk):
                 raise signals.FAIL()
 
             response = client.describe_file_systems(FileSystemIds=[self.filesystemid])
+            print(response)
             # 'Lifecycle': 'AVAILABLE' | 'CREATING' | 'FAILED' | 'DELETING' | 'MISCONFIGURED' | 'UPDATING',
             status = response['FileSystems'][0]['Lifecycle']
 
@@ -192,13 +216,18 @@ class FSxScratchDisk(ScratchDisk):
             if status == 'AVAILABLE':
                 log.info("FSx scratch disk is ready.")
 
-                subprocess.run(['sudo', 'rm', '-Rf', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                subprocess.run(['sudo', 'mkdir','-p', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                #subprocess.run(['sudo', 'rm', '-Rf', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                #subprocess.run(['sudo', 'mkdir','-p', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                subprocess.run(['mkdir','-p', self.mountpath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
                 try:
                     ''' sudo mount -t lustre -o noatime,flock fs-0efe931e2cc043a6d.fsx.us-east-1.amazonaws.com@tcp:/6i6xxbmv  /ptmp '''
                     log.info("Attempting to mount it locally...")
-                    result = subprocess.run(['sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', 
+ 
+                    # Argh! Need to test non-sudo user
+                    #result = subprocess.run(['sudo', 'mount', '-t', 'lustre', '-o', 'noatime,flock', 
+                    #result = subprocess.run(['mount', '-t', 'lustre', '-o', 'noatime,flock', 
+                    result = subprocess.run(['mount', '-t', 'lustre', 
                                             f'{self.dnsname}@tcp:/{self.mountname}', self.mountpath ],
                                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -208,14 +237,13 @@ class FSxScratchDisk(ScratchDisk):
                         raise signals.FAIL()
 
                     # Chmod to make it writeable by all
-                    log.info("Attempting to chmod FSx disk ...")
-                    result = subprocess.run(['sudo', 'chmod', '777', self.mountpath ],
-                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-                    if result.returncode != 0:
-                        print(result.stdout)
-                        log.exception('error attempting to chmod scratch disk ...')
-                        raise signals.FAIL()
+                    #log.info("Attempting to chmod FSx disk ...")
+                    #result = subprocess.run(['sudo', 'chmod', '777', self.mountpath ],
+                    #                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    #if result.returncode != 0:
+                    #    print(result.stdout)
+                    #    log.exception('error attempting to chmod scratch disk ...')
+                    #    raise signals.FAIL()
 
                 except Exception as e:
                     log.exception('unable to mount scratch disk ...')
@@ -250,7 +278,9 @@ class FSxScratchDisk(ScratchDisk):
         log.info(f'Unmounting FSx disk at {self.mountpath} ...')
         try:
             # umount -f = force, -l = lazy
-            result = subprocess.run(['sudo', 'umount', '-fl', self.mountpath ],
+            # -f requires sudo
+            #result = subprocess.run(['umount', '-fl', self.mountpath ],
+            result = subprocess.run(['umount', '-l', self.mountpath ],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
                 print(result.stdout)

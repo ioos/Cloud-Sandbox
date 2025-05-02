@@ -32,6 +32,7 @@ class Job(ABC):
     def __init__(self):
         """ Constructor """
 
+        # TODO: can I programmatically create self.VARNAME attributes?
         self.configfile = ''
         self.jobtype = ''
         self.CDATE = ''

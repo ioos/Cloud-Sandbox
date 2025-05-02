@@ -51,7 +51,7 @@ log = logging.getLogger('workflow')
 ##############
 
 @task
-def create_scratch(provider: str, jobconfigfile: str, mountpath: str = '/ptmp') -> ScratchDisk:
+def create_scratch(provider: str, cluster: Cluster, job: Job) -> ScratchDisk:
     """ Provides a high speed scratch disk if available. Creates and mounts the disk.
 
     Parameters
@@ -70,24 +70,27 @@ def create_scratch(provider: str, jobconfigfile: str, mountpath: str = '/ptmp') 
 
     """
 
-    ### PT 2/13/2025 - HERE
+    ### calls the object __init__
     if provider == 'FSx':
-        scratch = FSxScratchDisk(configfile)
+        scratch = FSxScratchDisk(cluster, job)
     elif provider == 'NFS':
-        scratch = NFSScratchDisk(configfile)
+        scratch = NFSScratchDisk(cluster, job)
     elif provider == 'Local':
         log.error('Coming soon ...')
-        raise signals.FAIL('FAILED')
+        #raise signals.FAIL('FAILED')
+        return
     else:
         log.error('Unsupported provider')
-        raise signals.FAIL('FAILED')
+        #raise signals.FAIL('FAILED')
+        return
 
-    scratch.create(mountpath)
+    log.debug(f"Creating scratch drive {provider}") 
+    scratch.create()
     return scratch
 
 
 @task
-def mount_scratch(scratch: ScratchDisk, cluster: Cluster):
+def mount_scratch(scratch: ScratchDisk, cluster: Cluster, job: Job):
     """ Mounts the scratch disk on each node of the cluster
 
     Parameters
@@ -391,6 +394,9 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     OUTDIR = job.OUTDIR
     SAVEDIR = job.SAVE
 
+    # for secofs
+    WRITERS = getattr(job, "WRITERS", '')
+
     runscript = f"{curdir}/fcst_launcher.sh"
     print(f"In hindcast_run_multi: runscript: {runscript}")
 
@@ -411,7 +417,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
         try:
             print('Launching model run ...')
-            result = subprocess.run([runscript, job.CDATE, HH, job.OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, job.OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, WRITERS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')

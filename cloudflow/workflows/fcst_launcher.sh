@@ -34,13 +34,14 @@ export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
 
 export CDATE=$1
 export HH=$2
-export COMOUT=$3   # OUTDIR in caller
-export WRKDIR=$4
-export NPROCS=$5
+export COMOUT=$3    # job.OUTDIR
+export WRKDIR=$4    # job.SAVE
+export NPROCS=$5    
 export PPN=$6
 export HOSTS=$7
 export OFS=$8
 export EXEC=$9
+export WRITERS=${10}   # needed for eccofs
 
 #OpenMPI
 #mpirun --version
@@ -119,6 +120,25 @@ case $OFS in
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT
+    result=$?
+    ;;
+  secofs)
+    cd "$COMOUT" || exit 1
+    echo "Current dir is: $PWD"
+    if [ ! -d outputs ]; then
+        mkdir outputs
+    else
+        rm -f outputs/*
+    fi
+
+    # WRKDIR is job.SAVE 
+    # e.g. /save/patrick/schism
+    module use -a $WRKDIR
+    module load intel_x86_64
+    echo "Calling: mpirun $MPIOPTS $EXEC $WRITERS"
+    echo "Testing ... sleeping"
+    sleep 300
+    # mpirun $MPIOPTS $EXEC $WRITERS
     result=$?
     ;;
   adnoc)

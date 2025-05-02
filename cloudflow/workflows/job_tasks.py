@@ -187,14 +187,14 @@ def get_forcing_multi(job: Job, sshuser=None):
 
     sdate = job.SDATE
     edate = job.EDATE
-
     ofs = job.OFS
-    comrot = job.COMROT
-    hh = job.HH
-
-    comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
     if ofs == 'liveocean':
+
+        comrot = job.COMROT
+        hh = job.HH
+
+        comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
         # /mnt/efs/fs1/com/ec2-user/LO_output/forcing/cas7
         #frcdir = job.COMROT + '/liveocean'
@@ -215,6 +215,8 @@ def get_forcing_multi(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
+    elif ofs == 'secofs':
+        print(f"only using pre-downloaded forcing files for {ofs}")
     else:
         log.error("Unsupported forecast: ", ofs)
         raise signals.FAIL()
