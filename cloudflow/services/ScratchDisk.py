@@ -19,7 +19,8 @@ log = logging.getLogger('workflow')
 
 debug = False
 
-_LOCKROOT='/tmp/mntlocks'
+username = os.environ.get('USER')
+_LOCKROOT=f'/mnt/fsxmntlocks/{username}'
 
 class ScratchDisk(ABC):
     """ Abstract base class for scratch disk. """

@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -x
+#set -x
 
 ami_name=$1
 project_tag=$2
@@ -15,7 +15,9 @@ echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
 instance_id=`curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
 echo "instance_id: $instance_id"
 
-ami_name=${ami_name:='IOOS-Cloud-Sandbox'}
+now=`date -u +\%Y\%m\%d_\%H-\%M`
+
+ami_name=${ami_name:="IOOS-Cloud-Sandbox-${now}"}
 echo "ami_name: $ami_name"
 
 # TODO: pass this in via Terraform init template
@@ -29,6 +31,6 @@ image_name="${ami_name}-Node"
 echo "Node image_name: $image_name"
 
 # Flush the disk cache
-sudo sync
+sync
 python3 create_image.py $instance_id "$image_name" "$project_tag"
 

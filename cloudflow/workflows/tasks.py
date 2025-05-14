@@ -35,7 +35,7 @@ from cloudflow.services.S3Storage import S3Storage
 
 from cloudflow.services.ScratchDisk import ScratchDisk
 from cloudflow.services.FSxScratchDisk import FSxScratchDisk
-from cloudflow.services.NFSScratchDisk import NFSScratchDisk
+# from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
 from cloudflow.utils import modelUtil as util
 
@@ -77,11 +77,12 @@ def create_scratch(provider: str, cluster: Cluster, job: Job) -> ScratchDisk:
         scratch = NFSScratchDisk(cluster, job)
     elif provider == 'Local':
         log.error('Coming soon ...')
-        #raise signals.FAIL('FAILED')
+        return
+    elif provider == 'None':
+        log.info('No scratch disk being used')
         return
     else:
         log.error('Unsupported provider')
-        #raise signals.FAIL('FAILED')
         return
 
     log.debug(f"Creating scratch drive {provider}") 
@@ -90,7 +91,7 @@ def create_scratch(provider: str, cluster: Cluster, job: Job) -> ScratchDisk:
 
 
 @task
-def mount_scratch(scratch: ScratchDisk, cluster: Cluster, job: Job):
+def scratch_remote_mount(scratch: ScratchDisk, cluster: Cluster, job: Job):
     """ Mounts the scratch disk on each node of the cluster
 
     Parameters
@@ -101,8 +102,13 @@ def mount_scratch(scratch: ScratchDisk, cluster: Cluster, job: Job):
       The cluster object that contains the hostnames and tags
     """ 
 
-    hosts = cluster.getHosts() 
-    scratch.remote_mount(hosts)
+
+    if isinstance(scratch, ScratchDisk):
+        log.info("Attempting to mount scratch disk on compute nodes...")
+        hosts = cluster.getHosts()
+        log.debug(f"cluster.hosts: {hosts}")
+        scratch.remote_mount(hosts)
+
     return
 
 
@@ -115,7 +121,9 @@ def delete_scratch(scratch: ScratchDisk):
     scratch : ScratchDisk
       The scratch disk object
     """
-    scratch.delete()
+    if isinstance(scratch, ScratchDisk):
+        scratch.delete()
+
     return
 
 # Storage
@@ -302,16 +310,11 @@ def job_init(cluster: Cluster, configfile) -> Job:
     """
     NPROCS = cluster.nodeCount * cluster.PPN
 
-    if debug: print(f"DEBUG: in tasks job_init configfile: {configfile}")
-    # This is opposite of the way resources are usually allocated
-    # Normally, NPROCs comes from the job and will use that much compute resources
-    # Here, we fit the job to the desired on-demand resources.
-    # TODO ?: set it up so that the best machine(s) for the job are provisioned based on the resource request.
+    log.debug(f"DEBUG: in tasks job_init configfile: {configfile}")
 
     factory = JobFactory()
     job = factory.job(configfile, NPROCS)
     return job
-
 
 
 
@@ -327,15 +330,20 @@ def forecast_run(cluster: Cluster, job: Job):
     job : Job
         The job to run
     """
-    PPN = cluster.getCoresPN()
 
     # Easier to read
+    PPN = cluster.PPN
     CDATE = job.CDATE
     HH = job.HH
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
     SAVEDIR = job.SAVE
+
+    PTMP = getattr(job, "PTMP", 'none')
+
+    # for secofs
+    NSCRIBES = getattr(job, "NSCRIBES", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
 
@@ -349,9 +357,9 @@ def forecast_run(cluster: Cluster, job: Job):
 
         if OFS == "adnoc":
             time.sleep(60)
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
         else:
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -394,8 +402,12 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     OUTDIR = job.OUTDIR
     SAVEDIR = job.SAVE
 
+    PTMP = getattr(job, "PTMP", 'none')
+
+    # Use an environment variable for FSx signal
+
     # for secofs
-    WRITERS = getattr(job, "WRITERS", '')
+    NSCRIBES = getattr(job, "NSCRIBES", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
     print(f"In hindcast_run_multi: runscript: {runscript}")
@@ -417,7 +429,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
         try:
             print('Launching model run ...')
-            result = subprocess.run([runscript, job.CDATE, HH, job.OUTDIR, SAVEDIR, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, WRITERS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')

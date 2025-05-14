@@ -32,7 +32,7 @@ yum install -y kmod-lustre-client lustre-client
 
 # Create a new image
 echo "Need to create a new AMI to use for the compute nodes"
-now=`date -u +\%Y\%m\%d_\%H-\%M`
-ami_name="${now}-IOOS-Cloud-Sandbox"
+#now=`date -u +\%Y\%m\%d_\%H-\%M`
+#ami_name="IOOS-Cloud-Sandbox-${now}"
 
 

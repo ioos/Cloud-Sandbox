@@ -37,6 +37,8 @@ install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 install_base_rpms
 install_ncep_rpms
 
+install_fsxdrivers.sh 
+
 # install_ffmpeg
 
 # TODO: create an output file to contain all of this state info - json

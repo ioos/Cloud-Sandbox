@@ -36,12 +36,13 @@ export CDATE=$1
 export HH=$2
 export COMOUT=$3    # job.OUTDIR
 export WRKDIR=$4    # job.SAVE
-export NPROCS=$5    
-export PPN=$6
-export HOSTS=$7
-export OFS=$8
-export EXEC=$9
-export WRITERS=${10}   # needed for eccofs
+export PTMP=$5
+export NPROCS=$6
+export PPN=$7
+export HOSTS=$8
+export OFS=$9
+export EXEC=${10}
+export NSCRIBES=${11}   # needed for schism
 
 #OpenMPI
 #mpirun --version
@@ -123,7 +124,10 @@ case $OFS in
     result=$?
     ;;
   secofs)
+    # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
     cd "$COMOUT" || exit 1
+    # If using scratch disk use PTMP
+    # cd $PTMP || exit 1
     echo "Current dir is: $PWD"
     if [ ! -d outputs ]; then
         mkdir outputs
@@ -135,11 +139,15 @@ case $OFS in
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
     module load intel_x86_64
-    echo "Calling: mpirun $MPIOPTS $EXEC $WRITERS"
-    echo "Testing ... sleeping"
-    sleep 300
-    # mpirun $MPIOPTS $EXEC $WRITERS
+    echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
+    starttime=`date +%R`
+    #echo "Testing ... sleeping"
+    #sleep 300
+    echo "STARTING RUN AT $starttime"
+    mpirun $MPIOPTS $EXEC $NSCRIBES
     result=$?
+    endtime=`date +%R`
+    echo "RUN FINISHED AT $endtime"
     ;;
   adnoc)
     EXEC=${EXEC:-roms}

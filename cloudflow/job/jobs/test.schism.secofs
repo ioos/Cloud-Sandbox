@@ -6,11 +6,11 @@
   "EDATE"     : "20171201",
   "HH"        : "00",
   "SAVE"      : "/save/patrick/schism",
-  "PTMP"      : "/ptmp/patrick",
+  "PTMP"      : "/ptmp/patrick/secofs/RUN08j",
   "OCEANIN"   : "",
   "OCNINTMPL" : "",
   "EXEC"      : "/save/patrick/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
-  "EXEC2"      : "/save/patrick/schism/bin/pschism_IOOSSB_NO_PARMETIS_PREC_EVAP_BLD_STANDALONE_TVD-VL",
-  "OUTDIR"    : "/com/patrick/secofs/RUN08j",
+  "THEIREXEC" : "/save/patrick/schism/bin/pschism_IOOSSB_NO_PARMETIS_PREC_EVAP_BLD_STANDALONE_TVD-VL",
+  "COMDIR"    : "/com/patrick/secofs/RUN08j",
   "NSCRIBES"  : "6"
 }

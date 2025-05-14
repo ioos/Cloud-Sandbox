@@ -201,6 +201,11 @@ def setup_user_env(full_name, email, username, public_key):
     cmd = [ 'sudo', '-u', username, 'ssh-keygen', 
             '-t', 'rsa', '-N', "", 
             '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/id_rsa" ]
+
+    # Note: If key has a non-standard name, ssh will not automatically use it unless something
+    # like the following is added to /etc/ssh/ssh_config
+    # Host *
+    #     IdentityFile ~/.ssh/id_rsa.mpi
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
@@ -211,9 +216,8 @@ def setup_user_env(full_name, email, username, public_key):
         subprocess.run(['echo', f"{public_key}"], stdout=dest)
         subprocess.run(['cat', f"/home/{username}/.ssh/id_rsa.pub"], stdout=dest)
 
-
 # Problem, add user requires sudo, add_ingress rule requires aws sso
-# Need to sudo -i and export or setenv AWS_PROFILE
+# Need to sudo -i and export or setenv AWS_PROFILE with a valid aws sso or iam credentials
 
 def add_ssh_ingress_rule(sg_id, ip_address, description="Allow SSH access from specified IP"):
     """

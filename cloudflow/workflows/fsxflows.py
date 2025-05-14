@@ -27,6 +27,31 @@ from cloudflow.workflows import job_tasks as jtasks
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
+#SCRATCH_TYPE = 'FSx'
+SCRATCH_TYPE = 'None'
+
+def sig_handler(signal_received, frame):
+    msg=f"{signal_received} detected."
+    print(msg)
+    raise signals.FAIL('FAILED')
+
+def block_ctlc(signal_received, frame):
+    msg=f"{signal_received} - Ctl-C is disabled"
+    print(msg)    
+
+# TODO: imrove on this
+    # This might be better, or simply exit
+    #signal.raise_signal(signum)
+    # Sends a signal to the calling process. Returns nothing.
+
+#signals_to_handle = [SIGINT, SIGTERM, SIGQUIT]
+signals_to_handle = [SIGTERM, SIGQUIT]
+for sig in signals_to_handle:
+    signal(sig, sig_handler)
+
+# Block all Ctl-C
+signal(SIGINT, block_ctlc)
+
 provider = 'AWS'
 
 # Our workflow log
@@ -44,6 +69,7 @@ log.addHandler(ch)
 # Prefect uses this: formatter.converter = time.gmtime
 prelog = prefect.utilities.logging.get_logger()
 #prelog.handler.formatter.converter = time.localtime
+
 # Use the same handler for all of them
 for handler in prelog.handlers:
     pformatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(module)s.%(funcName)s | %(message)s')
@@ -86,28 +112,32 @@ def multi_hindcast_flow(cluster_config, job_config, sshuser) -> Flow:
         forcing = jtasks.get_forcing_multi(job, sshuser)
 
         # Create scratch disk
-        scratch = tasks.create_scratch('FSx', cluster, job, upstream_tasks=[forcing])
+        # scratch = tasks.create_scratch('FSx', cluster, job, upstream_tasks=[forcing])
+
+        # Copy the run to /ptmp
+        # cp2ptmp = jtasks.com2ptmp(job, upstream_tasks=[scratch])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[job, forcing, scratch])
+        #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, cp2ptmp])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
 
-        # Mount the scratch disk
-        scratch_mount = tasks.mount_scratch(scratch, cluster, job, upstream_tasks=[cluster_start])
+        # Mount the scratch disk on the cluster nodes
+        # scratch_remote_mount = tasks.scratch_remote_mount(scratch, cluster, job, upstream_tasks=[cluster_start])
 
         # Create the oceanin and run the forecasts
         # This will run in a loop to complete all forecasts 
-        hcst_run = tasks.hindcast_run_multi(cluster, job, upstream_tasks=[cluster_start, scratch_mount])
+        #hcst_run = tasks.hindcast_run_multi(cluster, job, upstream_tasks=[cluster_start, scratch_remote_mount])
+        hcst_run = tasks.hindcast_run_multi(cluster, job, upstream_tasks=[cluster_start])
 
         # Terminate the cluster nodes
         cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])
 
         # move data from scratch
-        # Copy the results to /com (liveocean)
-        # cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[hcst_run])
+        # Copy the results to /com
+        # cp2com = jtasks.ptmp2com(job, upstream_tasks=[hcst_run])
 
         # Delete the scratch disk
         #scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[cp2com])
-        scratch_delete = tasks.delete_scratch(scratch, upstream_tasks=[hcst_run])
 
         # If the hcst fails, then set the whole flow to fail
         multiflow.set_reference_tasks([hcst_run])

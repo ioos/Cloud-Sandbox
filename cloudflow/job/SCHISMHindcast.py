@@ -47,8 +47,14 @@ class SCHISMHindcast(Job):
     EXEC : str
         The model executable to run.
     
-    MODEL_DIR : str
+    COMDIR : str
         The location of the SCHISM model run to execute
+
+    SAVE : str
+        The /save directory for this job containing other things needed, e.g. modulefile, scripts, executables, etc.
+
+    PTMP : str
+        The scratch disk to use for running the model
 
     NSCRIBES: str
         The number of cpus dedicated to SCHISM I/O procedures
@@ -96,12 +102,12 @@ class SCHISMHindcast(Job):
         self.CDATE = cfDict['CDATE']
         self.SDATE = cfDict['SDATE']
         self.EDATE = cfDict['EDATE']
-        self.EXEC = cfDict['EXEC']
         self.HH = cfDict['HH']
-        self.OUTDIR = cfDict['OUTDIR']
+        self.EXEC = cfDict['EXEC']
+        self.OUTDIR = cfDict['COMDIR']
         self.SAVE = cfDict['SAVE']
         self.PTMP = cfDict['PTMP']
-        self.WRITERS = cfDict['NSCRIBES']
+        self.NSCRIBES = cfDict['NSCRIBES']
 
         return
 

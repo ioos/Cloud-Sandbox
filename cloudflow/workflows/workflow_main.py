@@ -26,6 +26,8 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
+# TODO: block ctl-c signal
+
 ######################################################################
 ############### Set these for your specific deployment ###############
 ######################################################################
@@ -46,6 +48,8 @@ def handler(signal_received, frame):
     msg=f"{signal_received} detected. Exiting."
     print(msg)
     raise Exception(f"{signal_received} detected. Exiting gracefully.")
+
+# TODO: imrove on this
 
     # This might be better, or simply exit
     #signal.raise_signal(signum)

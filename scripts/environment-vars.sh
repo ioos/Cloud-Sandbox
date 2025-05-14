@@ -48,6 +48,6 @@ SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 # otherwise it will use the default
 
 now=`date -u +\%Y\%m\%d_\%H-\%M`
-ami_name=${ami_name:="${now}-IOOS-Cloud-Sandbox"}
+ami_name=${ami_name:="IOOS-Cloud-Sandbox-${now}"}
 project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 

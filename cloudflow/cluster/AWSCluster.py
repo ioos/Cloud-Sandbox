@@ -137,7 +137,8 @@ class AWSCluster(Cluster):
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
         self.__instances = []
-        self.__start_time = time.time()
+        #self.__start_time = time.time()
+        self.__start_time = ''
         self.region = ""
         self.nodeType = ''
         self.nodeCount = 0
@@ -357,7 +358,6 @@ class AWSCluster(Cluster):
             log.exception('ClientError exception in createCluster' + str(e))
             raise Exception() from e
 
-        self.__start_time = time.time()
 
         print('Waiting for nodes to enter running state ...')
         # Make sure the nodes are running before returning
@@ -374,8 +374,8 @@ class AWSCluster(Cluster):
                 }
             )
 
-        # Wait a little more. sshd is sometimes slow to come up
-        sleeptime=60
+        # Wait a little more. sshd can be slow to start "Connection refused" error
+        sleeptime=90
         log.info(f"Waiting an additional {sleeptime} seconds for nodes to fully initialize ...")
         time.sleep(sleeptime)
 
@@ -394,6 +394,8 @@ class AWSCluster(Cluster):
         if not (ready):
             self.terminate()
             raise Exception('Nodes did not start within time limit... terminating them...')
+
+        self.__start_time = time.time()
 
         return self.__instances
 
@@ -418,28 +420,31 @@ class AWSCluster(Cluster):
 
         log.info(f"Terminating instances: {self.__instances}")
 
-        ec2 = boto3.resource('ec2', region_name=self.region)
 
         responses = []
 
-        for instance in self.__instances:
-            response = instance.terminate()['TerminatingInstances']
-            responses.append(response)
+        try:
+            ec2 = boto3.resource('ec2', region_name=self.region)
 
-        end_time = time.time()
-        elapsed = end_time - self.__start_time
-        mins = math.ceil(elapsed / 60.0)
-        hrs = mins / 60.0
-        nodetype = self.nodeType
-        nodecnt = self.nodeCount
+            for instance in self.__instances:
+                response = instance.terminate()['TerminatingInstances']
+                responses.append(response)
 
-        #for tag in self.tags:
-        #   if tag["Key"] == "Name":
-        #       nametag = tag["Value"]
+            end_time = time.time()
+            elapsed = end_time - self.__start_time
+            mins = math.ceil(elapsed / 60.0)
+            hrs = mins / 60.0
+            nodetype = self.nodeType
+            nodecnt = self.nodeCount
 
-        nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
-        print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
-        timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+            nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
+            print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+            timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+
+        except Exception as e:
+            log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
+                           MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
+            raise signals.FAIL('FAILED')
 
         return responses
 
@@ -488,12 +493,6 @@ class AWSCluster(Cluster):
 
     def __placementGroup(self):
         """ most current generation instance types support placement groups now """
-
-        group = {}
-
-        """ instance types are being used that do not support EFA,
-            but support placement group, removing this restriction"""
-        #if self.nodeType.startswith(tuple(efatypes)):
 
         group = {'GroupName': self.placement_group}
 

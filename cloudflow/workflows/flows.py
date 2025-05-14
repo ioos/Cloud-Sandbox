@@ -14,6 +14,7 @@ import prefect
 from prefect import Flow
 from prefect.engine import signals
 
+# Relook into prefect signal handling, i just had a case of Ctl-C causing a zombie node
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))

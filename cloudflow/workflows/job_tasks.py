@@ -74,6 +74,60 @@ def ncfiles_from_Job(job: Job):
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES
 
+@task
+def com2ptmp(job: Job):
+    """ Transfer completed run from scratch disk to com 
+
+    Parameters
+    ----------
+    job : Job
+        The Job object with CDATE, PTMP, and COMROT attributes set.
+    """
+
+    # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB 
+    # If done in the cluster ~$5.18 of compute cost, do it in the head node instead
+    # NOS does it in the forecast script and renames the files in the process 
+    if job.OFS == "liveocean":
+        fdate = util.lo_date(job.CDATE)
+        ptmp = f'{job.PTMP}/liveocean/{fdate}/*'
+        comout = job.COMROT + '/liveocean/' + fdate
+
+        if debug:
+            print(f"ptmp: {ptmp}, comout: {comout}")
+
+        try:
+            cmd = f'mv {comout} {ptmp}'
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error moving data from {ptmp} to {comout}')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception moving data from {ptmp} to {comout}')
+            raise signals.FAIL()
+    elif job.OFS == "secofs":
+        log.debug(f"Copying data to {job.PTMP}")
+
+        comout = job.OUTDIR
+        try:
+            cmd = f'cp -Rp {comout}/* {job.PTMP}/'
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error copying data')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception copying data')
+            raise signals.FAIL()
+    else:
+        log.info("Skipping ... NOSOFS does this in the forecast script, other modes not implemented")
+        pass
+
+    return
+
+
 
 @task
 def ptmp2com(job: Job):
@@ -107,6 +161,24 @@ def ptmp2com(job: Job):
             log.exception(result.stdout)
             log.exception(f'exception moving data from {ptmp} to {comout}')
             raise signals.FAIL()
+
+    elif job.OFS == "secofs":
+
+        comout = job.OUTDIR
+        log.debug(f"Copying output data from {job.PTMP} to {comout}")
+        try:
+            cmd = f'cp -Rp --update {job.PTMP}/* {comout}'
+            log.debug(f"Running: {cmd}")
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error copying data')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception copying data')
+            raise signals.FAIL()
+
     else:
         log.info("Skipping ... NOSOFS does this in the forecast script")
         pass
