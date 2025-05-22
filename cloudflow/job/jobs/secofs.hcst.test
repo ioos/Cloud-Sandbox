@@ -5,12 +5,13 @@
   "SDATE"     : "20171201",
   "EDATE"     : "20171201",
   "HH"        : "00",
+  "COMROT"    : "Using_COMDIR_should_switch_to_this_for_consistency",
+  "COMDIR"    : "/com/patrick/secofs/RUN08j",
   "SAVE"      : "/save/patrick/schism",
   "PTMP"      : "/ptmp/patrick/secofs/RUN08j",
   "OCEANIN"   : "",
   "OCNINTMPL" : "",
   "EXEC"      : "/save/patrick/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
   "THEIREXEC" : "/save/patrick/schism/bin/pschism_IOOSSB_NO_PARMETIS_PREC_EVAP_BLD_STANDALONE_TVD-VL",
-  "COMDIR"    : "/com/patrick/secofs/RUN08j",
   "NSCRIBES"  : "6"
 }

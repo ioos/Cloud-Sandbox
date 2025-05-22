@@ -137,8 +137,7 @@ class AWSCluster(Cluster):
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
         self.__instances = []
-        #self.__start_time = time.time()
-        self.__start_time = ''
+        self.__start_time = time.time()
         self.region = ""
         self.nodeType = ''
         self.nodeCount = 0
@@ -444,7 +443,7 @@ class AWSCluster(Cluster):
         except Exception as e:
             log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
                            MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
-            raise signals.FAIL('FAILED')
+            raise Exception() from e
 
         return responses
 

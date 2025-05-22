@@ -406,8 +406,11 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
     # Use an environment variable for FSx signal
 
-    # for secofs
-    NSCRIBES = getattr(job, "NSCRIBES", '')
+    if OFS == "secofs":
+       JOBARGS = getattr(job, "NSCRIBES", '')
+
+    if OFS == "eccofs":
+       JOBARGS = getattr(job, "OCEANIN", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
     print(f"In hindcast_run_multi: runscript: {runscript}")
@@ -429,7 +432,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
         try:
             print('Launching model run ...')
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+            # TODO: too many script levels?
+            # TODO: where should this be encapsulated? 
+            # Maybe do it in python instead of bash, can have named arguments or use args**
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -440,10 +446,13 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             raise signals.FAIL('FAILED')
 
         # Set the date for the next day run
+        # TODO: most hindcasts don't run for a single day at a time (exception LiveOcean)
+        # It depends on restart state availability and other factors
+        # Take on a case by case basis, perhaps add the increment to task argument or embed in the job
         job.CDATE = util.ndate(job.CDATE, 1)
 
     # end of while loop
-
+    return
 
 ###############################################################################
 # cluster, job

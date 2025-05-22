@@ -35,7 +35,7 @@ $ cat > myBatch.cmd
 #SBATCH -t 30
 
 srun -N 4 -n 32 myApp
-^D
+
 This script asks for 4 nodes from the pdebug queue for no more than 30 minutes charging the myBank account.  The srun command launches 32 tasks of myApp across the four nodes.
 
 Now submit the job:

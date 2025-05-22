@@ -24,6 +24,7 @@ from cloudflow.plotting import plot_roms
 from cloudflow.plotting import plot_fvcom
 from cloudflow.plotting import shared as plot_shared
 from cloudflow.utils import modelUtil as util
+from cloudflow.workflows import getICsNOSOFS
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -257,14 +258,15 @@ def get_forcing_multi(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
-    sdate = job.SDATE
-    edate = job.EDATE
     ofs = job.OFS
 
-    if ofs == 'liveocean':
+    sdate = job.SDATE
+    edate = job.EDATE
+    hh = job.HH
 
-        comrot = job.COMROT
-        hh = job.HH
+    comrot = job.COMROT
+
+    if ofs == 'liveocean':
 
         comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
@@ -287,10 +289,36 @@ def get_forcing_multi(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
-    elif ofs == 'secofs':
-        print(f"only using pre-downloaded forcing files for {ofs}")
+    # ROMS models
+    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
+
+        # script = f"{curdir}/scripts/getICsROMS.py"
+
+        cdate = sdate
+
+        while cdate <= edate:
+
+            comdir = f"{comrot}/{ofs}.{cdate}"
+            try:
+                getICsNOSOFS.getICsROMS(cdate, hh, ofs, comdir)
+                #result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
+                #if result.returncode != 0:
+                #    log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
+                #    raise signals.FAIL()
+            except Exception as e:
+                log.exception('Problem encountered with downloading forcing data ...')
+                raise signals.FAIL()
+
+            cdate = util.ndate(cdate, 1)
+
+    # FVCOM models
+    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
+        log.info(f"get forcing stub: {ofs}")
+
+    elif ofs in ('secofs', 'eccofs', 'necofs'):
+        print(f"only using pre-downloaded forcing files for {ofs} test case")
     else:
-        log.error("Unsupported forecast: ", ofs)
+        log.error(f"Unsupported forecast: {ofs}")
         raise signals.FAIL()
 
     return

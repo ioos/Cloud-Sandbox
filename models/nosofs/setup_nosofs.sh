@@ -24,7 +24,7 @@ cp $CURHOME/intel_x86_64 $SAVEDIR/$SAVEPATH/modulefiles
 
 echo "Building everything ... "
 echo "The build scripts can be modified to only build specific models."
-./ROMS_COMPILE.sh
+#./ROMS_COMPILE.sh
 ./FVCOM_COMPILE.sh
 
 # Obtain the fixed field files (too large for gitHub)
@@ -35,6 +35,8 @@ cd $SAVEDIR/$SAVEPATH/fix
 # These files are too large to easily store on github and need to be obtained elsewhere.
 # You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
 # Edit the script to only download a subset.
-$CURHOME/get_fixfiles_s3.sh
+# This is already in the nosofs repo
+## $CURHOME/get_fixfiles_s3.sh
 
+bash get_fixfiles_s3.sh
 
