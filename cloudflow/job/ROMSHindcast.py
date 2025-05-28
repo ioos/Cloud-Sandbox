@@ -261,11 +261,13 @@ class ROMSHindcast(Job):
         COMROT = self.COMROT
         template = self.OCNINTMPL
 
-        if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
+        self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
+
+        if debug:
+            print(f"DEBUG: self.OUTDIR: {self.OUTDIR}")
 
         # The restart date is 6 hours prior to CDATE
         # DSTART = days from TIME_REF to start of forecast day
@@ -298,22 +300,20 @@ class ROMSHindcast(Job):
         # TODO: tweak these configurations for each model.
         # squareness is used to better balance NtileI/NtileJ with the specific grid
         # This can impact performance
-        if self.OCEANIN == "auto":
-            outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
 
-            # squareness of decomposition i,j tiling 
-            if OFS == 'dbofs':
-                squareness = 0.16
-            else:
-                squareness = 1.0
-            util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=squareness)
-
+        # squareness of decomposition i,j tiling 
+        if OFS == 'dbofs':
+            squareness = 0.16
         else:
-            outfile = self.OCEANIN
-            util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=1.0)
+            squareness = 1.0
 
-        return
-
+        # TODO: Bug - might need to put auto option back in, 
+        # need some way to easily override and use a different ocean.in file
+        # Changed for eccofs, can still override with specifying the template
+        outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+        self.OCEANIN = outfile
+        print(f"DEBUG: self.OCEANIN: {self.OCEANIN}")
+        util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=squareness)
 
     def __make_oceanin_adnoc(self):
         """ Create the ocean.in file for adnoc forecasts """

@@ -399,7 +399,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     HH = job.HH
     OFS = job.OFS
     NPROCS = job.NPROCS
-    OUTDIR = job.OUTDIR
+
     SAVEDIR = job.SAVE
 
     PTMP = getattr(job, "PTMP", 'none')
@@ -408,9 +408,6 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
     if OFS == "secofs":
        JOBARGS = getattr(job, "NSCRIBES", '')
-
-    if OFS == "eccofs":
-       JOBARGS = getattr(job, "OCEANIN", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
     print(f"In hindcast_run_multi: runscript: {runscript}")
@@ -429,6 +426,11 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
         # Create ocean in file
         job.make_oceanin()
+
+        if OFS == "eccofs":
+            JOBARGS = getattr(job, "OCEANIN", '')
+
+        OUTDIR = job.OUTDIR
 
         try:
             print('Launching model run ...')

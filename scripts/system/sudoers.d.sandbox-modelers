@@ -1,0 +1,12 @@
+
+### TODO: need to generalize this for all model users for FSx lustre disk usage
+
+patrick    ALL = (root) NOPASSWD: /usr/bin/mount -t lustre -o * /ptmp/patrick/*
+patrick    ALL = (root) NOPASSWD: /usr/bin/umount * /ptmp/patrick/*
+
+patrick    ALL = (root) NOPASSWD: /usr/bin/chmod * /ptmp/patrick/*
+patrick    ALL = (root) NOPASSWD: /usr/bin/chown * /ptmp/patrick/*
+
+# The above works but not with %u
+# ALL   ALL = (%u) NOPASSWD: /usr/bin/umount /ptmp/%u/*/
+

@@ -1,9 +1,9 @@
 {
 "platform"  : "AWS",
 "region"    : "us-east-2",
-"nodeType"  : "hpc7a.96xlarge",
-"nodeType1"  : "hpc6a.48xlarge",
-"nodeCount" : 1,
+"nodeType"  : "hpc6a.48xlarge",
+"nodeTypeBig"  : "hpc7a.96xlarge",
+"nodeCount" : 2,
 "tags"      : [ 
                 { "Key": "Name", "Value": "eccofs-testcase-1stday" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
