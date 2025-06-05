@@ -948,7 +948,8 @@ install_esmf_spack () {
 
   spack load intel-oneapi-compilers@${ONEAPI_VER}
 
-  COMPILER=intel@${INTEL_COMPILER_VER}
+  #COMPILER=intel@${INTEL_COMPILER_VER}
+  COMPILER=oneapi@${ONEAPI_VER}
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
@@ -968,6 +969,43 @@ install_esmf_spack () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
+install_petsc_intelmpi-spack () {
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  #module use /save/patrick/Cloud-Sandbox/models/modulefiles/
+  #module load intel_x86_64.impi_2021.12.1
+
+  module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
+  module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
+  #module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
+  module list
+
+  #spack load intel-oneapi-compilers@${ONEAPI_VER}
+  #spack load intel-oneapi-mpi@2021.12.1%oneapi@=2023.1.0/p5npcbi
+  #spack load intel-oneapi-runtime@2023.1.0%oneapi@=2023.1.0/wewsg5j
+  #spack load hdf5@1.14.3
+
+  #COMPILER=intel@${INTEL_COMPILER_VER}
+  COMPILER=oneapi@2023.1.0
+
+  # The PETSc library is required for some FVCOM builds.
+  # https://petsc.org/release/install/
+  # spack install petsc cflags='-g -O3 -march=native -mtune=native' fflags='-g -O3 -march=native -mtune=native'  cxxflags='-g -O3 -march=native -mtune=native'
+
+# install with some external packages - spack install petsc +superlu-dist +metis +hypre +hdf5
+
+  #spack install $SPACKOPTS petsc%${COMPILER} +metis +hdf5 cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
+
+  #spack install $SPACKOPTS gettext %${COMPILER} $SPACKTARGET
+
+  spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
+
+
+}
+
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 
 install_base_rpms () {

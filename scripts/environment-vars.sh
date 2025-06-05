@@ -19,7 +19,7 @@ ESMF_VER=8.5.0
 SPACK_VER='v0.22.5'
 
 SPACK_DIR='/save/environments/spack'
-SPACKOPTS='-v -y'
+SPACKOPTS='-v -y --dirty'
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions

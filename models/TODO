@@ -1,0 +1,12 @@
+TODO:
+Determine structure for models and coupledness.
+
+What scripts and other files that are model specific should be part of the Cloud-Sandbox repo or should stay with the model repo.
+
+Example: LiveOcean: we have been keeping everthing in the LiveOcean repo on asascience github. With so many different models being used now, this can make it difficult to manage.
+
+Module file should be included with the sandbox code since it is deployment specific.
+
+At a minimum, a script to fetch and to build each model/system should be in the sandbox repo. 
+
+Often times the model provided build scripts or config files need to be changed to work in this environment
