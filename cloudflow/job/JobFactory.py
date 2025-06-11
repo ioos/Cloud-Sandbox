@@ -16,9 +16,10 @@ from cloudflow.job.ADCIRC_Template import ADCIRC_Template
 from cloudflow.job.ROMS_Template import ROMS_Template
 from cloudflow.job.FVCOM_Template import FVCOM_Template
 
+from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
+
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 debug = True
 
@@ -50,9 +51,10 @@ class JobFactory:
         cfdict = self.readconfig(configfile)
         jobtype = cfdict['JOBTYPE']
 
+        # TODO: use something more elegant than if elf
         if jobtype == 'romsforecast':
             newjob = ROMSForecast(configfile, NPROCS)
-        if jobtype == 'romshindcast':
+        elif jobtype == 'romshindcast':
             newjob = ROMSHindcast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
@@ -77,6 +79,8 @@ class JobFactory:
             newjob = ROMS_Template(configfile, NPROCS)
         elif (jobtype == 'fvcom_template'):
             newjob = FVCOM_Template(configfile, NPROCS)
+        elif (jobtype == 'fvcom_experiment'):
+            newjob = FVCOM_Experiment(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
 

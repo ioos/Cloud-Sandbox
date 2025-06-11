@@ -77,34 +77,34 @@ def local_test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 
 ######################################################################
 
-def simple_fcst_flow(fcstconf, fcstjobfile) -> Flow:
+def simple_experiment_flow(cluster_conf, job_config) -> Flow:
 
-    with Flow('fcst workflow') as fcstflow:
+    with Flow('simple workflow') as expflow:
         #####################################################################
         # FORECAST
         #####################################################################
 
         # Create the cluster object
-        cluster = ctasks.cluster_init(fcstconf)
+        cluster = ctasks.cluster_init(cluster_conf)
 
         # Setup the job
-        fcstjob = tasks.job_init(cluster, fcstjobfile)
+        expjob = tasks.job_init(cluster, job_config)
 
         # Get forcing data here
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[fcstjob])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[expjob])
 
         # Run the forecast
-        fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
+        exp_run = tasks.simple_run(cluster, expjob, upstream_tasks=[cluster_start])
 
         # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[fcst_run])
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[exp_run])
 
-        # If the fcst fails, then set the whole flow to fail
-        fcstflow.set_reference_tasks([fcst_run])
+        # If the exp fails, then set the whole flow to fail
+        expflow.set_reference_tasks([exp_run])
 
-    return fcstflow
+    return expflow
 
 ######################################################################
 

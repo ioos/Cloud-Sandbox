@@ -12,7 +12,7 @@ from create_image import create_snapshot, create_image_from_snapshot
 """
     To run this with the needed permissions:
     1. sudo -i
-    2. aws sso login --profile ioos-sb-admin
+    2. aws sso login --profile ioos-sb-vmadmin
     3. run it
 """
 

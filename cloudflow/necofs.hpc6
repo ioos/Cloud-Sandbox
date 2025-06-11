@@ -1,0 +1,19 @@
+{
+"platform"  : "AWS",
+"region"    : "us-east-2",
+"nodeType"  : "hpc6a.48xlarge",
+"nodeTypeBig"  : "hpc7a.96xlarge",
+"nodeCount" : 1,
+"tags"      : [ 
+                { "Key": "Name", "Value": "necofs-barotropic-test-cold" },
+                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
+              ],
+"image_id"  : "ami-0df1adc30c6953fd8",
+"key_name"  : "ioos-sandbox",
+"sg_ids"    : [ "sg-0feaeb0d419b7ddda",
+  "sg-046f683021585a25f",
+  "sg-0416cbb8c060a1779"
+  ],
+"subnet_id" : "subnet-0be869ddbf3096968",
+"placement_group" : "forPR-cloud-sandbox-us-east-2b_Terraform_Placement_Group"
+}

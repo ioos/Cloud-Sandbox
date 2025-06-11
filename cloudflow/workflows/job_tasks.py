@@ -386,8 +386,9 @@ def get_forcing(job: Job, sshuser=None):
         #result = subprocess.run([script])
         print('Not required to download forcing') 
     else:
-        log.error("Unsupported forecast: ", ofs)
-        raise signals.FAIL()
+        log.warning(f"{ofs} has no script to download initial conditions, forcing data")
+        #log.error("Unsupported forecast: ", ofs)
+        #raise signals.FAIL()
 
     return
 

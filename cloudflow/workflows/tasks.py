@@ -316,6 +316,76 @@ def job_init(cluster: Cluster, configfile) -> Job:
     job = factory.job(configfile, NPROCS)
     return job
 
+# cluster, job
+@task
+def simple_run(cluster: Cluster, job: Job):
+    """ Run the forecast
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+
+    # Easier to read
+    OFS = job.OFS
+    PPN = cluster.PPN
+    NPROCS = job.NPROCS
+
+    #CDATE = job.CDATE
+    #HH = job.HH
+    #OUTDIR = job.OUTDIR
+    WRKDIR = job.WRKDIR
+
+    RUNDIR = job.RUNDIR
+    INPUTFILE = job.INPUTFILE
+    EXEC = job.EXEC
+
+    PTMP = getattr(job, "PTMP", 'none')
+
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('In driver: execption retrieving list of hostnames:' + str(e))
+        raise signals.FAIL('FAILED')
+
+    runscript = f"{curdir}/simple_launcher.sh"
+
+    try:
+        if OFS in ('necofs_cold', 'necofs'):
+
+# export OFS=$1
+# export HOSTS=$2
+# export NPROCS=$3
+# export PPN=$4
+# export WRKDIR=$5
+# export RUNDIR=$6
+# export INPUTFILE=$7
+# export EXEC=$8
+
+            args = [ runscript, OFS, HOSTS, str(NPROCS), str(PPN), WRKDIR, RUNDIR, INPUTFILE, EXEC ]
+            result = subprocess.run(args, stderr=subprocess.STDOUT, universal_newlines=True)
+        else:
+            raise signals.FAIL(f"ERROR: don't know how to run {OFS}")
+
+        if result.returncode != 0:
+            log.exception(f'Forecast failed ... result: {result.returncode}')
+            raise signals.FAIL(f'Forecast failed ... result: {result.returncode}')
+
+    except Exception as e:
+        log.exception('In driver: Exception during subprocess.run :' + str(e))
+        raise signals.FAIL('In driver: Exception during subprocess.run :' + str(e))
+
+    log.info('Forecast finished successfully')
+
+    curfcst=f"{job.COMROT}/current.fcst"
+    with open(curfcst, 'w') as cf:
+        cf.write(f"{OFS}.{CDATE}{HH}\n")
+
+    return
+
 
 
 # cluster, job

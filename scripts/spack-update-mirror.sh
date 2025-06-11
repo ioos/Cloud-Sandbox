@@ -13,9 +13,8 @@ spack mirror add s3-mirror $SPACK_MIRROR
 spack buildcache keys --install --trust --force
 spack buildcache update-index $SPACK_MIRROR
 
-
-#SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
-SPEC_LIST='%oneapi@2023.1.0'
+SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
+#SPEC_LIST='%oneapi@2023.1.0'
 
 SECRET=/mnt/efs/fs1/save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.secret
 

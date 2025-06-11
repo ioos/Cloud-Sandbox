@@ -32,10 +32,10 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 ############### Set these for your specific deployment ###############
 ######################################################################
 
-#fcstconf = f'{curdir}/../cluster/configs/NOS/cora.hsofs.cfg'
-#fcstconf = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
-#fcstconf = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
-#fcstconf = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
+#jobconfig = f'{curdir}/../cluster/configs/NOS/cora.hsofs.cfg'
+#jobconfig = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
+#jobconfig = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
+#jobconfig = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
 #postconf = f'{curdir}/../cluster/configs/local.config'
 
 # This is used for obtaining liveocean forcing data
@@ -73,7 +73,7 @@ def main():
         sys.exit(1)
     else:
         idx = 1
-        fcstconf = os.path.abspath(sys.argv[idx])
+        jobconfig = os.path.abspath(sys.argv[idx])
 
     #if lenargs < 1:
     #    print(f"Usage: {os.path.basename(__file__)} job_config [job2_config job3_config ...]")
@@ -99,16 +99,16 @@ def main():
 
         if re.search("forecast", jobtype):
             # Add the forecast flow
-            fcstflow = flows.fcst_flow(fcstconf, jobfile, sshuser)
+            fcstflow = flows.fcst_flow(jobconfig, jobfile, sshuser)
             flowdeq.appendleft(fcstflow)
 
         elif re.search("hindcast", jobtype):
            # Add the hindcast flow
-            hindcastflow = flows.multi_hindcast_flow(fcstconf, jobfile, sshuser)
+            hindcastflow = flows.multi_hindcast_flow(jobconfig, jobfile, sshuser)
             flowdeq.appendleft(hindcastflow)
 
         elif jobtype == "adcircreanalysis":
-            raflow = flows.reanalysis_flow(fcstconf, jobfile)
+            raflow = flows.reanalysis_flow(jobconfig, jobfile)
             flowdeq.appendleft(raflow)
 
         elif jobtype == "plotting":
@@ -120,6 +120,10 @@ def main():
             # Add the diff plot flow
             diffplotflow = flows.diff_plot_flow(postconf, jobfile)
             flowdeq.appendleft(diffplotflow)
+
+        elif jobtype == "fvcom_experiment":
+            expflow = flows.simple_experiment_flow(jobconfig, jobfile)
+            flowdeq.appendleft(expflow) 
 
         else:
             print(f"jobtype: {jobtype} is not supported")
