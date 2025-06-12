@@ -337,8 +337,8 @@ def simple_run(cluster: Cluster, job: Job):
     #CDATE = job.CDATE
     #HH = job.HH
     #OUTDIR = job.OUTDIR
-    WRKDIR = job.WRKDIR
 
+    WRKDIR = job.WRKDIR
     RUNDIR = job.RUNDIR
     INPUTFILE = job.INPUTFILE
     EXEC = job.EXEC
@@ -356,14 +356,14 @@ def simple_run(cluster: Cluster, job: Job):
     try:
         if OFS in ('necofs_cold', 'necofs'):
 
-# export OFS=$1
-# export HOSTS=$2
-# export NPROCS=$3
-# export PPN=$4
-# export WRKDIR=$5
-# export RUNDIR=$6
-# export INPUTFILE=$7
-# export EXEC=$8
+        # export OFS=$1
+        # export HOSTS=$2
+        # export NPROCS=$3
+        # export PPN=$4
+        # export WRKDIR=$5
+        # export RUNDIR=$6
+        # export INPUTFILE=$7
+        # export EXEC=$8
 
             args = [ runscript, OFS, HOSTS, str(NPROCS), str(PPN), WRKDIR, RUNDIR, INPUTFILE, EXEC ]
             result = subprocess.run(args, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -379,10 +379,6 @@ def simple_run(cluster: Cluster, job: Job):
         raise signals.FAIL('In driver: Exception during subprocess.run :' + str(e))
 
     log.info('Forecast finished successfully')
-
-    curfcst=f"{job.COMROT}/current.fcst"
-    with open(curfcst, 'w') as cf:
-        cf.write(f"{OFS}.{CDATE}{HH}\n")
 
     return
 
