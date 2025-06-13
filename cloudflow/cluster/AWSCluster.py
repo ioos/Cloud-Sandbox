@@ -63,7 +63,6 @@ awsTypes = {
             'hpc7a.48xlarge': 96,
 
             'hpc7a.96xlarge': 192,
-            #'hpc7a.96xlarge': 190,
 
             'r7iz.32xlarge': 64,
 

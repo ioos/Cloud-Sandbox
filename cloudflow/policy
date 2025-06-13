@@ -1,0 +1,45 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:CreateTags",
+				"ec2:DescribeInstanceTypes",
+				"ec2:DescribeInstances",
+				"sts:DecodeAuthorizationMessage"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:TerminateInstances"
+			],
+			"Resource": "arn:aws:ec2:us-east-2:579273261343:instance/*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": "ec2:RunInstances",
+			"Resource": "arn:aws:ec2:us-east-2:579273261343:instance/*",
+			"Condition": {
+				"StringLike": {
+					"ec2:Subnet": "arn:aws:ec2:us-east-2:579273261343:subnet/subnet-0be869ddbf3096968"
+				}
+			}
+		},
+		{
+			"Effect": "Allow",
+			"Action": "ec2:RunInstances",
+			"Resource": [
+				"arn:aws:ec2:us-east-2:579273261343:network-interface/*",
+				"arn:aws:ec2:us-east-2:579273261343:placement-group/forPR-cloud-sandbox-us-east-2b_Terraform_Placement_Group",
+				"arn:aws:ec2:us-east-2:579273261343:key-pair/ioos-sandbox",
+				"arn:aws:ec2:us-east-2:579273261343:security-group/*",
+				"arn:aws:ec2:us-east-2:579273261343:subnet/subnet-0be869ddbf3096968",
+				"arn:aws:ec2:us-east-2::image/*",
+				"arn:aws:ec2:us-east-2:579273261343:volume/*"
+			]
+		}
+	]
+}
