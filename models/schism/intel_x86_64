@@ -20,17 +20,16 @@ module-whatis "This module sets the environment variables for \
 #setenv COMP_CPP cpp
 #setenv COMP_MPCC "mpicc -fc=icc"
 
-module purge
 module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
-module load intel-oneapi-mpi/2021.9.0-intel-2021.9.0-egjrbfg
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
+module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
-module load zlib-ng/2.1.4-intel-2021.9.0-57ptxrw
-module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
-module load hdf5/1.14.3-intel-2021.9.0-4xskthb
-module load netcdf-fortran/4.6.1-intel-2021.9.0-meeveoj
-module load netcdf-c/4.9.2-intel-2021.9.0-vznmeik
+module load zlib-ng/2.1.6-intel-2021.9.0-mwrleel 
+#module load libszip/2.1.1-intel-2021.9.0-s3p3pgl
+module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
+module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
+module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 
 module use -a /usrx/modulefiles
 
@@ -43,17 +42,18 @@ module use -a /usrx/modulefiles
 #module load w3emc/v2.2.0
 #module load g2/v3.1.0
 
+set netcdf [exec nf-config --prefix]
+regsub {\n$} $netcdf {} netcdf
+setenv NETCDF $netcdf
 
-## HACK HERE WITH SPACK - use 'module show <netcdf module above>' to get the full path
-# NETCDF_INCDIR ?= $(shell $(NF_CONFIG) --prefix)/include
-setenv NETCDF "/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-meeveojv5q6onmj6kitfb2mwfqscavn6"
-setenv NETCDFC "/mnt/efs/fs1/save/environments/spack/opt/spack/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vznmeikm7cp5ht2ktorgf2ehhzgvqqel"
+set netcdfc [exec nc-config --prefix]
+regsub {\n$} $netcdfc {} netcdfc
+setenv NETCDFC $netcdfc
 
 # setenv LD_LIBRARY_PATH "$env(NETCDF)/lib:$LD_LIBRARY_PATH
 prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
 prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
 
 #setenv NETCDF_INCDIR  "$env(NETCDF)/include"
-
 #setenv JASPER_LIB "-L/lib64 -ljasper"
 

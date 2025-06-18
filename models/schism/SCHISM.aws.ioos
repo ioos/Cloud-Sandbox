@@ -25,5 +25,7 @@ set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
 # Testing O1 builds faster
 #set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O1 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
-set(CMAKE_Fortran_FLAGS_RELEASE "-xAVX2 -O0 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+#set(CMAKE_Fortran_FLAGS_RELEASE "-xAVX2 -O0 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
+# hp7a support avx-512, hpc6a does not

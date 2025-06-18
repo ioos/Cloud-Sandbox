@@ -1,0 +1,40 @@
+ ! OPTIONS:
+ ! --filename=XXX
+ !   The namelist runfile for the program! 
+ !   
+ !   Namelist OPTIONS: 
+ !    INPUT_DIR, (REQUIRED)
+ !    OUTPUT_DIR, (REQUIRED)
+ !    GRID_FILE, (REQUIRED)
+ !    SIGMA_LEVELS_FILE, (REQUIRED)
+ !    DEPTH_FILE, (REQUIRED)
+ !    OBC_NODE_LIST_FILE, (REQUIRED)
+ !    ELEVATION_SOURCE_FILE (OPTIONAL)
+ !    ELEVATION_SOURCE_TYPE: (OPTIONAL)
+ !    => convert2new_spectral
+ !    => convert2new_julian
+ !    => USER_DEFINED_JULIAN
+ !    => USER_DEFINED_SPECTRAL
+ !    TIME_ORIGIN,(SUGGESTED)
+ !    TIMEZONE,(SUGGESTED)
+ !    TS_SOURCE_FILE: (OPTIONAL)
+ !    TS_SOURCE_TYPE: (OPTIONAL)
+ !    => convert2new
+ !    => USER_DEFINED
+ !    
+ !    EXAMPLE NAMELIST:
+ &NML_OBC
+ INPUT_DIR       = '../input',
+ OUTPUT_DIR      = '../input',
+ GRID_FILE       = 'gom7_grd.dat' ,
+ SIGMA_LEVELS_FILE       = 'gom7_sigma.dat',
+ DEPTH_FILE      = 'gom7_dep.dat',
+ OBC_NODE_LIST_FILE      = 'gom7_obc.dat',
+ ELEVATION_SOURCE_TYPE   = 'convert2new_spectral',
+ ELEVATION_SOURCE_FILE   = 'gom7_el_obc.dat_v14_adj1',
+ TIME_ORIGIN     = 'days=0.0',
+ TIMEZONE        = 'none',
+ TS_SOURCE_TYPE  = 'none',
+ TS_SOURCE_FILE  = 'none'
+ /
+

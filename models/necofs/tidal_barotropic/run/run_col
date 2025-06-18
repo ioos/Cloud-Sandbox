@@ -1,0 +1,40 @@
+#!/bin/sh
+#====================== Job Settings ============================
+#PBS -u qxu
+#PBS -N ne_tide_bt
+#PBS -e tide.err
+#PBS -o tide_0.out
+#PBS -l nodes=12:ppn=32
+#PBS -q microway
+##PBS -l nodes=8:ppn=24
+##PBS -q ibm-12core
+#PBS -r n
+#====================== Working Directory ========================
+# This job's working directory
+echo Working directory is $PBS_O_WORKDIR
+### MAKE SURE THE PATH DOES NOT INCLUDE '/hosts/hydra/'
+echo Modified Working dir is: `echo $PBS_O_WORKDIR | sed 's_/hosts/hydra/_/_'`
+cd `echo $PBS_O_WORKDIR | sed 's_/hosts/hydra/_/_'`
+CPUS=`cat $PBS_NODEFILE | wc -l`
+echo NodeFile is: $PBS_NODEFILE , Nodes selected:
+cat $PBS_NODEFILE | sort | uniq
+echo I am launching from master node `hostname -s` in directory:
+#====================== Environment ============================
+eval `modulecmd load fvcom-mvapich2`
+eval `modulecmd load metis/1.1`
+eval `modulecmd load netcdf/4.9.2`
+eval `modulecmd load libjulian/1.3.3`
+eval `modulecmd load petsc/2.3.3`
+
+#eval `modulecmd load libfproj4/1.0`
+#eval `modulecmd load proj/4.9.3`
+export LD_LIBRARY_PATH=/data2/siqili/new_hydra/install/proj/lib:/usr/local/share/netcdf/4.9.2/intel/2023.1.0/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/data2/siqili/new_hydra/install/fproj/lib:$LD_LIBRARY_PATH
+
+export MV2_ENABLE_AFFINITY=0
+export MV2_HOMOGENEOUS_CLUSTER=1
+export MV2_SUPPRESS_JOB_STARTUP_PERFORMANCE_WARNING=1
+#====================== Executable line ==========================
+mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
+echo Tada! `date`
+

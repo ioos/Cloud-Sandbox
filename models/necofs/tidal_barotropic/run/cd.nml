@@ -1,0 +1,9 @@
+&NML_AUX
+ INPUT_DIR         = '../input'
+ OUTPUT_DIR        = '../input'
+ PROJECTION_REFERENCE    = 'init=nad83:1802',
+ GRID_FILE_UNITS   = 'meters'
+ GRID_FILE         = 'necofs_grd.dat'
+ SIGMA_LEVELS_FILE = 'necofs_sigma.dat'
+ DEPTH_FILE        = 'necofs_dep.dat'
+/

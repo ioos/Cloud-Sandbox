@@ -75,15 +75,14 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
 
 
 def create_image_from_snapshot(snapshot_id: str, image_name: str):
-  # print(f"create_image_from_snapshot: snapshot_id: {snapshot_id}, image_name: {image_name}")
+  print(f"create_image_from_snapshot: snapshot_id: {snapshot_id}, image_name: {image_name}")
 
   # image_name needs to be unique
   # Region must be defined in AWS_DEFAULT_REGION env var
 
-  # region_name = 'us-east-2'
-  #ec2 = boto3.client('ec2', region_name=region_name )
-
-  ec2 = boto3.client('ec2')
+  region_name = 'us-east-2'
+  ec2 = boto3.client('ec2', region_name='us-east-2' )
+  #ec2 = boto3.client('ec2')
 
   description = f"Created by IOOS Cloud Sandbox from snapshot: {snapshot_id}"
 
@@ -96,26 +95,34 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     }
   }
 
-  resrc = boto3.resource('ec2')
-  snapshot = resrc.Snapshot(snapshot_id)
+  try:
+    resrc = boto3.resource('ec2')
+    snapshot = resrc.Snapshot(snapshot_id)
 
-  # Wait for snapshot to be created 
-  # wait_until will throw an exception after 10 minutes
-  maxtries=5
-  tries=1
-  while tries <= maxtries:
-    try:
-      snapshot.wait_until_completed()
-      break
-    except Exception as e:
-      # print("WARNING: " + str(e))
-      tries += 1
-      print(f"... waiting for snapshot creation: tries {tries} of {maxtries}")
-      if tries == maxtries:
-        print("ERROR: maxtries reached. something went wrong")
-        traceback.print_stack()
-        return None
-  
+    # Wait for snapshot to be created 
+    # wait_until will throw an exception after 10 minutes
+    maxtries=5
+    tries=1
+    while tries <= maxtries:
+      print(f"Waiting for snapshot creation ...")
+      try:
+      
+        snapshot.wait_until_completed()
+        break
+      except Exception as e:
+        print("WARNING: " + str(e))
+        tries += 1
+        #print(f"... waiting for snapshot creation: tries {tries} of {maxtries}")
+
+        if tries == maxtries:
+          print("ERROR: maxtries reached. something went wrong")
+          traceback.print_stack()
+          # return None
+
+  except Exception as e:
+    print("Exception: " + str(e))
+    if DEBUG: traceback.print_stack()
+    return None  
  
   response=''
   try:

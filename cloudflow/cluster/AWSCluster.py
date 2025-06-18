@@ -28,12 +28,16 @@ log = logging.getLogger('workflow')
 
 homedir = Path.home()
 timelog = logging.getLogger('qops_timing')
-timelog.setLevel(logging.DEBUG)
+timelog.setLevel(logging.INFO)
 timelog.propagate = False
 
 fh = logging.FileHandler(f"{homedir}/cluster_runtime.log")
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s | %(message)s')
 fh.setFormatter(formatter)
+
+# To avoid duplicate entries, only have one handler
+if not timelog.hasHandlers():
+    timelog.addHandler(fh)
 
 #####  Includes recommended or tested types only  !!!!!!!
 #      Should be number of physical CPU cores, not vCPUs,
@@ -45,7 +49,7 @@ awsTypes = {
             'c5.large': 1,      'c5.xlarge': 2, 'c5.2xlarge': 4, 'c5.4xlarge': 8, 'c5.9xlarge': 18,
             'c5.12xlarge': 24,  'c5.18xlarge': 36, 'c5.24xlarge': 48, 'c5.metal': 36,
 
-            'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
+            'c5a.large': 1, 'c5a.xlarge': 2, 'c5a.2xlarge': 4, 'c5a.4xlarge': 8, 'c5a.24xlarge': 48,
 
             'c5n.large': 1,     'c5n.xlarge': 2, 'c5n.2xlarge': 4, 'c5n.4xlarge': 8, 'c5n.9xlarge': 18,
             'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
@@ -64,12 +68,6 @@ awsTypes = {
 
             # The below are in vCPUs not CPU cores
             'x2idn.24xlarge': 96, 'x2idn.32xlarge': 128 }
-
-# To avoid duplicate entries, only have one handler
-# This log might have a handler in one of their higher level scripts
-# This didn't work - still got duplicates, even when also added in main caller
-if not timelog.hasHandlers():
-    timelog.addHandler(fh)
 
 
 class AWSCluster(Cluster):
@@ -358,7 +356,6 @@ class AWSCluster(Cluster):
             log.exception('ClientError exception in createCluster' + str(e))
             raise Exception() from e
 
-        self.__start_time = time.time()
 
         print('Waiting for nodes to enter running state ...')
         # Make sure the nodes are running before returning
@@ -375,8 +372,11 @@ class AWSCluster(Cluster):
                 }
             )
 
-        # Wait a little more. sshd is sometimes slow to come up
-        time.sleep(60)
+        # Wait a little more. sshd can be slow to start "Connection refused" error
+        sleeptime=90
+        log.info(f"Waiting an additional {sleeptime} seconds for nodes to fully initialize ...")
+        time.sleep(sleeptime)
+
         # Assume the nodes are ready, set to False if not
         ready = True
 
@@ -390,8 +390,10 @@ class AWSCluster(Cluster):
             inum += 1
 
         if not (ready):
-            self.__terminateCluster()
+            self.terminate()
             raise Exception('Nodes did not start within time limit... terminating them...')
+
+        self.__start_time = time.time()
 
         return self.__instances
 
@@ -416,27 +418,31 @@ class AWSCluster(Cluster):
 
         log.info(f"Terminating instances: {self.__instances}")
 
-        ec2 = boto3.resource('ec2', region_name=self.region)
 
         responses = []
 
-        for instance in self.__instances:
-            response = instance.terminate()['TerminatingInstances']
-            responses.append(response)
+        try:
+            ec2 = boto3.resource('ec2', region_name=self.region)
 
-        end_time = time.time()
-        elapsed = end_time - self.__start_time
-        mins = math.ceil(elapsed / 60.0)
-        hrs = mins / 60.0
-        nodetype = self.nodeType
-        nodecnt = self.nodeCount
+            for instance in self.__instances:
+                response = instance.terminate()['TerminatingInstances']
+                responses.append(response)
 
-        #for tag in self.tags:
-        #   if tag["Key"] == "Name":
-        #       nametag = tag["Value"]
+            end_time = time.time()
+            elapsed = end_time - self.__start_time
+            mins = math.ceil(elapsed / 60.0)
+            hrs = mins / 60.0
+            nodetype = self.nodeType
+            nodecnt = self.nodeCount
 
-        nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
-        timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+            nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
+            print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+            timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+
+        except Exception as e:
+            log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
+                           MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
+            raise Exception() from e
 
         return responses
 
@@ -485,12 +491,6 @@ class AWSCluster(Cluster):
 
     def __placementGroup(self):
         """ most current generation instance types support placement groups now """
-
-        group = {}
-
-        """ instance types are being used that do not support EFA,
-            but support placement group, removing this restriction"""
-        #if self.nodeType.startswith(tuple(efatypes)):
 
         group = {'GroupName': self.placement_group}
 

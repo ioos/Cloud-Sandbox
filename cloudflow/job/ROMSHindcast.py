@@ -14,7 +14,7 @@ __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 
-debug = False
+debug = True
 
 
 class ROMSHindcast(Job):
@@ -127,8 +127,8 @@ class ROMSHindcast(Job):
         """
 
         self.OFS = cfDict['OFS']
-        self.CDATE = cfDict['CDATE']
         self.SDATE = cfDict['SDATE']
+        self.CDATE = self.SDATE
         self.EDATE = cfDict['EDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']
@@ -182,7 +182,7 @@ class ROMSHindcast(Job):
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs"):
+        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs", "eccofs"):
             self.__make_oceanin_nosofs()
         elif OFS == 'wrfroms':
             self.__make_oceanin_wrfroms()
@@ -241,12 +241,12 @@ class ROMSHindcast(Job):
 
         # Create the ocean.in, decompose NTILEI x NTILEJ
         outfile = f"{self.OUTDIR}/liveocean.in"
-        ratio = 0.5
-        # ratio=0.375   # Testing 6 nodes (9x24) crashes, .444 crashes (12x18)
-        # ratio=0.5
-        # ratio=0.02222
+        squareness = 0.5
+        # squareness=0.375   # Testing 6 nodes (9x24) crashes, .444 crashes (12x18)
+        # squareness=0.5
+        # squareness=0.02222
         print(f'calling util.makeOceanin')
-        util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=ratio)
+        util.makeOceanin(self.NPROCS, settings, template, outfile, squareness=squareness)
 
         return
 
@@ -261,11 +261,13 @@ class ROMSHindcast(Job):
         COMROT = self.COMROT
         template = self.OCNINTMPL
 
-        if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}{HH}"
+        self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
+
+        if debug:
+            print(f"DEBUG: self.OUTDIR: {self.OUTDIR}")
 
         # The restart date is 6 hours prior to CDATE
         # DSTART = days from TIME_REF to start of forecast day
@@ -279,6 +281,11 @@ class ROMSHindcast(Job):
         TIDE_START = util.ndays(JAN1CURYR, self.TIME_REF)
         TIDE_START = f"{'{:.4f}'.format(float(TIDE_START))}d0"
 
+        if debug:
+            print(f"JAN1CURYR: {JAN1CURYR}, TIME_REF: {self.TIME_REF}")
+            print("ndays: ", util.ndays(JAN1CURYR, self.TIME_REF))
+            print(f"TIDE_START: {TIDE_START}")
+
         # These are the templated variables to replace via substitution
         settings = {
             "__NTIMES__": self.NTIMES,
@@ -291,17 +298,22 @@ class ROMSHindcast(Job):
 
         # Create the ocean.in
         # TODO: tweak these configurations for each model.
-        # ratio is used to better balance NtileI/NtileJ with the specific grid
+        # squareness is used to better balance NtileI/NtileJ with the specific grid
         # This can impact performance
-        if self.OCEANIN == "auto":
-            outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
-            if OFS == 'dbofs':
-                ratio = 0.16
-            else:
-                ratio = 1.0
-            util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=ratio)
-        return
 
+        # squareness of decomposition i,j tiling 
+        if OFS == 'dbofs':
+            squareness = 0.16
+        else:
+            squareness = 1.0
+
+        # TODO: Bug - might need to put auto option back in, 
+        # need some way to easily override and use a different ocean.in file
+        # Changed for eccofs, can still override with specifying the template
+        outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+        self.OCEANIN = outfile
+        print(f"DEBUG: self.OCEANIN: {self.OCEANIN}")
+        util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=squareness)
 
     def __make_oceanin_adnoc(self):
         """ Create the ocean.in file for adnoc forecasts """
@@ -326,6 +338,7 @@ class ROMSHindcast(Job):
         # Create the ocean.in
         if self.OCEANIN == "auto":
             outfile = f"{self.OUTDIR}/ocean.in"
+            self.OCEANIN = outfile
             util.makeOceanin(self.NPROCS, settings, template, outfile)
         return
 

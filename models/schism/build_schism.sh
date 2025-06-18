@@ -10,27 +10,27 @@ if [ ! -d $SAVEDIR ]; then
 fi
 
 echo $PWD
-CURDIR=$PWD
-
-module use -a $PWD
-module load intel_x86_64
+SCRIPTS=$PWD
 
 cd $SAVEDIR
 if [ ! -d $SAVEDIR/schism ]; then
   git clone https://github.com/schism-dev/schism.git
-  # git clone --recurse-submodules https://github.com/schism-dev/schism.git
+  #git clone --recurse-submodules https://github.com/schism-dev/schism.git
   cd schism
-  get checkout tags/v5.11.1
+  git checkout tags/v5.13.0
   git submodule update --init --recursive
-
-  # git clone --branch v2.0 --depth 1 --recurse-submodules https://github.com/user/repo.git
 else
   echo "it appears schism is already present, not fetching it from the repository"
 fi
 
-cd schism/cmake
-cp $CURDIR/SCHISM.local.build .
-cp $CURDIR/SCHISM.aws.ioos .
+module use -a $SCRIPTS
+module purge
+module load intel_x86_64
+
+cd $SAVEDIR/schism/cmake
+
+cp $SCRIPTS/SCHISM.local.build .
+cp $SCRIPTS/SCHISM.aws.ioos .
 cd ..
 
 if [ ! -e build ]; then
@@ -40,20 +40,25 @@ cd build
 
 # Be careful not to delete wrong folder
 if [ -f cmake_install.cmake ]; then 
+  make clean
   rm -Rf * # Clean old cache
 fi
 
-#cmake -DCMAKE_WARN_DEV=OFF -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
-# -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441"
-# Add the flag to the C and C++ compilers
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -diag-disable=10441")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -diag-disable=10441")
+#export CMAKE_INSTALL_PREFIX=$SAVEDIR/schism_built
+#      -DCMAKE_INSTALL_PREFIX="$SAVEDIR/schism_built" \
 
-cmake -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441" -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
+cmake -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441" \
+       -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
 
-make -j1 pschism
+#make -j2 pschism
+make -j2 all
 
-#make VERBOSE=1 pschism # serial build with a lot of messages
+if [ ! -d ../bin ]; then
+    mkdir ../bin
+fi
+cp -p bin/* ../bin/
+
+cp -p $SCRIPTS/intel_x86_64 $SAVEDIR/schism
 
 # CMake Warning (dev) at /save/patrick/schism/cmake/SCHISM.local.build:37 (set):
 #  implicitly converting 'BOOLEAN' to 'STRING' type.

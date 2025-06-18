@@ -34,3 +34,5 @@ cloudflow/build/
 .nfs*
 cloudflow/cluster/SAVE.AWSCluster.py
 scripts/system/ioos.sb.users
+models/necofs/libs/libjulian.a
+models/utils/makedepf90/

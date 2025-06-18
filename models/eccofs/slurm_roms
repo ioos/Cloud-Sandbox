@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+#SBATCH --job-name=NFroms_0
+#SBATCH -o /fsx/jbzambon/eccofs/roms/roms.out
+#SBATCH -e /fsx/jbzambon/eccofs/roms/roms.err
+#SBATCH --nodes=3
+#SBATCH --ntasks-per-node=48
+#SBATCH --exclusive
+#SBATCH -t 3:00:00
+##SBATCH --wait
+
+dir=/fsx/jbzambon/eccofs/roms
+
+cd $dir
+
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+spack load intel-oneapi-mpi intel-oneapi-compilers
+spack env activate -p wrf_build
+module load libfabric-aws
+set -x
+ulimit -s unlimited
+ulimit -a
+
+export OMP_NUM_THREADS=2
+export FI_PROVIDER=efa
+export I_MPI_FABRICS=shm:ofi
+export I_MPI_OFI_PROVIDER=efa
+export I_MPI_PIN_DOMAIN=omp
+export KMP_AFFINITY=compact
+export I_MPI_DEBUG=4
+
+time mpiexec.hydra -np 144 --ppn 48 $dir/romsM $dir/roms_nl_eccofs_1st_day.in
+
+

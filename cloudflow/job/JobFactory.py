@@ -7,6 +7,8 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
+from cloudflow.job.SCHISMHindcast import SCHISMHindcast
+
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
 from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
 from cloudflow.job.SCHISM_Template import SCHISM_Template
@@ -14,9 +16,10 @@ from cloudflow.job.ADCIRC_Template import ADCIRC_Template
 from cloudflow.job.ROMS_Template import ROMS_Template
 from cloudflow.job.FVCOM_Template import FVCOM_Template
 
+from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
+
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
-
 
 debug = True
 
@@ -48,9 +51,10 @@ class JobFactory:
         cfdict = self.readconfig(configfile)
         jobtype = cfdict['JOBTYPE']
 
+        # TODO: use something more elegant than if elf
         if jobtype == 'romsforecast':
             newjob = ROMSForecast(configfile, NPROCS)
-        if jobtype == 'romshindcast':
+        elif jobtype == 'romshindcast':
             newjob = ROMSHindcast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
@@ -60,6 +64,9 @@ class JobFactory:
             newjob = Plotting(configfile, NPROCS)
         elif (jobtype == 'adcircreanalysis'):
             newjob = ADCIRCReanalysis(configfile, NPROCS)
+        elif (jobtype == 'schism_hindcast'):
+            newjob = SCHISMHindcast(configfile, NPROCS)
+
         elif (jobtype == 'dflowfm_template'):
             newjob = DFLOWFM_Template(configfile, NPROCS)
         elif (jobtype == 'schism_template'):
@@ -72,13 +79,14 @@ class JobFactory:
             newjob = ROMS_Template(configfile, NPROCS)
         elif (jobtype == 'fvcom_template'):
             newjob = FVCOM_Template(configfile, NPROCS)
+        elif (jobtype == 'fvcom_experiment'):
+            newjob = FVCOM_Experiment(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
 
         return newjob
 
 
-    # TODO: this is so frequently used, don't need multiple definitions of it
     def readconfig(self,configfile):
         """ Reads a JSON configuration file into a dictionary.
 

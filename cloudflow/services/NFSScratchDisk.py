@@ -18,8 +18,6 @@ __license__ = "BSD 3-Clause"
 
 
 log = logging.getLogger('workflow')
-log.setLevel(logging.DEBUG)
-
 
 class NFSScratchDisk(ScratchDisk):
     """ NFS implementation of scratch disk. Only manages the symbolic link to an already mounted NFS drive.

@@ -3,7 +3,7 @@
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
 # WRKDIR=/save/$USER
-# set -xa
+set -x
 set -a
 
 ulimit -c unlimited
@@ -20,8 +20,24 @@ fi
 
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
 
+# eccofs
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+export FI_PROVIDER=efa
+export I_MPI_FABRICS=shm:ofi  # default
+#NOTE: #This option is not applicable to slurm and pdsh bootstrap servers.
+# https://www.intel.com/content/www/us/en/docs/mpi-library/developer-reference-linux/2021-15/communication-fabrics-control.html
+export I_MPI_OFI_PROVIDER=efa
+# module load libfabric-aws
+
+# LiveOcean
+#export I_MPI_OFI_LIBRARY_INTERNAL=1
+#export I_MPI_OFI_PROVIDER=efa
+#export I_MPI_FABRICS=ofi
+#export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
 #export I_MPI_DEBUG=${I_MPI_DEBUG:-0}
 #export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
+#export I_MPI_DEBUG=1
 #export I_MPI_FABRICS=efa
 #export I_MPI_FABRICS=${I_MPI_FABRICS:-shm:ofi}
 #export FI_PROVIDER=efa
@@ -34,13 +50,15 @@ export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
 
 export CDATE=$1
 export HH=$2
-export COMOUT=$3   # OUTDIR in caller
-export WRKDIR=$4
-export NPROCS=$5
-export PPN=$6
-export HOSTS=$7
-export OFS=$8
-export EXEC=$9
+export COMOUT=$3    # job.OUTDIR
+export WRKDIR=$4    # job.SAVE
+export PTMP=$5
+export NPROCS=$6
+export PPN=$7
+export HOSTS=$8
+export OFS=$9
+export EXEC=${10}
+export XTRA_ARGS=${11}   # extra args needed for schism/secofs, and eccofs
 
 #OpenMPI
 #mpirun --version
@@ -89,6 +107,7 @@ fi
 
 #export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
 #export MPIOPTS="-hosts $HOSTS -np $NPROCS -ppn $PPN"
+result=0
 
 # Can put domain specific options here
 case $OFS in
@@ -104,7 +123,7 @@ case $OFS in
     result=$?
     ;;
   cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=$WRKDIR/nosofs-NCO
+    export HOMEnos=$WRKDIR/nosofs-3.5.0
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export cyc=$HH
@@ -121,6 +140,58 @@ case $OFS in
     $JOBSCRIPT
     result=$?
     ;;
+  secofs)
+    # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
+    cd "$COMOUT" || exit 1
+    # If using scratch disk use PTMP
+    # cd $PTMP || exit 1
+    echo "Current dir is: $PWD"
+    if [[ $OFS == "secofs" ]]; then 
+      if [ ! -d outputs ]; then
+        mkdir outputs
+      else
+        rm -f outputs/*
+      fi
+    fi
+
+    # WRKDIR is job.SAVE 
+    # e.g. /save/patrick/schism
+    module use -a $WRKDIR
+    module load intel_x86_64
+    NSCRIBES = $XTRA_ARGS
+    echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
+    starttime=`date +%R`
+    #echo "Testing ... sleeping"
+    #sleep 300
+    echo "STARTING RUN AT $starttime"
+    mpirun $MPIOPTS $EXEC $NSCRIBES
+    result=$?
+    endtime=`date +%R`
+    echo "RUN FINISHED AT $endtime"
+    ;;
+  eccofs)
+    # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
+    cd "$COMOUT" || exit 1
+    # If using scratch disk use PTMP
+    # cd $PTMP || exit 1
+    echo "Current dir is: $PWD"
+
+    # WRKDIR is job.SAVE 
+    module use -a $WRKDIR/modulefiles
+    module load intel_x86_64
+    OCEANIN=$XTRA_ARGS
+    echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
+    starttime=`date +%R`
+    #echo "Testing ... sleeping"
+    #sleep 300
+    echo "STARTING RUN AT $starttime"
+    mpirun $MPIOPTS $EXEC $OCEANIN
+    result=$?
+    echo "wth mpirun result: $result"
+    endtime=`date +%R`
+    echo "RUN FINISHED AT $endtime"
+    ;;
+
   adnoc)
     EXEC=${EXEC:-roms}
     export JOBDIR=$COMOUT

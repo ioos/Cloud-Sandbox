@@ -1,0 +1,28 @@
+#!/bin/bash --login
+ 
+#SBATCH -D .
+#SBATCH -J RUN08j
+#SBATCH -A nos-surge
+#SBATCH -p hercules
+##queues: 'windfall' max 450 nodes (no walltime limit but lower priority; for quick turn-around try <=8 hrs)
+###80 cores/node (mem 512GB/node)
+
+## Notes
+#SBATCH -N 35   # Number of Nodes, sames as --nodes
+#SBATCH -n 2800 # Number of tasks, sames as --ntasks
+# This is assuming hercules has 2800/35 cores per node = 80 ppn
+
+#SBATCH --exclusive    # This must mean exclusive node use for this job, will use the entire node
+#SBATCH -t 08:00:00
+#SBATCH -o myout
+#SBATCH -e err2.out
+#SBATCH --mail-user=yjzhang@vims.edu
+#SBATCH --mail-type=all  #send email for start, end and fail
+ 
+set -e
+ulimit -s unlimited
+ 
+source /home/yjzhang/modules.hercules
+ 
+srun ./pschism_HERCULES_NO_PARMETIS_PREC_EVAP_BLD_STANDALONE_SH_MEM_COMM_TVD-VL 6
+ 

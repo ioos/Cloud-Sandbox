@@ -1,10 +1,6 @@
-add ulimit -s unlimited to every user profile
+Ideas:
 
-commit changes
-test other builds
-clean up
-commit and tag as 1.5.0b
-commit and tag nosofs as ioos.1.5.0b
+Focus is on transition to operations, try to move things towards the operational launch scripts
 
-Test liveocean build and run
-commit and tag liveocean as ioos.1.5.0b
+2025 06 06 - Unify Job/ROMSHindcast and ROMSForecast, only real difference is addition of SDATE and EDATE and loop capability in workflow
+

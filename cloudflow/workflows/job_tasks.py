@@ -24,6 +24,7 @@ from cloudflow.plotting import plot_roms
 from cloudflow.plotting import plot_fvcom
 from cloudflow.plotting import shared as plot_shared
 from cloudflow.utils import modelUtil as util
+from cloudflow.workflows import getICsNOSOFS
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -74,6 +75,60 @@ def ncfiles_from_Job(job: Job):
     FILES = sorted(glob.glob(f'{SOURCE}/{filespec}'))
     return FILES
 
+@task
+def com2ptmp(job: Job):
+    """ Transfer completed run from scratch disk to com 
+
+    Parameters
+    ----------
+    job : Job
+        The Job object with CDATE, PTMP, and COMROT attributes set.
+    """
+
+    # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB 
+    # If done in the cluster ~$5.18 of compute cost, do it in the head node instead
+    # NOS does it in the forecast script and renames the files in the process 
+    if job.OFS == "liveocean":
+        fdate = util.lo_date(job.CDATE)
+        ptmp = f'{job.PTMP}/liveocean/{fdate}/*'
+        comout = job.COMROT + '/liveocean/' + fdate
+
+        if debug:
+            print(f"ptmp: {ptmp}, comout: {comout}")
+
+        try:
+            cmd = f'mv {comout} {ptmp}'
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error moving data from {ptmp} to {comout}')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception moving data from {ptmp} to {comout}')
+            raise signals.FAIL()
+    elif job.OFS == "secofs":
+        log.debug(f"Copying data to {job.PTMP}")
+
+        comout = job.OUTDIR
+        try:
+            cmd = f'cp -Rp {comout}/* {job.PTMP}/'
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error copying data')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception copying data')
+            raise signals.FAIL()
+    else:
+        log.info("Skipping ... NOSOFS does this in the forecast script, other modes not implemented")
+        pass
+
+    return
+
+
 
 @task
 def ptmp2com(job: Job):
@@ -107,6 +162,24 @@ def ptmp2com(job: Job):
             log.exception(result.stdout)
             log.exception(f'exception moving data from {ptmp} to {comout}')
             raise signals.FAIL()
+
+    elif job.OFS == "secofs":
+
+        comout = job.OUTDIR
+        log.debug(f"Copying output data from {job.PTMP} to {comout}")
+        try:
+            cmd = f'cp -Rp --update {job.PTMP}/* {comout}'
+            log.debug(f"Running: {cmd}")
+            result = subprocess.run(cmd, universal_newlines=True, shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                log.error(result.stdout)
+                log.error(f'error copying data')
+        except Exception as e:
+            log.exception(result.stdout)
+            log.exception(f'exception copying data')
+            raise signals.FAIL()
+
     else:
         log.info("Skipping ... NOSOFS does this in the forecast script")
         pass
@@ -185,16 +258,17 @@ def get_forcing_multi(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
+    ofs = job.OFS
+
     sdate = job.SDATE
     edate = job.EDATE
-
-    ofs = job.OFS
-    comrot = job.COMROT
     hh = job.HH
 
-    comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
+    comrot = job.COMROT
 
     if ofs == 'liveocean':
+
+        comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
         # /mnt/efs/fs1/com/ec2-user/LO_output/forcing/cas7
         #frcdir = job.COMROT + '/liveocean'
@@ -215,8 +289,36 @@ def get_forcing_multi(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
+    # ROMS models
+    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
+
+        # script = f"{curdir}/scripts/getICsROMS.py"
+
+        cdate = sdate
+
+        while cdate <= edate:
+
+            comdir = f"{comrot}/{ofs}.{cdate}"
+            try:
+                getICsNOSOFS.getICsROMS(cdate, hh, ofs, comdir)
+                #result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
+                #if result.returncode != 0:
+                #    log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
+                #    raise signals.FAIL()
+            except Exception as e:
+                log.exception('Problem encountered with downloading forcing data ...')
+                raise signals.FAIL()
+
+            cdate = util.ndate(cdate, 1)
+
+    # FVCOM models
+    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
+        log.info(f"get forcing stub: {ofs}")
+
+    elif ofs in ('secofs', 'eccofs', 'necofs'):
+        print(f"only using pre-downloaded forcing files for {ofs} test case")
     else:
-        log.error("Unsupported forecast: ", ofs)
+        log.error(f"Unsupported forecast: {ofs}")
         raise signals.FAIL()
 
     return
@@ -284,8 +386,9 @@ def get_forcing(job: Job, sshuser=None):
         #result = subprocess.run([script])
         print('Not required to download forcing') 
     else:
-        log.error("Unsupported forecast: ", ofs)
-        raise signals.FAIL()
+        log.warning(f"{ofs} has no script to download initial conditions, forcing data")
+        #log.error("Unsupported forecast: ", ofs)
+        #raise signals.FAIL()
 
     return
 
