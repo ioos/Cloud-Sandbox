@@ -73,7 +73,7 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-     VARNAME =  ../../Data/varinfo.yaml
+     VARNAME =  /com/eccofs/input/varinfo.yaml
 
 ! Number of nested grids.
 
@@ -106,9 +106,12 @@ GridsInLayer =  1
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-      NtileI == 16                               ! I-direction partition
+!      NtileI == 16                               ! I-direction partition
 !      NtileI == 10                               ! I-direction partition
-      NtileJ == 8                               ! J-direction partition
+!      NtileJ == 8                               ! J-direction partition
+
+     NtileI == __NTILEI__  ! I-direction partition
+     NtileJ == __NTILEJ__  ! J-direction partition
 
 ! Set horizontal and vertical advection schemes for active and inert
 ! tracers. A different advection scheme is allowed for each tracer.
@@ -222,7 +225,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-      NTIMES = 2160
+!      NTIMES = 2160
+      NTIMES = __NTIMES__
 !      NTIMES = 269280
           DT == 120.0d0           ! 720 timesteps per day
 !          DT == 45.0d0           ! 1920 timesteps per day
@@ -262,8 +266,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 ! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
-        NHIS == 21600
-     NDEFHIS == 21600
+        NHIS == 720
+     NDEFHIS == 720
         NXTR == 180           ! 6 hourly
      NDEFXTR == 720
         NQCK == 90            ! 3 hourly
@@ -982,14 +986,17 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
  ExtractFlag == 2
 
-     GRXNAME == /projects/f_omg_1/eccofs/grid/grid_eccofs_6km_08_b7.nc
+     GRXNAME == /com/eccofs/input/grid_eccofs_6km_08_b7.nc
 
 ! Input NetCDF file names, [1:Ngrids].
 
-     GRDNAME == /projects/f_omg_1/eccofs/grid/grid_eccofs_3km_08_b7.nc
-!     ININAME == /projects/f_omg_1/eccofs/eccofs3km_ini_Mercator_20171101_avg_BiasCor.nc
+     GRDNAME == /com/eccofs/input/grid_eccofs_3km_08_b7.nc
+!     ININAME == /com/eccofs/input/eccofs3km_ini_Mercator_20171101_avg_BiasCor.nc
 !     ININAME == eccofs_ini_20221207.nc
-    ININAME == eccofs_ini_20190102.nc
+!     ININAME == eccofs_ini_20190102.nc
+
+!! TODO Template this
+     ININAME == ../eccofs.20190101/eccofs_rst.nc
      ITLNAME == ocean_itl.nc
      IRPNAME == ocean_irp.nc
      IADNAME == ocean_iad.nc
@@ -1031,8 +1038,8 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
     NBCFILES == 1                          ! number of boundary files
 
-!     BRYNAME == /projects/f_omg_1/eccofs/Z_corr_daily/eccofs3km_bry_Mercator_daily_2019_01_1-9_BiasCor.nc
-     BRYNAME == /projects/f_omg_1/eccofs/MonthlyClima/eccofs_bry_mercator_19932023_monthly_Zcorr.nc
+!     BRYNAME == /com/eccofs/input/Z_corr_daily/eccofs3km_bry_Mercator_daily_2019_01_1-9_BiasCor.nc
+     BRYNAME == /com/eccofs/input/eccofs_bry_mercator_19932023_monthly_Zcorr.nc
 
 ! Input climatology file names. The USER has the option to separate the
 ! climatology variables into individual NetCDF files (NCLMFILES > 1),
@@ -1044,19 +1051,19 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
    NCLMFILES == 1                          ! number of climatology files
 
-!   CLMNAME == /projects/f_omg_1/eccofs/Z_corr_daily/eccofs3km_clm_Mercator_daily_2019_01_1-9_BiasCor.nc
-   CLMNAME == /projects/f_omg_1/eccofs/MonthlyClima/eccofs_mercator_19932023_monthly.nc
+!   CLMNAME == /com/eccofs/input/Z_corr_daily/eccofs3km_clm_Mercator_daily_2019_01_1-9_BiasCor.nc
+   CLMNAME == /com/eccofs/input/eccofs_mercator_19932023_monthly.nc
 
-     NUDNAME == /projects/f_omg_1/eccofs/eccofs_nudgcoef_3km_10days.nc
+     NUDNAME == /com/eccofs/input/eccofs_nudgcoef_3km_10days.nc
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-!     SSFNAME == /projects/f_omg_1/eccofs/rivers/eccofs_3km_rivers_GloFAS_2011-2024_v5.nc
-     SSFNAME == /projects/f_omg_1/eccofs/MonthlyClima/eccofs_3km_rivers_GloFAS_2011-2024_MonClm.nc
+!     SSFNAME == /com/eccofs/input/rivers/eccofs_3km_rivers_GloFAS_2011-2024_v5.nc
+     SSFNAME == /com/eccofs/input/eccofs_3km_rivers_GloFAS_2011-2024_MonClm.nc
 
 ! Input tidal forcing file name.
 
-     TIDENAME == /projects/f_omg_1/eccofs/tides_tpxo_eccofs_3km_01.nc
+     TIDENAME == /com/eccofs/input/tides_tpxo_eccofs_3km_01.nc
 
 
 ! Input forcing NetCDF file name(s).
@@ -1079,19 +1086,19 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
      NFFILES == 1                          ! number of unique forcing files
 
-     FRCNAME == /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2011.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2012.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2013.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2014.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2015.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2016.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2017.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2018.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2019.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2020.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2021.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2022.nc4 |
-                /projects/f_omg_1/eccofs/frc/frc_eccofs_ERA5_allflux_2023.nc4 
+     FRCNAME == /com/eccofs/input/frc_eccofs_ERA5_allflux_2011.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2012.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2013.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2014.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2015.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2016.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2017.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2018.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2019.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2020.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2021.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2022.nc4 |
+                /com/eccofs/input/frc_eccofs_ERA5_allflux_2023.nc4 
 
 ! Output NetCDF file names, [1:Ngrids].
 

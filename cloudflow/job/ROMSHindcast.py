@@ -259,7 +259,6 @@ class ROMSHindcast(Job):
         HH = self.HH
         OFS = self.OFS
         COMROT = self.COMROT
-        template = self.OCNINTMPL
 
         self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
@@ -287,6 +286,9 @@ class ROMSHindcast(Job):
             print(f"TIDE_START: {TIDE_START}")
 
         # These are the templated variables to replace via substitution
+        # Note: 
+        #    __VARNAME__ will be replaced in the template file if __VARNAME__ is present in the template
+        #    otherwise it will use whatever values are hardcoded in the template file
         settings = {
             "__NTIMES__": self.NTIMES,
             "__TIME_REF__": self.TIME_REF,
@@ -307,13 +309,14 @@ class ROMSHindcast(Job):
         else:
             squareness = 1.0
 
-        # TODO: Bug - might need to put auto option back in, 
-        # need some way to easily override and use a different ocean.in file
-        # Changed for eccofs, can still override with specifying the template
-        outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
-        self.OCEANIN = outfile
-        print(f"DEBUG: self.OCEANIN: {self.OCEANIN}")
-        util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=squareness)
+        if self.OCEANIN == "auto":
+            self.OCEANIN = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+        elif self.OCEANIN == "":
+            raise Exception(f"No ocean.in file specified")
+            
+        util.makeOceanin(self.NPROCS, settings, self.OCNINTMPL, self.OCEANIN, ratio=squareness)
+
+
 
     def __make_oceanin_adnoc(self):
         """ Create the ocean.in file for adnoc forecasts """
@@ -341,6 +344,7 @@ class ROMSHindcast(Job):
             self.OCEANIN = outfile
             util.makeOceanin(self.NPROCS, settings, template, outfile)
         return
+
 
 
     def __make_oceanin_wrfroms(self):
