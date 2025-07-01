@@ -34,9 +34,6 @@ echo "${DATETIME}" > run.start
 
 echo "MPIOPTS: $MPIOPTS"
 
-#echo "PT DEBUGGING link errors"
-#ldd $PHOME/adcprep
-
 #PrepLine1
 #PrepLine2
 

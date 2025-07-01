@@ -142,6 +142,8 @@ case $OFS in
     ;;
   secofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
+
+    mkdir -p $COMOUT
     cd "$COMOUT" || exit 1
     # If using scratch disk use PTMP
     # cd $PTMP || exit 1
@@ -154,15 +156,14 @@ case $OFS in
       fi
     fi
 
+    # TODO: need better encapsulation and standardization of module and launch procedure
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
     module load intel_x86_64
-    NSCRIBES = $XTRA_ARGS
+    NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
-    #echo "Testing ... sleeping"
-    #sleep 300
     echo "STARTING RUN AT $starttime"
     mpirun $MPIOPTS $EXEC $NSCRIBES
     result=$?

@@ -7,7 +7,7 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
-from cloudflow.job.SCHISMHindcast import SCHISMHindcast
+from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
 
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
 from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
@@ -65,7 +65,7 @@ class JobFactory:
         elif (jobtype == 'adcircreanalysis'):
             newjob = ADCIRCReanalysis(configfile, NPROCS)
         elif (jobtype == 'schism_hindcast'):
-            newjob = SCHISMHindcast(configfile, NPROCS)
+            newjob = SCHISM_Hindcast(configfile, NPROCS)
 
         elif (jobtype == 'dflowfm_template'):
             newjob = DFLOWFM_Template(configfile, NPROCS)

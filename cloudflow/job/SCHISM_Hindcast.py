@@ -2,6 +2,9 @@ import datetime
 import os
 import sys
 
+from cloudflow.job.Job import Job
+from cloudflow.utils import modelUtil as util
+
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
@@ -16,7 +19,7 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 # SECOFS
-class SCHISMHindcast(Job):
+class SCHISM_Hindcast(Job):
     """ Implementation of Job class for SCHISM simulations
 
     Attributes
@@ -55,6 +58,10 @@ class SCHISMHindcast(Job):
 
     PTMP : str
         The scratch disk to use for running the model
+
+    PARMNML_IN   : str
+
+    PARMNML_TMPL : str
 
     NSCRIBES: str
         The number of cpus dedicated to SCHISM I/O procedures
@@ -100,32 +107,63 @@ class SCHISMHindcast(Job):
         self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.CDATE = cfDict['CDATE']
-        self.SDATE = cfDict['SDATE']
-        self.EDATE = cfDict['EDATE']
+        if 'SDATE' in cfDict: self.SDATE = cfDict['SDATE']
+        if 'EDATE' in cfDict: self.EDATE = cfDict['EDATE']
+        self.RNDAY = cfDict['RNDAY']
         self.HH = cfDict['HH']
         self.EXEC = cfDict['EXEC']
-        self.OUTDIR = cfDict['COMDIR']
+        self.COMROT = cfDict['COMROT']
+        self.OUTDIR = self.COMROT + "/" + self.CDATE
         self.SAVE = cfDict['SAVE']
         self.PTMP = cfDict['PTMP']
+        self.NML_IN = cfDict['NML_IN']
+        self.NML_TMPL = cfDict['NML_TMPL']
         self.NSCRIBES = cfDict['NSCRIBES']
 
         return
 
+
+    # This function must be defined, workflow depends on it
     def make_oceanin(self):
-        print("make_oceanin - not implemented for this model yet")
+        self.make_parmnml()
+
+    def make_parmnml(self):
+
+        if self.OFS == "secofs":
+            self.__make_parmnml_secofs()
+        else:
+            print("make_parmnml - not implemented for this model yet")
+
         return
 
-# TODO: need to parameterize model run options that are used for .nml file
-# e.g. 
-# ! Starting time
-#  start_year = 2017 !int
-#  start_month = 12 !int
-#  start_day = 1 !int
-#  start_hour = 0 !double
-#  utc_start = 0 !double
 
-#  rnday = 396. !total run time in days
-#  dt = 120. !Time step in sec
+
+    def __make_parmnml_secofs(self):
+
+        if not os.path.exists(self.OUTDIR):
+            os.makedirs(self.OUTDIR)
+
+        if self.NML_IN == "auto":
+
+            template = self.NML_TMPL
+            
+            outfile = self.OUTDIR + "/param.nml"
+            start_year = self.CDATE[0:4]
+            start_month = self.CDATE[4:6]
+            start_day = self.CDATE[6:8]
+            start_hour = float(self.HH)
+
+            settings = {
+                "__RNDAY__": self.RNDAY,
+                "__START_YEAR__": start_year,
+                "__START_MONTH__": start_month,
+                "__START_DAY__": start_day,
+                "__START_HOUR__": str(start_hour)
+            }
+
+            util.sedoceanin(template, outfile, settings)
+
+        return
 
 
 if __name__ == '__main__':

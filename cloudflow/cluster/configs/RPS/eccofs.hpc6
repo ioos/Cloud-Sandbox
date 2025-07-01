@@ -5,7 +5,7 @@
 "nodeTypeBig"  : "hpc7a.96xlarge",
 "nodeCount" : 6,
 "tags"      : [ 
-                { "Key": "Name", "Value": "eccofs-testcase-1stday" },
+                { "Key": "Name", "Value": "eccofs-testcase-subseqday" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "image_id"  : "ami-0df1adc30c6953fd8",

@@ -76,7 +76,7 @@ if [[ "$OFS" == "adcirc-cora" ]]; then
 
     TRACKSDIR=$PROJHOME/TracksToRun
 
-    cp ./job/templates/submit.cloudflow.template "$JOBDIR/common"
+    cp ./job/templates/cora-run_storms.submit.cloudflow.template "$JOBDIR/common/submit.cloudflow.template"
     touch "$TRACKSDIR/${YYYY}.trk"
     
     cd "$JOBDIR" || exit 1

@@ -459,14 +459,13 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     """
     PPN = cluster.getCoresPN()
 
-    # Easier to read
-    SDATE = job.SDATE
-    EDATE = job.EDATE
-    HH = job.HH
+    SDATE = getattr(job,"SDATE", job.CDATE)
+    EDATE = getattr(job,"EDATE", job.CDATE)
+    HH = getattr(job,"HH", "00")
     OFS = job.OFS
     NPROCS = job.NPROCS
 
-    SAVEDIR = job.SAVE
+    SAVE = job.SAVE
 
     PTMP = getattr(job, "PTMP", 'none')
 
@@ -503,7 +502,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVE, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
