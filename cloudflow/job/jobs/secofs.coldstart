@@ -2,7 +2,7 @@
   "JOBTYPE"   : "schism_hindcast",
   "OFS"       : "secofs",
   "CDATE"     : "20171201",
-  "RNDAY"     : "1",
+  "RNDAY"     : "3",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/secofs",
   "SAVE"      : "/save/patrick/schism",

@@ -21,7 +21,7 @@
   ! rnday = 0.125 !total run time in days 0.125 = 3 hours
   ! rnday = 3. !total run time in days
   rnday = __RNDAY__
-  dt = 120. !Time step in sec
+  dt = 120. ! OG Time step in sec
   ! dt = 300. !Time step in sec
 
 ! Grid for WWM (USE_WWM)
@@ -659,10 +659,13 @@
 ! Option for hotstart outputs
 ! nhot = 1: output *_hotstart every 'hotout_write' steps
 ! nohot_write = must be a multiple of ihfskip if nhot=1
+! 1 day == 86400 seconds
 !-----------------------------------------------------------------------
-  nhot = 0
-  !OG  nhot_write = 2160 
-  nhot_write = 1440 !must be a multiple of ihfskip if nhot=1  ! 1 day at 120second dt
+  nhot = 1
+  !OG  nhot_write = 2160    ! 3 days @ 120s dt
+  nhot_write = 2160    ! 3 days @ 120s dt
+  ! nhot_write = 1440       ! 2 day at 120second dt
+  ! nhot_write = 720          ! 1 day at 120second dt
 
 !-----------------------------------------------------------------------
 ! Station output option. If iout_sta/=0, need output skip (nspool_sta) and

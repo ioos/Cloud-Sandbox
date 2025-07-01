@@ -13,6 +13,10 @@
 			"Resource": [
 				"arn:aws:s3:::ioos-cloud-sandbox",
 				"arn:aws:s3:::ioos-cloud-sandbox/*",
+                                "arn:aws:s3:::ioos-sandbox-use2",
+                                "arn:aws:s3:::ioos-sandbox-use2/*",
+                                "arn:aws:s3:us-east-2:579273261343:accesspoint/ioos-sandbox-use2-accesspoint",
+                                "arn:aws:s3:us-east-2:579273261343:accesspoint/ioos-sandbox-use2-accesspoint/*",
 				"arn:aws:s3:::ioos-transfers",
 				"arn:aws:s3:::ioos-transfers/*"
 			]
