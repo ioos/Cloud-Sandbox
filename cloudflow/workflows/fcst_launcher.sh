@@ -148,12 +148,8 @@ case $OFS in
     # If using scratch disk use PTMP
     # cd $PTMP || exit 1
     echo "Current dir is: $PWD"
-    if [[ $OFS == "secofs" ]]; then 
-      if [ ! -d outputs ]; then
-        mkdir outputs
-      else
-        rm -f outputs/*
-      fi
+    if [ ! -d outputs ]; then
+      mkdir outputs
     fi
 
     # TODO: need better encapsulation and standardization of module and launch procedure
@@ -162,6 +158,7 @@ case $OFS in
     module use -a $WRKDIR
     #module load intel_x86_64
    # Being more explicit irt mpi version to avoid my own future confusion
+    #TODO: make this part of the job config
     module load intel_x86_64_impi_2023.1.0
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"

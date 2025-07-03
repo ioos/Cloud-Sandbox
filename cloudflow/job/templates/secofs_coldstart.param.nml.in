@@ -66,8 +66,9 @@
   ics = 2 !Coordinate option
 
 !-----------------------------------------------------------------------
-! Hotstart option. 0: cold start; 1: hotstart with time reset to 0; 2: 
-! continue from the step in hotstart.nc
+! Hotstart option. 0: cold start; 
+!                  1: hotstart with time reset to 0;
+!                  2: continue from the step in hotstart.nc
 !-----------------------------------------------------------------------
   !OG ihot = 1
   ihot = 0
@@ -79,7 +80,7 @@
 !-----------------------------------------------------------------------
   ieos_type = 0
   ieos_pres = 0 !used only if ieos_type=0. 0: without pressure effects 
-  eos_a = -0.1 !needed if ieos_type=1; should be <=0 
+  eos_a = -0.1  !needed if ieos_type=1; should be <=0 
   eos_b = 1001. !needed if ieos_type=1
 
 !-----------------------------------------------------------------------
