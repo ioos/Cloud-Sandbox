@@ -2,6 +2,7 @@
 
 MODEL_DIR="/save/patrick"
 
+
 if [ ! -d $MODEL_DIR ]; then
   echo "Error: $MODEL_DIR does not exist"
   exit 1
@@ -9,6 +10,7 @@ fi
 
 echo $PWD
 SCRIPTS=$PWD
+MODULEFILE=intel_x86_64_impi_2023.1.0
 
 cd $MODEL_DIR
 if [ ! -d $MODEL_DIR/schism ]; then
@@ -23,7 +25,7 @@ fi
 
 module use -a $SCRIPTS/modulefiles
 module purge
-module load intel_x86_64
+module load $MODULEFILE
 
 cd $MODEL_DIR/schism/cmake
 
@@ -54,7 +56,7 @@ if [ ! -d ../bin ]; then
 fi
 cp -p bin/* ../bin/
 
-cp -p $SCRIPTS/intel_x86_64 $MODEL_DIR/schism
+cp -p $SCRIPTS/modulefiles/$MODULEFILE $MODEL_DIR/schism
 
 # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 # icc: command line warning #10006: ignoring unknown option '-cpp'

@@ -15,17 +15,9 @@ set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
 ###Compile flags
 #set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -mcmodel=medium -assume byterecl -axCORE-AVX2 -xSSE4.2" CACHE STRING "Fortran flags" FORCE)
 
-# set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+#For Hybrid (remember to add OMP in the name above)
+# add -qopenmp
 
-#Hybrid (remember to add OMP in the name above)
-#set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl -qopenmp" CACHE STRING "Fortran flags" FORCE)
-#
-# set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
-#
-# Testing O1 builds faster
-#set(CMAKE_Fortran_FLAGS_RELEASE "-axCORE-AVX2 -O1 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -mcmodel=medium -O2 -init=zero -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
-#set(CMAKE_Fortran_FLAGS_RELEASE "-xAVX2 -O0 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
-set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
-
-# hp7a support avx-512, hpc6a does not
+# Note: hp7a support avx-512, hpc6a does not
