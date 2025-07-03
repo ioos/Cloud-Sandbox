@@ -160,7 +160,9 @@ case $OFS in
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
-    module load intel_x86_64
+    #module load intel_x86_64
+   # Being more explicit irt mpi version to avoid my own future confusion
+    module load intel_x86_64_impi_2023.1.0
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
@@ -169,6 +171,15 @@ case $OFS in
     result=$?
     endtime=`date +%R`
     echo "RUN FINISHED AT $endtime"
+
+    # Combine hotstart files if they exist
+    # TODO: this might need to be run as a separate script post-process job
+    # example: what if hotstarts are written every 720 timesteps and not just at the end of the run?
+    #if ls -1 outputs/hotstart_0*; then
+    #    cd outputs
+    #    $WRKDIR/bin/combine_hotstart7 -i 720
+    #fi
+
     ;;
   eccofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this

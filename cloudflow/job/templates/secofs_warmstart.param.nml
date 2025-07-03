@@ -16,13 +16,8 @@
   ibc = 0 !Baroclinic option
   ibtp = 0 
 
-  !OG rnday = 396. !total run time in days
-  ! rnday = 1. !total run time in days
-  ! rnday = 0.125 !total run time in days 0.125 = 3 hours
-  ! rnday = 3. !total run time in days
-  rnday = __RNDAY__
-  dt = 120. ! OG Time step in sec
-  ! dt = 300. !Time step in sec
+  rnday = __RNDAY__ !total run time in days
+  dt = 120. !Time step in sec
 
 ! Grid for WWM (USE_WWM)
   msc2 = 24     !same as msc in .nml ... for consitency check between SCHISM and WWM
@@ -52,11 +47,10 @@
   ipre2 = 0
 
 ! Starting time
-  start_year = __START_YEAR__
-  start_month = __START_MONTH__
-  start_day = __START_DAY__
-  start_hour = __START_HOUR__   ! (double)
-
+  start_year = 2017 !int
+  start_month = 12 !int
+  start_day = 1 !int
+  start_hour = 0 !double
   utc_start = 0 !double
 
 !-----------------------------------------------------------------------
@@ -69,8 +63,7 @@
 ! Hotstart option. 0: cold start; 1: hotstart with time reset to 0; 2: 
 ! continue from the step in hotstart.nc
 !-----------------------------------------------------------------------
-  !OG ihot = 1
-  ihot = 0
+  ihot = 1
 
 !-----------------------------------------------------------------------
 ! Equation of State type used
@@ -518,7 +511,7 @@
   vnh2 = 500 !vertical nudging depth 2 (must >vnh1)
   vnf2 = 0. !vertical relax
 
-  step_nu_tr = 86400. !time step [sec] in all [MOD]_nu.nc (for inu_[MOD]=2)  ! 86400 == one day
+  step_nu_tr = 86400. !time step [sec] in all [MOD]_nu.nc (for inu_[MOD]=2)
 
 !-----------------------------------------------------------------------
 ! Cut-off depth for cubic spline interpolation near bottom when computing horizontal gradients
@@ -657,17 +650,9 @@
 ! Output section - all optional. Values shown are default unless otherwise stated.
 !-----------------------------------------------------------------------
 ! Option for hotstart outputs
-! nhot = 1: output *_hotstart every 'hotout_write' steps
-! nohot_write = must be a multiple of ihfskip if nhot=1
-! 1 day == 86400 seconds
 !-----------------------------------------------------------------------
-  nhot = 1
-  nhot_write = __NHOT_WRITE__
-  ! nhot_write = 720          ! 1 day at 120second dt
-  ! nhot_write = 720          ! 1 day at 120second dt
-  ! nhot_write = 1440         ! 2 day at 120second dt
-  ! nhot_write = 2160       ! 3 days @ 120s dt
-  !OG  nhot_write = 2160    ! 3 days @ 120s dt
+  nhot = 1 !1: output *_hotstart every 'hotout_write' steps
+  nhot_write = 2160 !must be a multiple of ihfskip if nhot=1
 
 !-----------------------------------------------------------------------
 ! Station output option. If iout_sta/=0, need output skip (nspool_sta) and

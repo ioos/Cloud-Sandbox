@@ -153,12 +153,20 @@ class SCHISM_Hindcast(Job):
             start_day = self.CDATE[6:8]
             start_hour = float(self.HH)
 
+            # TODO: assuming dt is 120 seconds, parameterize it
+            # ! nohot_write = must be a multiple of ihfskip if nhot=1
+            # ! 1 day == 86400 seconds
+
+            nhot_write = int(float(self.RNDAY) * 720)
+            nhot_write = 720
+
             settings = {
                 "__RNDAY__": self.RNDAY,
                 "__START_YEAR__": start_year,
-                "__START_MONTH__": start_month,
-                "__START_DAY__": start_day,
-                "__START_HOUR__": str(start_hour)
+                "__START_MONTH__": str(int(start_month)),
+                "__START_DAY__": str(int(start_day)),
+                "__START_HOUR__": str(start_hour),
+                "__NHOT_WRITE__": str(nhot_write)
             }
 
             util.sedoceanin(template, outfile, settings)
