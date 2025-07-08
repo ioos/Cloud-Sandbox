@@ -157,7 +157,7 @@ case $OFS in
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
-    module load /save/ec2-user/lapenta/Cloud-Sandbox/models/modulefiles/intel_x86_64.impi_2021.9.0
+    module load NOS_intel_x86_64
     NSCRIBES = $XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
@@ -178,7 +178,7 @@ case $OFS in
 
     # WRKDIR is job.SAVE 
     module use -a $WRKDIR/modulefiles
-    module load /save/ec2-user/lapenta/Cloud-Sandbox/models/modulefiles/intel_x86_64.impi_2021.9.0
+    module load NOS_intel_x86_64
     OCEANIN=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
     starttime=`date +%R`
