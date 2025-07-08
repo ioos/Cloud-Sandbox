@@ -157,6 +157,8 @@ case $OFS in
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
+    # TODO add switch to determine which module based on IOOS or NOS Sandbox, or 
+    # ensure both Sandboxes have the same modules
     module load NOS_intel_x86_64
     NSCRIBES = $XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
@@ -178,6 +180,8 @@ case $OFS in
 
     # WRKDIR is job.SAVE 
     module use -a $WRKDIR/modulefiles
+    # TODO add switch to determine which module based on IOOS or NOS Sandbox, or 
+    # ensure both Sandboxes have the same modules
     module load NOS_intel_x86_64
     OCEANIN=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
