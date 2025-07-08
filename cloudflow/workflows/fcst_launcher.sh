@@ -19,29 +19,20 @@ if [ $# -lt 8 ] ; then
 fi
 
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-
-# eccofs
-export I_MPI_OFI_LIBRARY_INTERNAL=0
 export FI_PROVIDER=efa
-export I_MPI_FABRICS=shm:ofi  # default
-#NOTE: #This option is not applicable to slurm and pdsh bootstrap servers.
-# https://www.intel.com/content/www/us/en/docs/mpi-library/developer-reference-linux/2021-15/communication-fabrics-control.html
+#export I_MPI_FABRICS=shm:ofi  # default
+export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
+
 # module load libfabric-aws
 
 # LiveOcean
+#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
 #export I_MPI_OFI_LIBRARY_INTERNAL=1
 #export I_MPI_OFI_PROVIDER=efa
 #export I_MPI_FABRICS=ofi
 #export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-
-#export I_MPI_DEBUG=${I_MPI_DEBUG:-0}
-#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-#export I_MPI_DEBUG=1
-#export I_MPI_FABRICS=efa
-#export I_MPI_FABRICS=${I_MPI_FABRICS:-shm:ofi}
 #export FI_PROVIDER=efa
-#export FI_PROVIDER=tcp
 
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
@@ -132,6 +123,8 @@ case $OFS in
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
+
+
   wrfroms)
     export HOMEnos=$WRKDIR/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
@@ -140,8 +133,12 @@ case $OFS in
     $JOBSCRIPT
     result=$?
     ;;
+
+
   secofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
+
+    ulimit -s unlimited
 
     mkdir -p $COMOUT
     cd "$COMOUT" || exit 1
@@ -156,10 +153,16 @@ case $OFS in
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
-    #module load intel_x86_64
-   # Being more explicit irt mpi version to avoid my own future confusion
+    MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+
     #TODO: make this part of the job config
-    module load intel_x86_64_impi_2023.1.0
+    module load $MODULEFILE
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=1
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
@@ -176,8 +179,9 @@ case $OFS in
     #    cd outputs
     #    $WRKDIR/bin/combine_hotstart7 -i 720
     #fi
-
     ;;
+
+
   eccofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
     cd "$COMOUT" || exit 1

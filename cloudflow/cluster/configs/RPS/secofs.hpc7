@@ -4,7 +4,7 @@
 "nodeType"  : "hpc7a.96xlarge",
 "nodeCount" : 4,
 "tags"      : [ 
-                { "Key": "Name", "Value": "seccofs-coldstart" },
+                { "Key": "Name", "Value": "seccofs-hotstart" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "image_id"  : "ami-0df1adc30c6953fd8",

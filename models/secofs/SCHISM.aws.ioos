@@ -22,7 +22,9 @@ set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
 #
 # I did not specify march for eccofs nor necofs and they ran on both hpc7a and hpc6a without issue
 #
-set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -mcmodel=medium -O2 -init=zero -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+# set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -mcmodel=medium -O2 -init=zero -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+
+set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -g -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
 
 # Note: hp7a support avx-512, hpc6a does not

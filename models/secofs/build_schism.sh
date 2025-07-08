@@ -9,7 +9,9 @@ fi
 
 echo $PWD
 SCRIPTS=$PWD
-MODULEFILE=intel_x86_64_impi_2023.1.0
+# MODULEFILE=intel_x86_64_impi_2023.1.0
+# target architecture  mpi version  intel compiler version
+MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
 
 module use -a $SCRIPTS/modulefiles
 module purge
