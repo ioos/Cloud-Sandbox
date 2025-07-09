@@ -9,7 +9,6 @@
   "PTMP"      : "/ptmp/patrick/secofs",
   "NML_IN"    : "auto",
   "NML_TMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/secofs_coldstart.param.nml.in",
-  "NOMETISEXEC"  : "/save/patrick/schism/bin/pschism_IOOSSB_NO_PARMETIS_PREC_EVAP_BLD_STANDALONE_TVD-VL",
   "EXEC"      : "/save/patrick/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
   "NSCRIBES"  : "6"
 }

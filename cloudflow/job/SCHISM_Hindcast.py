@@ -158,7 +158,7 @@ class SCHISM_Hindcast(Job):
             # ! 1 day == 86400 seconds
 
             nhot_write = int(float(self.RNDAY) * 720)
-            nhot_write = 720
+            # nhot_write = 720
 
             settings = {
                 "__RNDAY__": self.RNDAY,
