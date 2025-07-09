@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 
-MODEL_DIR="/save/patrick"
+SAVE_DIR="/save/$USER"
+MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
 
-if [ ! -d $MODEL_DIR ]; then
-  echo "Error: $MODEL_DIR does not exist"
+if [ ! -d $SAVE_DIR ]; then
+  echo "Error: $SAVE_DIR does not exist"
   exit 1
 fi
 
-echo $PWD
 SCRIPTS=$PWD
-# MODULEFILE=intel_x86_64_impi_2023.1.0
-# target architecture  mpi version  intel compiler version
-MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
 
 module use -a $SCRIPTS/modulefiles
 module purge
 module load $MODULEFILE
 
-cd $MODEL_DIR/schism/cmake
+cd $SAVE_DIR/schism/cmake
 
 cp $SCRIPTS/SCHISM.local.build .
 cp $SCRIPTS/SCHISM.aws.ioos .
@@ -38,8 +35,6 @@ fi
 cmake -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441" \
        -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
 
-#make -j2 pschism
-#make -j2 all
 make -j2
 
 if [ ! -d ../bin ]; then
@@ -47,7 +42,7 @@ if [ ! -d ../bin ]; then
 fi
 cp -p bin/* ../bin/
 
-cp -p $SCRIPTS/modulefiles/$MODULEFILE $MODEL_DIR/schism
+cp -p $SCRIPTS/modulefiles/$MODULEFILE $SAVE_DIR/schism
 
 # icc: remark #10441: The Intel(R) C++ Compiler Classic (ICC) is deprecated and will be removed from product release in the second half of 2023. The Intel(R) oneAPI DPC++/C++ Compiler (ICX) is the recommended compiler moving forward. Please transition to use this compiler. Use '-diag-disable=10441' to disable this message.
 # icc: command line warning #10006: ignoring unknown option '-cpp'

@@ -6,7 +6,7 @@ set -e
 # VPC access point: s3://arn:aws:s3:us-east-2:579273261343:accesspoint/ioos-sandbox-use2-accesspoint
 #     (only available within sandbox VPC)
 
-if [ -d /com/eccofs ]; then
+if [ ! -d /com/eccofs ]; then
     sudo mkdir -p /com/eccofs
     sudo chown ec2-user:ec2-user /com/eccofs
 fi
