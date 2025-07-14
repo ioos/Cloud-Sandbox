@@ -158,11 +158,12 @@ case $OFS in
     #TODO: make this part of the job config
     module load $MODULEFILE
 
-    export I_MPI_OFI_LIBRARY_INTERNAL=0
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
     export I_MPI_OFI_PROVIDER=efa
     export I_MPI_FABRICS=ofi
     export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-    export OMP_NUM_THREADS=1
+
+    # export OMP_NUM_THREADS=1 
 
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
