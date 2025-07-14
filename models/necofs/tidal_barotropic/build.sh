@@ -38,7 +38,7 @@ module load intel_x86_64.impi_2021.12.1
 
 cd $PROJHOME/src
 make clean
-make depends
+make depend
 make
 
 

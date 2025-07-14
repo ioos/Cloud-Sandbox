@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 
-SAVE_DIR="/save/$USER"
+MODEL_DIR="/save/$USER"
 
-if [ ! -d $SAVE_DIR ]; then
-  echo "Error: $SAVE_DIR does not exist"
+if [ ! -d $MODEL_DIR ]; then
+  echo "Error: $MODEL_DIR does not exist"
   exit 1
 fi
 
-BRANCH=v5.13.0
 
-REPO=https://github.com/schism-dev/schism.git
+#https://github.com/jduckerOWP/schism/tree/v5.13.0_NOS_Sandbox
+#https://github.com/jduckerOWP/schism.git
+
+REPO=https://github.com/jduckerOWP/schism.git
+BRANCH=v5.13.0_NOS_Sandbox
+
+#REPO=https://github.com/schism-dev/schism.git
+#BRANCH=v5.13.0
+
 cd $MODEL_DIR
 
 if [ ! -d $MODEL_DIR/schism ]; then

@@ -19,7 +19,7 @@ CURDIR=$PWD
 module use $CURDIR/modulefiles
 module load $MODULEFILE
 
-cd $COMOUT/$CDATE/outputs
+cd $COMOUT/outputs
 
 $MODEL_DIR/bin/combine_hotstart7 -i $TIMESTEP
 if [ $? -eq 0 ]; then

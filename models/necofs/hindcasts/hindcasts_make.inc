@@ -48,7 +48,8 @@
 #========== TOPDIR ========================================================
 # TOPDIR is the directory in which this make file and the fvcom source reside
 
-TOPDIR        = /save/patrick/necofs/sorc/tidal_barotropic/FVCOMv4.4.7.1/src
+#TOPDIR        = /save/$(USER)/necofs/NECOFS_v2.4/hindcast/FVCOMv4.4.8/src
+TOPDIR        = $(MODEL_DIR)/src
 
 #EXAMPLE
 # TOPDIR = /home/user/cchen/FVCOM_source
@@ -84,12 +85,8 @@ dashL= $(empty) -L
 #--------------------------------------------------------------------------
 #	STANDARD LIBRARIES FOR DATA AND TIME IN fVCOM:
 #
-
             DTLIBS      = -L$(TOPDIR)/libs/julian -ljulian
             DTINCS      = -I$(TOPDIR)/libs/julian
-
-#    DTLIBS	= -ljulian
-#    DTINCS	=  
 #
 #--------------------------------------------------------------------------
 #        NETCDF OUTPUT      NETCDF IS NOW REQUIRED TO COMPILE FVCOM
@@ -123,8 +120,7 @@ dashL= $(empty) -L
 ##PT            FLAG_41 = -DPETSC_B
 ##PT            include ${PETSC_DIR}/bmake/common/variables
 #
-#
-#       FOR VERSION 3.18.5, 3.21.1
+#       FOR VERSION 3.18.5 and higher
             FLAG_41 = -DPETSC_C
             include ${PETSC_DIR}/lib/petsc/conf/variables
 
@@ -177,17 +173,19 @@ dashL= $(empty) -L
 
              FLAG_4 = -DMULTIPROCESSOR
 #         If using METIS 5 or above, uncomment FLAG_411 and read the file readme_metis in folder METIS_readme for detail
-     FLAG_411 = -DMETIS_5
+
+         FLAG_411 = -DMETIS_5
+
 #        If FLAG_411 is defined, uncomment path below	     
 #             PARLIB = 
 #             PARTINCS = -I/usr/local/install/metis/5.1.0/intel/19/include
 #             PARTLIBS = -L/usr/local/install/metis/5.1.0/intel/19/lib -lmetis
-	PARLIB =
-	PARTINCS =
-	PARTLIBS = 
+         PARLIB =
+         PARTINCS =
+         PARTLIBS =
+
 #        If FLAG_411 is not defined, uncomment path below
-             # PARLIB = -lmetis  #-L/usr/local/lib -lmetis
-#             PARLIB = -L/save/environments/spack/opt/spack/linux-rhel8-x86_64/oneapi-2023.1.0/metis-5.1.0-jlw6d2v6imlphfbfg7a3jvf5fna6lvbv/lib -lmetis
+#             PARLIB = -lmetis  #-L/usr/local/lib -lmetis
 #             PARTINCS =
 #             PARTLIBS =
 
@@ -232,9 +230,12 @@ dashL= $(empty) -L
 #                           UNCOMMENT TO INCLUDE DATA ASSIMILATION 
 #--------------------------------------------------------------------------
 
-###             FLAG_7 = -DDATA_ASSIM
-#             OILIB  = -lmkl_lapack -lmkl_em64t -lguide -lpthread
+             FLAG_7 = -DDATA_ASSIM
 
+##PT This is specified previously in this file
+##PT      include ${PETSC_DIR}/bmake/common/variables
+
+#             OILIB  = -lmkl_lapack -lmkl_em64t -lguide -lpthread
 #             OILIB  = -L/usr/local/share/Intel-Compilers/mkl/lib/em64t -lmkl_lapack -lmkl_em64t -lguide -lpthread
 
 # For Build on em64t computer (Guppy) 
@@ -252,8 +253,8 @@ dashL= $(empty) -L
 #   !!!!!! ONLY ONE OF THE FLAGS BELOW CAN BE AND MUST BE CHOSEN
 #--------------------------------------------------------------------------
 
-            FLAG_8 =  -DLIMITED_NO
-#            FLAG_8 =  -DLIMITED_1
+#            FLAG_8 =  -DLIMITED_NO
+            FLAG_8 =  -DLIMITED_1
 #            FLAG_8 =  -DLIMITED_2
 
 #--------------------------------------------------------------------------
@@ -308,7 +309,7 @@ dashL= $(empty) -L
 #       RIVER INPUT FILES!
 #--------------------------------------------------------------------------
 
-###            FLAG_14 = -DRIVER_FLOAT
+            FLAG_14 = -DRIVER_FLOAT
 
 #--------------------------------------------------------------------------
 #        The TVD (total variational diminishing) option for FVCOM was developed by 
@@ -317,7 +318,7 @@ dashL= $(empty) -L
 #        diffusion and better shape preserving properties than the standard scheme. 
 #--------------------------------------------------------------------------
 
-##            FLAG_44 = -DTVD
+            FLAG_44 = -DTVD
 
 #--------------------------------------------------------------------------
 #        Using A fully multidimensional positive definite advection
@@ -326,7 +327,7 @@ dashL= $(empty) -L
 #        Physics, 54, 325-362, 1984
 #--------------------------------------------------------------------------
 
-##            FLAG_15 = -DMPDATA
+            FLAG_15 = -DMPDATA
 
 #--------------------------------------------------------------------------
 #         Run Two-D Barotropic Mode Only
@@ -438,7 +439,7 @@ dashL= $(empty) -L
 #         AIR_PRESSURE FROM SURFACE FORCING                           
 #--------------------------------------------------------------------------
 
-###            FLAG_28 = -DAIR_PRESSURE  
+            FLAG_28 = -DAIR_PRESSURE  
 
 #--------------------------------------------------------------------------
 # Visit online simulation mode
@@ -680,7 +681,7 @@ dashL= $(empty) -L
 #  Libraries           
 #--------------------------------------------------------------------------
 
-            LIBS  =	$(LIBDIR) $(CLIB) $(PARLIB) $(PARTLIBS) $(IOLIBS) $(DTLIBS)\
+            LIBS  =	$(LIBDIR) $(CLIB) $(PARLIB) $(PARTLIBS) $(IOLIBS)	$(DTLIBS)\
 			$(MPILIB) $(GOTMLIB) $(KFLIB) $(BIOLIB)	\
 			$(OILIB) $(VISITLIB) $(PROJLIBS) $(PETSC_LIB)
 
