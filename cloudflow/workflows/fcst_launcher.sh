@@ -153,7 +153,7 @@ case $OFS in
     # WRKDIR is job.SAVE 
     # e.g. /save/patrick/schism
     module use -a $WRKDIR
-    MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+    MODULEFILE=nos.intel_x86_64_mpi-2021.12.1-intel-2021.9.0
 
     #TODO: make this part of the job config
     module load $MODULEFILE
