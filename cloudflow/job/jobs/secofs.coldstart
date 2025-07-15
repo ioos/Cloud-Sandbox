@@ -4,11 +4,11 @@
   "CDATE"     : "20171201",
   "RNDAY"     : "1",
   "HH"        : "00",
-  "COMROT"    : "/com/patrick/secofs",
-  "SAVE"      : "/save/patrick/schism",
-  "PTMP"      : "/ptmp/patrick/secofs",
+  "COMROT"    : "/com/ec2-user/secofs",
+  "SAVE"      : "/save/ec2-user/lapenta/schism",
+  "PTMP"      : "/ptmp/ec2-user/secofs",
   "NML_IN"    : "auto",
-  "NML_TMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/secofs_coldstart.param.nml.in",
-  "EXEC"      : "/save/patrick/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
+  "NML_TMPL"  : "/save/ec2-user/lapenta/Cloud-Sandbox/cloudflow/job/templates/secofs_coldstart.param.nml.in",
+  "EXEC"      : "/save/ec2-user/lapenta/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
   "NSCRIBES"  : "6"
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-SAVE_DIR="/save/$USER"
-MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+SAVE_DIR="/save/$USER/lapenta/"
+MODULEFILE=nos.intel_x86_64_mpi-2021.12.1-intel-2021.9.0
 
 if [ ! -d $SAVE_DIR ]; then
   echo "Error: $SAVE_DIR does not exist"

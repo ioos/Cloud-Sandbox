@@ -2,7 +2,7 @@
 
 # This script will combine the hotstart file pieces into one file. 
 
-MODEL_DIR=/save/$USER/schism
+MODEL_DIR=/save/$USER/lapenta/schism
 CDATE=20171201
 COMOUT=/com/$USER/secofs/$CDATE
 TIMESTEP=720
