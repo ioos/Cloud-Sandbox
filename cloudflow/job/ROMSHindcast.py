@@ -49,7 +49,7 @@ class ROMSHindcast(Job):
     COMROT : str
         The base directory to use, e.g. /com/nos
 
-    SAVE : str
+    SAVEDIR : str
         The base directory to use, e.g. /save/ec2-user
 
     PTMP : str
@@ -132,7 +132,7 @@ class ROMSHindcast(Job):
         self.EDATE = cfDict['EDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']
-        self.SAVE = cfDict['SAVE']
+        self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
         self.EXEC = cfDict['EXEC']
         self.TIME_REF = cfDict['TIME_REF']
@@ -235,7 +235,7 @@ class ROMSHindcast(Job):
             "__FDATE__": fdate,
             "__ININAME__": self.ININAME,
             "__COMROT__": COMROT,
-            "__SAVE__": self.SAVE,
+            "__SAVEDIR": self.SAVEDIR,
             "__TRAPSDIR__" : TRAPSDIR
         }
 

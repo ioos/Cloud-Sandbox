@@ -1,0 +1,422 @@
+ &NML_CASE
+ CASE_TITLE      = 'FVCOM GOM NECOFS HINDCAST UPDATE'     ,
+ TIMEZONE        = 'UTC'                                  ,
+ DATE_FORMAT     = 'YMD'                                  ,
+ DATE_REFERENCE  = 'default'                              ,
+ START_DATE      = '__START_DATE__ __HHMMSS__'            ,
+ END_DATE        = '__END_DATE__ __END_HHMMSS__'
+! START_DATE      = '2019-01-01 00:00:00'                  ,
+! END_DATE        = '2019-02-01 00:00:00'                                                           
+ /
+ &NML_STARTUP
+ STARTUP_TYPE    = 'hotstart'                                                                      ,
+ STARTUP_FILE    = 'necofs_restart.nc'                                                                  ,
+ STARTUP_UV_TYPE = 'set values'                                                       ,
+ STARTUP_TURB_TYPE       = 'set values'                                                      ,
+ STARTUP_TS_TYPE = 'set values'                                  ,
+ STARTUP_T_VALS  = 20.0000000E+00  ,
+ STARTUP_S_VALS  = 30.0000000E+00  ,
+ STARTUP_U_VALS  =  0.0000000E+00,
+ STARTUP_V_VALS  =  0.0000000E+00,
+ STARTUP_DMAX    =  0.0000000E+00
+ /
+ &NML_IO
+ INPUT_DIR       = '../input'                                                   ,
+ OUTPUT_DIR      = '../output'                                         ,
+ IREPORT =          10,
+ VISIT_ALL_VARS  = F,
+ WAIT_FOR_VISIT  = F,
+ USE_MPI_IO_MODE = F
+ /
+ &NML_INTEGRATIONx
+ EXTSTEP_SECONDS = 2.0000000 ,
+ ISPLIT  =          10 ,
+ IRAMP   =          36000 ,
+ MIN_DEPTH       =  5.0000000E-02,
+ STATIC_SSH_ADJ  =  0.0000000E+00
+ /
+ &NML_INTEGRATIONXXX
+ INTSTEP_SECONDS =  1.0000,       !3.00000000000000E+001,
+ ISPLIT  =          5 ,
+ IRAMP   =          51840 ,        !3days=3*24*3600/5=51840,
+ MIN_DEPTH       =  2.0000000E-01,
+ STATIC_SSH_ADJ  =  0.0000000E+00,
+ RK_3D_ON        = F
+ /
+ &NML_INTEGRATION
+ INTSTEP_SECONDS =  8.0,
+ IRAMP   =           0,
+ MIN_DEPTH       =  0.2,
+ STATIC_SSH_ADJ  =  0.0000000E+00,
+ RK_3D_ON        = F 
+/
+ 
+ &NML_SEMI
+ IFCETA  =  0.5500000    ,
+ BEDF    =   1.000000    ,
+ KSTAGE_UV       =           1,
+ KSTAGE_TE       =           1,
+ KSTAGE_TS       =           1,
+ MSTG    = slow
+ /
+ &NML_RESTART
+ RST_ON  = T,
+ RST_FIRST_OUT    = '__END_DATE__ __END_HHMMSS__',
+! RST_FIRST_OUT   = '2019-01-01 00:00:00'                                                           ,
+ RST_OUT_INTERVAL        = 'days= 1.0'                                                                     ,
+ RST_OUTPUT_STACK        =           0
+ /
+ &NML_NETCDF
+ NC_ON   = T,
+ NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+! NC_FIRST_OUT    = '2019-01-01 00:00:00'                                                           ,
+ NC_OUT_INTERVAL = 'seconds= 3600.0'                                                               ,
+ NC_OUTPUT_STACK =           0,
+ NC_SUBDOMAIN_FILES      = 'FVCOM'                                                                           ,
+ NC_GRID_METRICS = F,
+ NC_FILE_DATE    = T,
+ NC_VELOCITY     = T,
+ NC_SALT_TEMP    = T,
+ NC_TURBULENCE   = T,
+ NC_AVERAGE_VEL  = T,
+ NC_VERTICAL_VEL = T,
+ NC_WIND_VEL     = F,
+ NC_WIND_STRESS  = F,
+ NC_EVAP_PRECIP  = F,
+ NC_SURFACE_HEAT = F,
+ NC_GROUNDWATER  = F,
+ NC_BIO  = F,
+ NC_WQM  = F,
+ NC_VORTICITY    = F
+ NC_UARD_OBCN    = T
+ /
+ &NML_NETCDF_SURFACE
+ NCSF_ON = F,
+ NCSF_FIRST_OUT  = '2017-01-01 00:00:00'              ,
+ NCSF_OUT_INTERVAL       = 'days= 1.0'                        ,
+ NCSF_OUTPUT_STACK       =           0,
+ NCSF_SUBDOMAIN_FILES    = FVCOM                                                                                                     
+               ,
+ NCSF_GRID_METRICS       = F,
+ NCSF_FILE_DATE  = F,
+ NCSF_VELOCITY   = F,
+ NCSF_SALT_TEMP  = F,
+ NCSF_TURBULENCE = F,
+ NCSF_WIND_VEL   = F,
+ NCSF_WIND_STRESS        = F,
+ NCSF_EVAP_PRECIP        = F,
+ NCSF_SURFACE_HEAT       = F
+ /
+ &NML_NETCDF_AV
+ NCAV_ON = T,
+ NCAV_FIRST_OUT  = '__START_DATE__ __HHMMSS__',
+! NCAV_FIRST_OUT  = '2019-01-01 00:00:00'                                                                          ,
+ NCAV_OUT_INTERVAL       = 'days=1.0'                                                                          ,
+ NCAV_OUTPUT_STACK       =           0,
+! PT: TODO extra whitespace intentional?
+ NCAV_SUBDOMAIN_FILES    = 'FVCOM'                                                                                              ,
+ NCAV_GRID_METRICS       = F,
+ NCAV_FILE_DATE  = T,
+ NCAV_VELOCITY   = T,
+ NCAV_SALT_TEMP  = T,
+ NCAV_TURBULENCE = F,
+ NCAV_AVERAGE_VEL        = T,
+ NCAV_VERTICAL_VEL       = F,
+ NCAV_WIND_VEL   = F,
+ NCAV_WIND_STRESS        = F,
+ NCAV_EVAP_PRECIP        = F,
+ NCAV_SURFACE_HEAT       = F,
+ NCAV_GROUNDWATER        = F,
+ NCAV_BIO        = F,
+ NCAV_WQM        = F,
+ NCAV_VORTICITY  = F
+ /
+ &NML_PHYSICS
+ HORIZONTAL_MIXING_TYPE  = 'closure'                                         ,
+ HORIZONTAL_MIXING_FILE  = 'necofs_aux_0.08_0.4.nc'                            ,
+ HORIZONTAL_MIXING_KIND  = 'static'                                    ,
+ HORIZONTAL_MIXING_COEFFICIENT   =  8.000000E-2    ,
+ HORIZONTAL_PRANDTL_NUMBER       =  0.10000000    ,
+ VERTICAL_MIXING_TYPE    = 'closure'                                                                       ,
+ VERTICAL_MIXING_COEFFICIENT     =  1.00000E-5,
+ VERTICAL_PRANDTL_NUMBER =   1.000000    ,
+ BOTTOM_ROUGHNESS_TYPE   = 'udef'                                                                          ,
+ BOTTOM_ROUGHNESS_KIND   = 'static'                                                                        ,
+ BOTTOM_ROUGHNESS_FILE   = 'necofs_cd.nc'                                                             ,
+ BOTTOM_ROUGHNESS_LENGTHSCALE    =  -1.000000    ,
+ BOTTOM_ROUGHNESS_MINIMUM        =  2.4999999E-03,
+ CONVECTIVE_OVERTURNING  = T,
+ SCALAR_POSITIVITY_CONTROL       = T,
+ BAROTROPIC      = F,     !lwang
+ BAROCLINIC_PRESSURE_GRADIENT    = 'sigma levels'                                                                  ,
+ SEA_WATER_DENSITY_FUNCTION      = 'dens3'                                                                         ,
+ RECALCULATE_RHO_MEAN    = T,
+ INTERVAL_RHO_MEAN       = 'days=1.0'                                                                      ,
+ TEMPERATURE_ACTIVE      = T,
+ SALINITY_ACTIVE = T,
+ SURFACE_WAVE_MIXING     = F,
+ WETTING_DRYING_ON       = T,
+ ADCOR_ON        = T,
+ NOFLUX_BOT_CONDITION    = F
+ /
+ &NML_SURFACE_FORCING
+ WIND_ON = T,
+ WIND_TYPE       = 'stress'                                                                        ,
+ WIND_STRESS_METHOD = 'LP1981'                                                                       ,
+ WIND_FILE       = 'wrf_hnd2019.nc'                                                                    ,
+ WIND_KIND       = 'variable'                                                                      ,
+ WIND_X  =  0.0000000E+00,
+ WIND_Y  =  0.0000000E+00,
+ HEATING_ON      = T,
+ HEATING_TYPE    = 'flux'                                                                          ,
+ HEATING_KIND    = 'variable'                                                                      ,
+ HEATING_FILE    = 'wrf_hnd2019.nc'
+ HEATING_SHORTWAVE_SUITE = 'USNE',                
+ HEATING_LONGWAVE_LENGTHSCALE    =   1.400000    ,
+ HEATING_LONGWAVE_PERCTAGE       =  0.7800000    ,
+ HEATING_SHORTWAVE_LENGTHSCALE   =   6.300000    ,
+ HEATING_RADIATION       =  0.0000000E+00,
+ HEATING_NETFLUX =  0.0000000E+00,
+ HEATING_SHALLOW_DEPTH = 100.0,
+ HEATING_SHALLOW_REDUCTION = 0.35,
+ HEATING_LIMITATION_DEPTH  =  15,
+ HEATING_LIMITATION_COEFFCIENT  =  0.1,
+ PRECIPITATION_ON        = T,
+ PRECIPITATION_KIND      = 'variable'                                                                      ,
+ PRECIPITATION_FILE      = 'wrf_hnd2019.nc'                                                                    ,
+ PRECIPITATION_PRC       =  0.0000000E+00,
+ PRECIPITATION_EVP       =  0.0000000E+00,
+ AIRPRESSURE_ON  = T,
+ AIRPRESSURE_KIND        = 'variable'                                                                          ,
+ AIRPRESSURE_FILE        = 'wrf_hnd2019.nc'                                                                          ,
+ AIRPRESSURE_VALUE       =  0.0000000E+00,
+ WAVE_ON = F,
+ WAVE_FILE       = 'none'                                                                          ,
+ WAVE_KIND       = 'none'                                                                          ,
+ WAVE_HEIGHT     =  0.0000000E+00,
+ WAVE_LENGTH     =  0.0000000E+00,
+ WAVE_DIRECTION  =  0.0000000E+00,
+ WAVE_PERIOD     =  0.0000000E+00,
+ WAVE_PER_BOT    =  0.0000000E+00,
+ WAVE_UB_BOT     =  0.0000000E+00
+ /
+ &NML_RIVER_TYPE
+ RIVER_NUMBER    =     96,        
+ RIVER_KIND      = 'variable'                                                                      ,
+ RIVER_TS_SETTING        = 'calculated'                                                                    ,
+ RIVER_INFO_FILE = 'necofs_river.nml'                                                           ,
+ RIVER_INFLOW_LOCATION   = 'node'                                                                          
+ /
+ &NML_OPEN_BOUNDARY_CONTROL
+ OBC_ON  = T,
+ OBC_NODE_LIST_FILE      = 'necofs_obc.dat'                                                                          ,
+ OBC_ELEVATION_FORCING_ON        = F,
+ OBC_ELEVATION_FILE      = 'julian_obc.nc'                                                                 ,
+ OBC_TS_TYPE     =           3,
+ OBC_TEMP_NUDGING        = F,
+ OBC_TEMP_FILE   = 'tsobc.nc'                                                                      ,
+ OBC_TEMP_NUDGING_TIMESCALE      =  2.7999999E-03,
+ OBC_SALT_NUDGING        = F,
+ OBC_SALT_FILE   = 'tsobc.nc'                                                                      ,
+ OBC_SALT_NUDGING_TIMESCALE      =  2.7999999E-03,
+ OBC_MEANFLOW    = F,
+ OBC_MEANFLOW_FILE       = 'none'                                                                          ,
+ OBC_TIDEOUT_INITIAL     =           0,
+ OBC_TIDEOUT_INTERVAL    =           0,
+ OBC_LONGSHORE_FLOW_ON   = T,
+ OBC_LONGSHORE_FLOW_FILE = 'necofs_lsf.dat'                                                                          
+ /
+ &NML_GRID_COORDINATES
+ GRID_FILE       = 'necofs_grd.dat'                                                                          ,
+ GRID_FILE_UNITS = 'meters'                                                                        ,
+ PROJECTION_REFERENCE    = 'init=nad83:1802'                                                                                         
+                                                                                               ,
+ SIGMA_LEVELS_FILE       = 'necofs_sigma.dat'                                                                          ,
+ DEPTH_FILE      = 'necofs_dep.dat'                                                                          ,
+ CORIOLIS_FILE   = 'necofs_cor.dat'                                                                          ,
+ SPONGE_FILE     = 'necofs_spg.dat'                                                                          
+ /
+ &NML_GROUNDWATER
+ GROUNDWATER_ON  = T,
+ GROUNDWATER_TEMP_ON     = T,
+ GROUNDWATER_SALT_ON     = T,
+ GROUNDWATER_KIND        = 'variable'                                                                          ,
+ GROUNDWATER_FILE        = 'necofs_groundwater.nc'                                                                          ,
+ GROUNDWATER_FLOW        =  0.0000000E+00,
+ GROUNDWATER_TEMP        =  0.0000000E+00,
+ GROUNDWATER_SALT        =  0.0000000E+00
+ /
+ &NML_LAG
+ LAG_PARTICLES_ON        = F,
+ LAG_START_FILE  = 'none'                                                                          ,
+ LAG_OUT_FILE    = 'none'                                                                          ,
+ LAG_FIRST_OUT   = 'none'                                                                          ,
+ LAG_RESTART_FILE        = 'none'                                                                          ,
+ LAG_OUT_INTERVAL        = 'none'                                                                          ,
+ LAG_SCAL_CHOICE = 'none'                                                                          
+ /
+ &NML_ADDITIONAL_MODELS
+ DATA_ASSIMILATION       = T,
+ DATA_ASSIMILATION_FILE  = 'necofs_hot_run.nml'                                                               ,
+ BIOLOGICAL_MODEL        = F,
+ BIOLOGICAL_MODEL_FILE   = 'none'                                                                          ,
+ SEDIMENT_MODEL  = F,
+ SEDIMENT_MODEL_FILE     = 'none'                                                                          ,
+ SEDIMENT_PARAMETER_TYPE = 'none'                                                                          ,
+ SEDIMENT_PARAMETER_FILE = 'none'                                                                          ,
+ ICING_MODEL     = F,
+ ICING_FORCING_FILE      = 'none'                                                                    ,
+! ICING_FORCING_FILE      = 'wrf_hnd2016.nc'                                                                    ,
+ ICING_FORCING_KIND      = 'variable'                                                                      ,
+ ICING_AIR_TEMP  =  0.0000000E+00,
+ ICING_WSPD      =  0.0000000E+00,
+ ICE_MODEL       = F,
+ ICE_FORCING_FILE        = 'none'                                                                          ,
+ ICE_FORCING_KIND        = 'none'                                                                          ,
+ ICE_SEA_LEVEL_PRESSURE  =  0.0000000E+00,
+ ICE_AIR_TEMP    =  0.0000000E+00,
+ ICE_SPEC_HUMIDITY       =  0.0000000E+00,
+ ICE_SHORTWAVE   =  0.0000000E+00,
+ ICE_CLOUD_COVER =  0.0000000E+00
+ /
+ &NML_PROBES
+ PROBES_ON       = F,
+ PROBES_NUMBER   =          -1,
+ PROBES_FILE     = 'none'                                                                          
+ /
+ &NML_PWP
+ UPPER_DEPTH_LIMIT       =   20.00000    ,
+ LOWER_DEPTH_LIMIT       =   200.0000    ,
+ VERTICAL_RESOLUTION     =   1.000000    ,
+ BULK_RICHARDSON =  0.6500000    ,
+ GRADIENT_RICHARDSON     =  0.2500000    
+ /
+ &NML_SST_ASSIMILATION
+ SST_ASSIM       = F,
+ SST_ASSIM_FILE  = 'none'                                                                          ,
+ SST_RADIUS      =  0.0000000E+00,
+ SST_WEIGHT_MAX  =  0.0000000E+00,
+ SST_TIMESCALE   =  0.0000000E+00,
+ SST_TIME_WINDOW =  0.0000000E+00,
+ SST_N_PER_INTERVAL      =           0
+ /
+ &NML_SSTGRD_ASSIMILATION
+ SSTGRD_ASSIM    = T,
+ SSTGRD_MLD      = F,
+ SSTGRD_ASSIM_FILE       = 'necofs_sst.nc'                                                                        ,
+ SSTGRD_WEIGHT_MAX       =  0.5000000    ,
+ SSTGRD_TIMESCALE        =  3.0000000E-03,
+ SSTGRD_TIME_WINDOW      =   0.05    ,
+ SSTGRD_N_PER_INTERVAL   =          24
+ /
+ &NML_SSSGRD_ASSIMILATION
+ SSSGRD_ASSIM    = T,
+ SSSGRD_ASSIM_FILE       = 'necofs_sss.nc'                                                                        ,
+ SSSGRD_WEIGHT_MAX       =  0.5000000    ,
+ SSSGRD_TIMESCALE        =  3.0000000E-03,
+ SSSGRD_TIME_WINDOW      =   0.05    ,
+ SSSGRD_N_PER_INTERVAL   =          24
+ /
+ &NML_CUR_NGASSIMILATION
+ CUR_NGASSIM     = T,
+ CUR_NGASSIM_FILE        = 'necofs_cur'                                                                       ,
+ CUR_NG_RADIUS   =   10000.00    ,
+ CUR_GAMA        =   1.000000    ,
+ CUR_GALPHA      =  8.2999999E-03,
+ CUR_NG_ASTIME_WINDOW    =  0.5000000    
+ /
+ &NML_CUR_OIASSIMILATION
+ CUR_OIASSIM     = F,
+ CUR_OIASSIM_FILE        = 'none'                                                                          ,
+ CUR_OI_RADIUS   =  0.0000000E+00,
+ CUR_OIGALPHA    =  0.0000000E+00,
+ CUR_OI_ASTIME_WINDOW    =  0.0000000E+00,
+ CUR_N_INFLU     =           0,
+ CUR_NSTEP_OI    =           0
+ /
+ &NML_SSHGRD_ASSIMILATION
+ SSHGRD_ASSIM    = T,
+ SSHGRD_ASSIM_FILE       = 'necofs_ssh.nc'                                                                          ,
+ SSHGRD_WEIGHT_MAX       =  1.000000E+00,
+ SSHGRD_TIMESCALE        =  4.000000E-03,
+ SSHGRD_TIME_WINDOW      =  12.0,
+ SSHGRD_N_PER_INTERVAL   =           24
+ /
+ &NML_TSGRD_ASSIMILATION
+ TSGRD_ASSIM     = F,
+ TSGRD_ASSIM_FILE        = 'none'                                                                          ,
+ TSGRD_WEIGHT_MAX        =  0.0000000E+00,
+ TSGRD_TIMESCALE =  0.0000000E+00,
+ TSGRD_TIME_WINDOW       =  0.0000000E+00,
+ TSGRD_N_PER_INTERVAL    =           0
+ /
+ &NML_TS_NGASSIMILATION
+ TS_NGASSIM      = F,
+ TS_NGASSIM_FILE = 'none'                                                                          ,
+ TS_NG_RADIUS    =  0.0000000E+00,
+ TS_GAMA =  0.0000000E+00,
+ TS_GALPHA       =  0.0000000E+00,
+ TS_NG_ASTIME_WINDOW     =  0.0000000E+00
+ /
+ &NML_TS_OIASSIMILATION
+ TS_OIASSIM      = T,
+ TS_OIASSIM_FILE = 'necofs_ts'                                                                          ,
+ TS_OI_RADIUS    =  20000.0,
+ TS_OIGALPHA     =  0.2,
+ TS_OI_ASTIME_WINDOW     =  3,
+ TS_MAX_LAYER    =           35,
+ TS_N_INFLU      =           1,
+ TS_NSTEP_OI     =           10
+ /
+ &NML_NCNEST
+ NCNEST_ON       = T,
+ NCNEST_BLOCKSIZE        =    10,
+ NCNEST_NODE_FILES       = 'bos_nest.dat,casco_nest.dat,ham_nest.dat,mbn_nest.dat,ny_nest.dat,saco_nest.dat,sci_nest.dat,windfarm_nest.dat' ,                                                
+ NCNEST_OUT_INTERVAL     = 'seconds= 360.0'                           
+ /
+
+ &NML_NESTING
+ NESTING_ON      = T,
+ NESTING_TYPE    = '1'                  ,
+ NESTING_BLOCKSIZE       =          10,
+ NESTING_FILE_NAME       = 'necofs_nesting.nc'                                                              
+ /
+
+ &NML_BOUNDSCHK
+ BOUNDSCHK_ON    = F,
+ CHK_INTERVAL    =           0,
+ VELOC_MAG_MAX   =  0.0000000E+00,
+ ZETA_MAG_MAX    =  0.0000000E+00,
+ TEMP_MAX        =  0.0000000E+00,
+ TEMP_MIN        =  0.0000000E+00,
+ SALT_MAX        =  0.0000000E+00,
+ SALT_MIN        =  0.0000000E+00
+ /
+ &NML_STATION_TIMESERIES
+ OUT_STATION_TIMESERIES_ON       = F,
+ STATION_FILE    = '203sta_nd_pair_necofs_v1_geo1_as_fvcom_station_output_Cartesian.dat'                                                                          ,
+ LOCATION_TYPE   = 'node'                                                                ,
+ OUT_ELEVATION   = T,
+ OUT_VELOCITY_3D = T,
+ OUT_VELOCITY_2D = T,
+ OUT_WIND_VELOCITY       = T,
+ OUT_SALT_TEMP   = T,
+ OUT_INTERVAL    = 'seconds= 3600.0'
+ /
+ &NML_MLD
+ NC_MLD  = F,
+ GAMMA_MIN       =  3.9999999E-05,
+ MLD_DEFAULT     =   5.000000    ,
+ DEEPWATER_DEPTH =   100.0000    ,
+ DEEPWATER_GAMMA =  2.9999999E-05
+ /
+ &NML_HEATFLUX_SEDIMENT
+ HEATFLUX_SEDIMENT_ON    = F,
+ MUD_INITIAL_TEMP_FILE   = none                                                        ,
+ VOLUMETRIC_HEAT_CAPACITY        =   3.650000    ,
+ THERMAL_DIFFUSIVITY     =  0.3800000    ,
+ EFFECTIVE_THICKNESS     =  9.9999998E-03,
+ CRITICAL_DEPTH  =   1.000000    ,
+ SEDIMENT_TEMPERATURE    =   10.00000
+ /
+

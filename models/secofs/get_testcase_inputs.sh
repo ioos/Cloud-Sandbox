@@ -1,4 +1,4 @@
-#!/usr/bin/env/bash
+#!/usr/bin/env bash
 set -e
 
 # Available from s3://ioos-sandbox-use2/public/

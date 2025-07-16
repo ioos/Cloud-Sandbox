@@ -6,7 +6,7 @@ HOMELIBS=$HOMEDIR/libs
 
 export MODEL_DIR=/save/$USER/necofs/NECOFS_v2.4/hindcast/FVCOMv4.4.8
 
-cp -p hindcasts_make.inc $MODEL_DIR/src/make.inc
+cp -p hindcasts.make.inc $MODEL_DIR/src/make.inc
 cd $MODEL_DIR/src || exit 1
 
 module use -a $HOMEDIR/modulefiles
@@ -38,3 +38,4 @@ make clean
 make depend
 make
 
+mv fvcom necofs_fvcom

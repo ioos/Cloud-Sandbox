@@ -6,7 +6,7 @@
   "EDATE"     : "20190102",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/eccofs",
-  "SAVE"      : "/save/patrick/nosofs.3.5.0",
+  "SAVEDIR"      : "/save/patrick/nosofs.3.5.0",
   "PTMP"      : "/ptmp/patrick",
   "EXEC"      : "/save/patrick/nosofs.3.5.0/exec/eccofs_roms_mpi",
   "TIME_REF"  : "20110101.0d0",

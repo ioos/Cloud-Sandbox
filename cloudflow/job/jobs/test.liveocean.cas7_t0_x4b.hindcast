@@ -7,7 +7,7 @@
   "EDATE"     : "20121009",
   "HH"        : "00",
   "COMROT"    : "/com/patrick",
-  "SAVE"      : "/save/patrick",
+  "SAVEDIR"      : "/save/patrick",
   "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",

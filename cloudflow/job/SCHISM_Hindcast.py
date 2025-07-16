@@ -53,7 +53,7 @@ class SCHISM_Hindcast(Job):
     COMDIR : str
         The location of the SCHISM model run to execute
 
-    SAVE : str
+    SAVEDIR : str
         The /save directory for this job containing other things needed, e.g. modulefile, scripts, executables, etc.
 
     PTMP : str
@@ -114,7 +114,7 @@ class SCHISM_Hindcast(Job):
         self.EXEC = cfDict['EXEC']
         self.COMROT = cfDict['COMROT']
         self.OUTDIR = self.COMROT + "/" + self.CDATE
-        self.SAVE = cfDict['SAVE']
+        self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
         self.NML_IN = cfDict['NML_IN']
         self.NML_TMPL = cfDict['NML_TMPL']
@@ -127,12 +127,14 @@ class SCHISM_Hindcast(Job):
     def make_oceanin(self):
         self.make_parmnml()
 
+
+
     def make_parmnml(self):
 
         if self.OFS == "secofs":
             self.__make_parmnml_secofs()
         else:
-            print("make_parmnml - not implemented for this model yet")
+            print(f"WARNING: make_parmnml is not implemented for {self.OFS}")
 
         return
 

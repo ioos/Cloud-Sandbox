@@ -7,7 +7,7 @@
   "EDATE"     : "20160101",
   "HH"        : "00",
   "COMROT"    : "/com/ec2-user",
-  "SAVE"      : "/save/ec2-user",
+  "SAVEDIR"      : "/save/ec2-user",
   "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",

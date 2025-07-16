@@ -3,11 +3,14 @@ import json
 from cloudflow.job.Job import Job
 from cloudflow.job.ROMSForecast import ROMSForecast
 from cloudflow.job.ROMSHindcast import ROMSHindcast
-from cloudflow.job.Plotting import Plotting
 from cloudflow.job.FVCOMForecast import FVCOMForecast
+from cloudflow.job.FVCOM_Hindcast import FVCOM_Hindcast
+from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
 from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
+
+from cloudflow.job.Plotting import Plotting
 
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
 from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
@@ -16,12 +19,11 @@ from cloudflow.job.ADCIRC_Template import ADCIRC_Template
 from cloudflow.job.ROMS_Template import ROMS_Template
 from cloudflow.job.FVCOM_Template import FVCOM_Template
 
-from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-debug = True
+debug = False
 
 # noinspection PyCallingNonCallable
 class JobFactory:
@@ -58,6 +60,11 @@ class JobFactory:
             newjob = ROMSHindcast(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
+        elif jobtype == 'fvcomhindcast':
+            newjob = FVCOM_Hindcast(configfile, NPROCS)
+        elif (jobtype == 'fvcom_experiment'):
+            newjob = FVCOM_Experiment(configfile, NPROCS)
+
         elif jobtype == 'adcircforecast':
             newjob = ADCIRCForecast(configfile, NPROCS)
         elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
@@ -79,8 +86,6 @@ class JobFactory:
             newjob = ROMS_Template(configfile, NPROCS)
         elif (jobtype == 'fvcom_template'):
             newjob = FVCOM_Template(configfile, NPROCS)
-        elif (jobtype == 'fvcom_experiment'):
-            newjob = FVCOM_Experiment(configfile, NPROCS)
         else:
             raise Exception('Unsupported jobtype')
 

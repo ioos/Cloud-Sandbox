@@ -338,7 +338,7 @@ def simple_run(cluster: Cluster, job: Job):
     #HH = job.HH
     #OUTDIR = job.OUTDIR
 
-    WRKDIR = job.WRKDIR
+    SAVEDIR = job.SAVEDIR
     RUNDIR = job.RUNDIR
     INPUTFILE = job.INPUTFILE
     EXEC = job.EXEC
@@ -360,12 +360,12 @@ def simple_run(cluster: Cluster, job: Job):
         # export HOSTS=$2
         # export NPROCS=$3
         # export PPN=$4
-        # export WRKDIR=$5
+        # export SAVEDIR=$5
         # export RUNDIR=$6
         # export INPUTFILE=$7
         # export EXEC=$8
 
-            args = [ runscript, OFS, HOSTS, str(NPROCS), str(PPN), WRKDIR, RUNDIR, INPUTFILE, EXEC ]
+            args = [ runscript, OFS, HOSTS, str(NPROCS), str(PPN), SAVEDIR, RUNDIR, INPUTFILE, EXEC ]
             result = subprocess.run(args, stderr=subprocess.STDOUT, universal_newlines=True)
         else:
             raise signals.FAIL(f"ERROR: don't know how to run {OFS}")
@@ -404,7 +404,7 @@ def forecast_run(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
-    SAVEDIR = job.SAVE
+    SAVEDIR = job.SAVEDIR
 
     PTMP = getattr(job, "PTMP", 'none')
 
@@ -465,7 +465,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
 
-    SAVE = job.SAVE
+    SAVEDIR = job.SAVEDIR
 
     PTMP = getattr(job, "PTMP", 'none')
 
@@ -502,7 +502,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVE, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')

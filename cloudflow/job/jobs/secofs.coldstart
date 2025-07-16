@@ -5,7 +5,7 @@
   "RNDAY"     : "1",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/secofs",
-  "SAVE"      : "/save/patrick/schism",
+  "SAVEDIR"      : "/save/patrick/schism",
   "PTMP"      : "/ptmp/patrick/secofs",
   "NML_IN"    : "auto",
   "NML_TMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/secofs_coldstart.param.nml.in",
