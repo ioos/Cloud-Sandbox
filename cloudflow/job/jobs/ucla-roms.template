@@ -1,8 +1,8 @@
 {
   "JOBTYPE"   : "ucla-roms",
   "OFS"       : "ucla-roms",
-  "NCORES"    : 192,
-  "EXEC"      : "/save/ec2-user/ucla-roms/Work/Rivers_ana/roms",
-  "MODEL_DIR" : "/save/ec2-user/ucla-roms/Work/Rivers_ana",
-  "IN_FILE"   : "/save/ec2-user/ucla-roms/Work/Rivers_ana/river_ana.in"
+  "NCORES"    : 6,
+  "EXEC"      : "/save/ec2-user/lapenta/ucla-roms/Examples/Rivers_real/roms",
+  "MODEL_DIR" : "/save/ec2-user/lapenta/ucla-roms/Examples/Rivers_real",
+  "IN_FILE"   : "/save/ec2-user/lapenta/ucla-roms/Examples/Rivers_real/rivers.in"
 }
