@@ -1,4 +1,5 @@
 Hotstart file needs to be combined:
+
 IMPORTANT NOTE: 
 
 https://schism-dev.github.io/schism/master/getting-started/post-processing.html
@@ -13,5 +14,4 @@ Usage example, 720 is first day, 1440 is day 2, 2160 is day 3 etc:
    /save/patrick/schism/bin/combine_hotstart7 -i 720
 
 Allocation error (7) - need large enough machine
-
 

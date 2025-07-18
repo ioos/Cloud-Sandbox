@@ -19,7 +19,6 @@ fi
 
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
 export FI_PROVIDER=efa
-#export I_MPI_FABRICS=shm:ofi  # default
 export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
 
@@ -158,9 +157,10 @@ case $OFS in
     export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
     export I_MPI_OFI_PROVIDER=efa
     export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
     export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 
-    # export OMP_NUM_THREADS=1 
+    export OMP_NUM_THREADS=1 
 
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
@@ -191,6 +191,13 @@ case $OFS in
     # SAVEDIR is job.SAVEDIR
     module use -a $SAVEDIR/modulefiles
     module load intel_x86_64
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
     OCEANIN=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
     starttime=`date +%R`
@@ -209,6 +216,9 @@ case $OFS in
     
     cd "$COMOUT" || exit 1
     echo "Current dir is: $PWD"
+    if [ ! -d output ]; then
+      mkdir output
+    fi
 
     module use -a $SAVEDIR/modulefiles
     module load intel_x86_64.impi_2021.12.1
@@ -216,6 +226,7 @@ case $OFS in
     export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
     export I_MPI_OFI_PROVIDER=efa
     export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
     export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 
     # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
