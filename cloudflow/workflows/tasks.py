@@ -354,7 +354,7 @@ def simple_run(cluster: Cluster, job: Job):
     runscript = f"{curdir}/simple_launcher.sh"
 
     try:
-        if OFS in ('necofs_cold', 'necofs'):
+        if OFS in ('necofs_cold', 'necofs_hot', 'necofs'):
 
         # export OFS=$1
         # export HOSTS=$2
@@ -464,6 +464,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     HH = getattr(job,"HH", "00")
     OFS = job.OFS
     NPROCS = job.NPROCS
+    XTRA_ARGS = ""
 
     SAVEDIR = job.SAVEDIR
 
@@ -472,7 +473,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     # Use an environment variable for FSx signal
 
     if OFS == "secofs":
-       JOBARGS = getattr(job, "NSCRIBES", '')
+       XTRA_ARGS = getattr(job, "NSCRIBES", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
     print(f"In hindcast_run_multi: runscript: {runscript}")
@@ -490,10 +491,11 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
         print(f'In hindcast run multi: job.CDATE: {job.CDATE}')
 
         # Create ocean in file
+        print(f"Calling job.make_oceanin() for {OFS}")
         job.make_oceanin()
 
         if OFS == "eccofs":
-            JOBARGS = getattr(job, "OCEANIN", '')
+            XTRA_ARGS = getattr(job, "OCEANIN", '')
 
         OUTDIR = job.OUTDIR
 
@@ -502,7 +504,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, JOBARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -771,13 +773,9 @@ def fetchpy_and_run(job: Job, service: StorageService, notebook = ''):
 
     # retrieved the python file, use the current job object to set up parameters/arguments
 
-    COMDIR = job.INDIR
-    OFS = job.OFS
-    HH = job.HH
-   
-    arg1 = COMDIR
-    arg2 = OFS
-    arg3 = HH 
+    arg1 = job.INDIR
+    arg2 = job.OFS
+    arg3 = job.HH 
  
     curdir = os.getcwd()
     os.chdir(localtmp)

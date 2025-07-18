@@ -1,8 +1,8 @@
 {
   "JOBTYPE"   : "fvcom_experiment",
   "OFS"       : "necofs_cold",
-  "RUNDIR"    : "/com/patrick/necofs/NECOFS_v2.4_tide_barotropic_2noaa/run",
-  "SAVEDIR"    : "/save/patrick/necofs",
+  "RUNDIR"    : "/com/patrick/necofs/tidal_simulation/NECOFS_v2.4_tide_barotropic_2noaa/run",
+  "SAVEDIR"   : "/save/patrick/necofs",
   "INPUTFILE" : "necofs_cold_run.nml",
-  "EXEC"      : "/save/patrick/necofs/sorc/tidal_barotropic/FVCOMv4.4.7.1/fvcom_necofs_barotropic"
+  "EXEC"      : "/save/patrick/necofs/tidal_simulation/tidal_barotropic/FVCOMv4.4.7.1/fvcom_necofs_barotropic"
 }

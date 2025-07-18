@@ -137,8 +137,6 @@ case $OFS in
   secofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
 
-    ulimit -s unlimited
-
     mkdir -p $COMOUT
     cd "$COMOUT" || exit 1
     # If using scratch disk use PTMP
@@ -200,6 +198,33 @@ case $OFS in
     #sleep 300
     echo "STARTING RUN AT $starttime"
     mpirun $MPIOPTS $EXEC $OCEANIN
+    result=$?
+    echo "wth mpirun result: $result"
+    endtime=`date +%R`
+    echo "RUN FINISHED AT $endtime"
+    ;;
+
+
+  necofs)
+    
+    cd "$COMOUT" || exit 1
+    echo "Current dir is: $PWD"
+
+    module use -a $SAVEDIR/modulefiles
+    module load intel_x86_64.impi_2021.12.1
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
+    # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
+    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out"
+    starttime=`date +%R`
+
+    echo "STARTING RUN AT $starttime"
+    #mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
+    mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     result=$?
     echo "wth mpirun result: $result"
     endtime=`date +%R`

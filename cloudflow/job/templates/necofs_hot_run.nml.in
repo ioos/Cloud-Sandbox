@@ -21,8 +21,8 @@
  STARTUP_DMAX    =  0.0000000E+00
  /
  &NML_IO
- INPUT_DIR       = '../input'                                                   ,
- OUTPUT_DIR      = '../output'                                         ,
+ INPUT_DIR       = './input',
+ OUTPUT_DIR      = './output',
  IREPORT =          10,
  VISIT_ALL_VARS  = F,
  WAIT_FOR_VISIT  = F,
@@ -61,15 +61,13 @@
  /
  &NML_RESTART
  RST_ON  = T,
- RST_FIRST_OUT    = '__END_DATE__ __END_HHMMSS__',
-! RST_FIRST_OUT   = '2019-01-01 00:00:00'                                                           ,
+ RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
  RST_OUT_INTERVAL        = 'days= 1.0'                                                                     ,
  RST_OUTPUT_STACK        =           0
  /
  &NML_NETCDF
  NC_ON   = T,
  NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
-! NC_FIRST_OUT    = '2019-01-01 00:00:00'                                                           ,
  NC_OUT_INTERVAL = 'seconds= 3600.0'                                                               ,
  NC_OUTPUT_STACK =           0,
  NC_SUBDOMAIN_FILES      = 'FVCOM'                                                                           ,
@@ -95,8 +93,7 @@
  NCSF_FIRST_OUT  = '2017-01-01 00:00:00'              ,
  NCSF_OUT_INTERVAL       = 'days= 1.0'                        ,
  NCSF_OUTPUT_STACK       =           0,
- NCSF_SUBDOMAIN_FILES    = FVCOM                                                                                                     
-               ,
+ NCSF_SUBDOMAIN_FILES    = 'FVCOM',
  NCSF_GRID_METRICS       = F,
  NCSF_FILE_DATE  = F,
  NCSF_VELOCITY   = F,
@@ -110,11 +107,10 @@
  &NML_NETCDF_AV
  NCAV_ON = T,
  NCAV_FIRST_OUT  = '__START_DATE__ __HHMMSS__',
-! NCAV_FIRST_OUT  = '2019-01-01 00:00:00'                                                                          ,
  NCAV_OUT_INTERVAL       = 'days=1.0'                                                                          ,
  NCAV_OUTPUT_STACK       =           0,
 ! PT: TODO extra whitespace intentional?
- NCAV_SUBDOMAIN_FILES    = 'FVCOM'                                                                                              ,
+ NCAV_SUBDOMAIN_FILES    = 'FVCOM',
  NCAV_GRID_METRICS       = F,
  NCAV_FILE_DATE  = T,
  NCAV_VELOCITY   = T,
@@ -257,7 +253,7 @@
  /
  &NML_ADDITIONAL_MODELS
  DATA_ASSIMILATION       = T,
- DATA_ASSIMILATION_FILE  = 'necofs_hot_run.nml'                                                               ,
+ DATA_ASSIMILATION_FILE  = 'necofs_run.nml'                                                               ,
  BIOLOGICAL_MODEL        = F,
  BIOLOGICAL_MODEL_FILE   = 'none'                                                                          ,
  SEDIMENT_MODEL  = F,
@@ -265,8 +261,7 @@
  SEDIMENT_PARAMETER_TYPE = 'none'                                                                          ,
  SEDIMENT_PARAMETER_FILE = 'none'                                                                          ,
  ICING_MODEL     = F,
- ICING_FORCING_FILE      = 'none'                                                                    ,
-! ICING_FORCING_FILE      = 'wrf_hnd2016.nc'                                                                    ,
+ ICING_FORCING_FILE      = 'wrf_hnd2016.nc'                                                                    ,
  ICING_FORCING_KIND      = 'variable'                                                                      ,
  ICING_AIR_TEMP  =  0.0000000E+00,
  ICING_WSPD      =  0.0000000E+00,

@@ -124,11 +124,7 @@ class FVCOM_Hindcast(Job):
         self.NHOURS = cfDict['NHOURS']
         self.COMROT = cfDict['COMROT']
 
-
-        # Why do I need this?
         self.SAVEDIR = cfDict['SAVEDIR']
-
-
         self.PTMP = cfDict['PTMP']
         self.DATE_REF = cfDict['DATE_REF']
         self.BUCKET = cfDict['BUCKET']
@@ -141,9 +137,8 @@ class FVCOM_Hindcast(Job):
         if self.INTMPL == "auto":
             self.INTMPL = f"{self.TEMPLPATH}/{self.OFS}.fcst.in"
 
-        # This logic doesnt work for multi run
-        #if self.OUTDIR == "auto":
-        #    self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}{self.HH}"
+        if self.OUTDIR == "auto":
+            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}"
 
         return
 
@@ -167,6 +162,7 @@ class FVCOM_Hindcast(Job):
 
         return
 
+    # TODO: add an setCDATE or incrementCDATE function
 
     def __make_fcstin_nosofs(self):
         """ Create the input namelist .in file if INPUTFILE == auto, otherwise use the provided INPUTFILE """
@@ -178,6 +174,7 @@ class FVCOM_Hindcast(Job):
         NHOURS = self.NHOURS
         template = self.INTMPL
 
+        # NOTE: self.OUTDIR needs to be specified here since CDATE can change outside of this
         self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
@@ -204,11 +201,16 @@ class FVCOM_Hindcast(Job):
 
         # Create the namelist.in file
         if self.INPUTFILE == "auto":
-            self.INPUTFILE = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+            # This is how the operational nosofs names it
+            self.INPUTFILE = f"nos.{OFS}.hindcast.{CDATE}.t{HH}z.in"
         elif self.INPUTFILE == "":
             raise Exception(f"No namelist input file specified")
 
-        outfile = self.INPUTFILE
+        if template == "":
+            print(f"WARNING: No template specified, using {self.INPUTFILE} as it is")
+            return
+
+        outfile = self.OUTDIR + "/" + self.INPUTFILE
         util.sedoceanin(template, outfile, settings)
 
         return

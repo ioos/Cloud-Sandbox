@@ -36,6 +36,9 @@ export RUNDIR=$6
 export INPUTFILE=$7
 export EXEC=$8
 
+# TODO: INPUTFILE isn't used, FVCOM expects casename, and the exec expects a nml file that matches the casename
+#       or in this case we can use OFS
+
 # TODO: put the following back in
 # mpirun --version | grep Intel
 # impi=$?
@@ -75,7 +78,7 @@ result=0
 # Can put domain specific options here
 case $OFS in
     
-  necofs_cold)
+  necofs_hot | necofs_cold)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
     cd "$RUNDIR" || exit 1
     echo "Current dir is: $PWD"

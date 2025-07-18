@@ -607,7 +607,7 @@ dashL= $(empty) -L
           CC       = $(COMP_MPCC) -cc=icc
           CPP      = $(COMP_CPP)
           CXX      = $(COMP_CC)
-          OPT      = -O3 -fp-model precise -ftz -fast-transcendentals -no-prec-div
+          OPT      = -O3 -g -traceback -fp-model precise -ftz -fast-transcendentals -no-prec-div
 
 #--------------------------------------------------------------------------
 #  gfortran defs 

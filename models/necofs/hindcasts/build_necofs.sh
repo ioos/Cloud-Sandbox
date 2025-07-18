@@ -38,4 +38,4 @@ make clean
 make depend
 make
 
-mv fvcom necofs_fvcom
+mv fvcom ../necofs_fvcom
