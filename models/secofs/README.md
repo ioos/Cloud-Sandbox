@@ -18,9 +18,11 @@ Note: Due to high memory requirements during initialization, if there is insuffi
 
 coldstart:
     hpc7a.96xlarge x 2 nodes minimum
+
     hpc6a.48xlarge x 6 nodes minimum
 
 hotstart:
     hpc7a.96xlarge x 2 nodes minimum
+
     hpc6a.48xlarge x 8 nodes minimum
 

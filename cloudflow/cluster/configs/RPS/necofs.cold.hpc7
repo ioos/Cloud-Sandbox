@@ -1,7 +1,6 @@
 {
 "platform"  : "AWS",
 "region"    : "us-east-2",
-"nodeTypeSmall"  : "hpc6a.48xlarge",
 "nodeType"  : "hpc7a.96xlarge",
 "nodeCount" : 2,
 "tags"      : [ 
