@@ -28,7 +28,7 @@ class ucla_roms(Job):
         A JSON configuration file containing the required parameters for this class.
 
     RUNCORES : int
-        Total number of processors (cores) in this cluster.
+        Total number of processors (cores) ucla-roms will use.
 
     OFS : str
         The model setup type to run
@@ -53,7 +53,7 @@ class ucla_roms(Job):
         configfile : str
 
         NPROCS : int
-            The number of processors to run the job on
+            The number of processors requested for the job
 
         """
 
