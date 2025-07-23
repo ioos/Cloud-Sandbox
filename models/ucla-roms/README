@@ -1,0 +1,96 @@
+###################################
+# Setting up ucla-roms in the cloud
+###################################
+
+1. edit the HOMEroms path in
+setup_uclaroms.sh
+to where you want the ucla-roms source code to live
+
+2. run setup_uclaroms.sh
+This will load required modules, clone ucla-roms from GitHub,
+compile necessary tools, and get input data for the examples.
+A ucla-roms directory with the source code will be created where
+you specified HOMEroms in 1.
+
+3. (optional) run a test case called Rivers_real
+  a. edit the HOMEroms path and run testcase.sh
+    i. This compiles the ROMS code for this example inside of the 
+       ucla-roms/Examples/Rivers_real folder
+  b. change directories to Cloud-Sandbox/cloudflow/
+  c. edit job/jobs/ucla-roms.exp  
+    i.   edit the EXEC, MODEL_DIR, and IN_FILE paths
+    ii.  EXEC      = roms executable that was generated in a.
+    iii. MODEL_DIR = directory of roms executable
+    iv.  IN_FILE   = input file for roms
+    v.   in this case, all paths should lead to 
+         ucla-roms/Examples/Rivers_real/
+	 with EXEC and IN_FILE paths having roms and rivers.in
+         appended at the end, respectively
+  d. while inside Cloud-Sandbox/cloudflow/ execute:
+     workflows/workflow_main.py cluster/configs/NOS/ucla-roms.config job/jobs/ucla-roms.exp &> ucla-roms-rivers.log &
+     i.   how this command works is detailed in step 3 below
+     ii.  ucla-roms-rivers.log: 
+	  details of job submission to the cloud and the model output log 
+	  (including time stepping) will be stored here
+     iii. model output will be in MODEL_DIR
+
+#################################
+# Running ucla-roms in the cloud 
+#################################
+
+The general workflow will be:
+1. Compile code for your experiment by copying compile.sh to your 
+   model experiment directory (usually inside ucla-roms/Work/) 
+   and executing ./compile.sh
+   i. Make sure the ROMS_ROOT path (same as HOMEroms) 
+      in compile.sh is set correctly
+2. Inside the Cloud-Sandbox, your main working folder will be 
+   Cloud-Sandbox/cloudflow/ 
+   i.  Make sure this is the current working directory before proceeding.
+   ii. From here, the command to execute a model run is:
+       workflows/workflow_main.py cluster/configs/NOS/ucla-roms.config job/jobs/ucla-roms.exp &> ucla-roms.log &
+3. Let's break this command down and understand what you need to edit
+   i.   workflows/workflow_main.py 
+        Sandbox launcher script. No changes are to be made here.
+   ii.  job/jobs/ucla-roms.exp
+	Job file that is specific to each model run
+        Leave JOBTYPE and OFS as "ucla-roms"
+        RUNCORES:  Number of cores needed to run the experiment
+                   This will be equal to NP_XI*NP_ETA in param.opt
+        EXEC:      Path to your roms executable compiled in 1.
+        MODEL_DIR: This is the same path as EXEC without the executable
+        IN_FILE:   Path to your roms .in input file 
+   iii. cluster/configs/NOS/ucla-roms.config
+	Configuration file for Cloud running
+        The main changes will be to "nodeType" and "nodeCount"
+	nodeType:  Type of AWS instances (nodes) chosen. 
+                   cluster/AWSCluster.py under variable awsTypes lists
+                                         all available types and the
+					 core count of each type.
+		   The cost to run and memory can be found here:
+                   https://aws.amazon.com/ec2/pricing/on-demand/
+		   hpc6a.48xlarge nodes work well for ucla-roms purposes,
+			          containing 96 cores for each node
+	nodeCount: Number of nodes requested of the specified nodeType.
+	 	   This number should be RUNCORES divided by 
+                   nodeType.core_count, rounded up to the nearest integer. 
+		   For example:
+		     Say I want to run a model with 256 cores with the 
+	             hpc6a.48xlarge nodes. 
+                   RUNCORES = 256
+		   nodeType = hpc6a.48xlarge
+                     because hpc6a.48xlarge have 96 cores per node,
+                     256/96 = 2.66, so 
+                   nodeCount = 3
+		   Try to choose RUNCORES that is a factor of the core count
+		   of the specified nodeType. Otherwise, the requested 
+		   cores not being used will go to waste.
+   iv. 	ucla-roms.log
+	details of job submission to the cloud and the model output log 
+	(including time stepping) will be stored here
+
+###################################
+# Running and configuring ucla-roms
+###################################
+Please see ucla-roms/Documentation/readme.2.model-setup for details
+on how to configure ucla-roms for custom experiments.

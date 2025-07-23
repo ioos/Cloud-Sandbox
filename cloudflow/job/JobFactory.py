@@ -9,7 +9,6 @@ from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
 from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
-
 from cloudflow.job.Plotting import Plotting
 
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
@@ -18,7 +17,7 @@ from cloudflow.job.SCHISM_Template import SCHISM_Template
 from cloudflow.job.ADCIRC_Template import ADCIRC_Template
 from cloudflow.job.ROMS_Template import ROMS_Template
 from cloudflow.job.FVCOM_Template import FVCOM_Template
-
+from cloudflow.job.ucla_roms import ucla_roms
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -58,6 +57,8 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'romshindcast':
             newjob = ROMSHindcast(configfile, NPROCS)
+        if jobtype == 'ucla-roms':
+            newjob = ucla_roms(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
         elif jobtype == 'fvcomhindcast':
