@@ -670,9 +670,9 @@ def template_run(cluster: Cluster, job: Job):
 
     elif(OFS=='ucla-roms'):
         IN_FILE = job.IN_FILE
-        NCORES = job.NCORES
+        RUNCORES = job.RUNCORES
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(NCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'ROMS model run failed ... result: {result.returncode}')

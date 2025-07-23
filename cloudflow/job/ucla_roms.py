@@ -27,7 +27,7 @@ class ucla_roms(Job):
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
-    NCORES : int
+    RUNCORES : int
         Total number of processors (cores) in this cluster.
 
     OFS : str
@@ -85,7 +85,7 @@ class ucla_roms(Job):
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
         self.IN_FILE = cfDict['IN_FILE']
-        self.NCORES = cfDict['NCORES']
+        self.RUNCORES = cfDict['RUNCORES']
         return
 
 

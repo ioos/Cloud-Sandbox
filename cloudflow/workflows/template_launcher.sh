@@ -51,7 +51,7 @@ fi
 #Unique extra option required for ROMS
 if [[ "$OFS" == "ucla-roms" ]]; then
   export IN_FILE=$7
-  export NCORES=$8
+  export RUNCORES=$8
 fi
 
 #Unique extra option required for FVCOM
@@ -93,7 +93,7 @@ elif [ $impi -eq 1 ]; then
   if [[ "$OFS" == "roms" ]]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
   elif [[ "$OFS" == "ucla-roms" ]]; then
-    export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np $NCORES"
+    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $RUNCORES"
   else
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
   fi
@@ -198,7 +198,7 @@ elif [[ "$OFS" == "ucla-roms" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./ucla-roms_template_run.sh $MODEL_DIR $IN_FILE $EXEC"
+    RUNSCRIPT="./ucla-roms_run.sh $MODEL_DIR $IN_FILE $EXEC"
 
     # Run it
     $RUNSCRIPT

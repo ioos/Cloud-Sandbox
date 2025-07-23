@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export HOMEroms=/save/$USER/lapenta/ucla-roms
+export HOMEroms=/save/$USER/ucla-roms
 
 export ROMS_ROOT=$HOMEroms
 

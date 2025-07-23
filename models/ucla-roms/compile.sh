@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export ROMS_ROOT=/save/$USER/ucla-roms
+
 module purge
 module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3a7dxu3
@@ -16,9 +18,4 @@ export FC=mpiifort
 export CXX=mpiicpc
 export CC=mpiicc
 
-export EXAMPLE_DIR="$(pwd)"
-
-export ROMS_ROOT="$(dirname "$(dirname "$EXAMPLE_DIR")")"
-
 make COMPILER=ifort MPI_WRAPPER=mpiifort
-

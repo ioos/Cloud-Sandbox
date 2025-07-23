@@ -1,6 +1,9 @@
 #!/bin/bash
 
-export HOMEroms=/save/$USER/lapenta/ucla-roms
+###########################################################
+# USER INPUT NEEDED: set where ucla-roms will be downloaded
+###########################################################
+export HOMEroms=/save/$USER/ucla-roms
 
 ########################
 # load required modules
