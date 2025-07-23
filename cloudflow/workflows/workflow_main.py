@@ -125,6 +125,10 @@ def main():
             expflow = flows.simple_experiment_flow(jobconfig, jobfile)
             flowdeq.appendleft(expflow) 
 
+        elif jobtype == "ucla-roms":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+
         else:
             print(f"jobtype: {jobtype} is not supported")
             sys.exit()

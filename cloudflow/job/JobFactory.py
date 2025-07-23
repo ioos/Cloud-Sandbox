@@ -8,6 +8,7 @@ from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
 from cloudflow.job.SCHISMHindcast import SCHISMHindcast
+from cloudflow.job.ucla_roms import ucla_roms
 
 from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
 from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
@@ -56,6 +57,8 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'romshindcast':
             newjob = ROMSHindcast(configfile, NPROCS)
+        if jobtype == 'ucla-roms':
+            newjob = ucla_roms(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)
         elif jobtype == 'adcircforecast':

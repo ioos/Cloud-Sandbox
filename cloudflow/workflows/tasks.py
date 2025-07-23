@@ -668,6 +668,22 @@ def template_run(cluster: Cluster, job: Job):
 
         log.info('ROMS model run finished successfully')
 
+    elif(OFS=='ucla-roms'):
+        IN_FILE = job.IN_FILE
+        RUNCORES = job.RUNCORES
+        try:
+            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'ROMS model run failed ... result: {result.returncode}')
+                raise signals.FAIL('FAILED')
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL('FAILED')
+
+        log.info('ROMS model run finished successfully')
+
     # For FVCOM model execution, we need to know the casename of the master
     # .nml file that tells FVCOM the model run configuration
     elif(OFS=='fvcom'):
