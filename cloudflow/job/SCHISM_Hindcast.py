@@ -2,6 +2,9 @@ import datetime
 import os
 import sys
 
+from cloudflow.job.Job import Job
+from cloudflow.utils import modelUtil as util
+
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
@@ -16,7 +19,7 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 # SECOFS
-class SCHISMHindcast(Job):
+class SCHISM_Hindcast(Job):
     """ Implementation of Job class for SCHISM simulations
 
     Attributes
@@ -50,11 +53,15 @@ class SCHISMHindcast(Job):
     COMDIR : str
         The location of the SCHISM model run to execute
 
-    SAVE : str
+    SAVEDIR : str
         The /save directory for this job containing other things needed, e.g. modulefile, scripts, executables, etc.
 
     PTMP : str
         The scratch disk to use for running the model
+
+    PARMNML_IN   : str
+
+    PARMNML_TMPL : str
 
     NSCRIBES: str
         The number of cpus dedicated to SCHISM I/O procedures
@@ -100,32 +107,73 @@ class SCHISMHindcast(Job):
         self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.CDATE = cfDict['CDATE']
-        self.SDATE = cfDict['SDATE']
-        self.EDATE = cfDict['EDATE']
+        if 'SDATE' in cfDict: self.SDATE = cfDict['SDATE']
+        if 'EDATE' in cfDict: self.EDATE = cfDict['EDATE']
+        self.RNDAY = cfDict['RNDAY']
         self.HH = cfDict['HH']
         self.EXEC = cfDict['EXEC']
-        self.OUTDIR = cfDict['COMDIR']
-        self.SAVE = cfDict['SAVE']
+        self.COMROT = cfDict['COMROT']
+        self.OUTDIR = self.COMROT + "/" + self.CDATE
+        self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
+        self.NML_IN = cfDict['NML_IN']
+        self.NML_TMPL = cfDict['NML_TMPL']
         self.NSCRIBES = cfDict['NSCRIBES']
 
         return
 
+
+    # This function must be defined, workflow depends on it
     def make_oceanin(self):
-        print("make_oceanin - not implemented for this model yet")
+        self.make_parmnml()
+
+
+
+    def make_parmnml(self):
+
+        if self.OFS == "secofs":
+            self.__make_parmnml_secofs()
+        else:
+            print(f"WARNING: make_parmnml is not implemented for {self.OFS}")
+
         return
 
-# TODO: need to parameterize model run options that are used for .nml file
-# e.g. 
-# ! Starting time
-#  start_year = 2017 !int
-#  start_month = 12 !int
-#  start_day = 1 !int
-#  start_hour = 0 !double
-#  utc_start = 0 !double
 
-#  rnday = 396. !total run time in days
-#  dt = 120. !Time step in sec
+
+    def __make_parmnml_secofs(self):
+
+        if not os.path.exists(self.OUTDIR):
+            os.makedirs(self.OUTDIR)
+
+        if self.NML_IN == "auto":
+
+            template = self.NML_TMPL
+            
+            outfile = self.OUTDIR + "/param.nml"
+            start_year = self.CDATE[0:4]
+            start_month = self.CDATE[4:6]
+            start_day = self.CDATE[6:8]
+            start_hour = float(self.HH)
+
+            # TODO: assuming dt is 120 seconds, parameterize it
+            # ! nohot_write = must be a multiple of ihfskip if nhot=1
+            # ! 1 day == 86400 seconds
+
+            nhot_write = int(float(self.RNDAY) * 720)
+            # nhot_write = 720
+
+            settings = {
+                "__RNDAY__": self.RNDAY,
+                "__START_YEAR__": start_year,
+                "__START_MONTH__": str(int(start_month)),
+                "__START_DAY__": str(int(start_day)),
+                "__START_HOUR__": str(start_hour),
+                "__NHOT_WRITE__": str(nhot_write)
+            }
+
+            util.sedoceanin(template, outfile, settings)
+
+        return
 
 
 if __name__ == '__main__':

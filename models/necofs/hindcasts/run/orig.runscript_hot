@@ -1,0 +1,36 @@
+#!/bin/sh
+#PBS -u qxu
+#PBS -N NECOFS_01
+#PBS -e log.err
+#PBS -o log.out
+#PBS -l nodes=6:ppn=32
+#PBS -r n
+#PBS -q microway
+
+# This job's working directory
+echo Working directory is $PBS_O_WORKDIR
+
+### MAKE SURE THE PATH DOES NOT INCLUDE '/hosts/hydra/'
+echo Modified Working dir is: `echo $PBS_O_WORKDIR | sed 's_/hosts/hydra/_/_'`
+cd `echo $PBS_O_WORKDIR | sed 's_/hosts/hydra/_/_'`
+###=====================================================#
+CPUS=`cat $PBS_NODEFILE | wc -l`
+
+echo NodeFile is: $PBS_NODEFILE , Nodes selected:
+cat $PBS_NODEFILE | sort | uniq
+
+echo I am launching from master node `hostname -s` in directory:
+
+rm -f log.err
+rm -f log.out
+#====================Environment=========================
+export MV2_ENABLE_AFFINITY=0
+export MV2_SUPPRESS_JOB_STARTUP_PERFORMANCE_WARNING=1
+#===================Executable line=====================
+
+mpiexec --machinefile $PBS_NODEFILE -np $CPUS  ./fvcom --casename=necofs_hot --logfile=test
+
+echo Tada! `date`
+
+
+

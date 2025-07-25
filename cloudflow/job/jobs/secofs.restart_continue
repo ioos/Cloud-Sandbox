@@ -1,0 +1,14 @@
+{
+  "JOBTYPE"   : "schism_hindcast",
+  "OFS"       : "secofs",
+  "CDATE"     : "20171201",
+  "RNDAY"     : "3",
+  "HH"        : "00",
+  "COMROT"    : "/com/patrick/secofs",
+  "SAVEDIR"      : "/save/patrick/schism",
+  "PTMP"      : "/ptmp/patrick/secofs",
+  "NML_IN"    : "auto",
+  "NML_TMPL"  : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/secofs_restart_continue.param.nml.in",
+  "EXEC"      : "/save/patrick/schism/bin/pschism_IOOSSB_PREC_EVAP_BLD_STANDALONE_TVD-VL",
+  "NSCRIBES"  : "6"
+}

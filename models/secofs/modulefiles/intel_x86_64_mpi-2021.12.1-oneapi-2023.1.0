@@ -1,0 +1,81 @@
+#%Module
+
+##############################################################
+###     Machuan Peng and Aijun Zhang Aijun.Zhang@noaa.gov
+###     NOS' Center for Operational Oceanographic Products and Services (CO-OPS)
+### NOS_SHARED
+##############################################################
+proc ModulesHelp { } {
+puts stderr "Set environment veriables for NOSOFS"
+}
+
+module-whatis "This module sets the environment variables for \
+               nosofs_shared production utilities:"
+
+#setenv COMP_F ifort
+#setenv COMP_F_MPI90 mpif90
+#setenv COMP_F_MPI mpif90
+#setenv COMP_ICC icc
+#setenv COMP_CC  icc
+#setenv COMP_CPP cpp
+#setenv COMP_MPCC "mpicc -fc=icc"
+
+module use -a /mnt/efs/fs1/save/environments/spack/share/spack/modules/linux-rhel8-x86_64
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
+# Loading requirement: glibc/2.28-gcc-11.2.1-xw6lb4v 
+#     gcc-runtime/11.2.1-gcc-11.2.1-wwsew2s
+
+module load zlib-ng/2.1.6-intel-2021.9.0-mwrleel 
+# Loading requirement: glibc/2.28-intel-2021.9.0-2uwzqhm
+module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
+#  Loading requirement: 
+#      intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4 
+#      pkgconf/2.2.0-intel-2021.9.0-s7445l2
+#
+module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci 
+# intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi 
+#  Loading requirement: 
+#    glibc/2.28-intel-2021.9.0-2uwzqhm
+#    bzip2/1.0.8-intel-2021.9.0-cupkwjh
+#    lz4/1.9.4-intel-2021.9.0-cu6cmc3
+#    snappy/1.1.10-intel-2021.9.0-bxusyvy
+#    zlib-ng/2.1.6-intel-2021.9.0-mwrleel
+#    zstd/1.5.6-intel-2021.9.0-6okpm43
+#    c-blosc/1.21.5-intel-2021.9.0-ln4dv7k
+#    intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
+#    pkgconf/2.2.0-intel-2021.9.0-s7445l2
+#    hdf5/1.14.3-intel-2021.9.0-jjst2zs
+#    libaec/1.0.6-intel-2021.9.0-hqfpltz
+#    netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
+
+module load intel-oneapi-runtime/2023.1.0-oneapi-2023.1.0-wewsg5j
+module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
+
+setenv MPI_INC "$env(I_MPI_ROOT)/include"
+
+module use -a /usrx/modulefiles
+
+# Loding nceplibs modules
+#module load produtil/1.0.18
+#module load wgrib2
+#module load bacio/v2.1.0
+#module load bufr/v11.0.2
+#module load w3nco/v2.0.6
+#module load w3emc/v2.2.0
+#module load g2/v3.1.0
+
+set netcdf [exec nf-config --prefix]
+regsub {\n$} $netcdf {} netcdf
+setenv NETCDF $netcdf
+
+set netcdfc [exec nc-config --prefix]
+regsub {\n$} $netcdfc {} netcdfc
+setenv NETCDFC $netcdfc
+
+# setenv LD_LIBRARY_PATH "$env(NETCDF)/lib:$LD_LIBRARY_PATH
+prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
+prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
+
+#setenv NETCDF_INCDIR  "$env(NETCDF)/include"
+#setenv JASPER_LIB "-L/lib64 -ljasper"
+

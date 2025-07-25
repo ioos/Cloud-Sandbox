@@ -7,7 +7,7 @@
   "HH"        : "00",
   "COMROT"    : "Using_COMDIR_should_switch_to_this_for_consistency",
   "COMDIR"    : "/com/patrick/secofs/RUN08j",
-  "SAVE"      : "/save/patrick/schism",
+  "SAVEDIR"      : "/save/patrick/schism",
   "PTMP"      : "/ptmp/patrick/secofs/RUN08j",
   "OCEANIN"   : "",
   "OCNINTMPL" : "",

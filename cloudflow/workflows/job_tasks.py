@@ -260,9 +260,9 @@ def get_forcing_multi(job: Job, sshuser=None):
 
     ofs = job.OFS
 
-    sdate = job.SDATE
-    edate = job.EDATE
-    hh = job.HH
+    sdate = getattr(job,"SDATE", job.CDATE)
+    edate = getattr(job,"EDATE", job.CDATE)
+    hh = getattr(job,"HH", "00")
 
     comrot = job.COMROT
 

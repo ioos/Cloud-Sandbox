@@ -12,7 +12,7 @@ ulimit -s unlimited
 #__license__ = "BSD 3-Clause"
 
 if [ $# -lt 8 ] ; then
-  echo "Usage: $0 YYYYMMDD HH COMOUT WRKDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
+  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
   exit 1
 fi
 
@@ -31,10 +31,13 @@ export HOSTS=$2
 export NPROCS=$3
 export PPN=$4
 
-export WRKDIR=$5
+export SAVEDIR=$5
 export RUNDIR=$6
 export INPUTFILE=$7
 export EXEC=$8
+
+# TODO: INPUTFILE isn't used, FVCOM expects casename, and the exec expects a nml file that matches the casename
+#       or in this case we can use OFS
 
 # TODO: put the following back in
 # mpirun --version | grep Intel
@@ -75,12 +78,12 @@ result=0
 # Can put domain specific options here
 case $OFS in
     
-  necofs_cold)
+  necofs_hot | necofs_cold)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
     cd "$RUNDIR" || exit 1
     echo "Current dir is: $PWD"
 
-    module use -a $WRKDIR/modulefiles
+    module use -a $SAVEDIR/modulefiles
     module load intel_x86_64.impi_2021.12.1
     # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
     echo "Calling: mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out"

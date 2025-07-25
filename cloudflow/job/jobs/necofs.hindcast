@@ -1,0 +1,20 @@
+{
+  "JOBTYPE"   : "fvcomhindcast",
+  "OFS"       : "necofs",
+  "CDATE"     : "20190101",
+  "SDATE"     : "20190101",
+  "EDATE"     : "20190101",
+  "HH"        : "00",
+  "NHOURS"    : "48",
+  "TODO_NDAYS": "make this an option",
+  "COMROT"    : "/com/patrick/necofs/NECOFS_v2.4/hindcast",
+  "SAVEDIR"   : "/save/patrick/necofs",
+  "PTMP"      : "not being used",
+  "DATE_REF"  : "default",
+  "BUCKET"    : "not being used",
+  "BCKTFLDR"  : "not being used",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "necofs_run.nml",
+  "INTMPL"    : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/necofs_hot_run.nml.in",
+  "EXEC"      : "/save/patrick/necofs/NECOFS_v2.4/hindcast/FVCOMv4.4.8/necofs_fvcom"
+}

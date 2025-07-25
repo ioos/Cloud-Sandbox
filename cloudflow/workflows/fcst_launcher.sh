@@ -2,7 +2,6 @@
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
 
-# WRKDIR=/save/$USER
 set -x
 set -a
 
@@ -14,34 +13,24 @@ ulimit -s unlimited
 
 
 if [ $# -lt 8 ] ; then
-  echo "Usage: $0 YYYYMMDD HH COMOUT WRKDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
+  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
   exit 1
 fi
 
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-
-# eccofs
-export I_MPI_OFI_LIBRARY_INTERNAL=0
 export FI_PROVIDER=efa
-export I_MPI_FABRICS=shm:ofi  # default
-#NOTE: #This option is not applicable to slurm and pdsh bootstrap servers.
-# https://www.intel.com/content/www/us/en/docs/mpi-library/developer-reference-linux/2021-15/communication-fabrics-control.html
+export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
+
 # module load libfabric-aws
 
 # LiveOcean
+#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
 #export I_MPI_OFI_LIBRARY_INTERNAL=1
 #export I_MPI_OFI_PROVIDER=efa
 #export I_MPI_FABRICS=ofi
 #export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-
-#export I_MPI_DEBUG=${I_MPI_DEBUG:-0}
-#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-#export I_MPI_DEBUG=1
-#export I_MPI_FABRICS=efa
-#export I_MPI_FABRICS=${I_MPI_FABRICS:-shm:ofi}
 #export FI_PROVIDER=efa
-#export FI_PROVIDER=tcp
 
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
@@ -50,8 +39,8 @@ export I_MPI_OFI_PROVIDER=efa
 
 export CDATE=$1
 export HH=$2
-export COMOUT=$3    # job.OUTDIR
-export WRKDIR=$4    # job.SAVE
+export COMOUT=$3     # job.OUTDIR
+export SAVEDIR=$4
 export PTMP=$5
 export NPROCS=$6
 export PPN=$7
@@ -112,7 +101,7 @@ result=0
 # Can put domain specific options here
 case $OFS in
   liveocean)
-    export HOMEnos=$WRKDIR/LiveOcean
+    export HOMEnos=$SAVEDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export JOBARGS="$CDATE $COMOUT"
@@ -123,7 +112,7 @@ case $OFS in
     result=$?
     ;;
   cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=$WRKDIR/nosofs-3.5.0
+    export HOMEnos=$SAVEDIR/nosofs-3.5.0
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export cyc=$HH
@@ -132,43 +121,66 @@ case $OFS in
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
+
+
   wrfroms)
-    export HOMEnos=$WRKDIR/WRF-ROMS-Coupled
+    export HOMEnos=$SAVEDIR/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
     cd "$JOBDIR" || exit 1
     $JOBSCRIPT
     result=$?
     ;;
+
+
   secofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
+
+    mkdir -p $COMOUT
     cd "$COMOUT" || exit 1
     # If using scratch disk use PTMP
     # cd $PTMP || exit 1
     echo "Current dir is: $PWD"
-    if [[ $OFS == "secofs" ]]; then 
-      if [ ! -d outputs ]; then
-        mkdir outputs
-      else
-        rm -f outputs/*
-      fi
+    if [ ! -d outputs ]; then
+      mkdir outputs
     fi
 
-    # WRKDIR is job.SAVE 
+    # TODO: need better encapsulation and standardization of module and launch procedure
+    # SAVEDIR is job.SAVEDIR
     # e.g. /save/patrick/schism
-    module use -a $WRKDIR
-    module load intel_x86_64
-    NSCRIBES = $XTRA_ARGS
+    module use -a $SAVEDIR
+    MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+
+    #TODO: make this part of the job config
+    module load $MODULEFILE
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
+    export OMP_NUM_THREADS=1 
+
+    NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
-    #echo "Testing ... sleeping"
-    #sleep 300
     echo "STARTING RUN AT $starttime"
     mpirun $MPIOPTS $EXEC $NSCRIBES
     result=$?
     endtime=`date +%R`
     echo "RUN FINISHED AT $endtime"
+
+    # Combine hotstart files if they exist
+    # TODO: this might need to be run as a separate script post-process job
+    # example: what if hotstarts are written every 720 timesteps and not just at the end of the run?
+    #if ls -1 outputs/hotstart_0*; then
+    #    cd outputs
+    #    $SAVEDIR/bin/combine_hotstart7 -i 720
+    #fi
     ;;
+
+
   eccofs)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
     cd "$COMOUT" || exit 1
@@ -176,9 +188,16 @@ case $OFS in
     # cd $PTMP || exit 1
     echo "Current dir is: $PWD"
 
-    # WRKDIR is job.SAVE 
-    module use -a $WRKDIR/modulefiles
+    # SAVEDIR is job.SAVEDIR
+    module use -a $SAVEDIR/modulefiles
     module load intel_x86_64
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
     OCEANIN=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
     starttime=`date +%R`
@@ -186,6 +205,37 @@ case $OFS in
     #sleep 300
     echo "STARTING RUN AT $starttime"
     mpirun $MPIOPTS $EXEC $OCEANIN
+    result=$?
+    echo "wth mpirun result: $result"
+    endtime=`date +%R`
+    echo "RUN FINISHED AT $endtime"
+    ;;
+
+
+  necofs)
+    
+    cd "$COMOUT" || exit 1
+    echo "Current dir is: $PWD"
+    if [ ! -d output ]; then
+      mkdir output
+    fi
+
+    module use -a $SAVEDIR/modulefiles
+    module load intel_x86_64.impi_2021.12.1
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export FI_PROVIDER=efa
+    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
+    # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
+    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out"
+    starttime=`date +%R`
+
+    echo "STARTING RUN AT $starttime"
+    #mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
+    mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     result=$?
     echo "wth mpirun result: $result"
     endtime=`date +%R`

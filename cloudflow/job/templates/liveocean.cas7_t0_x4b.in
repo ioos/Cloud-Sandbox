@@ -73,7 +73,7 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-      VARNAME = __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/varinfo.yaml
+      VARNAME = __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/varinfo.yaml
       
 ! Number of nested grids.
 
@@ -1086,12 +1086,12 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
 ! Input ASCII parameter filenames.
 
-     APARNAM =  __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/s4dvar.in
-     SPOSNAM =  __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/stations.in
-     FPOSNAM =  __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/floats.in
+     APARNAM =  __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/s4dvar.in
+     SPOSNAM =  __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/stations.in
+     FPOSNAM =  __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/floats.in
      BPARNAM =  __COMROT__/LO_roms/cas7_t0_x4b/__FDATE__/bio_Banas.in
-     SPARNAM =  __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/sediment.in
-     USRNAME =  __SAVE__/LiveOcean/LO_roms_source_git/ROMS/External/MyFile.dat
+     SPARNAM =  __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/sediment.in
+     USRNAME =  __SAVEDIR__/LiveOcean/LO_roms_source_git/ROMS/External/MyFile.dat
 
 !
 !  GLOSSARY:

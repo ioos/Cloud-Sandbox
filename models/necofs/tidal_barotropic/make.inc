@@ -117,7 +117,7 @@ dashL= $(empty) -L
 #       UNCOMMENT THE RIGHT PETSC FLAG BELOW ON VERSION:
 #       FOR VERSION 2.0   TO 2.3.2
 #            FLAG_41 = -DPETSC_A
-#            include ${PETSC_DIR}/bmake/common/variables
+##PT            include ${PETSC_DIR}/bmake/common/variables
 #
 #       FOR VERSION 2.3.3
 ##PT            FLAG_41 = -DPETSC_B

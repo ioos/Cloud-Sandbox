@@ -73,7 +73,7 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-      #VARNAME = __SAVE__/LiveOcean/LO_roms_source_alt/varinfo/varinfo.yaml
+      #VARNAME = __SAVEDIR__/LiveOcean/LO_roms_source_alt/varinfo/varinfo.yaml
       VARNAME = varinfo.yaml
       
 ! Number of nested grids.

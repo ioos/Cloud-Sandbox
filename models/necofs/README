@@ -1,0 +1,16 @@
+NECOFS
+
+Current version is in hindcasts folder.
+
+Setup scripts, make sure to edit them to set to your directory locations.
+
+1. get_src.sh
+2. build_necofs.sh
+3. get_testcase_inputs.sh
+
+Tested example job configs cloudflow/job/jobs, make sure to edit them to set to your directory locations and other options:
+
+necofs.exp.test  - bare bones manual setup cold start
+necofs.exp.hot   - bare bones manual setup hindcast
+necofs.hindcast  - parameterized hindcast setup
+

@@ -992,9 +992,8 @@ install_petsc_intelmpi-spack () {
 
   # The PETSc library is required for some FVCOM builds.
   # https://petsc.org/release/install/
-  # spack install petsc cflags='-g -O3 -march=native -mtune=native' fflags='-g -O3 -march=native -mtune=native'  cxxflags='-g -O3 -march=native -mtune=native'
 
-# install with some external packages - spack install petsc +superlu-dist +metis +hypre +hdf5
+  # install with some external packages - spack install petsc +superlu-dist +metis +hypre +hdf5
 
   #spack install $SPACKOPTS petsc%${COMPILER} +metis +hdf5 cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
 

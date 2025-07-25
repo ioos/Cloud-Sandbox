@@ -6,7 +6,7 @@
   "EDATE"     : "20250520",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/nosofs",
-  "SAVE"      : "/save/patrick",
+  "SAVEDIR"      : "/save/patrick",
   "PTMP"      : "/ptmp/patrick",
   "EXEC"      : "",
   "TIME_REF"  : "20160101.0d0",

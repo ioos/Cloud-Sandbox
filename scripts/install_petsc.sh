@@ -24,8 +24,7 @@ source /opt/rh/gcc-toolset-11/enable
 #spack load esmf@8.5.0
 
 install_intel_oneapi_spack
-#install_petsc_intelmpi-spack
-
+install_petsc_intelmpi-spack
 
 # also needed for FVCOM
 # sudo yum install byacc
@@ -46,7 +45,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-# TESTING
-# ./create_image.sh $ami_name $project_tag
+./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"
