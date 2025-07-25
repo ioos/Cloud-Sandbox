@@ -969,8 +969,10 @@ install_esmf_spack () {
   cd $home
 }
 
+
 #-----------------------------------------------------------------------------#
 install_petsc_intelmpi-spack () {
+  # TODO: Add this to the setup-instance.sh script for deployment
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
@@ -1095,6 +1097,12 @@ install_ncep_rpms () {
 
   cd $home
 }
+
+#-----------------------------------------------------------------------------#
+install_ncep_libs_spack () {
+    return
+}
+
 
 #-----------------------------------------------------------------------------#
 
