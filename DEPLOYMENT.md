@@ -159,10 +159,16 @@ Run `terraform apply` to create the AWS resources.
 terraform apply -var-file="mysettings.tfvars"
 ```
 
+Alternative method:
+```
+terraform plan -var-file=mysettings.tfvars -out=my.plan
+terraform apply my.plan
+```
+
 Enter 'yes' to create the resources.  
 
 ---
-**NOTE:**
+**NOTES:**
 
 You may run into something similar to the following error if applying Terraform on an AWS account where more than one Cloud Sandbox have been deployed:  
 ```

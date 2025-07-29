@@ -187,7 +187,6 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 ### AMI Options
 ### Specify aws_ami.*****.id in aws_instance section below
 
-
 ###################################
 # RHEL 8
 # 2023-10-06: ami-057094267c651958e
@@ -195,13 +194,24 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 # Owner account ID 309956199498 Red Hat
 ##################################
 
+################################################################
+# CLI search command for troubleshooting, specificity
+#aws ec2 describe-images --owners 309956199498        \
+#    --filters "Name=name,Values=RHEL-8.*_HVM-*-x86_64-*-Hourly2-*"  \
+#    --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
+#    --output table
+# example:
+# |  RHEL-8.9.0_HVM-20240327-x86_64-4-Hourly2-GP3  |  ami-03b59d2a779dad4d3 |  2024-03-28T07:27:26.000Z  |
+# success: ami                                  = "ami-03b59d2a779dad4d3"
+
 data "aws_ami" "rhel_8" {
   owners = ["309956199498"]
   most_recent = true
 
   filter {
     name = "name"
-    values = ["RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2"]
+    #values = ["RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2"]
+    values = ["RHEL-8.9*_HVM-*-x86_64-*-Hourly2-*"]
   }
 
   filter {
