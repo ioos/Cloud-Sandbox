@@ -246,7 +246,7 @@ class ROMSHindcast(Job):
         # squareness=0.5
         # squareness=0.02222
         print(f'calling util.makeOceanin')
-        util.makeOceanin(self.NPROCS, settings, template, outfile, squareness=squareness)
+        util.makeOceanin(self.NPROCS, settings, template, outfile, ratio=squareness)
 
         return
 
