@@ -57,7 +57,7 @@ class JobFactory:
             newjob = ROMSForecast(configfile, NPROCS)
         elif jobtype == 'romshindcast':
             newjob = ROMSHindcast(configfile, NPROCS)
-        if jobtype == 'ucla-roms':
+        elif jobtype == 'ucla-roms':
             newjob = ucla_roms(configfile, NPROCS)
         elif jobtype == 'fvcomforecast':
             newjob = FVCOMForecast(configfile, NPROCS)

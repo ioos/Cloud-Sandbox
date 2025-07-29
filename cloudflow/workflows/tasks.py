@@ -504,7 +504,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            if OFS == "eccofs":
+                result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            else:
+                result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
