@@ -104,20 +104,18 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     maxtries=5
     tries=1
     while tries <= maxtries:
-      print(f"Waiting for snapshot creation ...")
+      print(f"Waiting for snapshot creation ... do not make any changes to the root volume.")
       try:
       
         snapshot.wait_until_completed()
         break
       except Exception as e:
-        print("WARNING: " + str(e))
         tries += 1
-        #print(f"... waiting for snapshot creation: tries {tries} of {maxtries}")
-
         if tries == maxtries:
-          print("ERROR: maxtries reached. something went wrong")
-          traceback.print_stack()
-          # return None
+          print("ERROR: maxtries reached... something went wrong")
+          return None
+        else:
+            print(f"... still waiting for snapshot creation to complete: tries:{tries} of maxtries:{maxtries}")
 
   except Exception as e:
     print("Exception: " + str(e))

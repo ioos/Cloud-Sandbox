@@ -18,6 +18,9 @@ fi
 
 setup_environment () {
 
+  # TODO: add etc/profile.d customizations - see ./system directory
+  # TODO: add .vimrc to ~ to turn off auto-indent - see ./system directory
+
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -285,7 +288,9 @@ install_spack() {
   git checkout -q $SPACK_VER
 
   # Don't add this if it is already there
-  if [ grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null ]; then
+
+  grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null
+  if [ $? -eq 1 ] ; then 
       echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
       echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
   fi
@@ -969,6 +974,57 @@ install_esmf_spack () {
   cd $home
 }
 
+
+#-----------------------------------------------------------------------------#
+install_fsx_driver () {
+    # Run as sudo
+
+    # RedHat EL 8
+    # Kernel - uname -r
+    # 4.18.0-425.13.1.el8_7.x86_64
+
+    # Install rpm key
+    curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc -o /tmp/fsx-rpm-public-key.asc
+
+    sudo rpm --import /tmp/fsx-rpm-public-key.asc
+
+    # Add repo
+    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
+
+    # Do one of the following:
+    kernel=`uname -r`
+    echo "Current kernel version is: ${kernel}"
+
+
+    # If the command returns 4.18.0-553*, you don't need to modify the repository configuration. Continue to the To install the Lustre client procedure.
+
+    ##### If the command returns 4.18.0-513*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.9 release.
+    if [[ $kernel =~ "4.18.0-553" ]]; then
+        echo "RHEL 8.10"
+	# no change needed
+    elif [[ $kernel =~ "4.18.0-513" ]]; then
+        echo "RHEL 8.9"
+        sudo sed -i 's#/8/#/8.9/#' /etc/yum.repos.d/aws-fsx.repo
+    elif [[ $kernel =~ "4.18.0-477" ]]; then
+        echo "RHEL 8.8"
+        sudo sed -i 's#/8/#/8.8/#' /etc/yum.repos.d/aws-fsx.repo
+    elif [[ $kernel =~ "4.18.0-425" ]]; then
+        echo "RHEL 8.7"
+        sudo sed -i 's#/8/#/8.7/#' /etc/yum.repos.d/aws-fsx.repo
+    else
+       echo "not sure if any changes to /etc/yum.repos.d/aws-fsx.repo are needed for $kernel"
+    fi 
+
+    # If the command returns 4.18.0-477*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.8 release.
+
+    # If the command returns 4.18.0-425*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.7 release.
+
+    sudo yum install -y kmod-lustre-client lustre-client
+    sudo yum clean all
+
+}
+
+
 #-----------------------------------------------------------------------------#
 install_petsc_intelmpi-spack () {
 
@@ -977,30 +1033,34 @@ install_petsc_intelmpi-spack () {
   #module use /save/patrick/Cloud-Sandbox/models/modulefiles/
   #module load intel_x86_64.impi_2021.12.1
 
-  module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
-  module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
+  COMPILER=oneapi@$ONEAPI_VER
+  #module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
+  #module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
   #module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
-  module list
+  #module load hdf5/1.14.3-oneapi-2023.1.0-wdcqims
 
-  #spack load intel-oneapi-compilers@${ONEAPI_VER}
-  #spack load intel-oneapi-mpi@2021.12.1%oneapi@=2023.1.0/p5npcbi
-  #spack load intel-oneapi-runtime@2023.1.0%oneapi@=2023.1.0/wewsg5j
-  #spack load hdf5@1.14.3
+  spack load intel-oneapi-compilers@$ONEAPI_VER
+  spack load intel-oneapi-mpi@$INTEL_MPI_VER%$COMPILER
+  spack load intel-oneapi-runtime@$ONEAPI_VER%$COMPILER
 
-  #COMPILER=intel@${INTEL_COMPILER_VER}
-  COMPILER=oneapi@2023.1.0
+  # COMPILER=intel@${INTEL_COMPILER_VER}
+  # gettext-0.22.5 fails to build with intel icc
+  #  >> 5440    malloca.c(49): error #3895: expected a comma (the one-argument version of static_assert is not enabled in this mode)
+  # spack load intel-oneapi-compilers@${ONEAPI_VER}
+  #module load intel-oneapi-compilers
+  # try getting this to work, maybe try a previous version of gettext
+  # spack install $SPACKOPTS gettext %${COMPILER} $SPACKTARGET
+  # icc is deprecated anyways
 
+
+  ######################################################
   # The PETSc library is required for some FVCOM builds.
   # https://petsc.org/release/install/
 
   # install with some external packages - spack install petsc +superlu-dist +metis +hypre +hdf5
-
   #spack install $SPACKOPTS petsc%${COMPILER} +metis +hdf5 cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
 
-  #spack install $SPACKOPTS gettext %${COMPILER} $SPACKTARGET
-
   spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
-
 
 }
 

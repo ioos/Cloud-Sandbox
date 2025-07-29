@@ -16,25 +16,24 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-setup_paths
-setup_aliases
-setup_environment
+# setup_paths
+# setup_aliases
+# setup_environment
 
 ## install_jupyterhub # Requires some manual work
-setup_ssh_mpi
-
-install_efa_driver
-install_fsx_driver
+# setup_ssh_mpi
+# install_efa_driver
+# install_fsx_driver
 
 # Compilers and libraries
-install_python_modules_user
-install_gcc_toolset_yum
+# install_python_modules_user
+# install_gcc_toolset_yum
 
 source /opt/rh/gcc-toolset-11/enable
 
-install_spack
-install_intel_oneapi_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
+# install_spack
+# install_intel_oneapi_spack
+# install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 
 # TODO: Install these libraries via spack
 #install_base_rpms
@@ -61,6 +60,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-./create_image.sh $ami_name $project_tag
+# ./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"

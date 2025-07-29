@@ -32,7 +32,15 @@ EFA_INSTALLER_VER='1.38.0'
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
+#SPACK_CACHEONLY=1
 SPACK_CACHEONLY=0
+
+if [ $SPACK_CACHEONLY -eq 1 ]; then
+    echo "NOTICE: SPACK_CACHEONLY is set to 1 in environment-vars.sh"
+    echo "NOTICE: Spack will only install if the precompiled package is found in the s3 mirror."
+    echo "NOTICE: Spack will not build any packages."
+    echo "NOTICE: Set SPACK_CACHEONLY=0 to enable building"
+fi
 
 SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 

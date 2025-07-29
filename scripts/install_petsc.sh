@@ -22,15 +22,14 @@ source /opt/rh/gcc-toolset-11/enable
 #spack load intel-oneapi-compilers@2023.1.0
 #spack load intel-oneapi-mpi@2021.12.1
 #spack load esmf@8.5.0
+#install_intel_oneapi_spack
 
-install_intel_oneapi_spack
 install_petsc_intelmpi-spack
 
 # also needed for FVCOM
 # sudo yum install byacc
 # git clone makedepf90
 # make it and make install -t
-
 
 # create node image
 ###################################
