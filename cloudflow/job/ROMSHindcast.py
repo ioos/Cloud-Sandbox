@@ -235,7 +235,7 @@ class ROMSHindcast(Job):
             "__FDATE__": fdate,
             "__ININAME__": self.ININAME,
             "__COMROT__": COMROT,
-            "__SAVEDIR": self.SAVEDIR,
+            "__SAVEDIR__": self.SAVEDIR,
             "__TRAPSDIR__" : TRAPSDIR
         }
 

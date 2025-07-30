@@ -4,6 +4,7 @@
   "CDATE"     : "20170601",
   "HH"        : "00",
   "COMROT"    : "/com/ec2-user",
+  "SAVEDIR"   : "/save/ec2-user",
   "PTMP"      : "/ptmp",
   "EXEC"      : "",
   "TIME_REF"  : "19700101",

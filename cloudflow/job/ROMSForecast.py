@@ -136,6 +136,7 @@ class ROMSForecast(Job):
         self.OUTDIR = cfDict['OUTDIR']
         self.OCEANIN = cfDict['OCEANIN']
         self.OCNINTMPL = cfDict['OCNINTMPL']
+        self.SAVEDIR = cfDict['SAVEDIR']
 
         if self.CDATE == "today":
             today = datetime.date.today().strftime("%Y%m%d")
