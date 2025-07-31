@@ -52,6 +52,7 @@ setup_environment () {
   sudo yum -y install vim-enhanced
   sudo yum -y install subversion
   sudo yum -y install bc
+  sudo yum -y install htop
 
   sudo yum -y install python3.11-devel
   sudo alternatives --set python3 /usr/bin/python3.11
@@ -288,7 +289,6 @@ install_spack() {
   git checkout -q $SPACK_VER
 
   # Don't add this if it is already there
-
   grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null
   if [ $? -eq 1 ] ; then 
       echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
@@ -302,22 +302,34 @@ install_spack() {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   # TODO: Rebuild everything using this, and push to mirror
-  # spack config add "config:install_tree:padded_length:128"
+  spack config add "config:install_tree:padded_length:73"
   spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
-
   spack buildcache keys --install --trust --force
+
   spack buildcache update-index $SPACK_MIRROR
   #     update-index (same as rebuild-index)
   #               update a buildcache index
 
   spack compiler find --scope system
 
+  ###############################################
+  # Use system installed packages when available
+  # had some gettext build issues, using the system one resolved it
+  ###############################################
+  #spack external find --scope system
+  #spack external find --not-buildable --scope system
+  # --not-buildable       packages with detected externals won't be built with Spack
+
   # Note: to recreate modulefiles
   # spack module tcl refresh -y
+
+  # This is spack's mirror of some libraries
+  #spack mirror add v0.22.5 https://binaries.spack.io/v0.22.5
+  #spack buildcache keys --install --trust
 
   cd $home
 }
@@ -325,13 +337,24 @@ install_spack() {
 #-----------------------------------------------------------------------------#
 # Uninstalls everything
 remove_spack() {
-  set -x
+  set +x
 
+  echo "In remove_spack() ..."
+  echo "WARNING: This will remove everything in $SPACK_DIR and /etc/spack"
+  echo "Proceed with caution, this action might affect other users"
+  read -r -p "Do you want to proceed? (y/N): " response
+  case "$response" in
+        [Yy]* ) echo "Proceeding ..." ;;
+        * ) echo "Operation cancelled. Exiting."; exit;;
+  esac
+
+  set -x
   if [ ! -d /etc/spack ] ; then
     echo "WARNING: /etc/spack not found, nothing to clean "
   else
     cd /etc/spack || exit 1
-    sudo rm -f compilers.yaml
+    rm -f compilers.yaml
+    rm -f packages.yaml
     cd ..
     sudo rmdir spack
     cd $home
@@ -465,26 +488,19 @@ install_intel_oneapi_spack () {
 
   source /opt/rh/gcc-toolset-11/enable
 
-  GCC_COMPILER=`spack compilers | grep "gcc@11\."`
+  #GCC_COMPILER=`spack compilers | grep "gcc@11\."`
+  GCC_COMPILER=gcc@$GCC_VER
 
-  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
+  # spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
+
+  # There is a bug in the gmake@4.4.1 build spec in spack for gcc 11.2.1 compiler
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} ^gmake@4.2.1 $SPACKTARGET
 
   spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
   spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
-  # MKL is not installing, a lot of build issues! frustrating!
-  # sudo yum -y install libxml2
-  # sudo yum -y install libxml2-devel
-
-  # Build with Intel Classic compilers
-  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %intel@${INTEL_VER}
-  #   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %intel@${INTEL_VER} $SPACKTARGET
-
   # Build with Intel OneApi compilers
-  #  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER}
-  #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
-
-  # MKL fails with intel classic compiler
+  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
 
   cd $home
 }
@@ -952,9 +968,10 @@ install_esmf_spack () {
   . $SPACK_DIR/share/spack/setup-env.sh
 
   spack load intel-oneapi-compilers@${ONEAPI_VER}
+  spack load intel-oneapi-mkl@${ONEAPI_VER}
 
-  #COMPILER=intel@${INTEL_COMPILER_VER}
-  COMPILER=oneapi@${ONEAPI_VER}
+  COMPILER=intel@${INTEL_COMPILER_VER}
+  #COMPILER=oneapi@${ONEAPI_VER}   # v8.5 and v8.6 build errors with oneapi compilers, use intel classic
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
@@ -962,12 +979,46 @@ install_esmf_spack () {
 
   # diffutils 3.10 build fails
   #    using ^diffutils@3.7
-  spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
+
+  # Using built in externals diffutils
+  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} %${COMPILER} $SPACKTARGET
+  #spack install -j 4 $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+
+  # esmf 8.5.0 getting segmentation error during build, trying 8.6.0
+  # 8.6.0 had same error - rebooting setting -j 4 sometimes parallel compilation causes weird errors
+#         #17 0x000014b6651587e5 __libc_start_main + 229
+#         #18 0x0000000001cf1729
+#
+#/tmp/ifx1897599690HSlFpB/ifxvctKti.i90: error #5633: **Internal compiler error: segmentation violation signal raised** Please report this error along with the circumstances in which it occurred in a Software Problem Report.  Note: File and line given may not be explicit cause of this error.
+#
+  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+  #spack install -j1 $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+
+  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf  ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+
+# /mnt/efs/fs1/save/environments/spack/var/spack/cache/_source-cache/archive/ac/acd0b2641587007cc3ca318427f47b9cae5bfd2da8d2a16ea778f637107c29c4.tar.gz
+#[+] /usr (external glibc-2.28-xw6lb4vknvfv2xu2vq56ndjocpqslk5b)
+#[+] /usr (external glibc-2.28-2uwzqhmprowfl2cm2khpzd2otvfnrprb)
+
+#==> Installing esmf-8.5.0-u4hek76jvy5tklkz3rfde2wtbr3dlu5e [19/19]
+#==> Using cached archive: /mnt/efs/fs1/save/environments/spack/var/spack/cache/_source-cache/archive/ac/acd0b2641587007cc3ca318427f47b9cae5bfd2da8d2a16ea778f637107c29c4.tar.gz
+#==> Applied patch /mnt/efs/fs1/save/environments/spack/var/spack/repos/builtin/packages/esmf/esmf_cpp_info.patch
+#==> esmf: Executing phase: 'edit'
+#==> esmf: Executing phase: 'build'
+#==> [2025-07-30-22:00:47.876804] '/usr/bin/chmod' '+x' 'scripts/libs.mvapich2f90'
+#==> [2025-07-30-22:00:47.879392] 'make' '-j1'
+
+# j1 same error
+# clean out /tmp/spack-stage, remove .lock
+# next, try removing some externals from /etc/spack/packages
+# need to use a newer version of intel oneapi compiler
 
   # spack --debug install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
   # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
 
-  # Install fails with the following maybe because mpi isn't installed with oneapi build
+  # Install fails with the following
   #COMPILER=oneapi@${ONEAPI_VER}
   #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
@@ -1451,6 +1502,8 @@ setup_aliases () {
 
   home=$PWD
 
+  # TODO: don't add these if already there
+
   echo alias lsl ls -al >> ~/.tcshrc
   echo alias lst ls -altr >> ~/.tcshrc
   echo alias h history >> ~/.tcshrc
@@ -1458,6 +1511,13 @@ setup_aliases () {
   echo alias cds cd /save/$USER >> ~/.tcshrc
   echo alias cdc cd /com/$USER >> ~/.tcshrc
   echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
+
+
+  echo alias lsl=\'ls -al\' >> ~/.bashrc
+  echo alias lst=\'ls -altr\' >> ~/.bashrc
+  echo alias h=\'history\' >> ~/.tcshrc
+
+  echo alias cds=\'cd /save/$USER\' >> ~/.bashrc
 
   #echo alias cdns cd /noscrub >> ~/.tcshrc
 

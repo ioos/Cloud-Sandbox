@@ -7,6 +7,8 @@ ONEAPI_VER=2023.1.0
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 INTEL_COMPILER_VER=2021.9.0
 
+#ONEAPI_VER=2024.1.0
+
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
 # spack v0.22.3 and higher has that spec
@@ -19,7 +21,9 @@ ESMF_VER=8.5.0
 SPACK_VER='v0.22.5'
 
 SPACK_DIR='/save/environments/spack'
-SPACKOPTS='-v -y --dirty'
+
+SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
+#SPACKOPTS='-v -y'
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
@@ -34,6 +38,7 @@ EFA_INSTALLER_VER='1.38.0'
 
 #SPACK_CACHEONLY=1
 SPACK_CACHEONLY=0
+#SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
     echo "NOTICE: SPACK_CACHEONLY is set to 1 in environment-vars.sh"

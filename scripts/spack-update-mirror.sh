@@ -13,7 +13,7 @@ spack mirror add s3-mirror $SPACK_MIRROR
 spack buildcache keys --install --trust --force
 spack buildcache update-index $SPACK_MIRROR
 
-SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
+#SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
 #SPEC_LIST='%oneapi@2023.1.0'
 
 SECRET=/mnt/efs/fs1/save/environments/spack/opt/spack/gpg/spack.mirror.gpgkey.secret
@@ -24,6 +24,7 @@ if [ ! -e $SECRET ]; then
     exit 1
 fi
 
+# spack config add "config:install_tree:padded_length:128"
 spack gpg trust $SECRET
 
 # Public Key
@@ -36,13 +37,6 @@ do
 
   PKGLIST=`spack find --format "{name}@{version}%{compiler}/{hash}" $SPEC`
 
-  # These are not redistributable, specify --private
-  #PKGLIST='
-      #intel-oneapi-compilers@2023.1.0%gcc@=11.2.1/aimw7vuu3did5zga4raqb4xjbufyermi
-      #glibc@2.28%intel@=2021.9.0/2uwzqhmprowfl2cm2khpzd2otvfnrprb
-      #intel-oneapi-mpi@2021.12.1%intel@=2021.9.0/6nra3z4zqx5yvtxykhbeueq64da6xvmu
-      #'
-
   echo "Package List: "
   echo "-------------------------------------------------------------------------"
   echo "$PKGLIST"
@@ -51,9 +45,30 @@ do
   for PKG in $PKGLIST
   do
     echo "PACKAGE: $PKG"
-    spack buildcache push -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
+    #spack buildcache push -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
+    # -f force - overwrite if already in mirror
+    spack buildcache push -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
+  done
+
+  # These are not publicly redistributable, specify --private
+  PRIVLIST='
+    glibc@2.28%gcc@=11.2.1/xw6lb4v
+    glibc@2.28%intel@=2021.9.0/2uwzqhm
+    intel-oneapi-compilers@2023.1.0%gcc@=11.2.1/3rbcwfi
+    intel-oneapi-mpi@2021.12.1%intel@=2021.9.0/6nra3z4
+    intel-oneapi-mkl@2023.1.0%oneapi@=2023.1.0/5hqrhtx 
+    intel-oneapi-mpi@2021.12.1%oneapi@=2023.1.0/p5npcbi
+    intel-oneapi-runtime@2023.1.0%oneapi@=2023.1.0/wewsg5j
+    intel-tbb@2021.9.0%oneapi@=2023.1.0/qpfqejb
+    '
+
+  for PKG in $PRIVLIST
+  do
+    echo "PACKAGE: $PKG"
     # -f force - overwrite if already in mirror
     #spack --debug buildcache push -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
-    #spack --debug buildcache push --private -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
+    spack buildcache push --private -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
   done
 done
+
+spack buildcache update-index $SPACK_MIRROR

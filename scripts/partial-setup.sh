@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#set -x
 
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
@@ -28,18 +29,24 @@ sudo setenforce 0
 # Compilers and libraries
 # install_python_modules_user
 # install_gcc_toolset_yum
-
 source /opt/rh/gcc-toolset-11/enable
+gcc --version
 
-# install_spack
-# install_intel_oneapi_spack
-# install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
+#remove_spack
+#install_spack
+
+#install_intel_oneapi_spack
+
+# esmf build errors, pre-reqs install fine now
+install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
 
 # TODO: Install these libraries via spack
 #install_base_rpms
 #install_ncep_rpms
 
-install_petsc_intelmpi-spack
+# install_petsc_intelmpi-spack
+
+exit
 
 # install_ffmpeg
 
