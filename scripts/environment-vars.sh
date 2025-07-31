@@ -22,8 +22,8 @@ SPACK_VER='v0.22.5'
 
 SPACK_DIR='/save/environments/spack'
 
-SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
-#SPACKOPTS='-v -y'
+#SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
+SPACKOPTS='-v -y'
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions

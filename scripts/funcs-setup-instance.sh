@@ -321,7 +321,7 @@ install_spack() {
   # had some gettext build issues, using the system one resolved it
   ###############################################
   #spack external find --scope system
-  #spack external find --not-buildable --scope system
+  # spack external find --not-buildable --scope system
   # --not-buildable       packages with detected externals won't be built with Spack
 
   # Note: to recreate modulefiles
