@@ -9,7 +9,8 @@ RUNUSER="ec2-user"
 # CentOS 7 - Stream 8
 #RUNUSER="centos"
 
-BRANCH=main
+BRANCH=deployed-072925
+# BRANCH=main
 #BRANCH=origin/x86_64
 #BRANCH=origin/formainpr
 
