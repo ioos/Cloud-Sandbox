@@ -244,7 +244,7 @@ install_gcc_toolset_yum() {
 
 #-----------------------------------------------------------------------------#
 # Not currently used - needs work
-install_spack-stack() {
+onhold_spack-stack_install() {
 
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
@@ -301,18 +301,20 @@ install_spack() {
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # TODO: Rebuild everything using this, and push to mirror
+  # New method of trusting key
+  if [ ! -e $SPACK_KEY ]; then
+    wget $SPACK_KEY_URL $SPACK_KEY
+    spack gpg trust $SPACK_KEY
+    spack gpg list
+  fi
+
   spack config add "config:install_tree:padded_length:73"
   spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
   spack mirror add s3-mirror $SPACK_MIRROR
-  spack buildcache keys --install --trust --force
-
-  spack buildcache update-index $SPACK_MIRROR
-  #     update-index (same as rebuild-index)
-  #               update a buildcache index
+  spack buildcache keys --install --trust
 
   spack compiler find --scope system
 

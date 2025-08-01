@@ -37,8 +37,8 @@ EFA_INSTALLER_VER='1.38.0'
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
-#SPACK_CACHEONLY=1
-SPACK_CACHEONLY=0
+SPACK_CACHEONLY=1
+#SPACK_CACHEONLY=0
 #SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then

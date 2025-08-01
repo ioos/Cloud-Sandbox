@@ -18,17 +18,16 @@ fi
 spack gpg trust $SECRET
 
 spack buildcache keys --install --trust --force
-#spack buildcache update-index $SPACK_MIRROR
 
 # Public Key
 KEY=F525C05B06DCA266
 
 #spack mirror destroy --mirror-url s3://
-#spack mirror create --private -d s3://ioos-cloud-sandbox/public/spack/mirror intel-oneapi-compilers@2023.1.0%gcc@=11.2.1/3rbcwfi
 
+# You need to provide at least one package to create a mirror
 PKG='gcc-runtime@11.2.1/wwsew2s'
 spack mirror create --private -d s3://ioos-cloud-sandbox/public/spack/mirror $PKG
 
 #spack buildcache push -f -k $KEY -j $JOBS --only package $SPACK_MIRROR $PKG
-
+spack buildcache update-index $SPACK_MIRROR
 

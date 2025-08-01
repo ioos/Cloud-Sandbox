@@ -9,15 +9,19 @@ SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/s
 SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 JOBS=6
 
-echo "Using SPACK s3-mirror $SPACK_MIRROR"
-#spack mirror add s3-mirror $SPACK_MIRROR
+# New method of trusting key
+if [ ! -e $SPACK_KEY ]; then
+  wget $SPACK_KEY_URL $SPACK_KEY
+  spack gpg trust $SPACK_KEY
+  spack gpg list
+fi
 
-#SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
-#SPEC_LIST='%gcc@11.2.1'
-#SPEC_LIST='%intel@2021.9.0'
-#SPEC_LIST='%oneapi@2023.1.0'
-SPEC_LIST='%intel@2021.9.0 %oneapi@2023.1.0'
-#SPEC_LIST=''
+spack config add "config:install_tree:padded_length:73"
+spack config add "modules:default:enable:[tcl]"
+
+# Using an s3-mirror for previously built packages
+echo "Using SPACK s3-mirror $SPACK_MIRROR"
+spack mirror add s3-mirror $SPACK_MIRROR
 
 SECRET=$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.secret
 
@@ -31,7 +35,14 @@ fi
 KEY=F525C05B06DCA266
 
 spack buildcache keys --install --trust --force
+spack buildcache update-index $SPACK_MIRROR
 
+#SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
+#SPEC_LIST='%gcc@11.2.1'
+#SPEC_LIST='%intel@2021.9.0'
+#SPEC_LIST='%oneapi@2023.1.0'
+SPEC_LIST='%intel@2021.9.0 %oneapi@2023.1.0'
+#SPEC_LIST=''
 
 for SPEC in $SPEC_LIST
 do
