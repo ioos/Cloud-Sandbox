@@ -37,7 +37,7 @@ install_spack
 . $SPACK_DIR/share/spack/setup-env.sh
 
 install_intel_oneapi_spack
-install_intel-oneapi-mkl_spack
+#install_intel-oneapi-mkl_spack
 
 install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 
