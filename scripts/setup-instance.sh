@@ -34,7 +34,9 @@ source /opt/rh/gcc-toolset-11/enable
 
 install_spack
 install_intel_oneapi_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
+install_intel-oneapi-mkl_spack
+
+# install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 
 # TODO: Install these libraries via spack
 #install_base_rpms

@@ -20,7 +20,8 @@ ESMF_VER=8.5.0
 
 SPACK_VER='v0.22.5'
 
-SPACK_DIR='/save/environments/spack'
+# NOTE: Changing SPACK_DIR will still modify files in /etc/spack
+SPACK_DIR="/save/environments/spack.${SPACK_VER}"
 
 #SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
 SPACKOPTS='-v -y'

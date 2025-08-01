@@ -37,14 +37,17 @@ gcc --version
 
 #install_intel_oneapi_spack
 
+# Skipping mkl for now
+# install_intel-oneapi-mkl_spack
 # esmf build errors, pre-reqs install fine now
-install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
+# skipping esmf for now
 
 # TODO: Install these libraries via spack
 #install_base_rpms
 #install_ncep_rpms
 
-# install_petsc_intelmpi-spack
+#install_petsc_intelmpi-spack
+install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
 
 exit
 

@@ -61,6 +61,9 @@ PRIVLIST='
  intel-oneapi-mpi@2021.12.1%oneapi@=2023.1.0/p5npcbixovlsmdotpfqwydphcezlcjgs
 '
 
+# These packages can not be pushed to a mirror for some reason and have to be built every time
+# findutils
+
 PRIVLIST=''
 
 for PKG in $PRIVLIST

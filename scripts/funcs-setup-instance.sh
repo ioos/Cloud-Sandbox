@@ -320,8 +320,13 @@ install_spack() {
   # Use system installed packages when available
   # had some gettext build issues, using the system one resolved it
   ###############################################
-  #spack external find --scope system
-  # spack external find --not-buildable --scope system
+  # scope 
+  # site -- changes saved in SPACK_DIR
+  # system -- changes globally in /etc/spack
+  # user -- changes in ~/.spack
+
+  spack external find --scope site
+  # spack external find --not-buildable --scope site
   # --not-buildable       packages with detected externals won't be built with Spack
 
   # Note: to recreate modulefiles
@@ -493,14 +498,48 @@ install_intel_oneapi_spack () {
 
   # spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
-  # There is a bug in the gmake@4.4.1 build spec in spack for gcc 11.2.1 compiler
-  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} ^gmake@4.2.1 $SPACKTARGET
+  # gmake@4.4.1 build fails when built here
+  # gmake.4.2.1 build does not work either
+  # gmake.4.2.1 as a pre-req works when specifying it as an external in /etc/spack/packages.yaml
+  #spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} ^gmake@4.2.1 $SPACKTARGET
+  spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
-  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
-  spack compiler add `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
+  spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
+  spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
+
+  cd $home
+}
+
+
+
+install_intel-oneapi-mkl_spack () {
+  echo "Running ${FUNCNAME[0]} ..."
+
+  home=$PWD
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  source /opt/rh/gcc-toolset-11/enable
+
+  set -x
+  spack load intel-oneapi-compilers@$ONEAPI_VER
 
   # Build with Intel OneApi compilers
-  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
+  # use m4@1.4.17     - intel compiler fails with newer versions
+
+  # netcdf-c@4.8.0 ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe \
+  #    ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
+
+  #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
+  #/tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-36watno3kqa6bsuopisfn3jq72cp247y/spack-build-out.txt
+  # It is not finding libimf.so - intel math library - annoying
+  # Need to imanually add rpath to compilers.yaml - but this worked before wth!
+  # trying witn m4@1.4.17 since it is a previous make error before libimf.so error - nope, still cant find it
+  # spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.17 %oneapi@${ONEAPI_VER} $SPACKTARGET
+  # ran spack external find m4, found v 1.4.18 on system, trying that
+  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %oneapi@${ONEAPI_VER} $SPACKTARGET
+
+  set +x
 
   cd $home
 }
@@ -967,11 +1006,11 @@ install_esmf_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  spack load intel-oneapi-compilers@${ONEAPI_VER}
-  spack load intel-oneapi-mkl@${ONEAPI_VER}
+  #spack load intel-oneapi-compilers@${ONEAPI_VER}
+  #spack load intel-oneapi-mkl@${ONEAPI_VER}
 
   COMPILER=intel@${INTEL_COMPILER_VER}
-  #COMPILER=oneapi@${ONEAPI_VER}   # v8.5 and v8.6 build errors with oneapi compilers, use intel classic
+  #COMPILER=oneapi@${ONEAPI_VER}   # v8.5 and v8.6 build errors with oneapi compilers, use intel classic, maybe try a newer version of oneapi compilers
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
@@ -995,8 +1034,22 @@ install_esmf_spack () {
   #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
   #spack install -j1 $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
-  spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
   #spack install $SPACKOPTS esmf  ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+  # Errors with netcdf.mod, unexpected EOF, maybe corrupted file
+
+  # This is working
+  # Did a spack clean and removed ^intel-oneapi-mpi, but but it did not rebuild intel mpi so that probably didn't fix it
+  # also removed spack load intel oneapi compilers but that is needed for libimf library maybe for netcdf prereq
+  spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} $SPACKTARGET
+  # Try using a new netcdf version
+  # Can tell mpiifort to use ifx:
+  # export FC=ifx
+  # export CC=icx
+  # export CXX=icpx
+  # export I_MPI_CC=icx
+  # export I_MPI_CXX=icpx
+  # export I_MPI_FC=ifx 
 
 # /mnt/efs/fs1/save/environments/spack/var/spack/cache/_source-cache/archive/ac/acd0b2641587007cc3ca318427f47b9cae5bfd2da8d2a16ea778f637107c29c4.tar.gz
 #[+] /usr (external glibc-2.28-xw6lb4vknvfv2xu2vq56ndjocpqslk5b)
@@ -1091,8 +1144,8 @@ install_petsc_intelmpi-spack () {
   #module load hdf5/1.14.3-oneapi-2023.1.0-wdcqims
 
   spack load intel-oneapi-compilers@$ONEAPI_VER
-  spack load intel-oneapi-mpi@$INTEL_MPI_VER%$COMPILER
-  spack load intel-oneapi-runtime@$ONEAPI_VER%$COMPILER
+  #spack load intel-oneapi-mpi@$INTEL_MPI_VER%$COMPILER
+  #spack load intel-oneapi-runtime@$ONEAPI_VER%$COMPILER
 
   # COMPILER=intel@${INTEL_COMPILER_VER}
   # gettext-0.22.5 fails to build with intel icc
@@ -1111,7 +1164,9 @@ install_petsc_intelmpi-spack () {
   # install with some external packages - spack install petsc +superlu-dist +metis +hypre +hdf5
   #spack install $SPACKOPTS petsc%${COMPILER} +metis +hdf5 cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
 
-  spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
+  #spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^hdf5@1.14.3 ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
+
+  spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
 
 }
 
@@ -1235,11 +1290,11 @@ install_python_modules_user () {
   python3 -m pip install --upgrade boto3==1.20.46
 
   # Install requirements for plotting module
-  cd ../cloudflow
-  python3 -m pip install --user -r requirements.txt
+  # cd ../cloudflow
+  # python3 -m pip install --user -r requirements.txt
 
   # install plotting module
-  python3 setup.py sdist
+  # python3 setup.py sdist
 
   # deactivate
   cd $home 
@@ -1502,24 +1557,28 @@ setup_aliases () {
 
   home=$PWD
 
-  # TODO: don't add these if already there
+  # don't add these if already there
 
-  echo alias lsl ls -al >> ~/.tcshrc
-  echo alias lst ls -altr >> ~/.tcshrc
-  echo alias h history >> ~/.tcshrc
+  grep 'alias lsl ls -a' ~/.tcshrc
+  if [ $? -eq 1 ]; then
+      echo alias lsl ls -al >> ~/.tcshrc
+      echo alias lst ls -altr >> ~/.tcshrc
+      echo alias h history >> ~/.tcshrc
+      echo alias cds cd /save/$USER >> ~/.tcshrc
+      echo alias cdc cd /com/$USER >> ~/.tcshrc
+      echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
+  fi
 
-  echo alias cds cd /save/$USER >> ~/.tcshrc
-  echo alias cdc cd /com/$USER >> ~/.tcshrc
-  echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
+  grep 'alias lsl=' ~/.bashrc
+  if [ $? -eq 1 ]; then
 
+      echo alias lsl=\'ls -al\' >> ~/.bashrc
+      echo alias lst=\'ls -altr\' >> ~/.bashrc
+      echo alias h=\'history\' >> ~/.tcshrc
+      echo alias cds=\'cd /save/$USER\' >> ~/.bashrc
+  fi
 
-  echo alias lsl=\'ls -al\' >> ~/.bashrc
-  echo alias lst=\'ls -altr\' >> ~/.bashrc
-  echo alias h=\'history\' >> ~/.tcshrc
-
-  echo alias cds=\'cd /save/$USER\' >> ~/.bashrc
-
-  #echo alias cdns cd /noscrub >> ~/.tcshrc
+  cp system/.vimrc ~/.vimrc
 
 #  git config --global user.name "Patrick Tripp"
 #  git config --global user.email "44276748+patrick-tripp@users.noreply.github.com"
