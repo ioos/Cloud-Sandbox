@@ -47,13 +47,15 @@ gcc --version
 #install_ncep_rpms
 
 #install_petsc_intelmpi-spack
-install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
-
-exit
+# install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
 
 # install_ffmpeg
 
 # TODO: create an output file to contain all of this state info - json
+
+spack clean
+
+exit
 
 # create node image
 ###################################

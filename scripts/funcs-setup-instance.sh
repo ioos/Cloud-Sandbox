@@ -345,7 +345,7 @@ remove_spack() {
   set +x
 
   echo "In remove_spack() ..."
-  echo "WARNING: This will remove everything in $SPACK_DIR and /etc/spack"
+  echo "WARNING: This will remove everything in $SPACK_DIR, /etc/spack, and ~/.spack"
   echo "Proceed with caution, this action might affect other users"
   read -r -p "Do you want to proceed? (y/N): " response
   case "$response" in
@@ -353,7 +353,6 @@ remove_spack() {
         * ) echo "Operation cancelled. Exiting."; exit;;
   esac
 
-  set -x
   if [ ! -d /etc/spack ] ; then
     echo "WARNING: /etc/spack not found, nothing to clean "
   else
@@ -389,8 +388,9 @@ remove_spack() {
     cd $home
   fi
 
-  set +x
 }
+
+
 
 #-----------------------------------------------------------------------------#
 # Not currently used, using gcc toolset

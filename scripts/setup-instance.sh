@@ -33,10 +33,13 @@ install_gcc_toolset_yum
 source /opt/rh/gcc-toolset-11/enable
 
 install_spack
+
+. $SPACK_DIR/share/spack/setup-env.sh
+
 install_intel_oneapi_spack
 install_intel-oneapi-mkl_spack
 
-# install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
+install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
 
 # TODO: Install these libraries via spack
 #install_base_rpms
@@ -50,6 +53,8 @@ install_petsc_intelmpi-spack
 
 # create node image
 ###################################
+
+spack clean
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
