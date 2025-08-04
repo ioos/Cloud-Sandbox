@@ -35,17 +35,19 @@ gcc --version
 #remove_spack
 #install_spack
 
-SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
-SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
+#SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+#SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+#SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
-. $SPACK_DIR/share/spack/setup-env.sh
+#. $SPACK_DIR/share/spack/setup-env.sh
 
-if [ ! -e $SPACK_KEY ]; then
-  wget $SPACK_KEY_URL $SPACK_KEY
-  spack gpg trust $SPACK_KEY
-  spack gpg list
-fi
+#if [ ! -e $SPACK_KEY ]; then
+#  wget $SPACK_KEY_URL -O $SPACK_KEY
+#fi
+#spack gpg trust $SPACK_KEY
+#spack gpg list
+
+exit
 
 # install_intel_oneapi_spack
 

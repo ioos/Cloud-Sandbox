@@ -301,22 +301,21 @@ install_spack() {
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  # New method of trusting key
   if [ ! -e $SPACK_KEY ]; then
-    wget $SPACK_KEY_URL $SPACK_KEY
-    spack gpg trust $SPACK_KEY
-    spack gpg list
+    wget $SPACK_KEY_URL -O $SPACK_KEY
   fi
+  spack gpg trust $SPACK_KEY
+  spack gpg list
 
   spack config add "config:install_tree:padded_length:73"
   spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
   echo "Using SPACK s3-mirror $SPACK_MIRROR"
-  spack mirror add s3-mirror $SPACK_MIRROR
+  spack mirror add s3-mirror $SPACK_MIRROR >& /dev/null
   spack buildcache keys --install --trust
-
-  spack compiler find --scope system
+  
+  spack compiler find --scope site
 
   ###############################################
   # Use system installed packages when available
