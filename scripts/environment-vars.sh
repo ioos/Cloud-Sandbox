@@ -49,6 +49,8 @@ if [ $SPACK_CACHEONLY -eq 1 ]; then
 fi
 
 export SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+export SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+export SPACK_KEY=${SPACK_DIR}/opt/spack/gpg/spack.mirror.gpgkey.pub
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

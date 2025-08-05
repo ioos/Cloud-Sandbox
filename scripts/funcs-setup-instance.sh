@@ -249,10 +249,6 @@ onhold_spack-stack_install() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
-  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
-
   cd /save/environments
   git clone --recurse-submodules -b ioos-aws https://github.com/asascience/spack-stack.git
   cd spack-stack
@@ -270,10 +266,6 @@ install_spack() {
   home=$PWD
 
   source /opt/rh/gcc-toolset-11/enable
-
-  SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-  SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
-  SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
@@ -301,8 +293,14 @@ install_spack() {
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
+  #echo "DEBUGGING unexpected errors trusting $SPACK_KEY"
+  #echo $SPACK_KEY_URL
+  #echo $SPACK_KEY
+  spack gpg list
+  echo "curl -o $SPACK_KEY $SPACK_KEY_URL"
+  curl -o $SPACK_KEY $SPACK_KEY_URL
   if [ ! -e $SPACK_KEY ]; then
-    wget $SPACK_KEY_URL -O $SPACK_KEY
+    echo "ERROR: $SPACK_KEY not downloaded"
   fi
   spack gpg trust $SPACK_KEY
   spack gpg list
