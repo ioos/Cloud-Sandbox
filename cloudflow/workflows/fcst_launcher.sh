@@ -223,6 +223,8 @@ case $OFS in
     module use -a $SAVEDIR/modulefiles
     module load intel_x86_64.impi_2021.12.1
 
+    module list
+
     export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
     export I_MPI_OFI_PROVIDER=efa
     export I_MPI_FABRICS=ofi
