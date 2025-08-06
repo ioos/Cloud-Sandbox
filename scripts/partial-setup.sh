@@ -37,8 +37,8 @@ gcc --version
 # Skipping mkl for now
 # install_intel-oneapi-mkl_spack
 
-install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
-install_petsc_intelmpi-spack
+#install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
+#install_petsc_intelmpi-spack
 
 # TODO: Install these libraries via spack
 #install_base_rpms
@@ -48,9 +48,7 @@ install_petsc_intelmpi-spack
 
 # TODO: create an output file to contain all of this state info - json
 
-#spack clean
-
-exit
+spack clean
 
 # create node image
 ###################################
@@ -67,6 +65,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-# ./create_image.sh $ami_name $project_tag
+./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"

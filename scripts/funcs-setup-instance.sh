@@ -520,7 +520,6 @@ install_intel-oneapi-mkl_spack () {
 
   source /opt/rh/gcc-toolset-11/enable
 
-  set -x
   spack load intel-oneapi-compilers@$ONEAPI_VER
 
   # Build with Intel OneApi compilers
@@ -537,8 +536,6 @@ install_intel-oneapi-mkl_spack () {
   # spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.17 %oneapi@${ONEAPI_VER} $SPACKTARGET
   # ran spack external find m4, found v 1.4.18 on system, trying that
   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %oneapi@${ONEAPI_VER} $SPACKTARGET
-
-  set +x
 
   cd $home
 }
