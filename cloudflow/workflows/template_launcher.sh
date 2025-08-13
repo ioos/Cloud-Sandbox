@@ -91,7 +91,9 @@ elif [ $impi -eq 1 ]; then
   # correctly run OPENMP code structure within the allocated AWS
   # cloud resources specified by the given user
   if [[ "$OFS" == "roms" ]]; then
-    export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
+    #PT -np 1 ??? 
+    #PT export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
+    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
   elif [[ "$OFS" == "ucla-roms" ]]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $RUNCORES"
   else
@@ -118,7 +120,6 @@ echo "**********************************************************"
 ###### it within this template launcher script after we have   ######
 ###### predefined all the required environmental variables     ######
 ###### for you properly within the cloud cluster initilaized   ######
-
 
 if [[ "$OFS" == "nwmv3_wrf_hydro" ]]; then
 
@@ -176,6 +177,7 @@ elif [[ "$OFS" == "adcirc" ]]; then
     $RUNSCRIPT
     result=$?
 
+#PT roms is a base model, many OFS use roms, OFS probably not the best variable name anymore
 elif [[ "$OFS" == "roms" ]]; then
 
     # location of model shell launch script
@@ -204,6 +206,7 @@ elif [[ "$OFS" == "ucla-roms" ]]; then
     $RUNSCRIPT
     result=$?
 
+#PT fvcom is a base model, many OFS use fvcom, OFS probably not the best variable name anymore
 elif [[ "$OFS" == "fvcom" ]]; then
 
     # location of model shell launch script

@@ -23,7 +23,7 @@ source /opt/rh/gcc-toolset-11/enable
 #spack load intel-oneapi-mpi@2021.12.1
 #spack load esmf@8.5.0
 
-install_intel_oneapi_spack
+#install_intel_oneapi_spack
 install_petsc_intelmpi-spack
 
 # also needed for FVCOM
@@ -45,6 +45,6 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
-./create_image.sh $ami_name $project_tag
+#./create_image.sh $ami_name $project_tag
 
 echo "Setup completed!"

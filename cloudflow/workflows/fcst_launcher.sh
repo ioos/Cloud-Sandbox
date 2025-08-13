@@ -234,7 +234,6 @@ case $OFS in
     starttime=`date +%R`
 
     echo "STARTING RUN AT $starttime"
-    #mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     result=$?
     echo "wth mpirun result: $result"
