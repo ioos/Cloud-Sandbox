@@ -149,7 +149,7 @@ case $OFS in
     # SAVEDIR is job.SAVEDIR
     # e.g. /save/patrick/schism
     module use -a $SAVEDIR
-    MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+    MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
 
     #TODO: make this part of the job config
     module load $MODULEFILE
@@ -160,8 +160,6 @@ case $OFS in
     export FI_PROVIDER=efa
     export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 
-    export OMP_NUM_THREADS=1 
-
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
     starttime=`date +%R`
@@ -169,6 +167,7 @@ case $OFS in
     mpirun $MPIOPTS $EXEC $NSCRIBES
     result=$?
     endtime=`date +%R`
+
     echo "RUN FINISHED AT $endtime"
 
     # Combine hotstart files if they exist

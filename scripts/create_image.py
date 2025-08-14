@@ -37,6 +37,7 @@ def main():
     image_id  = create_image_from_snapshot(snapshot_id, image_name)
     print("image_id: ", str(image_id))
 
+    # TODO: write image_id to clodflow/cluster/configs someplace
 
 def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
   ''' NOTE: Run 'sync' on filesystem to flush the disk cache before running this ''' 
@@ -91,7 +92,7 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     'Ebs': {
       'DeleteOnTermination': True,
       'SnapshotId': snapshot_id,
-      'VolumeType': 'gp2'
+      'VolumeType': 'gp3'
     }
   }
 

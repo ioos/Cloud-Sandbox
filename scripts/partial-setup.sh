@@ -24,10 +24,11 @@ source funcs-setup-instance.sh
 # install_fsx_driver
 
 # Compilers and libraries
-# install_python_modules_user
+install_python_modules_user
+exit
 # install_gcc_toolset_yum
-source /opt/rh/gcc-toolset-11/enable
-gcc --version
+# source /opt/rh/gcc-toolset-11/enable
+# gcc --version
 
 #remove_spack
 #install_spack

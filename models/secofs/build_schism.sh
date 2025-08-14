@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SAVE_DIR="/save/$USER"
-MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
 
 if [ ! -d $SAVE_DIR ]; then
   echo "Error: $SAVE_DIR does not exist"
@@ -13,6 +13,8 @@ SCRIPTS=$PWD
 module use -a $SCRIPTS/modulefiles
 module purge
 module load $MODULEFILE
+
+cp -p $SCRIPTS/modulefiles/$MODULEFILE  $SAVE_DIR/schism
 
 cd $SAVE_DIR/schism/cmake
 

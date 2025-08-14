@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import csv
+import sys
 import subprocess
 import pwd
 import grp
 import os
 import boto3
+import requests
 
 from datetime import datetime
 from botocore.exceptions import ClientError
@@ -303,6 +305,31 @@ def create_ami(instance_id, image_name, project_tag):
 
 
 
+
+###############################################################################
+def get_instance_id():
+
+    # Get the IMDSv2 token
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},
+        timeout=2
+    )
+    token.raise_for_status()
+
+    # Use the token to get instance-id
+    instance_id = requests.get(
+        "http://169.254.169.254/latest/meta-data/instance-id",
+        headers={"X-aws-ec2-metadata-token": token.text},
+        timeout=2
+    )
+    instance_id.raise_for_status()
+    return instance_id.text
+
+
+
+
+###############################################################################
 def main():
 
     # Check if the script is being run as root (uid 0)
@@ -311,9 +338,9 @@ def main():
         sys.exit(1)
 
     # This script also requires extra AWS permissions
-    if not os.environ.get("AWS_PROFILE"):
-        print("Error: AWS_PROFILE must be set.")
-        sys.exit(1)
+#    if not os.environ.get("AWS_PROFILE"):
+#        print("Error: AWS_PROFILE must be set.")
+#        sys.exit(1)
 
     filename = "system/ioos.sb.users"
     print(filename)
@@ -373,7 +400,8 @@ def main():
             print("Finished adding users, creating new ami image")
 
         # Create new AMI for root volume after all users are added
-        instance_id = "i-070b64b46dd7aef33"
+        #instance_id = "i-070b64b46dd7aef33"
+        instance_id = get_instance_id()
 
         now = datetime.now().strftime("%Y-%m-%d_%H-%M")
         image_name = f"{now}-ioos-sandbox-ami"

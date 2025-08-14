@@ -7,12 +7,13 @@
                 { "Key": "Name", "Value": "seccofs-hotstart" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
-"image_id"  : "ami-0df1adc30c6953fd8",
 "key_name"  : "ioos-sandbox",
-"sg_ids"    : [ "sg-0feaeb0d419b7ddda",
-  "sg-046f683021585a25f",
-  "sg-0416cbb8c060a1779"
-  ],
-"subnet_id" : "subnet-0be869ddbf3096968",
-"placement_group" : "forPR-cloud-sandbox-us-east-2b_Terraform_Placement_Group"
+"image_id"  : "ami-03e854ffba37e01cc",
+"sg_ids"    : [
+  "sg-06f872237e3c34f00",
+  "sg-03c2f65207b22676e",
+  "sg-08f3162d6cded1567"
+],
+"subnet_id" : "subnet-091bcf131af86e9f9",
+"placement_group" : "cloud-sandbox-07292025-us-east-2b_Terraform_Placement_Group"
 }

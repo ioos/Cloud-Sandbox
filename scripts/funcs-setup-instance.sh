@@ -1281,9 +1281,13 @@ install_python_modules_user () {
   python3 -m pip install --upgrade haikunator       # memorable Name tags
 
   # SPACK has problems with botocore newer than below
+  # TODO: might be fixed with currently used Spack version
   python3 -m pip install --upgrade botocore==1.23.46
   # This is the most recent boto3 that is compatible with botocore above
   python3 -m pip install --upgrade boto3==1.20.46
+
+  #python3 -m pip install --upgrade botocore
+  #python3 -m pip install --upgrade boto3
 
   # Install requirements for plotting module
   # cd ../cloudflow
