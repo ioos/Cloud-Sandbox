@@ -357,3 +357,21 @@ resource "aws_network_interface" "head_node" {
       Project = var.project_tag
   }
 }
+
+
+# Quick search reply from google AI - check/test for correctness
+#resource "null_resource" "run_post_apply_script" {
+#  # This 'triggers' block ensures the null_resource is re-evaluated
+#  # if any of the specified values change, effectively re-running the script.
+#  # You can add dependencies on other resources if you want the script
+#  # to run only after those resources are fully provisioned.
+#  triggers = {
+#    always_run = timestamp() # This ensures it runs on every apply
+#  }
+#
+#  provisioner "local-exec" {
+#    command = "${path.module}/scp.terraform.output.sh"
+#  }
+#}
+
+
