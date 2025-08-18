@@ -41,14 +41,13 @@ def setup_shell_configs(username):
         "alias lsl 'ls -al'",
         "alias lst 'ls -altr'",
         "alias h 'history'",
-        f"alias cds 'cd /save/{username}'",
-        f"alias cdc 'cd /com/{username}'",
-        f"alias cdpt 'cd /ptmp/{username}'"
+        f"alias cds cd /save/{username}",
+        f"alias cdc cd /com/{username}",
+        f"alias cdpt cd /ptmp/{username}"
     ]
 
     bashrc_lines = [
         ". /usr/share/Modules/init/bash",
-        "module use -a /usrx/modulefiles",
         ". /save/environments/spack/share/spack/setup-env.sh",
         "",
         "alias lsl='ls -al'",

@@ -88,10 +88,10 @@ setup_environment () {
   if [ ! -d /save/environments/modulefiles ] ; then
     sudo mkdir -p /save/environments/modulefiles
     echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
-    echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
     echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
     echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-    echo "module use -a /usrx/modulefiles" >> ~/.bashrc
+    #echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
+    #echo "module use -a /usrx/modulefiles" >> ~/.bashrc
     . ~/.bashrc
   fi
 
@@ -1178,7 +1178,7 @@ install_base_rpms () {
 
   . /usr/share/Modules/init/bash
 
-  # Only do this once
+  # TODO: Only do this once
   echo "/usrx/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
 
   # gcc/6.5.0  hdf5/1.10.5  netcdf/4.5  produtil/1.0.18 esmf/8.0.0

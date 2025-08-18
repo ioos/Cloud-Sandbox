@@ -14,33 +14,37 @@ BRANCH=deployed-072925
 #BRANCH=origin/x86_64
 #BRANCH=origin/formainpr
 
-EFS_VERS='v1.36.0'
+EFS_VERS='v2.3.3'
+# v2 supports TSL encryption
 
 # Mount the EFS volume
 
 mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 
-sudo yum -y install amazon-efs-utils
+## Install EFS utilities
+# sudo yum -y install amazon-efs-utils
+# Some Linux distributiones: Unable to find a match: amazon-efs-utils
 
-if [ $? -ne 0 ]; then
-  # Error: Unable to find a match: amazon-efs-utils
-  # Alternate method
-  sudo yum -y install rpm-build
-  sudo yum -y install make
-#  sudo yum -y install openssl-devel
-#  sudo yum -y install cargo
-#  sudo yum -y install rust
-  cd /tmp
-  git clone -b $EFS_VERS https://github.com/aws/efs-utils
-  cd efs-utils
-  sudo make rpm
-  sudo yum -y install ./build/amazon-efs-utils*rpm
-  cd /tmp
-fi
+# Alternate method, build from source
+# Install prerequisites
+sudo yum -y install rpm-build
+sudo yum -y install make
+sudo yum -y install nfs-utils
+sudo yum -y install openssl-devel
+sudo yum -y install cargo
+sudo yum -y install rust
+sudo yum -y install stunnel
 
-mount -t nfs4 "${efs_name}:/" /mnt/efs/fs1
-echo "${efs_name}:/ /mnt/efs/fs1 nfs defaults,_netdev 0 0" >> /etc/fstab
+cd /tmp
+git clone -b $EFS_VERS https://github.com/aws/efs-utils
+cd efs-utils
+sudo make rpm
+sudo yum -y install ./build/amazon-efs-utils*rpm
+cd /tmp
+
+mount -t efs "${efs_name}:/" /mnt/efs/fs1
+echo "${efs_name}:/ /mnt/efs/fs1 efs defaults,_netdev 0 0" >> /etc/fstab
 
 cd /mnt/efs/fs1
 if [ ! -d save ] ; then
@@ -56,7 +60,7 @@ sudo chown $RUNUSER:$RUNUSER $RUNUSER
 cd $RUNUSER
 sudo -u $RUNUSER git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox
-sudo -u $RUNUSER git checkout -t $BRANCH
+sudo -u $RUNUSER git checkout $BRANCH
 cd scripts
 
 # Need to pass ami_name
