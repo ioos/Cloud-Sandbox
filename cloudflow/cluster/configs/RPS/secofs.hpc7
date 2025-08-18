@@ -8,7 +8,7 @@
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "key_name"  : "ioos-sandbox",
-"image_id"  : "ami-03e854ffba37e01cc",
+"image_id"  : "ami-0f9c8d69be8c31629",
 "sg_ids"    : [
   "sg-06f872237e3c34f00",
   "sg-03c2f65207b22676e",

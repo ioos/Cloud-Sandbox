@@ -14,7 +14,7 @@ __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 
-debug = True
+debug = False
 
 
 class ROMSHindcast(Job):
