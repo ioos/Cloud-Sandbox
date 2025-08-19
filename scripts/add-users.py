@@ -35,6 +35,7 @@ def setup_shell_configs(username):
     home_dir = f"/home/{username}"
     tcshrc = os.path.join(home_dir, ".tcshrc")
     bashrc = os.path.join(home_dir, ".bashrc")
+    spackcfg = os.path.join(home_dir, ".spack/config.yaml")
 
     # Lines to add to .tcshrc and .bashrc
     tcshrc_lines = [
@@ -58,6 +59,14 @@ def setup_shell_configs(username):
         f"alias cdpt='cd /ptmp/{username}'"
     ]
 
+
+    # spack find needs this since we are padding the install location
+    spackcfg_lines = [
+      "config:",
+      "  install_tree:",
+      "    root: /save/environments/spack.v0.22.5/opt/spack/__spack_path_place"
+    ]
+
     # Append lines to .tcshrc and update ownership
     try:
         with open(tcshrc, "a") as f:
@@ -77,6 +86,17 @@ def setup_shell_configs(username):
         change_file_ownership(bashrc, username)
     except Exception as e:
         print(f"Error updating {bashrc} for user {username}: {e}")
+
+
+    # Create the .spack/config.yaml
+    try:
+        with open(spackcfg, "w") as f:
+            for line in spackcfg_lines:
+                f.write(line + "\n")
+        print(f"Updated {spackcfg} for user {username}")
+        change_file_ownership(bashrc, username)
+    except Exception as e:
+        print(f"Error updating {spackcfg} for user {username}: {e}")
 
 
 
