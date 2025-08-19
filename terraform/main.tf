@@ -359,7 +359,8 @@ resource "aws_network_interface" "head_node" {
 }
 
 
-# Quick search reply from google AI - check/test for correctness
+# TODO scp deployment info to head node automatically
+# quick search reply from google AI - fix/check/test for correctness, e.g. fix trigger
 #resource "null_resource" "run_post_apply_script" {
 #  # This 'triggers' block ensures the null_resource is re-evaluated
 #  # if any of the specified values change, effectively re-running the script.

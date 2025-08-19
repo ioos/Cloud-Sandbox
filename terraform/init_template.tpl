@@ -3,26 +3,22 @@ set -x
 
 echo `date` > ~/setup.log
 
+BRANCH=main
+
 # RHEL8+
 RUNUSER="ec2-user"
 
-# CentOS 7 - Stream 8
-#RUNUSER="centos"
-
-BRANCH=deployed-072925
-# BRANCH=main
-#BRANCH=origin/x86_64
-#BRANCH=origin/formainpr
-
 EFS_VERS='v2.3.3'
-# v2 supports TSL encryption
-
-# Mount the EFS volume
+# EFS v2 supports TSL encryption
 
 mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 
+
+
 ## Install EFS utilities
+########################
+# https://github.com/aws/efs-utils/blob/v2.3.3/README.md
 # sudo yum -y install amazon-efs-utils
 # Some Linux distributiones: Unable to find a match: amazon-efs-utils
 
@@ -43,6 +39,10 @@ sudo make rpm
 sudo yum -y install ./build/amazon-efs-utils*rpm
 cd /tmp
 
+
+
+## Mount the EFS volume
+#######################
 mount -t efs "${efs_name}:/" /mnt/efs/fs1
 echo "${efs_name}:/ /mnt/efs/fs1 efs defaults,_netdev 0 0" >> /etc/fstab
 
@@ -54,6 +54,10 @@ if [ ! -d save ] ; then
   sudo ln -s /mnt/efs/fs1/save /save
 fi
 
+
+
+## git checkout the Cloud-Sandbox repository
+############################################
 cd /mnt/efs/fs1/save
 sudo mkdir $RUNUSER
 sudo chown $RUNUSER:$RUNUSER $RUNUSER
@@ -63,11 +67,16 @@ cd Cloud-Sandbox
 sudo -u $RUNUSER git checkout $BRANCH
 cd scripts
 
-# Need to pass ami_name
+
+# Need to pass ami_name for image creation
+# ami_name is defined in main.tf user_data
 export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
-# Install all of the software and drivers
+
+
+## Install all of the software and drivers
+##########################################
 sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
