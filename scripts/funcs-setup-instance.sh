@@ -78,7 +78,7 @@ setup_environment () {
 
   # Only do this once
   grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-  if [ $? -eq 1 ] ; then
+  if [ $? -ne 0 ] ; then
     echo . /usr/share/Modules/init/bash >> ~/.bashrc
     echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
     . /usr/share/Modules/init/bash
@@ -282,7 +282,7 @@ install_spack() {
 
   # Don't add this if it is already there
   grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null
-  if [ $? -eq 1 ] ; then 
+  if [ $? -ne 0 ] ; then 
       echo ". $SPACK_DIR/share/spack/setup-env.sh" >> ~/.bashrc
       echo "source $SPACK_DIR/share/spack/setup-env.csh" >> ~/.tcshrc 
   fi
@@ -1560,22 +1560,24 @@ setup_aliases () {
   # don't add these if already there
 
   grep 'alias lsl ls -a' ~/.tcshrc
-  if [ $? -eq 1 ]; then
-      echo alias lsl ls -al >> ~/.tcshrc
-      echo alias lst ls -altr >> ~/.tcshrc
-      echo alias h history >> ~/.tcshrc
-      echo alias cds cd /save/$USER >> ~/.tcshrc
-      echo alias cdc cd /com/$USER >> ~/.tcshrc
-      echo alias cdpt cd /ptmp/$USER >> ~/.tcshrc
+  if [ $? -ne 0 ]; then
+      echo 'alias lsl "ls -al"' >> ~/.tcshrc
+      echo 'alias lst "ls -altr"' >> ~/.tcshrc
+      echo 'alias h history' >> ~/.tcshrc
+      echo 'alias cds "cd /save/$USER"' >> ~/.tcshrc
+      echo 'alias cdc "cd /com/$USER"' >> ~/.tcshrc
+      echo 'alias cdpt "cd /ptmp/$USER"' >> ~/.tcshrc
+      echo 'set prompt="[NEW-IOOS-Sandbox:%~] %n $0> "' >> ~/.tcshrc
   fi
 
   grep 'alias lsl=' ~/.bashrc
-  if [ $? -eq 1 ]; then
+  if [ $? -ne 0 ]; then
 
-      echo alias lsl=\'ls -al\' >> ~/.bashrc
-      echo alias lst=\'ls -altr\' >> ~/.bashrc
-      echo alias h=\'history\' >> ~/.tcshrc
-      echo alias cds=\'cd /save/$USER\' >> ~/.bashrc
+      echo 'alias lsl="ls -al"' >> ~/.bashrc
+      echo 'alias lst="ls -altr"' >> ~/.bashrc
+      echo 'alias h="history"' >> ~/.bashrc
+      echo 'alias cds="cd /save/$USER"' >> ~/.bashrc
+      echo 'PS1="[NEW-IOOS-Sandbox:\w] \u> "' >> ~/.bashrc
   fi
 
   cp system/.vimrc ~/.vimrc

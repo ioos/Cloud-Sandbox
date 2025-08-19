@@ -21,7 +21,8 @@ module-whatis "This module sets the environment variables for \
 #setenv COMP_MPCC "mpicc -fc=icc"
 
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
-module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-vyukg6u
+module load intel-oneapi-mkl/2023.1.0-gcc-11.2.1-5o3qp7o
+#module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-vyukg6u
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 # Loading requirement: intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 
