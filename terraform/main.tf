@@ -313,7 +313,10 @@ resource "aws_instance" "head_node" {
   key_name             = var.key_name
   iam_instance_profile = aws_iam_instance_profile.cloud_sandbox_iam_instance_profile.name
 
-  user_data            = templatefile("init_template.tpl", { efs_name = aws_efs_file_system.main_efs.dns_name, ami_name = "${var.name_tag}-${random_pet.ami_id.id}", aws_region = var.preferred_region, project = var.project_tag })
+  # The user_data section is executed in the last step of initialization/creation of the instance
+  # the variables in { } will be exported and available to the shell script in init_template.tpl
+
+  user_data  = templatefile("init_template.tpl", { efs_name = aws_efs_file_system.main_efs.dns_name, ami_name = "${var.name_tag}-${random_pet.ami_id.id}", aws_region = var.preferred_region, project = var.project_tag, sandbox_version = var.sandbox_version})
 
   # associate_public_ip_address = true
   network_interface {
