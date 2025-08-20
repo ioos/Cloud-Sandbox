@@ -3,8 +3,7 @@ set -x
 
 echo `date` > ~/setup.log
 
-# Use sandbox_version if defined, otherwise use main
-BRANCH=${sandbox_version:-main}
+BRANCH=${sandbox_version}
 
 # RHEL8+
 RUNUSER="ec2-user"
