@@ -1,0 +1,23 @@
+Intel Compiler Options for AMD 3rd Gen EPYC hpc6a
+
+-march=core-avx2  (-xCORE-AVX2 might work)
+-O3
+-Ofast
+-unroll-aggressive
+-no-prec-div
+-vec
+-ipo
+-qopt-prefetch
+-qopenmp
+-fma
+
+-O3 -march=core-avx2 -align array64byte -fma -ftz -fomit-frame-pointer
+
+
+Intel Compiler Options for AMD 4th Gen EPYC hpc7a
+-axCORE-AVX512  -march=core-avx512
+
+C++
+-inline-level=
+-unroll<value>
+

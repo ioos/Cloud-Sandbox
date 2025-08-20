@@ -7,7 +7,7 @@ CDATE=20171201
 COMOUT=/com/$USER/secofs/$CDATE
 TIMESTEP=720
 
-MODULEFILE=intel_x86_64_mpi-2021.12.1-intel-2021.9.0
+MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
 
 if [ ! -d $MODEL_DIR ]; then
   echo "Could not find MODEL_DIR : $MODEL_DIR"
@@ -27,6 +27,4 @@ if [ $? -eq 0 ]; then
 fi
 
 mv "hotstart_it=$TIMESTEP.nc" ../hotstart.nc
-
-# tested: it will NOT restart with the pieces when using same cluster config
 

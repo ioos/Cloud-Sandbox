@@ -17,7 +17,7 @@ echo $PWD
 if [ ! -d $MODEL_DIR/FVCOM$VERSION ]; then
   git clone $REPO ./FVCOM$VERSION
   cd FVCOM$VERSION
-  git checkout $VERSON
+  git checkout $VERSION
 else
   echo "it appears FVCOM is already present, not fetching it from the repository"
 fi
