@@ -10,12 +10,11 @@
 #------------------------------------------------------------
 
 # Specify the cloud sandbox branch or tag to use for the node setup
-# wil default to main if not defined. 
+# will default to main if not defined. 
 # Examples:
 # sandbox_version = "main"
-# sandbox_version = "v2.1.0"
 
-sandbox_version = "main"
+sandbox_version = "v2.1.0"
 
 # List of the specific IP's or IP address ranges that are allowed SSH access to the system
 # They should be in the format ###.###.###.###/32 for a single IP, any number of IPs can be added to the list.
