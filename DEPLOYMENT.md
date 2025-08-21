@@ -18,6 +18,9 @@ Newer versions are NOT open source for commercial use.
 Download and install the package that matches your desktop computer's architecture.  
 https://releases.hashicorp.com/terraform/1.5.7/  
 
+Terraform Language Documentation
+https://developer.hashicorp.com/terraform/language/v1.5.x
+
 On a Mac you can also install it using brew:
 ```brew install terraform```
 

@@ -127,3 +127,9 @@ variable "ami_id" {
   type        = string
   default     = "unknown value"
 }
+
+variable "sandbox_version" {
+  description = "Specify the Cloud-Sandbox branch/tag to use"
+  type = string
+  default = "main"
+}

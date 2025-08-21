@@ -3,7 +3,7 @@ set -x
 
 echo `date` > ~/setup.log
 
-BRANCH=main
+BRANCH=${sandbox_version}
 
 # RHEL8+
 RUNUSER="ec2-user"
@@ -13,7 +13,6 @@ EFS_VERS='v2.3.3'
 
 mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
-
 
 
 ## Install EFS utilities
