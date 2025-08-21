@@ -361,21 +361,18 @@ resource "aws_network_interface" "head_node" {
   }
 }
 
+# https://developer.hashicorp.com/terraform/language/v1.5.x/resources/terraform-data
 
-# TODO scp deployment info to head node automatically
-# quick search reply from google AI - fix/check/test for correctness, e.g. fix trigger
-#resource "null_resource" "run_post_apply_script" {
-#  # This 'triggers' block ensures the null_resource is re-evaluated
-#  # if any of the specified values change, effectively re-running the script.
-#  # You can add dependencies on other resources if you want the script
-#  # to run only after those resources are fully provisioned.
-#  triggers = {
-#    always_run = timestamp() # This ensures it runs on every apply
-#  }
-#
-#  provisioner "local-exec" {
-#    command = "${path.module}/scp.terraform.output.sh"
-#  }
-#}
+# scp deployment info to head node automatically
+resource "terraform_data" "send_outputs" {
 
+  triggers_replace = [
+    timestamp() 
+  ]
+  # aws_instance.head_node.id
+
+  provisioner "local-exec" {
+    command = "./scp.terraform.output.sh"
+  }
+}
 
