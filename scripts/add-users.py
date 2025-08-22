@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import csv
+import sys
 import subprocess
 import pwd
 import grp
 import os
 import boto3
+import requests
 
 from datetime import datetime
 from botocore.exceptions import ClientError
@@ -33,20 +35,20 @@ def setup_shell_configs(username):
     home_dir = f"/home/{username}"
     tcshrc = os.path.join(home_dir, ".tcshrc")
     bashrc = os.path.join(home_dir, ".bashrc")
+    spackcfg = os.path.join(home_dir, ".spack/config.yaml")
 
     # Lines to add to .tcshrc and .bashrc
     tcshrc_lines = [
         "alias lsl 'ls -al'",
         "alias lst 'ls -altr'",
         "alias h 'history'",
-        f"alias cds 'cd /save/{username}'",
-        f"alias cdc 'cd /com/{username}'",
-        f"alias cdpt 'cd /ptmp/{username}'"
+        f"alias cds cd /save/{username}",
+        f"alias cdc cd /com/{username}",
+        f"alias cdpt cd /ptmp/{username}"
     ]
 
     bashrc_lines = [
         ". /usr/share/Modules/init/bash",
-        "module use -a /usrx/modulefiles",
         ". /save/environments/spack/share/spack/setup-env.sh",
         "",
         "alias lsl='ls -al'",
@@ -55,6 +57,14 @@ def setup_shell_configs(username):
         f"alias cds='cd /save/{username}'",
         f"alias cdc='cd /com/{username}'",
         f"alias cdpt='cd /ptmp/{username}'"
+    ]
+
+
+    # spack find needs this since we are padding the install location
+    spackcfg_lines = [
+      "config:",
+      "  install_tree:",
+      "    root: /save/environments/spack.v0.22.5/opt/spack/__spack_path_place"
     ]
 
     # Append lines to .tcshrc and update ownership
@@ -76,6 +86,17 @@ def setup_shell_configs(username):
         change_file_ownership(bashrc, username)
     except Exception as e:
         print(f"Error updating {bashrc} for user {username}: {e}")
+
+
+    # Create the .spack/config.yaml
+    try:
+        with open(spackcfg, "w") as f:
+            for line in spackcfg_lines:
+                f.write(line + "\n")
+        print(f"Updated {spackcfg} for user {username}")
+        change_file_ownership(bashrc, username)
+    except Exception as e:
+        print(f"Error updating {spackcfg} for user {username}: {e}")
 
 
 
@@ -303,6 +324,31 @@ def create_ami(instance_id, image_name, project_tag):
 
 
 
+
+###############################################################################
+def get_instance_id():
+
+    # Get the IMDSv2 token
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},
+        timeout=2
+    )
+    token.raise_for_status()
+
+    # Use the token to get instance-id
+    instance_id = requests.get(
+        "http://169.254.169.254/latest/meta-data/instance-id",
+        headers={"X-aws-ec2-metadata-token": token.text},
+        timeout=2
+    )
+    instance_id.raise_for_status()
+    return instance_id.text
+
+
+
+
+###############################################################################
 def main():
 
     # Check if the script is being run as root (uid 0)
@@ -311,9 +357,9 @@ def main():
         sys.exit(1)
 
     # This script also requires extra AWS permissions
-    if not os.environ.get("AWS_PROFILE"):
-        print("Error: AWS_PROFILE must be set.")
-        sys.exit(1)
+#    if not os.environ.get("AWS_PROFILE"):
+#        print("Error: AWS_PROFILE must be set.")
+#        sys.exit(1)
 
     filename = "system/ioos.sb.users"
     print(filename)
@@ -373,7 +419,8 @@ def main():
             print("Finished adding users, creating new ami image")
 
         # Create new AMI for root volume after all users are added
-        instance_id = "i-070b64b46dd7aef33"
+        #instance_id = "i-070b64b46dd7aef33"
+        instance_id = get_instance_id()
 
         now = datetime.now().strftime("%Y-%m-%d_%H-%M")
         image_name = f"{now}-ioos-sandbox-ami"

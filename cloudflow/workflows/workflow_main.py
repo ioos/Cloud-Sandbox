@@ -129,6 +129,34 @@ def main():
             template_flow = flows.template_flow(jobconfig, jobfile)
             flowdeq.appendleft(template_flow) 
 
+        elif jobtype == "ucla-roms":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+            
+        elif jobtype == "schism_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+
+        elif jobtype == "dflowfm_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow)         
+
+        elif jobtype == "nwmv3_wrf_hydro_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+
+        elif jobtype == "adcirc_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+
+        elif jobtype == "roms_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+            
+        elif jobtype == "fvcom_template":
+            template_flow = flows.template_flow(jobconfig, jobfile)
+            flowdeq.appendleft(template_flow) 
+            
         else:
             print(f"jobtype: {jobtype} is not supported")
             sys.exit()

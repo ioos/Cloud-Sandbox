@@ -18,6 +18,9 @@ Newer versions are NOT open source for commercial use.
 Download and install the package that matches your desktop computer's architecture.  
 https://releases.hashicorp.com/terraform/1.5.7/  
 
+Terraform Language Documentation
+https://developer.hashicorp.com/terraform/language/v1.5.x
+
 On a Mac you can also install it using brew:
 ```brew install terraform```
 
@@ -159,10 +162,16 @@ Run `terraform apply` to create the AWS resources.
 terraform apply -var-file="mysettings.tfvars"
 ```
 
+Alternative method:
+```
+terraform plan -var-file=mysettings.tfvars -out=my.plan
+terraform apply my.plan
+```
+
 Enter 'yes' to create the resources.  
 
 ---
-**NOTE:**
+**NOTES:**
 
 You may run into something similar to the following error if applying Terraform on an AWS account where more than one Cloud Sandbox have been deployed:  
 ```
@@ -204,7 +213,7 @@ The installation script will continue to run on the instance after terraform com
 You can log into the newly created EC2 instance and watch the installation progress. 
 ```
 Example:
-ssh -i my-sandbox.pem centos@ec2-3-219-217-151.compute-1.amazonaws
+ssh -i my-sandbox.pem ec2-user@ec2-3-219-217-151.compute-1.amazonaws
 sudo -i
 tail -f /root/setup.log
 ```
@@ -226,7 +235,7 @@ terraform apply -var-file="mysettings.tfvars"
 ```
 *If terraform says the instance needs to be destroyed first, type "no" when prompted to keep the existing instance. There are other ways to change the instance type.*
 
-### Cleanup
+### Cleanup - delete the sandbox
 When done using the Cloud Sandbox deployment, all of the AWS resources (including disks!) can be destroyed with the following command:
 ```
 terraform destroy -var-file="mysettings.tfvars"
@@ -236,6 +245,6 @@ terraform destroy -var-file="mysettings.tfvars"
 
 ### Recovering Terraform State
 
-In case you've already deployed cloud resources but your local copy of Cloud Sandbox is destroyed or you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init -backend-config=config.s3.tfbackend` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
+In case you've already deployed cloud resources but your local Cloud Sandbox terraform directory/files are destroyed or or lost, or if you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init -backend-config=config.s3.tfbackend` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
 
 *© Copyright 2025 RPS Group. All rights reserved.*

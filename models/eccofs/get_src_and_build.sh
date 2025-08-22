@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-
 # git clone the nosofs branch
+
+CURDIR=$PWD
 
 export nosofs_ver=3.5.0
 export HOMEnos=/save/$USER/nosofs.$nosofs_ver
+export MODULEFILE=intel_x86_64
 
 cd /save/$USER || exit 1
 
@@ -16,6 +18,9 @@ if [ ! -d $HOMEnos ]; then
         exit 1
     fi
 fi
+
+# Copy the current modulefile
+cp $CURDIR/modulefiles/$MODULEFILE $HOMEnos/modulefiles
 
 cd $HOMEnos/sorc
 

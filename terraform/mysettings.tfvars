@@ -9,7 +9,15 @@
 # The following variables must be defined, no defaults exist:
 #------------------------------------------------------------
 
-# List of the specific IP's or IP address rangest the are allowed SSH access to the system
+# Specify the cloud sandbox branch or tag to use for the node setup
+# wil default to main if not defined. 
+# Examples:
+# sandbox_version = "main"
+# sandbox_version = "v2.1.0"
+
+sandbox_version = "main"
+
+# List of the specific IP's or IP address ranges that are allowed SSH access to the system
 # They should be in the format ###.###.###.###/32 for a single IP, any number of IPs can be added to the list.
 # Example:  
 allowed_ssh_cidr_list =  ["72.0.162.256/32", "94.256.4.28/32" ]
@@ -19,7 +27,7 @@ allowed_ssh_cidr_list =  ["72.0.162.256/32", "94.256.4.28/32" ]
 
 # Example:
 key_name = "my-sandbox-key"
-public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2cQ3fq/VNzP1R2+94nGwonW9k20nuQJcCd3g2ylW5clzyjun6eWz2PZKMwtJh7E28B1jp3F8YTP5XBPg+Z++hpvcthL2XtAwANd0ouvZO6gkcrbgjhuM0A4NKJM6RylGAOqqPY/ZE6gOUGrnIbhd9eI3RKhSQbxf5hwS7tIG1FebO9HuObaM23LDB1/Ra/YMTXB5LHPChlfxrEIlM/0//tO7OUfRPNgtudAb/MQZ+YD+6I77QDtTwZwQvebxLK62bP5CrpV4XY5ybWOZ0T3m4pVNfhfl7+QWAvWeStNpH3B3q1ZtPLTuAVvsR4RWk7t75IwpHwiPBcgZn/PTpN45z"
+public_key = "ssh-rsa AAAABbbccd+long-sequence-of-characters+a123abcd+XYX/z910A"
 
 # (Optional VPC) If using an existing VPC use the ID to deploy resources to use that VPC ID, otherwise leave blank
 # vpc_id = "vpc-0dd381e9f82c9ae68e7"
