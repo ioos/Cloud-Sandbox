@@ -1,40 +1,56 @@
 # Source this file in script to use
 
-GCC_VER=11.2.1
+export GCC_VER=11.2.1
 
 # Current used versions
-ONEAPI_VER=2023.1.0
+export ONEAPI_VER=2023.1.0
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
-INTEL_COMPILER_VER=2021.9.0
+export INTEL_COMPILER_VER=2021.9.0
+
+#ONEAPI_VER=2024.1.0
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
 # spack v0.22.3 and higher has that spec
 # problems with spack v23
 
-INTEL_MPI_VER=2021.12.1
+export INTEL_MPI_VER=2021.12.1
 
-ESMF_VER=8.5.0
+export ESMF_VER=8.5.0
 
-SPACK_VER='v0.22.5'
+export SPACK_VER='v0.22.5'
 
-SPACK_DIR='/save/environments/spack'
-SPACKOPTS='-v -y --dirty'
+# NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands
+export SPACK_DIR="/save/environments/spack.${SPACK_VER}"
+
+#SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
+export SPACKOPTS='-v -y'
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
 #SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
-SPACKTARGET="arch=linux-rhel8-x86_64"
+export SPACKTARGET="arch=linux-rhel8-x86_64"
 
-EFA_INSTALLER_VER='1.38.0'
+export EFA_INSTALLER_VER='1.38.0'
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
-SPACK_CACHEONLY=0
+export SPACK_CACHEONLY=0
+#export SPACK_CACHEONLY=1
+#export SPACK_CACHEONLY=-1
 
-SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+if [ $SPACK_CACHEONLY -eq 1 ]; then
+    echo "NOTICE: SPACK_CACHEONLY is set to 1 in environment-vars.sh"
+    echo "NOTICE: Spack will only install if the precompiled package is found in the s3 mirror."
+    echo "NOTICE: Spack will not build any packages."
+    echo "NOTICE: Set SPACK_CACHEONLY=0 to enable building"
+fi
+
+export SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
+export SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
+export SPACK_KEY=${SPACK_DIR}/opt/spack/gpg/spack.mirror.gpgkey.pub
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -48,6 +64,6 @@ SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 # otherwise it will use the default
 
 now=`date -u +\%Y\%m\%d_\%H-\%M`
-ami_name=${ami_name:="IOOS-Cloud-Sandbox-${now}"}
-project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
+export ami_name=${ami_name:="IOOS-Cloud-Sandbox-${now}"}
+export project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 

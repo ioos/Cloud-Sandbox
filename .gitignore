@@ -39,3 +39,4 @@ models/utils/makedepf90/
 *.log
 *.out
 out.*
+terraform/deployment.info

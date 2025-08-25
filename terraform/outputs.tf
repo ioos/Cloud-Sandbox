@@ -72,5 +72,5 @@ output "aws_placement_group" {
 */
 output "login_command" {
    description = "SSH Login"
-   value = one(aws_eip.head_node[*]) != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${one(aws_eip.head_node[*]).public_dns}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"
+   value = aws_instance.head_node.public_ip != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_ip}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"
 }

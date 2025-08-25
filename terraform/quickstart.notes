@@ -1,0 +1,8 @@
+aws sso login
+terraform init -backend-config=config.s3.tfbackend
+terraform workspace list
+terraform workspace new testdeploy-20250818
+vi my.tfvars
+terraform plan -var-file=my.tfvars -out=my.plan
+terraform apply my.plan
+

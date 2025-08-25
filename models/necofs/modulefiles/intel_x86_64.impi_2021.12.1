@@ -21,38 +21,18 @@ setenv COMP_CC  icc
 setenv COMP_CPP cpp
 setenv COMP_MPCC mpicc
 #setenv COMP_MPCC "mpicc -fc=icc"
-# setenv FC
+#setenv FC
 
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu 
-module load petsc/3.21.1-oneapi-2023.1.0-47el2ee
-module load metis/5.1.0-oneapi-2023.1.0-jlw6d2v
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
+module load petsc/3.21.1-oneapi-2023.1.0-osgytdw
+module load metis/5.1.0-intel-2021.9.0-fdsd6ir
 
-# TODO: paramterize METIS library path in make.inc files
-
+# TODO: paramterize METIS library path in make.inc files ??
+#
 # petsc loads the following, mpi has a different hash than the one used for netcdf 
 # because petsc was built using oneapi instead of classic compilers
-
-# glibc/2.28-gcc-11.2.1-xw6lb4v
-# glibc/2.28-intel-2021.9.0-2uwzqhm
-# gmake/4.4.1-intel-2021.9.0-jnchw2k
-# gcc-runtime/11.2.1-gcc-11.2.1-wwsew2s
-# intel-oneapi-runtime/2023.1.0-oneapi-2023.1.0-wewsg5j
-# pkgconf/2.2.0-intel-2021.9.0-s7445l2
-# zlib-ng/2.1.6-intel-2021.9.0-mwrleel
-# hdf5/1.14.3-oneapi-2023.1.0-zw53vsh
-# openblas/0.3.26-intel-2021.9.0-li44fpy
-# hypre/2.31.0-oneapi-2023.1.0-zod3lxt
-# metis/5.1.0-oneapi-2023.1.0-jlw6d2v
-# parmetis/4.0.3-oneapi-2023.1.0-usgz4uu
-# superlu-dist/8.2.1-oneapi-2023.1.0-gth5qw6
-# petsc/3.21.1-oneapi-2023.1.0-47el2ee
-
-#module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-#module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
-
-#module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
 
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
