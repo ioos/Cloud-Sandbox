@@ -15,9 +15,7 @@ source funcs-setup-instance.sh
 
 # System stuff
 # setup_paths
-set -x
-setup_aliases
-exit
+# setup_aliases
 # setup_environment
 
 ## install_jupyterhub # Requires some manual work
@@ -33,18 +31,17 @@ exit
 
 #remove_spack
 #install_spack
-
 #install_intel_oneapi_spack
 
-# Skipping mkl for now
-# install_intel-oneapi-mkl_spack
+install_intel-oneapi-mkl_spack
 
 #install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
 #install_petsc_intelmpi-spack
 
 # TODO: Install these libraries via spack
-#install_base_rpms
-#install_ncep_rpms
+# install_nceplibs-spack
+
+exit
 
 # install_ffmpeg
 
