@@ -4,15 +4,14 @@
 #__license__ = "BSD 3-Clause"
 
 
-version="v3.5.4"
+version="v3.6.11"
 noaaurl="https://www.nco.ncep.noaa.gov/pmb/codes/nwprod/nosofs.${version}"
 
 opts="-nc -np -r"
 
-fixdirs="
+fixdirs='
 cbofs
 ciofs
-creofs
 dbofs
 gomofs
 leofs
@@ -21,14 +20,13 @@ loofs
 lsofs
 ngofs2
 sfbofs
+sscofs
 tbofs
 wcofs
-"
-# shared
-
-#fixdirs='
-#shared
-#'
+wcofs_da
+wcofs_free
+shared
+'
 
 for dir in $fixdirs
 do
@@ -48,14 +46,13 @@ rm -Rf www.nco.ncep.noaa.gov
 # Tar it and save to S3
 cd nosofs.${version}/fix
 
-bucket="ioos-cloud-sandbox"
+bucket="ioos-sandbox-use2"
 
 for dir in $fixdirs
 do
   tarfile=$dir.${version}.fix.tgz
   tar -czvf $tarfile $dir
-  aws s3 cp $tarfile s3://${bucket}/public/nosofs/fix/${tarfile} --acl public-read
-  #https://ioos-cloud-sandbox.s3.amazonaws.com/public/nosofs/fix/cbofs.v3.2.1.fix.tgz
-  rm $tarfile
+  aws s3 cp $tarfile s3://${bucket}/public/nosofs/fix/${tarfile}
+  #rm $tarfile
 done
 

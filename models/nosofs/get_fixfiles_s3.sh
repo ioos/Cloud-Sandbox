@@ -5,12 +5,12 @@
 
 
 # Call this from the nosofs-NCO/fix folder
+homeNOSOFS=''
 
-fixdirs="
+fixdirs='
 shared
 cbofs
 ciofs
-creofs
 dbofs
 gomofs
 leofs
@@ -19,15 +19,18 @@ loofs
 lsofs
 ngofs2
 sfbofs
+sscofs
 tbofs
 wcofs
-"
+wcofs_da
+wcofs_free
+'
 
 # Optionally only download some
 #fixdirs='shared cbofs'
 
-bucket=ioos-cloud-sandbox
-version="v3.5.4"
+bucket=ioos-sandbox-use2
+version="v3.6.11"
 
 url="https://${bucket}.s3.amazonaws.com/public/nosofs/fix"
 for model in $fixdirs
