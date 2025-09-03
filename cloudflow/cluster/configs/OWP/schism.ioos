@@ -1,8 +1,8 @@
 {
 "platform"  : "AWS",
 "region"    : "us-east-2",
-"nodeType"  : "x2idn.32xlarge",
-"nodeCount" : 4,
+"nodeType"  : "hpc6a.48xlarge",
+"nodeCount" : 10,
 "tags"      : [ 
                 { "Key": "Name", "Value": "SCHISM" },
                 { "Key": "Project", "Value": "OWP" }
