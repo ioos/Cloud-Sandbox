@@ -274,7 +274,7 @@ class AWSCluster(Cluster):
 
 
     # TODO: use gp3 volume instead of default gp2
-    def start(self):
+    def start(self,job):
         """ Provision the configured cluster in the cloud.
 
         Returns
@@ -296,7 +296,6 @@ class AWSCluster(Cluster):
         # hpc6a and hpc7a and some others do not support the CpuOptions={ 'ThreadsPerCore': option }
 
         try:
-
           if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
           # EFA supported:           NO                  YES
               self.__instances = ec2.create_instances(
@@ -353,11 +352,102 @@ class AWSCluster(Cluster):
                 }
               )
         except ClientError as e:
-            log.exception('ClientError exception in createCluster' + str(e))
-            raise Exception() from e
+            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+
+                 # Retry settings
+                 try:
+                     max_retries = int(job.NUM_TRIES)
+                 except:
+                     print('AWS Insufficent Instance Capacity has been detected, but user did not specify number of maximum number of retries to obtain the ec2 instance/s. Will default to 5 retries to obtain AWS resources.')
+                     max_retries = 5
+                 try:
+                     retry_delay_seconds = int(job.JOB_DELAY)
+                 except:
+                     print('AWS Insufficent Instance Capacity has been detected, but user did not specify the number of seconds for cloudflow to wait before requesting the ec2 instance/s again. Will default to waiting 300 seconds before requesting AWS resources again.')
+                     retry_delay_seconds = 300
+
+                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {retry_delay_seconds} seconds and then retry {max_retries} times over to see if we can obtain the user requested AWS resources.")
+                 retries = 0
+
+                 while retries < max_retries:
+                     try:
+                         if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
+                             # EFA supported:           NO                  YES
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = 1)
+                             )
+
+                         elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
+                             )
+
+                         else:  # supports the ThreadsPerCore option and setting it to 1
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
+                               CpuOptions={
+                                   'CoreCount': self.PPN,
+                                   'ThreadsPerCore': 1
+                               }
+                             )
+
+                         
+                         break  
+                     except ClientError as e:
+                         if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+                             retries += 1
+                             if(retries == max_retries):
+                                 print(f"Insufficient capacity. Number of retries ({max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
+                                 raise Exception() from e
+                             else:
+                                 print(f"Insufficient capacity. Retrying in {retry_delay_seconds} seconds... (Attempt {retries}/{max_retries})")
+                                 time.sleep(retry_delay_seconds)
+                         else:
+                             # Re-raise the exception if it's not a capacity issue
+                             log.exception('ClientError exception in createCluster' + str(e))
+                             raise Exception() from e
+            else:
+                log.exception('ClientError exception in createCluster' + str(e))
+                raise Exception() from e
 
 
-        print('Waiting for nodes to enter running state ...')
+        print('AWS resources have been allocated for cloudflow job. Waiting for nodes to enter running state ...')
         # Make sure the nodes are running before returning
 
         client = boto3.client('ec2', self.region)
