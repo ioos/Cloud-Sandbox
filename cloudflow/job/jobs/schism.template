@@ -1,7 +1,9 @@
 {
   "JOBTYPE"   : "schism_template",
   "OFS"       : "schism",
-  "EXEC"      : "/save/ec2-user/OWP/schism/build/bin/pschism_DEBUG_DEBUG_BLD_STANDALONE_SH_MEM_COMM_TVD-VL",
+  "EXEC"      : "/save/ec2-user/OWP/schism_jerome_hpc7a/build/bin/pschism_TVD-VL",
   "MODEL_DIR" : "/save/ec2-user/OWP/laura",
+  "JOB_DELAY" : "300",
+  "NUM_TRIES" : "10",
   "NSCRIBES"  : "2"
 }
