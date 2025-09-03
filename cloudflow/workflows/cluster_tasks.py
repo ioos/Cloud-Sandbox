@@ -59,7 +59,7 @@ def cluster_init(config) -> Cluster:
 
 # cluster
 @task
-def cluster_start(cluster):
+def cluster_start(cluster,job):
     """ Start the cluster
 
     Parameters
@@ -70,7 +70,7 @@ def cluster_start(cluster):
     log.info('Starting ' + str(cluster.nodeCount) + ' instances ...')
     log.info('Waiting for nodes to start ...')
     try:
-        cluster.start()
+        cluster.start(job)
     except Exception as e:
         log.exception('In driver: Exception while creating nodes :' + str(e))
         raise signals.FAIL()
