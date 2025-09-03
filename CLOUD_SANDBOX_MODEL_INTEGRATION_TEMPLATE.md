@@ -38,7 +38,7 @@ Edit the `workflow_main.py` script.
 - In the function `main()` under the for loop `for jobfile in joblist:`
    - add an `elif jobtype == ` block with your JOBTYPE that you specified in the job file from Step #3. 
       - You can copy the block for `ucla-roms` for most models and replace the jobtype. Otherwise, choose or create a function in `Cloud-Sandbox/cloudflow/workflows/flows.py`
-   - If you need to execute a specific Python environment pathway, then you will also need to replace the `-S python3` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/python -u`.
+   - If you need to execute a specific Python environment pathway, then you will also need to replace the `-S python3 -u` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/python`.
 
 6. **Build the workflow for your model - `your_model_name.py`** 
 We will create a file to read in the keywords from your job file by creating a new script and class for your model.
