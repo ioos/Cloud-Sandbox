@@ -39,6 +39,12 @@ class SCHISM_Template(Job):
     MODEL_DIR : str
         The location of the SCHISM model run to execute
 
+    JOB_DELAY : str
+        The number of seconds that a user wants to wait to allow AWS resources to be freed up before attempting to grab ec2 resources
+
+    NUM_TRIES : str
+        The number of retries a user wants to attempt on waiting for AWS resources to be available
+
     NSCRIBES: str
         The number of cpus dedicated to SCHISM I/O procedures
     """
@@ -84,6 +90,8 @@ class SCHISM_Template(Job):
         self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
+        self.JOB_DELAY = cfDict['JOB_DELAY']
+        self.NUM_TRIES = cfDict['NUM_TRIES']
         self.NSCRIBES = cfDict['NSCRIBES']
 
         return
