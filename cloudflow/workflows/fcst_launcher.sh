@@ -111,8 +111,8 @@ case $OFS in
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
-  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=$SAVEDIR/nosofs-3.5.0
+  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | ngofs2 | sfbofs )
+    export HOMEnos=$SAVEDIR
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
     export cyc=$HH
@@ -149,7 +149,7 @@ case $OFS in
     # SAVEDIR is job.SAVEDIR
     # e.g. /save/patrick/schism
     module use -a $SAVEDIR
-    MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
+    MODULEFILE=intel_x86_64
 
     #TODO: make this part of the job config
     module load $MODULEFILE

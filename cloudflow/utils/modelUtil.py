@@ -18,10 +18,10 @@ roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
 fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
 
 nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
-                  "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
+                  "leofs", "lmhofs", "sfbofs", "ngofs2"]
 
 def nosofs_cyc0(ofs : str) -> str:
-    if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2" ]:
+    if ofs in [ "sfbofs", "ngofs2" ]:
         return "03"
     else:
         return "00"
@@ -94,7 +94,10 @@ def makeOceanin(NPROCS, settings, template, outfile, ratio=1.0):
         "__NTILEJ__": str(tiles["NtileJ"]),
     }
 
+    # Update the ntile settings
     settings.update(reptiles)
+
+    # replace template placeholders with values in settings
     sedoceanin(template, outfile, settings)
     return
 

@@ -966,7 +966,7 @@
 
 ! Input NetCDF file names, [1:Ngrids].
 
-          GRDNAME == nos.cbofs.romsgrid.nc
+          GRDNAME == cbofs.romsgrid.nc
           ININAME == cbofs.t__HH__z.__CDATE__.rst.nowcast.nc
           ITLNAME == damee4_itl.nc
           IRPNAME == damee4_irp.nc
@@ -1056,7 +1056,7 @@
      NFFILES == 2
 
      FRCNAME == cbofs.t__HH__z.__CDATE__.met.forecast.nc \
-     nos.cbofs.respirate.nc
+     cbofs.respirate.nc
 
 ! Output NetCDF file names, [1:Ngrids].
 
@@ -1077,9 +1077,9 @@
 ! Input ASCII parameter filenames.
 
           APARNAM =  ROMS/External/s4dvar.in
-     SPOSNAM ==  nos.cbofs.stations.in
+     SPOSNAM ==  cbofs.stations.in
           FPOSNAM =  ROMS/External/floats.in
-          BPARNAM =  nos.cbofs.bio.in
+          BPARNAM =  cbofs.bio.in
           SPARNAM =  ROMS/External/sediment.in
           USRNAME =  ROMS/External/MyFile.dat
 

@@ -126,6 +126,7 @@ class ROMSForecast(Job):
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']
+        self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
         self.EXEC = cfDict['EXEC']
         self.TIME_REF = cfDict['TIME_REF']
@@ -241,7 +242,7 @@ class ROMSForecast(Job):
         template = self.OCNINTMPL
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}{HH}"
+            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -273,7 +274,7 @@ class ROMSForecast(Job):
         # ratio is used to better balance NtileI/NtileJ with the specific grid
         # This can impact performance
         if self.OCEANIN == "auto":
-            outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+            outfile = f"{self.OUTDIR}/{OFS}.t{HH}z.{CDATE}.forecast.in"
             if OFS == 'dbofs':
                 ratio = 0.16
             else:

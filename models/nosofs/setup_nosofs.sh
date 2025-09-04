@@ -38,7 +38,7 @@ echo "The build scripts can be modified to only build specific models."
 ./build.sh
 
 # Obtain the fixed field files (too large for gitHub)
- mkdir -p $SAVEDIR/$MODEL_DIR/fix
+mkdir -p $SAVEDIR/$MODEL_DIR/fix
 cd $SAVEDIR/$MODEL_DIR/fix
 
 # Obtain the Fixed Field Files

@@ -9,7 +9,10 @@ def getICsROMS(cdate, hh, ofs, comdir):
     #    print('Usage: {} YYYYMMDD HH cbofs|(other ROMS model) COMDIR'.format(os.path.basename(__file__)))
     #    exit()
 
-    url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,cdate)
+    # url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,cdate)
+
+    # Using NODD
+    url = 'https://noaa-ofs-pds.s3.amazonaws.com/{}.{}'.format(ofs,cdate)
 
     if os.path.isdir(comdir):
         listCount = len(os.listdir(comdir))
@@ -28,20 +31,23 @@ def getICsROMS(cdate, hh, ofs, comdir):
       '{}.met.forecast.{}'.format(pfx,sfx),
       '{}.obc.{}'.format(pfx,sfx),
       '{}.river.{}'.format(pfx,sfx),
-      '{}.roms.tides.{}'.format(pfx,sfx),
-      '{}.forecast.in'.format(pfx)
+      '{}.roms.tides.{}'.format(pfx,sfx)
     ]
+    # we make this one
+    #   '{}.forecast.in'.format(pfx)
     
-    print(icfiles)
+    print(f"icfiles: {icfiles}")
 
-    for file in icfiles:
+    for filename in icfiles:
         try:
-            urllib.request.urlretrieve('{}/{}'.format(url,file),file)
+            print('url: {}/{}'.format(url,filename))
+            urllib.request.urlretrieve('{}/{}'.format(url,filename),filename)
         except:
-            print('ERROR: Unable to retrieve {} from {}'.format(file,url))
+            print('ERROR: Unable to retrieve {} from {}'.format(filename,url))
     
-    # Need to rename the tides file - roms is still using generic name
-    #os.rename('{}.roms.tides.{}'.format(pfx,sfx),'nos.{}.roms.tides.nc'.format(ofs))
+    # Need to rename the tides file - roms is still expecting basic name
+    # os.rename('{}.roms.tides.{}'.format(pfx,sfx),'{}.roms.tides.nc'.format(ofs))
+    # Fixed the above in nos_ofs_nowcast_forecast nosofs.v3.6.6
 
     if ofs == 'gomofs':
         climfile = '{}.clim.{}'.format(pfx,sfx)
@@ -50,6 +56,8 @@ def getICsROMS(cdate, hh, ofs, comdir):
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(climfile, url))
 
+
+    # Get the restart file: start from next cycle nowcast init
     # Get cdate cyc +6 hours init file, rename it to cdate cyc restart file
     datetimeObj = datetime.strptime(cdate+hh, '%Y%m%d%H')+timedelta(hours=6)
     next = datetimeObj.strftime('%Y%m%d%H')
@@ -59,15 +67,14 @@ def getICsROMS(cdate, hh, ofs, comdir):
     ncyc = list(next)[9:10]
     print(ncyc[0])
 
-    # cbofs.t06z.20250520.init.nowcast.nc   
-    #nsfx = '{}.t{:02d}z.nc'.format(ncdate,int(ncyc[0]))
-    # pfx = '{}.t{}z.{}'.format(ofs,hh,cdate)
-
     npfx = '{}.t{:02d}z.{}'.format(ofs,int(ncyc[0]),ncdate)
 
+    # OMG! The init.nowcast files are on NOMADS but NOT NODD
+    # TODO: request these get added to the dump to NODD
+    url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,cdate)
     if hh == str(18):
-        url = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,ncdate)
-    
+        url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,ncdate)
+
     ifile = '{}.init.nowcast.{}'.format(npfx,sfx)
     rfile = '{}.rst.nowcast.{}'.format(pfx,sfx)
     try:

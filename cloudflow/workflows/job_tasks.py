@@ -246,7 +246,7 @@ def get_baseline(job: Job, sshuser=None):
 
 
 @task
-def get_forcing_multi(job: Job, sshuser=None):
+def get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
 
     Parameters
@@ -292,8 +292,6 @@ def get_forcing_multi(job: Job, sshuser=None):
     # ROMS models
     elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
 
-        # script = f"{curdir}/scripts/getICsROMS.py"
-
         cdate = sdate
 
         while cdate <= edate:
@@ -301,10 +299,6 @@ def get_forcing_multi(job: Job, sshuser=None):
             comdir = f"{comrot}/{ofs}.{cdate}"
             try:
                 getICsNOSOFS.getICsROMS(cdate, hh, ofs, comdir)
-                #result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-                #if result.returncode != 0:
-                #    log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-                #    raise signals.FAIL()
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
                 raise signals.FAIL()
@@ -312,8 +306,20 @@ def get_forcing_multi(job: Job, sshuser=None):
             cdate = util.ndate(cdate, 1)
 
     # FVCOM models
-    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
-        log.info(f"get forcing stub: {ofs}")
+    elif ofs in ('ngofs2', 'leofs', 'sfbofs', 'lmhofs'):
+
+        cdate = sdate
+
+        while cdate <= edate:
+
+            comdir = f"{comrot}/{ofs}.{cdate}"
+            try:
+                getICsNOSOFS.getICsFVCOM(cdate, hh, ofs, comdir)
+            except Exception as e:
+                log.exception('Problem encountered with downloading forcing data ...')
+                raise signals.FAIL()
+
+            cdate = util.ndate(cdate, 1)
 
     elif ofs in ('secofs', 'eccofs', 'necofs'):
         print(f"only using pre-downloaded forcing files for {ofs} test case")
@@ -324,7 +330,7 @@ def get_forcing_multi(job: Job, sshuser=None):
     return
 
 @task
-def get_forcing(job: Job, sshuser=None):
+def old_get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
 
     Parameters
