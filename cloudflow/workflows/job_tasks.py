@@ -290,7 +290,7 @@ def get_forcing(job: Job, sshuser=None):
             cdate = util.ndate(cdate, 1)
 
     # ROMS models
-    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
+    elif ofs in util.nosofs_roms_models:
 
         cdate = sdate
 
@@ -359,7 +359,7 @@ def old_get_forcing(job: Job, sshuser=None):
             raise signals.FAIL()
 
     # ROMS models
-    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
+    elif ofs in util.nosofs_roms_models:
         #comdir = f"{comrot}/{ofs}.{cdate}"
         script = f"{curdir}/scripts/getICsROMS.sh"
 
@@ -551,7 +551,6 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     if baselen != explen:
         log.warning(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
 
-    #lastbase = BASELINE[baselen-1]
     # Refactored this to support short experiment runs
     lastbase = BASELINE[explen-1]
     lastexp = EXPERIMENT[explen-1]

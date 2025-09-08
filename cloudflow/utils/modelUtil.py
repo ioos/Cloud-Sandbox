@@ -1,5 +1,4 @@
 """ Various routines, not just for ROMS models anymore.
-TODO: Rename this module.
 """
 import datetime
 import json
@@ -11,17 +10,18 @@ import subprocess
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
 debug = False
 
-roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
-fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
+roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","tbofs","wcofs","liveocean"]
+fvcom_models = ["leofs", "lmhofs", "ngofs2", "sfbofs"]
 
-nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
-                  "leofs", "lmhofs", "sfbofs", "ngofs2"]
+nosofs_roms_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs","wcofs" ]
+nosofs_fvcom_models = [ "leofs", "lmhofs", "sfbofs" ]
+
+nosofs_models = nosofs_roms_models + nosofs_fvcom_models
 
 def nosofs_cyc0(ofs : str) -> str:
-    if ofs in [ "sfbofs", "ngofs2" ]:
+    if ofs in [ "sfbofs", "wcofs" ]:
         return "03"
     else:
         return "00"
@@ -322,6 +322,7 @@ def get_baseline_lo(cdate, vdir, sshuser):
         print("Error retrieving liveocean baselines: ", result.stdout)
 
     return
+
 
 def get_ICs_lo_cas7_hindcast(cdate, localpath, sshuser):
     """ Get the atmospheric forcing and boundary layer conditions and ICs

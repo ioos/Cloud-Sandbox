@@ -142,6 +142,10 @@ class ROMSForecast(Job):
             today = datetime.date.today().strftime("%Y%m%d")
             self.CDATE = today
 
+        if self.CDATE == "yesterday":
+            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y%m%d")
+            self.CDATE = yesterday
+
         # Coupled models have additional input files 
         if 'CPLINTMPL' in cfDict:
             self.CPLINTMPL = cfDict['CPLINTMPL']
@@ -172,7 +176,7 @@ class ROMSForecast(Job):
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs"):
+        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs","wcofs"):
             self.__make_oceanin_nosofs()
         elif OFS == 'wrfroms':
             self.__make_oceanin_wrfroms()

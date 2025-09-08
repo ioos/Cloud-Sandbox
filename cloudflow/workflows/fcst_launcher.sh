@@ -13,7 +13,7 @@ ulimit -s unlimited
 
 
 if [ $# -lt 8 ] ; then
-  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
+  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs2|liveocean|secofs etc.>"
   exit 1
 fi
 
@@ -111,7 +111,7 @@ case $OFS in
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
-  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | ngofs2 | sfbofs )
+  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | ngofs2 | sfbofs | wcofs )
     export HOMEnos=$SAVEDIR
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
@@ -212,7 +212,6 @@ case $OFS in
 
 
   necofs)
-    
     cd "$COMOUT" || exit 1
     echo "Current dir is: $PWD"
     if [ ! -d output ]; then

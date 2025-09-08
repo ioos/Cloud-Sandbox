@@ -6,5 +6,7 @@ if [[ $USERNAME == "" ]]; then
   exit 1
 fi
 
+# Add retry, timeouts, continue, and no-clobber optoions
+
 wget --user=$USERNAME --ask-password --no-check-certificate --recursive https://ccrm.vims.edu/yinglong/NOAA/COOPS/RUN08j_JZ/
 

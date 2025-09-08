@@ -3,23 +3,29 @@ import urllib.request
 from datetime import datetime
 from datetime import timedelta
 
+NOMADS = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod'
+NODD   = 'https://noaa-ofs-pds.s3.amazonaws.com'
+
 def getICsROMS(cdate, hh, ofs, comdir):
 
     #if len(locals()) != 4:
     #    print('Usage: {} YYYYMMDD HH cbofs|(other ROMS model) COMDIR'.format(os.path.basename(__file__)))
     #    exit()
 
-    # url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,cdate)
-
-    # Using NODD
-    url = 'https://noaa-ofs-pds.s3.amazonaws.com/{}.{}'.format(ofs,cdate)
+    # Using NODD for everything except the restart file
+    url = '{}/{}.{}'.format(NODD,ofs,cdate)
 
     if os.path.isdir(comdir):
         listCount = len(os.listdir(comdir))
-        if listCount > 4:
-            print('Looks like ICs already exist. .... skipping') 
-            print('Remove the files in {} to re-download.'.format(comdir))
-            return
+
+        # Below only works if COMDIR is unique to this run, ops puts 4 cycles in one folder 
+        # TODO: refactor to be specific to actual ic files, files are relatively small for these
+        #       redownloading from NODD not really an issue
+        #
+        #if listCount > 4:
+        #    print('Looks like ICs already exist. .... skipping') 
+        #    print('Remove the files in {} to re-download.'.format(comdir))
+        #    return
     else:
         os.makedirs(comdir)
 
@@ -33,10 +39,6 @@ def getICsROMS(cdate, hh, ofs, comdir):
       '{}.river.{}'.format(pfx,sfx),
       '{}.roms.tides.{}'.format(pfx,sfx)
     ]
-    # we make this one
-    #   '{}.forecast.in'.format(pfx)
-    
-    print(f"icfiles: {icfiles}")
 
     for filename in icfiles:
         try:
@@ -49,7 +51,7 @@ def getICsROMS(cdate, hh, ofs, comdir):
     # os.rename('{}.roms.tides.{}'.format(pfx,sfx),'{}.roms.tides.nc'.format(ofs))
     # Fixed the above in nos_ofs_nowcast_forecast nosofs.v3.6.6
 
-    if ofs == 'gomofs':
+    if ofs in ['gomofs','wcofs']:
         climfile = '{}.clim.{}'.format(pfx,sfx)
         try:
             urllib.request.urlretrieve('{}/{}'.format(url,climfile),climfile)
@@ -57,29 +59,44 @@ def getICsROMS(cdate, hh, ofs, comdir):
             print('ERROR: Unable to retrieve {} from {}'.format(climfile, url))
 
 
+    #####################################
+    # restart init file
+    #####################################
     # Get the restart file: start from next cycle nowcast init
     # Get cdate cyc +6 hours init file, rename it to cdate cyc restart file
-    datetimeObj = datetime.strptime(cdate+hh, '%Y%m%d%H')+timedelta(hours=6)
-    next = datetimeObj.strftime('%Y%m%d%H')
-    ncdate = list(next)[0:8]
-    ncdate = ''.join(ncdate)
-    print(ncdate)
-    ncyc = list(next)[9:10]
-    print(ncyc[0])
+    nextdate = datetime.strptime(cdate+hh, '%Y%m%d%H')+timedelta(hours=6)
+    nextday = datetime.strptime(cdate+hh, '%Y%m%d%H')+timedelta(hours=24)
 
-    npfx = '{}.t{:02d}z.{}'.format(ofs,int(ncyc[0]),ncdate)
+    # next cdate and cyc
+    ncdate = nextdate.strftime('%Y%m%d')
+    ncyc = nextdate.strftime('%H')
+    npfx = '{}.t{}z.{}'.format(ofs,ncyc,ncdate)
 
-    # OMG! The init.nowcast files are on NOMADS but NOT NODD
-    # TODO: request these get added to the dump to NODD
-    url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,cdate)
+    print(f"ncdate: {ncdate}")
+    print(f"ncyc: {ncyc}")
+    print(f"npfx: {npfx}")
+
+    # The init.nowcast files are on NOMADS, NOT on NODD
+    # TODO?: request these get added to the dump to NODD
+    url='{}/{}.{}'.format(NOMADS,ofs,cdate)
+
+    #TODO: Make sure the TIDE REFERENCE and init restart file TIMES are correct - again
+    if ofs == 'wcofs':
+        # wcofs runs only once per day, different folder
+        ncdate = nextday.strftime('%Y%m%d')
+        ncyc = nextday.strftime('%H')
+        npfx = '{}.t{}z.{}'.format(ofs,ncyc,ncdate) 
+        url='{}/{}.{}'.format(NOMADS,ofs,ncdate)
+    
     if hh == str(18):
-        url='https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/{}.{}'.format(ofs,ncdate)
+        # next cycle will be in next day's folder if current cyc = 18
+        url='{}/{}.{}'.format(NOMADS,ofs,ncdate)
 
     ifile = '{}.init.nowcast.{}'.format(npfx,sfx)
     rfile = '{}.rst.nowcast.{}'.format(pfx,sfx)
     try:
-        urllib.request.urlretrieve('{}/{}'.format(url,ifile),ifile)
+        urllib.request.urlretrieve('{}/{}'.format(url,ifile),rfile)
     except:
         print('ERROR: Unable to retrieve {} from \n {}'.format(ifile,url))
     
-    os.rename(ifile,rfile)
+    # os.rename(ifile,rfile)
