@@ -3,7 +3,5 @@
   "OFS"       : "schism",
   "EXEC"      : "/save/ec2-user/OWP/schism_jerome_hpc7a/build/bin/pschism_TVD-VL",
   "MODEL_DIR" : "/save/ec2-user/OWP/laura",
-  "JOB_DELAY" : "300",
-  "NUM_TRIES" : "10",
-  "NSCRIBES"  : "2"
+  "NSCRIBES"  : "4"
 }

@@ -91,6 +91,12 @@ class AWSCluster(Cluster):
     PPN       : int
         Number of processors (physical cores) per node.
 
+    vm_retry_delay : int
+        The number of seconds that a user wants to wait to allow AWS resources to be freed up before attempting to grab ec2 resources
+
+    vm_max_retries : int
+        The number of retries a user wants to attempt on waiting for AWS resources to be available
+
     tags      : list of dictionary/s of str
         Specific tags to attach to the resources provisioned.
 
@@ -142,6 +148,8 @@ class AWSCluster(Cluster):
         self.nodeCount = 0
         self.NPROCS = 0
         self.PPN = 0
+        self.vm_retry_delay = 300
+        self.vm_max_retries = 5
         self.tags = []
         self.image_id = ''
         self.key_name = ''
@@ -246,6 +254,17 @@ class AWSCluster(Cluster):
         self.nodeType = cfDict['nodeType']
         self.nodeCount = cfDict['nodeCount']
 
+        try:
+            self.vm_retry_delay = cfDict['vm_retry_delay']
+        except KeyError:
+            print(f'Cluster configuration variable vm_retyr_delay was not specified by user. Defaulting to value of {self.vm_retry_delay} seconds.')
+
+        try:
+            self.vm_max_retries = cfDict['vm_max_retries']
+        except KeyError:
+            print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
+
+
         # Hacky way to force unique Name tags
         print("running memorable_tags")
         self.tags = self.memorable_tags(cfDict['tags'])
@@ -274,7 +293,7 @@ class AWSCluster(Cluster):
 
 
     # TODO: use gp3 volume instead of default gp2
-    def start(self,job):
+    def start(self):
         """ Provision the configured cluster in the cloud.
 
         Returns
@@ -354,22 +373,10 @@ class AWSCluster(Cluster):
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 
-                 # Retry settings
-                 try:
-                     max_retries = int(job.NUM_TRIES)
-                 except:
-                     print('AWS Insufficent Instance Capacity has been detected, but user did not specify number of maximum number of retries to obtain the ec2 instance/s. Will default to 5 retries to obtain AWS resources.')
-                     max_retries = 5
-                 try:
-                     retry_delay_seconds = int(job.JOB_DELAY)
-                 except:
-                     print('AWS Insufficent Instance Capacity has been detected, but user did not specify the number of seconds for cloudflow to wait before requesting the ec2 instance/s again. Will default to waiting 300 seconds before requesting AWS resources again.')
-                     retry_delay_seconds = 300
-
-                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {retry_delay_seconds} seconds and then retry {max_retries} times over to see if we can obtain the user requested AWS resources.")
+                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the delay time will be implemented over each retry interval. Cloudflow will retry {self.vm_max_retries} times over to see if we can obtain the user requested AWS resources.")
                  retries = 0
 
-                 while retries < max_retries:
+                 while retries < self.vm_max_retries:
                      try:
                          if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
                              # EFA supported:           NO                  YES
@@ -432,12 +439,18 @@ class AWSCluster(Cluster):
                      except ClientError as e:
                          if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
                              retries += 1
-                             if(retries == max_retries):
-                                 print(f"Insufficient capacity. Number of retries ({max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
+                             if(retries == self.vm_max_retries):
+                                 print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
                                  raise Exception() from e
                              else:
-                                 print(f"Insufficient capacity. Retrying in {retry_delay_seconds} seconds... (Attempt {retries}/{max_retries})")
-                                 time.sleep(retry_delay_seconds)
+                                 # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
+                                 if(retries>1):
+                                     self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
+                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     time.sleep(self.vm_retry_delay)
+                                 else:
+                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     time.sleep(self.vm_retry_delay)
                          else:
                              # Re-raise the exception if it's not a capacity issue
                              log.exception('ClientError exception in createCluster' + str(e))

@@ -96,7 +96,7 @@ def simple_experiment_flow(cluster_conf, job_config) -> Flow:
         # Get forcing data here
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, expjob, upstream_tasks=[expjob])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[expjob])
 
         # Run the forecast
         exp_run = tasks.simple_run(cluster, expjob, upstream_tasks=[cluster_start])
@@ -148,7 +148,7 @@ def multi_hindcast_flow(hcstconf, jobfile, sshuser) -> Flow:
         # scratch = tasks.create_scratch('FSx',jobfile,'/ptmp', upstream_tasks=[forcing])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, job, upstream_tasks=[forcing, job])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, job])
 
         # Mount the scratch disk
         #scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
@@ -217,7 +217,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
         forcing = jtasks.get_forcing(fcstjob, sshuser)
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, fcstjob, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
 
         # Run the forecast
         fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
@@ -276,7 +276,7 @@ def template_flow(conf, jobfile) -> Flow:
         template_job = tasks.job_init(cluster, jobfile)
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster,template_job)
+        cluster_start = ctasks.cluster_start(cluster)
 
         # Run the model
         template_run = tasks.template_run(cluster, template_job, upstream_tasks=[cluster_start])
@@ -328,7 +328,7 @@ def reanalysis_flow(fcstconf, fcstjobfile) -> Flow:
 
         # Start the cluster
         #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
-        cluster_start = ctasks.cluster_start(cluster,fcstjob)
+        cluster_start = ctasks.cluster_start(cluster)
 
         # Run the forecast
         fcst_run = tasks.cora_reanalysis_run(cluster, fcstjob, upstream_tasks=[cluster_start])
@@ -387,7 +387,7 @@ def plot_flow(postconf, postjobfile) -> Flow:
         plotjob = tasks.job_init(postmach, postjobfile)
 
         # Start the machine
-        pmStarted = ctasks.cluster_start(postmach,plotjob)
+        pmStarted = ctasks.cluster_start(postmach)
 
         # Push the env, install required libs on post machine
         # TODO: install all of the 3rd party dependencies on AMI
@@ -458,7 +458,7 @@ def diff_plot_flow(postconf, postjobfile, sshuser=None) -> Flow:
         getbaseline = jtasks.get_baseline(plotjob, sshuser)
 
         # Start the machine
-        pmStarted = ctasks.cluster_start(postmach, plotjob, upstream_tasks=[getbaseline])
+        pmStarted = ctasks.cluster_start(postmach, upstream_tasks=[getbaseline])
 
         # Push the env, install required libs on post machine
         # TODO: install all of the 3rd party dependencies on AMI
@@ -622,7 +622,7 @@ def debug_model(fcstconf, fcstjobfile, sshuser) -> Flow:
         #scratch = tasks.create_scratch(provider,fcstconf,'/ptmp', upstream_tasks=[forcing])
 
         # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, fcstjob, upstream_tasks=[forcing])
+        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
 
         # Mount the scratch disk
         #scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])

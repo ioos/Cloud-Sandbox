@@ -3,6 +3,8 @@
 "region"    : "us-east-2",
 "nodeType"  : "hpc6a.48xlarge",
 "nodeCount" : 10,
+"vm_retry_delay": 300,
+"vm_max_retries": 5,
 "tags"      : [ 
                 { "Key": "Name", "Value": "SCHISM" },
                 { "Key": "Project", "Value": "OWP" }
