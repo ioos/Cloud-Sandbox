@@ -94,12 +94,19 @@ elif [ $impi -eq 1 ]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
   elif [[ "$OFS" == "ucla-roms" ]]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $RUNCORES"
+  # Slice up SCHISM tasks between OpenMP and MPI protocols to 
+  # optimize memory allocation for the slave ranks. This method
+  # will allow the hpc node instances to work with large SCHISM
+  # meshes. For smaller meshes, consider revising $SCHISM_ntasks
+  # and $SCHISM_NPROCS to just both be equal to $NPROCS
+  elif [[ "$OFS" == "schism" ]]; then
+    export SCHISM_ntasks=70
+    export OMP_NUM_THREADS=1
+    export SCHISM_NPROCS=$((SCHISM_ntasks*(NPROCS/96)))
+    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $SCHISM_NPROCS -ppn $SCHISM_ntasks"
   else
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
   fi
-  #export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-  export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-  export I_MPI_DEBUG=0
 else
   echo "ERROR: Unsupported mpirun version ..."
   exit 1
