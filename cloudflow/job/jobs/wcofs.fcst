@@ -10,7 +10,7 @@
   "TIME_REF"  : "20160101.0d0",
   "BUCKET"    : "ioos-sandbox-use2",
   "BCKTFLDR"  : "nosofs/patrick.tripp/wcofs/output",
-  "NTIMES"    : "240",
+  "NTIMES"    : "2880",
   "72HOUR_NTIMES" : "2880",
   "6Hour_NTIMES"  : "240",
   "1Hour_NTIMES"  : "40",

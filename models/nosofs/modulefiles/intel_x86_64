@@ -29,6 +29,13 @@ module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
 module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 # module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
+module load metis/5.1.0-intel-2021.9.0-fdsd6ir
+
+set METIS [exec spack location -i metis]
+regsub {\n$} $METIS {} METIS
+setenv METIS $METIS
+
+# /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/metis-5.1.0-fdsd6irtc7ukcwpy4ehuwsgxwqd5g33z/
 
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 

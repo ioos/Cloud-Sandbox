@@ -6,7 +6,7 @@
 "vm_retry_delay": 300,
 "vm_max_retries": 5,
 "tags"      : [ 
-                { "Key": "Name", "Value": "cbofs-fcst" },
+                { "Key": "Name", "Value": "nosofs-fcst" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "key_name"  : "ioos-sandbox",

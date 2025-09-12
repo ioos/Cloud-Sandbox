@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SAVEDIR=${1:-"/save/$USER"}
+export SAVEDIR=${1:-"/save/$USER"}
 if [ ! -d $SAVEDIR ]; then
     mkdir -p $SAVEDIR | echo "Can not create $SAVEDIR"; exit 1
 fi
 
-CURHOME=$PWD
-CSHOME="${PWD%/*/*}"
+export CURHOME=$PWD
+export CSHOME="${PWD%/*/*}"
 echo "Cloud-Sandbox/ directory is: $CSHOME"
 
-REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
-BRANCH="v3.6.6.dev"
-MODEL_VERSION='nosofs.v3.6.6'
+export REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
+export BRANCH="v3.6.6.dev"
+export MODEL_VERSION='nosofs.v3.6.6'
 
-MODEL_DIR=$SAVEDIR/$MODEL_VERSION
+export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 
 cd $SAVEDIR
 if [ ! -d $MODEL_DIR ]; then

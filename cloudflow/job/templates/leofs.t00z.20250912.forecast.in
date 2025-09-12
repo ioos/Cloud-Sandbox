@@ -15,14 +15,14 @@
  CASE_TITLE      = 'LEOFS',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
- DATE_REFERENCE  = '__DATE_REFERENCE__',
- START_DATE      = '__START_DATE__ __HHMMSS__',
- END_DATE        = '__END_DATE__ __END_HHMMSS__'
+ DATE_REFERENCE  = '2015-01-01 00:00:00',
+ START_DATE      = '2025-09-12 00:00:00',
+ END_DATE        = '2025-09-17 00:00:00'
  /
 
  &NML_STARTUP
- STARTUP_TYPE      = 'hotstart',
- STARTUP_FILE      = 'leofs.t__HH__z.__CDATE__.rst.nowcast.nc',
+STARTUP_TYPE      = 'hotstart',
+ STARTUP_FILE      = 'leofs.t00z.20250912.rst.nowcast.nc',
  STARTUP_UV_TYPE   = 'set values',
  STARTUP_TURB_TYPE = 'set values',
  STARTUP_TS_TYPE   = 'set values',
@@ -53,14 +53,14 @@
 
  &NML_RESTART
  RST_ON           = T,
- RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ RST_FIRST_OUT    = '2025-09-12 00:00:00',
  RST_OUT_INTERVAL = 'seconds=21600.0',
  RST_OUTPUT_STACK = 1   
  /
 
  &NML_NETCDF
  NC_ON   = T,
- NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ NC_FIRST_OUT    = '2025-09-12 00:00:00',
  NC_OUT_INTERVAL = 'seconds=3600.0',
  NC_OUTPUT_STACK = 1,
  NC_SUBDOMAIN_FILES      = FVCOM,
@@ -85,7 +85,7 @@
 
 &NML_NETCDF_SURFACE
  NCSF_ON   = F,
- NCSF_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ NCSF_FIRST_OUT    = '2025-09-12 00:00:00',
  NCSF_OUT_INTERVAL = 'seconds=3600.0',
  NCSF_OUTPUT_STACK = 1,
  NCSF_SUBDOMAIN_FILES = 'FVCOM',
@@ -127,14 +127,14 @@
  WIND_ON      = T,
  WIND_TYPE    = 'speed',
  WIND_STRESS_METHOD = 'LP1981' , 
- WIND_FILE    = 'leofs.t__HH__z.__CDATE__.met.forecast.nc',
+ WIND_FILE    = 'leofs.t00z.20250912.met.forecast.nc',
  WIND_KIND    = 'variable',
  WIND_X       =  0.0400000E+00, 
  WIND_Y       =  0.0200000E+00,
  HEATING_ON     = F,
  HEATING_TYPE   = 'flux',
  HEATING_KIND   = 'variable',
- HEATING_FILE   = 'leofs.t__HH__z.__CDATE__.met.forecast.nc',
+ HEATING_FILE   = 'leofs.t00z.20250912.met.forecast.nc',
  HEATING_LONGWAVE_LENGTHSCALE  = 3.6,
  HEATING_LONGWAVE_PERCTAGE     = 0.55,
  HEATING_SHORTWAVE_LENGTHSCALE = 0.35,
@@ -148,14 +148,14 @@
  
  AIRPRESSURE_ON    = F,                       
  AIRPRESSURE_KIND  = 'variable',
- AIRPRESSURE_FILE  = 'leofs.t__HH__z.__CDATE__.met.forecast.nc',
+ AIRPRESSURE_FILE  = 'leofs.t00z.20250912.met.forecast.nc',
  AIRPRESSURE_VALUE =  0.005500000E+00
  /
 
  &NML_HEATING_CALCULATED
  HEATING_CALCULATE_ON   = F,
  HEATING_CALCULATE_TYPE = 'flux',
- HEATING_CALCULATE_FILE = 'leofs.t__HH__z.__CDATE__.hflux.forecast.nc',
+ HEATING_CALCULATE_FILE = 'leofs.t00z.20250912.hflux.forecast.nc',
  HEATING_CALCULATE_KIND = 'variable',
  HEATING_FRESHWATER      = F,
  COARE_VERSION          = 'COARE26Z',
@@ -173,7 +173,7 @@
  &NML_HEATING_SOLAR
  HEATING_SOLAR_ON        = T,
  HEATING_SOLAR_TYPE      = 'flux',
- HEATING_SOLAR_FILE      = 'leofs.t__HH__z.__CDATE__.met.forecast.nc',
+ HEATING_SOLAR_FILE      = 'leofs.t00z.20250912.met.forecast.nc',
  HEATING_SOLAR_KIND      = 'variable',
  ZM                      = 10.0,        ! Units = meters
  LATITUDE_REFERENCE      = 0.0,
@@ -221,10 +221,10 @@
  OBC_ON                     = T,
  OBC_NODE_LIST_FILE         = 'leofs_obc.dat',
  OBC_ELEVATION_FORCING_ON   = T,
- OBC_ELEVATION_FILE         = 'leofs.t__HH__z.__CDATE__.obc.nc',
+ OBC_ELEVATION_FILE         = 'leofs.t00z.20250912.obc.nc',
  OBC_TS_TYPE                = 1,
  OBC_TEMP_NUDGING           = T,
- OBC_TEMP_FILE              = 'leofs.t__HH__z.__CDATE__.obc.nc',
+ OBC_TEMP_FILE              = 'leofs.t00z.20250912.obc.nc',
  OBC_TEMP_NUDGING_TIMESCALE =  1.0000000E+00,
  OBC_SALT_NUDGING           = F,
  OBC_SALT_FILE              = 'none',
@@ -283,7 +283,7 @@
  ICING_AIR_TEMP  =  0.0000000E+00,
  ICING_WSPD      =  0.0000000E+00,
  ICE_MODEL       = T,
- ICE_FORCING_FILE        = 'leofs.t__HH__z.__CDATE__.met.forecast.nc'                                            ,
+ ICE_FORCING_FILE        = 'leofs.t00z.20250912.met.forecast.nc'                                            ,
  ICE_FORCING_KIND        = 'variable'                                            ,
  ICE_SEA_LEVEL_PRESSURE  =  0.0000000E+00,
  ICE_AIR_TEMP            =  0.0000000E+00,
@@ -334,7 +334,7 @@
  &NML_NESTING
  NESTING_ON        = F,
  NESTING_BLOCKSIZE = ,
- NESTING_FILE_NAME = 'leofs.t__HH__z.__CDATE__.obc.nc'
+ NESTING_FILE_NAME = 'leofs.t00z.20250912.obc.nc'
  /
 
  &NML_MLD
