@@ -68,10 +68,8 @@ class FVCOMForecast(Job):
     TEMPLPATH : str
         The full path to the templates to use
 
-    LOCALNEST : bool
-        Used for NEGOFS and NWGOFS.
-        True - use the nested obc file generated on this machine by the NGOFS forecast
-        False - use the nested obc file available on NOMADS
+    EXEC : str
+        The model executable to run.
     """
 
     # TODO: make attributes consistent, add initialization here
@@ -102,11 +100,6 @@ class FVCOMForecast(Job):
 
         self.make_fcstin()
 
-        if self.LOCALNEST:
-            PARENTNEST = f"{self.COMROT}/ngofs.{self.CDATE}/nos.ngofs.nestnode.{self.OFS}.forecast.{self.CDATE}.t{self.HH}z.nc"
-            LOCALOBC = f"{self.OUTDIR}/nos.{self.OFS}.obc.{self.CDATE}.t{self.HH}z.nc"
-            shutil.copyfile(PARENTNEST, LOCALOBC)
-
 
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
@@ -122,6 +115,8 @@ class FVCOMForecast(Job):
         self.HH = cfDict['HH']
         self.NHOURS = cfDict['NHOURS']
         self.COMROT = cfDict['COMROT']
+        self.SAVEDIR = cfDict['SAVEDIR']
+        self.EXEC = cfDict.get('EXEC', "")
         self.PTMP = cfDict['PTMP']
         self.DATE_REF = cfDict['DATE_REF']
         self.BUCKET = cfDict['BUCKET']
@@ -129,12 +124,6 @@ class FVCOMForecast(Job):
         self.OUTDIR = cfDict['OUTDIR']
         self.INPUTFILE = cfDict['INPUTFILE']
         self.INTMPL = cfDict['INTMPL']  # Input file template
-
-        # NESTING support
-        if self.OFS in ('nwgofs', 'negofs'):
-            self.LOCALNEST = cfDict['LOCALNEST'] == "True"  # Correctly evaluates to True or False boolean
-        else:
-            self.LOCALNEST = None
 
         if self.CDATE == "today":
             today = datetime.date.today().strftime("%Y%m%d")
@@ -144,7 +133,7 @@ class FVCOMForecast(Job):
             self.INTMPL = f"{self.TEMPLPATH}/{self.OFS}.fcst.in"
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}{self.HH}"
+            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}"
 
 
         return
@@ -156,10 +145,10 @@ class FVCOMForecast(Job):
         OFS = self.OFS
 
         # Create the ocean.in file from a template
-        if OFS in ('ngofs', 'negofs', 'nwgofs', 'sfbofs', 'leofs', 'lmhofs'):
+        if OFS in util.nosofs_fvcom_models:
             self.__make_fcstin_nosofs()
         else:
-            raise Exception(f"{OFS} is not a supported forecast")
+            print(f"WARNING: unknown model {OFS}, not making input namelist file") 
 
         return
 
@@ -198,7 +187,7 @@ class FVCOMForecast(Job):
 
         # Create the ocean.in
         if self.INPUTFILE == "auto":
-            outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+            outfile = f"{self.OUTDIR}/{OFS}.t{HH}z.{CDATE}.forecast.in"
             util.sedoceanin(template, outfile, settings)
 
         return

@@ -3,17 +3,18 @@ import urllib.request
 from datetime import datetime
 from datetime import timedelta
 
+from cloudflow.utils import modelUtil as util
+
 NOMADS = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod'
 NODD   = 'https://noaa-ofs-pds.s3.amazonaws.com'
 
-def getICsROMS(cdate, hh, ofs, comdir):
+# TODO: Refactor this, too much duplicate code
+
+def getICs(cdate, hh, ofs, comdir):
 
     #if len(locals()) != 4:
     #    print('Usage: {} YYYYMMDD HH cbofs|(other ROMS model) COMDIR'.format(os.path.basename(__file__)))
     #    exit()
-
-    # Using NODD for everything except the restart file
-    url = '{}/{}.{}'.format(NODD,ofs,cdate)
 
     if os.path.isdir(comdir):
         listCount = len(os.listdir(comdir))
@@ -33,20 +34,38 @@ def getICsROMS(cdate, hh, ofs, comdir):
 
     pfx = '{}.t{}z.{}'.format(ofs,hh,cdate)
     sfx = 'nc'
-    icfiles = [
-      '{}.met.forecast.{}'.format(pfx,sfx),
-      '{}.obc.{}'.format(pfx,sfx),
-      '{}.river.{}'.format(pfx,sfx),
-      '{}.roms.tides.{}'.format(pfx,sfx)
-    ]
 
+    if ofs in util.nosofs_roms_models:
+      icfiles = [
+        '{}.met.forecast.{}'.format(pfx,sfx),
+        '{}.obc.{}'.format(pfx,sfx),
+        '{}.river.{}'.format(pfx,sfx),
+        '{}.roms.tides.{}'.format(pfx,sfx)
+      ]
+      on_nomads = []
+
+    elif ofs in util.nosofs_fvcom_models:
+      # leofs.t00z.20250916.river.nc.tar  
+      # no river.nc.tar on NODD ugh!!!
+      icfiles = [
+        '{}.met.forecast.{}'.format(pfx,sfx),
+        '{}.obc.{}'.format(pfx,sfx),
+        '{}.hflux.forecast.{}'.format(pfx,sfx)
+      ]
+      on_nomads = [ '{}.river.{}.tar'.format(pfx,sfx) ]
+
+    else:
+      print(f"WARNING: Don't know how to get ICs for {ofs}") 
+    
+    url = '{}/{}.{}'.format(NODD,ofs,cdate)
     for filename in icfiles:
         try:
             print('url: {}/{}'.format(url,filename))
             urllib.request.urlretrieve('{}/{}'.format(url,filename),filename)
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(filename,url))
-    
+            raise
+
     # Need to rename the tides file - roms is still expecting basic name
     # os.rename('{}.roms.tides.{}'.format(pfx,sfx),'{}.roms.tides.nc'.format(ofs))
     # Fixed the above in nos_ofs_nowcast_forecast nosofs.v3.6.6
@@ -57,7 +76,16 @@ def getICsROMS(cdate, hh, ofs, comdir):
             urllib.request.urlretrieve('{}/{}'.format(url,climfile),climfile)
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(climfile, url))
+            raise
 
+    url = '{}/{}.{}'.format(NOMADS,ofs,cdate)
+    for filename in on_nomads:
+        try:
+            print('url: {}/{}'.format(url,filename))
+            urllib.request.urlretrieve('{}/{}'.format(url,filename),filename)
+        except:
+            print('ERROR: Unable to retrieve {} from {}'.format(filename,url))
+            raise
 
     #####################################
     # restart init file
@@ -72,9 +100,9 @@ def getICsROMS(cdate, hh, ofs, comdir):
     ncyc = nextdate.strftime('%H')
     npfx = '{}.t{}z.{}'.format(ofs,ncyc,ncdate)
 
-    print(f"ncdate: {ncdate}")
-    print(f"ncyc: {ncyc}")
-    print(f"npfx: {npfx}")
+    #print(f"ncdate: {ncdate}")
+    #print(f"ncyc: {ncyc}")
+    #print(f"npfx: {npfx}")
 
     # The init.nowcast files are on NOMADS, NOT on NODD
     # TODO?: request these get added to the dump to NODD
@@ -92,11 +120,12 @@ def getICsROMS(cdate, hh, ofs, comdir):
         # next cycle will be in next day's folder if current cyc = 18
         url='{}/{}.{}'.format(NOMADS,ofs,ncdate)
 
+    # Download init.nowcast and rename to rst.nowcast 
     ifile = '{}.init.nowcast.{}'.format(npfx,sfx)
     rfile = '{}.rst.nowcast.{}'.format(pfx,sfx)
     try:
         urllib.request.urlretrieve('{}/{}'.format(url,ifile),rfile)
     except:
         print('ERROR: Unable to retrieve {} from \n {}'.format(ifile,url))
-    
-    # os.rename(ifile,rfile)
+        raise
+   

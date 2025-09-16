@@ -12,12 +12,13 @@ __license__ = "BSD 3-Clause"
 
 debug = False
 
+# Used by plotting workflows
 roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","tbofs","wcofs","liveocean"]
-fvcom_models = ["leofs", "lmhofs", "ngofs2", "sfbofs"]
+fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
+############################
 
 nosofs_roms_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs","wcofs" ]
-nosofs_fvcom_models = [ "leofs", "lmhofs", "sfbofs" ]
-
+nosofs_fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
 nosofs_models = nosofs_roms_models + nosofs_fvcom_models
 
 def nosofs_cyc0(ofs : str) -> str:
@@ -285,12 +286,6 @@ def getTiling(totalCores, ratio=1.0):
 #####################################################################
 
 
-def get_ICs_roms(ofs, cdate, cycle, localpath):
-    # There is a shell script that already exists to do this
-    # Can maybe re write it in Python later
-    # Or wrap it here
-    return
-
 
 def get_baseline_lo(cdate, vdir, sshuser):
     """ Retrieve operational LiveOcean forecast data from UW """
@@ -323,7 +318,7 @@ def get_baseline_lo(cdate, vdir, sshuser):
 
     return
 
-
+# TODO - move the LiveOcean ICs routines to a different place
 def get_ICs_lo_cas7_hindcast(cdate, localpath, sshuser):
     """ Get the atmospheric forcing and boundary layer conditions and ICs
         for LiveOcean ROMS model.

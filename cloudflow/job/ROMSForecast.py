@@ -47,7 +47,7 @@ class ROMSForecast(Job):
         The base directory for the scratch disk, usually /ptmp
 
     EXEC : str
-        The model executable to run. Only used for ADNOC currently.
+        The model executable to run.
 
     TIME_REF : str
         Templated TIME_REF field value for ROMS ocean.in

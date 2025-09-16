@@ -289,8 +289,8 @@ def get_forcing(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
-    # ROMS models
-    elif ofs in util.nosofs_roms_models:
+    # ROMS and FVCOM NOSOFS models
+    elif ofs in util.nosofs_models:
 
         cdate = sdate
 
@@ -298,23 +298,7 @@ def get_forcing(job: Job, sshuser=None):
 
             comdir = f"{comrot}/{ofs}.{cdate}"
             try:
-                getICsNOSOFS.getICsROMS(cdate, hh, ofs, comdir)
-            except Exception as e:
-                log.exception('Problem encountered with downloading forcing data ...')
-                raise signals.FAIL()
-
-            cdate = util.ndate(cdate, 1)
-
-    # FVCOM models
-    elif ofs in ('ngofs2', 'leofs', 'sfbofs', 'lmhofs'):
-
-        cdate = sdate
-
-        while cdate <= edate:
-
-            comdir = f"{comrot}/{ofs}.{cdate}"
-            try:
-                getICsNOSOFS.getICsFVCOM(cdate, hh, ofs, comdir)
+                getICsNOSOFS.getICs(cdate, hh, ofs, comdir)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
                 raise signals.FAIL()
@@ -349,36 +333,8 @@ def old_get_forcing(job: Job, sshuser=None):
 
     comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
-    if ofs == 'liveocean':
-        
-        frcdir = job.COMROT + '/liveocean'
-        try:
-            util.get_ICs_lo(cdate, frcdir, sshuser)
-        except Exception as e:
-            log.exception('Problem encountered with downloading forcing data ...')
-            raise signals.FAIL()
-
-    # ROMS models
-    elif ofs in util.nosofs_roms_models:
-        #comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/scripts/getICsROMS.sh"
-
-        result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-        if result.returncode != 0:
-            log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-            raise signals.FAIL()
-
-    # FVCOM models
-    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
-        #comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/scripts/getICsFVCOM.sh"
-
-        result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-        if result.returncode != 0:
-            log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-            raise signals.FAIL()
     # Coupled WRF/ROMS
-    elif ofs == 'wrfroms':
+    if ofs == 'wrfroms':
         #comdir = f"{comrot}/{ofs}/{cdate}"
         script = f"{curdir}/scripts/getICsWRFROMS.sh"
 
@@ -392,9 +348,7 @@ def old_get_forcing(job: Job, sshuser=None):
         #result = subprocess.run([script])
         print('Not required to download forcing') 
     else:
-        log.warning(f"{ofs} has no script to download initial conditions, forcing data")
-        #log.error("Unsupported forecast: ", ofs)
-        #raise signals.FAIL()
+        log.warning(f"Could not download initial conditions for {ofs}")
 
     return
 

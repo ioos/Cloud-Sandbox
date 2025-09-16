@@ -34,6 +34,8 @@ module load metis/5.1.0-intel-2021.9.0-fdsd6ir
 set METIS [exec spack location -i metis]
 regsub {\n$} $METIS {} METIS
 setenv METIS $METIS
+prepend-path LD_LIBRARY_PATH "$env(METIS)/lib"
+
 
 # /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/metis-5.1.0-fdsd6irtc7ukcwpy4ehuwsgxwqd5g33z/
 
