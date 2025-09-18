@@ -106,9 +106,6 @@
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-     ! NtileI == 8  ! I-direction partition
-     ! NtileJ == 16  ! J-direction partition
-
      NtileI == __NTILEI__  ! I-direction partition
      NtileJ == __NTILEJ__  ! J-direction partition
 
@@ -420,10 +417,6 @@
 ! Time-stamp assigned for model initialization, reference time
 ! origin for tidal forcing, and model reference time for output
 ! NetCDF units attribute.
-
-     ! DSTART =  2611.0000d0       ! days
-     ! TIDE_START = 2557.0000   ! days
-     ! TIME_REF = 20160101.0d0     ! yyyymmdd.dd
 
      DSTART =  __DSTART__       ! days
      TIDE_START = __TIDE_START__   ! days
@@ -966,8 +959,8 @@
 
 ! Input NetCDF file names, [1:Ngrids].
 
-          GRDNAME == cbofs.romsgrid.nc
-          ININAME == cbofs.t__HH__z.__CDATE__.rst.nowcast.nc
+     GRDNAME == cbofs.romsgrid.nc
+     ININAME == cbofs.t__HH__z.__CDATE__.rst.nowcast.nc
           ITLNAME == damee4_itl.nc
           IRPNAME == damee4_irp.nc
           IADNAME == damee4_iad.nc
@@ -1033,7 +1026,7 @@
 
 ! Input tidal forcing file name.
 
-     TIDENAME == cbofs.t__HH__z.__CDATE__.roms.tides.nc
+     TIDENAME == cbofs.roms.tides.nc
 
 ! Input forcing NetCDF file name(s).
 !

@@ -106,9 +106,6 @@
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-!     NtileI == 8  ! I-direction partition
-!     NtileJ == 60  ! J-direction partition
-
      NtileI == __NTILEI__  ! I-direction partition
      NtileJ == __NTILEJ__  ! J-direction partition
 
@@ -223,10 +220,7 @@
 
 ! Time-Stepping parameters.
 
-!     NTIMES == 2880    ! 72 forecast hours
-
      NTIMES == __NTIMES__
-
      DT == 90.0d0
      NDTFAST == 30
 
@@ -423,11 +417,6 @@
 ! Time-stamp assigned for model initialization, reference time
 ! origin for tidal forcing, and model reference time for output
 ! NetCDF units attribute.
-
-! 2025090503Z forecast.in
-!     DSTART =  3535.1250d0       ! days
-!     TIDE_START = 3288.0000   ! days
-!     TIME_REF = 20160101.0d0     ! yyyymmdd.dd
 
      DSTART =  __DSTART__       ! days
      TIDE_START = __TIDE_START__   ! days
@@ -970,7 +959,6 @@
 
 ! Input NetCDF file names, [1:Ngrids].
 
-! WCOFS is once per day at 03z
      GRDNAME == wcofs.romsgrid.nc
      ININAME == wcofs.t__HH__z.__CDATE__.rst.nowcast.nc
           ITLNAME == damee4_itl.nc
@@ -1038,9 +1026,7 @@
 
 ! Input tidal forcing file name.
 
-     # TIDENAME == wcofs.roms.tides.nc
-     TIDENAME == wcofs.t__HH__z.__CDATE__.roms.tides.nc
-
+     TIDENAME == wcofs.roms.tides.nc
 
 ! Input forcing NetCDF file name(s).
 !

@@ -128,12 +128,14 @@ class ROMSForecast(Job):
         self.COMROT = cfDict['COMROT']
         self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
-        self.EXEC = cfDict['EXEC']
+
+        #PT can make attributes optional if they aren't needed in your workflow
+        self.EXEC = cfDict.get('EXEC', "")
         self.TIME_REF = cfDict['TIME_REF']
         self.BUCKET = cfDict['BUCKET']
         self.BCKTFLDR = cfDict['BCKTFLDR']
         self.NTIMES = cfDict['NTIMES']
-        self.ININAME = cfDict['ININAME']
+        self.ININAME = cfDict.get('ININAME', "")
         self.OUTDIR = cfDict['OUTDIR']
         self.OCEANIN = cfDict['OCEANIN']
         self.OCNINTMPL = cfDict['OCNINTMPL']

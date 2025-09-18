@@ -12,21 +12,21 @@
  !======Copyright 1998, Regents of University of Minnesota========!
  !                                                                !
  &NML_CASE
- CASE_TITLE      = 'LEOFS',
+ CASE_TITLE      = 'LOOFS',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
- DATE_REFERENCE  = '2015-01-01 00:00:00',
- START_DATE      = '2025-09-12 00:00:00',
- END_DATE        = '2025-09-17 00:00:00'
+ DATE_REFERENCE  = '__DATE_REFERENCE__',
+ START_DATE      = '__START_DATE__ __HHMMSS__'
+ END_DATE        = '__END_DATE__ __END_HHMMSS__'
  /
 
  &NML_STARTUP
 STARTUP_TYPE      = 'hotstart',
- STARTUP_FILE      = 'leofs.t00z.20250912.rst.nowcast.nc',
+ STARTUP_FILE      = 'loofs.t__HH__z.__CDATE__.rst.nowcast.nc',
  STARTUP_UV_TYPE   = 'set values',
  STARTUP_TURB_TYPE = 'set values',
  STARTUP_TS_TYPE   = 'set values',
- STARTUP_T_VALS  = 20.0000000E+00  ,
+ STARTUP_T_VALS  = 3.4500000E+00  ,
  STARTUP_S_VALS  = 0.0000000E+00  ,
  STARTUP_U_VALS  =  0.0000000E+00,
  STARTUP_V_VALS  =  0.0000000E+00,
@@ -44,8 +44,8 @@ STARTUP_TYPE      = 'hotstart',
  /
 
  &NML_INTEGRATION
- EXTSTEP_SECONDS =  10.0,
- ISPLIT          =  1,
+ EXTSTEP_SECONDS =  5.0,
+ ISPLIT          =  2,
  IRAMP           =  0,
  MIN_DEPTH       =  0.1,
  STATIC_SSH_ADJ  =  0.0000000E+00
@@ -53,14 +53,14 @@ STARTUP_TYPE      = 'hotstart',
 
  &NML_RESTART
  RST_ON           = T,
- RST_FIRST_OUT    = '2025-09-12 00:00:00',
+ RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
  RST_OUT_INTERVAL = 'seconds=21600.0',
  RST_OUTPUT_STACK = 1   
  /
 
  &NML_NETCDF
  NC_ON   = T,
- NC_FIRST_OUT    = '2025-09-12 00:00:00',
+ NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
  NC_OUT_INTERVAL = 'seconds=3600.0',
  NC_OUTPUT_STACK = 1,
  NC_SUBDOMAIN_FILES      = FVCOM,
@@ -73,6 +73,7 @@ STARTUP_TYPE      = 'hotstart',
  NC_VERTICAL_VEL = T,
  NC_WIND_VEL     = T,
  NC_WIND_STRESS  = F,
+ NC_ATM_PRESS  =   T,
  NC_EVAP_PRECIP  = F,
  NC_SURFACE_HEAT = T,
  NC_GROUNDWATER  = F,
@@ -85,8 +86,8 @@ STARTUP_TYPE      = 'hotstart',
 
 &NML_NETCDF_SURFACE
  NCSF_ON   = F,
- NCSF_FIRST_OUT    = '2025-09-12 00:00:00',
- NCSF_OUT_INTERVAL = 'seconds=3600.0',
+ NCSF_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ NCSF_OUT_INTERVAL = 'seconds=0.0',
  NCSF_OUTPUT_STACK = 1,
  NCSF_SUBDOMAIN_FILES = 'FVCOM',
  NCSF_GRID_METRICS = T,
@@ -95,6 +96,7 @@ STARTUP_TYPE      = 'hotstart',
  NCSF_SALT_TEMP    = T,
  NCSF_TURBULENCE   = T,
  NCSF_WIND_VEL     = T,
+ NCSF_ATM_PRESS    = T,
  NCSF_WIND_STRESS  = F,
  NCSF_EVAP_PRECIP  = F,
  NCSF_SURFACE_HEAT = F 
@@ -127,37 +129,37 @@ STARTUP_TYPE      = 'hotstart',
  WIND_ON      = T,
  WIND_TYPE    = 'speed',
  WIND_STRESS_METHOD = 'LP1981' , 
- WIND_FILE    = 'leofs.t00z.20250912.met.forecast.nc',
+ WIND_FILE    = 'loofs.t__HH__z.__CDATE__.met.forecast.nc',
  WIND_KIND    = 'variable',
- WIND_X       =  0.0400000E+00, 
- WIND_Y       =  0.0200000E+00,
+ WIND_X       =  0.0000000E+00, 
+ WIND_Y       =  0.0000000E+00,
  HEATING_ON     = F,
  HEATING_TYPE   = 'flux',
  HEATING_KIND   = 'variable',
- HEATING_FILE   = 'leofs.t00z.20250912.met.forecast.nc',
+ HEATING_FILE   = 'loofs.t__HH__z.__CDATE__.met.forecast.nc',
  HEATING_LONGWAVE_LENGTHSCALE  = 3.6,
  HEATING_LONGWAVE_PERCTAGE     = 0.55,
  HEATING_SHORTWAVE_LENGTHSCALE = 0.35,
  HEATING_RADIATION  = 0.0000000E+00,
  HEATING_NETFLUX    = 0.0000000E+00,
- PRECIPITATION_ON   = F,
+ PRECIPITATION_ON   = T,
  PRECIPITATION_KIND = 'variable',
- PRECIPITATION_FILE = 'wrf_for.nc',
+ PRECIPITATION_FILE = 'loofs.t__HH__z.__CDATE__.met.forecast.nc',
  PRECIPITATION_PRC  = 0.0000000E+00,
  PRECIPITATION_EVP  = 0.0000000E+00,
  
- AIRPRESSURE_ON    = F,                       
+ AIRPRESSURE_ON    = T,                       
  AIRPRESSURE_KIND  = 'variable',
- AIRPRESSURE_FILE  = 'leofs.t00z.20250912.met.forecast.nc',
+ AIRPRESSURE_FILE  = 'loofs.t__HH__z.__CDATE__.met.forecast.nc',
  AIRPRESSURE_VALUE =  0.005500000E+00
  /
 
  &NML_HEATING_CALCULATED
- HEATING_CALCULATE_ON   = F,
+ HEATING_CALCULATE_ON   = T,
  HEATING_CALCULATE_TYPE = 'flux',
- HEATING_CALCULATE_FILE = 'leofs.t00z.20250912.hflux.forecast.nc',
+ HEATING_CALCULATE_FILE = 'loofs.t__HH__z.__CDATE__.hflux.forecast.nc',
  HEATING_CALCULATE_KIND = 'variable',
- HEATING_FRESHWATER      = F,
+ HEATING_FRESHWATER      = T,
  COARE_VERSION          = 'COARE26Z',
  ZTT                    = 2.0000000E+00,
  ZQQ                    = 2.0000000E+00,
@@ -166,19 +168,19 @@ STARTUP_TYPE      = 'hotstart',
  SURFACE_PRESSURE        =  0.000000000000000E+000,
  LONGWAVE_RADIATION      =  0.000000000000000E+000,
  SHORTWAVE_RADIATION     =  0.000000000000000E+000,
- HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX   =  0.780000000000000,
- HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX        =   1.40000000000000,
- HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX       =   6.30000000000000
+ HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX   =  0.550000000000000,
+ HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX        =   3.60000000000000,
+ HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX       =   0.35000000000000
  /
  &NML_HEATING_SOLAR
- HEATING_SOLAR_ON        = T,
+ HEATING_SOLAR_ON        = F,
  HEATING_SOLAR_TYPE      = 'flux',
- HEATING_SOLAR_FILE      = 'leofs.t00z.20250912.met.forecast.nc',
+ HEATING_SOLAR_FILE      = 'loofs.t__HH__z.__CDATE__.met.forecast.nc',
  HEATING_SOLAR_KIND      = 'variable',
  ZM                      = 10.0,        ! Units = meters
  LATITUDE_REFERENCE      = 0.0,
  LONGITUDE_REFERENCE     = 0.0,
- JULIANDAY_REFERENCE     = 0
+ JULIANDAY_REFERENCE     = 0.0
  /
 
  &NML_PHYSICS
@@ -210,21 +212,21 @@ STARTUP_TYPE      = 'hotstart',
  /
 
  &NML_RIVER_TYPE
- RIVER_NUMBER    =          0,
+ RIVER_NUMBER    =          22,
  RIVER_TS_SETTING        = 'specified',
- RIVER_INFLOW_LOCATION   = 'node',
+ RIVER_INFLOW_LOCATION   = 'edge',
  RIVER_INFO_FILE   = 'RIVERS_NAMELIST.nml',
  RIVER_KIND        = 'variable'
  /
 
  &NML_OPEN_BOUNDARY_CONTROL
- OBC_ON                     = T,
- OBC_NODE_LIST_FILE         = 'leofs_obc.dat',
- OBC_ELEVATION_FORCING_ON   = T,
- OBC_ELEVATION_FILE         = 'leofs.t00z.20250912.obc.nc',
+ OBC_ON                     = F,
+ OBC_NODE_LIST_FILE         = 'loofs_obc.dat',
+ OBC_ELEVATION_FORCING_ON   = F,
+ OBC_ELEVATION_FILE         = 'loofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TS_TYPE                = 1,
- OBC_TEMP_NUDGING           = T,
- OBC_TEMP_FILE              = 'leofs.t00z.20250912.obc.nc',
+ OBC_TEMP_NUDGING           = F,
+ OBC_TEMP_FILE              = 'loofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TEMP_NUDGING_TIMESCALE =  1.0000000E+00,
  OBC_SALT_NUDGING           = F,
  OBC_SALT_FILE              = 'none',
@@ -238,13 +240,13 @@ STARTUP_TYPE      = 'hotstart',
  /
 
  &NML_GRID_COORDINATES
- GRID_FILE            = 'leofs_grd.dat',
+ GRID_FILE            = 'loofs_grd.dat',
  GRID_FILE_UNITS      = 'degrees',
- PROJECTION_REFERENCE = 'init=nad83:3401',
- SIGMA_LEVELS_FILE    = 'leofs_sigma.dat',
- DEPTH_FILE      = 'leofs_dep.dat',
- CORIOLIS_FILE   = 'leofs_cor.dat',
- SPONGE_FILE     = 'leofs_spg.dat'
+ PROJECTION_REFERENCE = 'proj=utm +zone=16 +datum=NAD83',    
+ SIGMA_LEVELS_FILE    = 'loofs_sigma.dat',
+ DEPTH_FILE      = 'loofs_dep.dat',
+ CORIOLIS_FILE   = 'loofs_cor.dat',
+ SPONGE_FILE     = 'loofs_spg.dat'
  /
  
  &NML_GROUNDWATER
@@ -272,6 +274,7 @@ STARTUP_TYPE      = 'hotstart',
  DATA_ASSIMILATION       = F,
  DATA_ASSIMILATION_FILE  = 'none'                                  ,
  BIOLOGICAL_MODEL        = F,
+ STARTUP_BIO_TYPE        = 'observed', ! constant, linear, observed, set values,
  BIOLOGICAL_MODEL_FILE   = 'none'                                            ,
  SEDIMENT_MODEL  = F,
  SEDIMENT_MODEL_FILE     = 'none'                                            ,
@@ -283,7 +286,7 @@ STARTUP_TYPE      = 'hotstart',
  ICING_AIR_TEMP  =  0.0000000E+00,
  ICING_WSPD      =  0.0000000E+00,
  ICE_MODEL       = T,
- ICE_FORCING_FILE        = 'leofs.t00z.20250912.met.forecast.nc'                                            ,
+ ICE_FORCING_FILE        = 'loofs.t__HH__z.__CDATE__.met.forecast.nc'                                            ,
  ICE_FORCING_KIND        = 'variable'                                            ,
  ICE_SEA_LEVEL_PRESSURE  =  0.0000000E+00,
  ICE_AIR_TEMP            =  0.0000000E+00,
@@ -314,9 +317,9 @@ STARTUP_TYPE      = 'hotstart',
 
  &NML_STATION_TIMESERIES
  OUT_STATION_TIMESERIES_ON = T,
- STATION_FILE              = 'leofs_station.dat',
+ STATION_FILE              = 'loofs_station.dat',
  LOCATION_TYPE             = 'node',
- GRID_EDGE_FILE_NAME       = 'leofs_station_edge.dat'
+ GRID_EDGE_FILE_NAME       = 'loofs_station_edge.dat'
  OUT_ELEVATION             = T,
  OUT_VELOCITY_3D           = T,
  OUT_VELOCITY_2D           = F,
@@ -328,13 +331,13 @@ STARTUP_TYPE      = 'hotstart',
  &NML_NCNEST
  NCNEST_ON        = F,
  NCNEST_BLOCKSIZE = 120,
- NCNEST_NODE_FILES= 'leofs_nestnode.dat'
+ NCNEST_NODE_FILES= 'loofs_nestnode.dat'
  /
 
  &NML_NESTING
  NESTING_ON        = F,
- NESTING_BLOCKSIZE = ,
- NESTING_FILE_NAME = 'leofs.t00z.20250912.obc.nc'
+ NESTING_BLOCKSIZE = 5,
+ NESTING_FILE_NAME = 'loofs.t__HH__z.__CDATE__.obc.nc'
  /
 
  &NML_MLD
