@@ -96,13 +96,18 @@ fi
 #export MPIOPTS="-hosts $HOSTS -np $NPROCS -ppn $PPN"
 result=0
 
-nosofs_fvcom="leofs | lmhofs | loofs | lsofs | ngofs2 | sscofs | sfbofs"
-nosofs_roms="cbofs | ciofs | dbofs | gomofs | tbofs | wcofs"
+#nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs"
+#nosofs_fvcom="leofs lmhofs loofs lsofs ngofs2 sscofs sfbofs"
+
+shopt -s extglob
+nosofs_fvcom='leofs|lmhofs|loofs|lsofs|ngofs2|sscofs|sfbofs'
+nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs'
+
 
 # Can put domain specific options here
 case $OFS in
 
-  $nosofs_fvcom | $nosofs_roms)
+    @($nosofs_roms) | @($nosofs_fvcom))
     export HOMEnos=$SAVEDIR
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh

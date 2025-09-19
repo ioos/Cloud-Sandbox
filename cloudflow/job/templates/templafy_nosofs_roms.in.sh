@@ -11,7 +11,13 @@ HH='03'
 # https://nomads.ncep.noaa.gov/pub/data/nccf/com/nosofs/prod/ciofs.20250918/ciofs.t00z.20250918.forecast.in
 # ciofs.ocean.in
 
-filename=$1
+OFS=$1
+filename=$OFS.ocean.in
+
+
+echo "WARNING: operations is using a non-specific parameter name for TIDENAME"
+echo "   example:      TIDENAME == dbofs.roms.tides.nc"
+echo "   fixing it here using time-based forcing file e.g. dbofs.t00z.20250918.roms.tides.nc"
 
 sed -i \
   -e "s/\.t${HH}z\.${CDATE}\./.t__HH__z.__CDATE__./g"                                     \
@@ -21,5 +27,6 @@ sed -i \
   -e "s/^[[:space:]]*DSTART = .*/     DSTART =  __DSTART__       ! days/g"                \
   -e "s/^[[:space:]]*TIDE_START = .*/     TIDE_START = __TIDE_START__   ! days/g"         \
   -e "s/^[[:space:]]*TIME_REF = .*/     TIME_REF = __TIME_REF__     ! yyyymmdd.dd/g"      \
+  -e "s/^[[:space:]]*TIDENAME == .*/     TIDENAME == ${OFS}.t__HH__z.__CDATE__.roms.tides.nc/g" \
   $filename
 

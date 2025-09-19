@@ -12,6 +12,8 @@ NODD   = 'https://noaa-ofs-pds.s3.amazonaws.com'
 
 def getICs(cdate, hh, ofs, comdir):
 
+    errors=0
+
     #if len(locals()) != 4:
     #    print('Usage: {} YYYYMMDD HH cbofs|(other ROMS model) COMDIR'.format(os.path.basename(__file__)))
     #    exit()
@@ -40,18 +42,26 @@ def getICs(cdate, hh, ofs, comdir):
         '{}.met.forecast.{}'.format(pfx,sfx),
         '{}.obc.{}'.format(pfx,sfx),
         '{}.river.{}'.format(pfx,sfx),
-        '{}.roms.tides.{}'.format(pfx,sfx)
-      ]
+        '{}.roms.tides.{}'.format(pfx,sfx) ]
       on_nomads = []
 
+    # loofs and lsofs do not have obc 
     elif ofs in util.nosofs_fvcom_models:
-      # leofs.t00z.20250916.river.nc.tar  
       # no river.nc.tar on NODD ugh!!!
-      icfiles = [
-        '{}.met.forecast.{}'.format(pfx,sfx),
-        '{}.obc.{}'.format(pfx,sfx),
-        '{}.hflux.forecast.{}'.format(pfx,sfx)
-      ]
+      # leofs.t00z.20250916.river.nc.tar  
+
+      # loofs and lsofs have no obc file
+      if ofs in "loofs lsofs":
+        icfiles = [
+          '{}.met.forecast.{}'.format(pfx,sfx),
+          '{}.hflux.forecast.{}'.format(pfx,sfx) ]
+      else:
+        icfiles = [
+          '{}.met.forecast.{}'.format(pfx,sfx),
+          '{}.obc.{}'.format(pfx,sfx),
+          '{}.hflux.forecast.{}'.format(pfx,sfx) ]
+      # no river.nc.tar on NODD ugh!!!
+      # leofs.t00z.20250916.river.nc.tar  
       on_nomads = [ '{}.river.{}.tar'.format(pfx,sfx) ]
 
     else:
@@ -64,11 +74,7 @@ def getICs(cdate, hh, ofs, comdir):
             urllib.request.urlretrieve('{}/{}'.format(url,filename),filename)
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(filename,url))
-            raise
-
-    # Need to rename the tides file - roms is still expecting basic name
-    # os.rename('{}.roms.tides.{}'.format(pfx,sfx),'{}.roms.tides.nc'.format(ofs))
-    # Fixed the above in nos_ofs_nowcast_forecast nosofs.v3.6.6
+            errors += 1
 
     if ofs in ['gomofs','wcofs']:
         climfile = '{}.clim.{}'.format(pfx,sfx)
@@ -76,7 +82,7 @@ def getICs(cdate, hh, ofs, comdir):
             urllib.request.urlretrieve('{}/{}'.format(url,climfile),climfile)
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(climfile, url))
-            raise
+            errors += 1
 
     url = '{}/{}.{}'.format(NOMADS,ofs,cdate)
     for filename in on_nomads:
@@ -85,7 +91,7 @@ def getICs(cdate, hh, ofs, comdir):
             urllib.request.urlretrieve('{}/{}'.format(url,filename),filename)
         except:
             print('ERROR: Unable to retrieve {} from {}'.format(filename,url))
-            raise
+            errors += 1
 
     #####################################
     # restart init file
@@ -108,7 +114,7 @@ def getICs(cdate, hh, ofs, comdir):
     # TODO?: request these get added to the dump to NODD
     url='{}/{}.{}'.format(NOMADS,ofs,cdate)
 
-    #TODO: Make sure the TIDE REFERENCE and init restart file TIMES are correct - again
+    #TODO: Double check the TIDE REFERENCE and init restart file TIMES match those in operational runs
     if ofs == 'wcofs':
         # wcofs runs only once per day, different folder
         ncdate = nextday.strftime('%Y%m%d')
@@ -127,5 +133,7 @@ def getICs(cdate, hh, ofs, comdir):
         urllib.request.urlretrieve('{}/{}'.format(url,ifile),rfile)
     except:
         print('ERROR: Unable to retrieve {} from \n {}'.format(ifile,url))
-        raise
-   
+        errors += 1
+
+    if errors != 0:
+        raise Exception(f"Problems encountered downloading forcing, initial conditions, for {ofs} {cdate}")

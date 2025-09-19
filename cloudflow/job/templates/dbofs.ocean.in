@@ -1027,7 +1027,7 @@
 
 ! Input tidal forcing file name.
 
-     TIDENAME == dbofs.roms.tides.nc
+     TIDENAME == dbofs.t__HH__z.__CDATE__.roms.tides.nc
 
 ! Input forcing NetCDF file name(s).
 !

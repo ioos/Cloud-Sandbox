@@ -2,10 +2,13 @@
 
 cd ..
 
-nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs"
-nosofs_fvcom="leofs lmhofs loofs lsofs ngofs2 sscofs sfbofs"
+nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
+nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sscofs sfbofs"
 
-ofslist='cbofs'
+#ofslist='ciofs loofs dbofs lsofs'
+#ofslist='loofs gomofs tbofs'
+#ofslist='lsofs ngofs2 wcofs'
+ofslist='sscofs sfbofs'
 
 create_ccfg () {
   ofs=$1
@@ -34,7 +37,6 @@ create_ccfg () {
 EOL
 
 }
-
 
 
 for ofs in $ofslist
