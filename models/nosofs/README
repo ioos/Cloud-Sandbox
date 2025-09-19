@@ -1,8 +1,17 @@
-Scripts to help install the NOSOFS models go here.
+NOSOFS on Coastal Modeling Cloud Sandbox
 
+Start here:
+-----------
 setup_nosofs.sh - retrieves source code
                   calls the nosofs build.sh to build everything
                   retrieves fixed field files
+
+
+Other files:
+---------------------------------------------------------------------------
+
+modulefiles - the modulefiles used for building and running the models
+              this might need to be modified to match your system
 
 build_nosofs.sh - calls the nosofs build.sh
                   use when rebuilding after modifying the modulefile
@@ -11,7 +20,5 @@ get_fixfiles_s3.sh - used by set_nosofs.sh, can run standalone
 
 get_ops_fixfiles_nwprod.sh - update the fixed field files from nwprod if needed
                              also archives them to S3 for use by get_fixfiles_s3.sh
-
-modulefiles - the modulefiles used for building and running the models
 
 README - this file
