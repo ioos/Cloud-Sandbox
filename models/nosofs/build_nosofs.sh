@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# This script can be used to rerun the nosofs build
+
 export SAVEDIR=${1:-"/save/$USER"}
 if [ ! -d $SAVEDIR ]; then
     mkdir -p $SAVEDIR | echo "Can not create $SAVEDIR"; exit 1

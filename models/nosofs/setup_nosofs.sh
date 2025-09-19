@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Use this to:
+#   fetch the operational NOSOFS source codes
+#   build the models and other executables needed by the production suite
+#   retrieve the fixed fields needed to run the models
+
+
 export SAVEDIR=${1:-"/save/$USER"}
 if [ ! -d $SAVEDIR ]; then
     mkdir -p $SAVEDIR | echo "Can not create $SAVEDIR"; exit 1
@@ -47,5 +53,6 @@ cd $SAVEDIR/$MODEL_DIR/fix
 # You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
 # Edit the script to only download a subset.
 
+echo "Retrieving the fixed field files from S3"
 $CURHOME/get_fixfiles_s3.sh
 

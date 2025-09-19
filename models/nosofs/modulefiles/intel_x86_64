@@ -30,14 +30,12 @@ module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 # module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 module load metis/5.1.0-intel-2021.9.0-fdsd6ir
+module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
 
 set METIS [exec spack location -i metis]
 regsub {\n$} $METIS {} METIS
 setenv METIS $METIS
 prepend-path LD_LIBRARY_PATH "$env(METIS)/lib"
-
-
-# /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/metis-5.1.0-fdsd6irtc7ukcwpy4ehuwsgxwqd5g33z/
 
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
@@ -62,8 +60,18 @@ setenv NETCDFC $netcdfc
 prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
 prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
 
+# The following are needed for makefiles, will break if spack finds more than one match
 set JASPER [exec spack location -i jasper]
 regsub {\n$} $JASPER {} JASPER
 setenv JASPER_LIB "-L$JASPER/lib64 -ljasper"
+
+set BACIO [exec spack location -i bacio]
+regsub {\n$} $BACIO {} BACIO
+setenv BACIO_LIB4 "-L$BACIO/lib -lbacio_4"
+
+set PNG [exec spack location -i libpng]
+regsub {\n$} $PNG {} PNG
+setenv PNG_LIB "-L$PNG/lib64 -lpng"
+
 
 
