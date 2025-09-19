@@ -91,6 +91,12 @@ class AWSCluster(Cluster):
     PPN       : int
         Number of processors (physical cores) per node.
 
+    vm_retry_delay : int
+        The number of seconds that a user wants to wait to allow AWS resources to be freed up before attempting to grab ec2 resources
+
+    vm_max_retries : int
+        The number of retries a user wants to attempt on waiting for AWS resources to be available
+
     tags      : list of dictionary/s of str
         Specific tags to attach to the resources provisioned.
 
@@ -142,6 +148,8 @@ class AWSCluster(Cluster):
         self.nodeCount = 0
         self.NPROCS = 0
         self.PPN = 0
+        self.vm_retry_delay = 300
+        self.vm_max_retries = 5
         self.tags = []
         self.image_id = ''
         self.key_name = ''
@@ -246,6 +254,17 @@ class AWSCluster(Cluster):
         self.nodeType = cfDict['nodeType']
         self.nodeCount = cfDict['nodeCount']
 
+        try:
+            self.vm_retry_delay = cfDict['vm_retry_delay']
+        except KeyError:
+            print(f'Cluster configuration variable vm_retyr_delay was not specified by user. Defaulting to value of {self.vm_retry_delay} seconds.')
+
+        try:
+            self.vm_max_retries = cfDict['vm_max_retries']
+        except KeyError:
+            print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
+
+
         # Hacky way to force unique Name tags
         print("running memorable_tags")
         self.tags = self.memorable_tags(cfDict['tags'])
@@ -296,7 +315,6 @@ class AWSCluster(Cluster):
         # hpc6a and hpc7a and some others do not support the CpuOptions={ 'ThreadsPerCore': option }
 
         try:
-
           if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
           # EFA supported:           NO                  YES
               self.__instances = ec2.create_instances(
@@ -353,11 +371,96 @@ class AWSCluster(Cluster):
                 }
               )
         except ClientError as e:
-            log.exception('ClientError exception in createCluster' + str(e))
-            raise Exception() from e
+            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+
+                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the delay time will be implemented over each retry interval. Cloudflow will retry {self.vm_max_retries} times over to see if we can obtain the user requested AWS resources.")
+                 retries = 0
+
+                 while retries < self.vm_max_retries:
+                     try:
+                         if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
+                             # EFA supported:           NO                  YES
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = 1)
+                             )
+
+                         elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
+                             )
+
+                         else:  # supports the ThreadsPerCore option and setting it to 1
+                             self.__instances = ec2.create_instances(
+                               ImageId=self.image_id,
+                               InstanceType=self.nodeType,
+                               KeyName=self.key_name,
+                               MinCount=self.nodeCount,
+                               MaxCount=self.nodeCount,
+                               TagSpecifications=[
+                                   {
+                                       'ResourceType': 'instance',
+                                       'Tags': self.tags
+                                   }
+                               ],
+                               Placement=self.__placementGroup(),
+                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
+                               CpuOptions={
+                                   'CoreCount': self.PPN,
+                                   'ThreadsPerCore': 1
+                               }
+                             )
+
+                         
+                         break  
+                     except ClientError as e:
+                         if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+                             retries += 1
+                             if(retries == self.vm_max_retries):
+                                 print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
+                                 raise Exception() from e
+                             else:
+                                 # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
+                                 if(retries>1):
+                                     self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
+                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     time.sleep(self.vm_retry_delay)
+                                 else:
+                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     time.sleep(self.vm_retry_delay)
+                         else:
+                             # Re-raise the exception if it's not a capacity issue
+                             log.exception('ClientError exception in createCluster' + str(e))
+                             raise Exception() from e
+            else:
+                log.exception('ClientError exception in createCluster' + str(e))
+                raise Exception() from e
 
 
-        print('Waiting for nodes to enter running state ...')
+        print('AWS resources have been allocated for cloudflow job. Waiting for nodes to enter running state ...')
         # Make sure the nodes are running before returning
 
         client = boto3.client('ec2', self.region)
