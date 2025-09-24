@@ -25,6 +25,7 @@ export MODEL_VERSION='nosofs.v3.6.6'
 
 export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 
+# Get the nosofs source code and scripts
 cd $SAVEDIR
 if [ ! -d $MODEL_DIR ]; then
 
@@ -39,23 +40,26 @@ else
 fi
 
 
+# Build it
+echo "Building everything ... "
 cp $CURHOME/modulefiles/intel_x86_64 $MODEL_DIR/modulefiles/intel_x86_64
 cd $MODEL_DIR/sorc
 
-echo "Building everything ... "
 echo "The build scripts can be modified to only build specific models."
 ./build.sh
 
-# Obtain the fixed field files (too large for gitHub)
+
+
+# Obtain the fixed field files
+# ----------------------------
+# These files are too large to easily store on github.
+# You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
+# You can edit the script to only download a subset.
+
 mkdir -p $SAVEDIR/$MODEL_DIR/fix
 cd $SAVEDIR/$MODEL_DIR/fix
 
-# Obtain the Fixed Field Files
-# ----------------------------
-# These files are too large to easily store on github and need to be obtained elsewhere.
-# You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
-# Edit the script to only download a subset.
-
 echo "Retrieving the fixed field files from S3"
 $CURHOME/get_fixfiles_s3.sh
+
 

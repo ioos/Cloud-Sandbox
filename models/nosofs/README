@@ -13,8 +13,8 @@ Other files:
 modulefiles - the modulefiles used for building and running the models
               this might need to be modified to match your system
 
-build_nosofs.sh - calls the nosofs build.sh
-                  use when rebuilding after modifying the modulefile
+build_nosofs.sh - calls the nosofs build.sh script
+                  use when rebuilding or after modifying the modulefile
 
 get_fixfiles_s3.sh - used by set_nosofs.sh, can run standalone
 

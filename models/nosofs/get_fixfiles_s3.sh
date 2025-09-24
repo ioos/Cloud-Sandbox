@@ -3,9 +3,7 @@
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-
 # Call this from the nosofs-NCO/fix folder
-homeNOSOFS=''
 
 fixdirs='
 shared
