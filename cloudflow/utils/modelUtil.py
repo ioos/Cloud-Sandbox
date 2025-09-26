@@ -1,5 +1,4 @@
 """ Various routines, not just for ROMS models anymore.
-TODO: Rename this module.
 """
 import datetime
 import json
@@ -11,17 +10,19 @@ import subprocess
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-
 debug = False
 
-roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","liveocean","tbofs"]
-fvcom_models = ["leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
+# Used by plotting workflows
+roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","tbofs","wcofs","liveocean"]
+fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
+############################
 
-nosofs_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs",
-                  "leofs", "lmhofs", "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2"]
+nosofs_roms_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs","wcofs" ]
+nosofs_fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
+nosofs_models = nosofs_roms_models + nosofs_fvcom_models
 
 def nosofs_cyc0(ofs : str) -> str:
-    if ofs in [ "negofs", "ngofs", "nwgofs", "sfbofs", "ngofs2" ]:
+    if ofs in [ "sfbofs", "wcofs" ]:
         return "03"
     else:
         return "00"
@@ -94,7 +95,10 @@ def makeOceanin(NPROCS, settings, template, outfile, ratio=1.0):
         "__NTILEJ__": str(tiles["NtileJ"]),
     }
 
+    # Update the ntile settings
     settings.update(reptiles)
+
+    # replace template placeholders with values in settings
     sedoceanin(template, outfile, settings)
     return
 
@@ -282,12 +286,6 @@ def getTiling(totalCores, ratio=1.0):
 #####################################################################
 
 
-def get_ICs_roms(ofs, cdate, cycle, localpath):
-    # There is a shell script that already exists to do this
-    # Can maybe re write it in Python later
-    # Or wrap it here
-    return
-
 
 def get_baseline_lo(cdate, vdir, sshuser):
     """ Retrieve operational LiveOcean forecast data from UW """
@@ -320,6 +318,7 @@ def get_baseline_lo(cdate, vdir, sshuser):
 
     return
 
+# TODO - move the LiveOcean ICs routines to a different place
 def get_ICs_lo_cas7_hindcast(cdate, localpath, sshuser):
     """ Get the atmospheric forcing and boundary layer conditions and ICs
         for LiveOcean ROMS model.

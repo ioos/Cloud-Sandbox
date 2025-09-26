@@ -476,7 +476,8 @@ class AWSCluster(Cluster):
             )
 
         # Wait a little more. sshd can be slow to start "Connection refused" error
-        sleeptime=90
+        # "System is booting up. Unprivileged users are not permitted to log in yet. Please come back later.
+        sleeptime=150
         log.info(f"Waiting an additional {sleeptime} seconds for nodes to fully initialize ...")
         time.sleep(sleeptime)
 

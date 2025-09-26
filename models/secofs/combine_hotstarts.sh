@@ -7,7 +7,7 @@ CDATE=20171201
 COMOUT=/com/$USER/secofs/$CDATE
 TIMESTEP=720
 
-MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
+MODULEFILE=intel_x86_64
 
 if [ ! -d $MODEL_DIR ]; then
   echo "Could not find MODEL_DIR : $MODEL_DIR"

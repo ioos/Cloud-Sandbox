@@ -12,25 +12,25 @@
  !======Copyright 1998, Regents of University of Minnesota========!
  !                                                                !
  &NML_CASE
- CASE_TITLE      = 'San Francisco Bay OFS (SFBOFS) - IOOS Cloud Sandbox',
+ CASE_TITLE      = 'SFBOFS',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
  DATE_REFERENCE  = '__DATE_REFERENCE__',
- START_DATE      = '__START_DATE__ __HHMMSS__',
+ START_DATE      = '__START_DATE__ __HHMMSS__'
  END_DATE        = '__END_DATE__ __END_HHMMSS__'
  /
 
  &NML_STARTUP
- STARTUP_TYPE      = 'hotstart',
- STARTUP_FILE      = 'nos.sfbofs.rst.nowcast.__CDATE__.t__HH__z.nc',
+STARTUP_TYPE      = 'hotstart',
+ STARTUP_FILE      = 'sfbofs.t__HH__z.__CDATE__.rst.nowcast.nc',
  STARTUP_UV_TYPE   = 'set values',
  STARTUP_TURB_TYPE = 'set values',
  STARTUP_TS_TYPE   = 'set values',
- STARTUP_T_VALS    = 27.0,
- STARTUP_S_VALS    = 35.0,
- STARTUP_U_VALS    = 0.0,
- STARTUP_V_VALS    = 0.0,
- STARTUP_DMAX      = -10.0
+ STARTUP_T_VALS  = 20.0000000E+00  ,
+ STARTUP_S_VALS  = 35.0000000E+00  ,
+ STARTUP_U_VALS  =  0.0000000E+00,
+ STARTUP_V_VALS  =  0.0000000E+00,
+ STARTUP_DMAX    =  0.0000000E+00
  /
 
  &NML_IO
@@ -39,6 +39,7 @@
  IREPORT         = 100,
  VISIT_ALL_VARS  = F,
  WAIT_FOR_VISIT  = F,
+ OLD_STYLE_TIME  = F,
  USE_MPI_IO_MODE = F
  /
 
@@ -47,13 +48,13 @@
  ISPLIT          =  6,
  IRAMP           =  1800,
  MIN_DEPTH       =  0.2,
- STATIC_SSH_ADJ  =  0.0
+ STATIC_SSH_ADJ  =  0.0000000E+00
  /
 
  &NML_RESTART
  RST_ON           = T,
- RST_FIRST_OUT    = '__END_DATE__ __END_HHMMSS__',
- RST_OUT_INTERVAL = 'seconds=172800.0',
+ RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ RST_OUT_INTERVAL = 'seconds=21600.0',
  RST_OUTPUT_STACK = 1   
  /
 
@@ -62,7 +63,7 @@
  NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
  NC_OUT_INTERVAL = 'seconds=3600.0',
  NC_OUTPUT_STACK = 1,
- NC_SUBDOMAIN_FILES = 'FVCOM',
+ NC_SUBDOMAIN_FILES      = FVCOM,
  NC_GRID_METRICS = T,
  NC_VELOCITY     = T,
  NC_SALT_TEMP    = T,
@@ -119,24 +120,22 @@
  /
 
  &NML_SURFACE_FORCING
- WIND_ON      = T
+ WIND_ON      = T,
  WIND_TYPE    = 'speed',
- WIND_FILE    = 'nos.sfbofs.met.forecast.__CDATE__.t__HH__z.nc',
+ WIND_STRESS_METHOD = 'LP1981' , 
+ WIND_FILE    = 'sfbofs.t__HH__z.__CDATE__.met.forecast.nc',
  WIND_KIND    = 'variable',
  WIND_X       =  0.0400000E+00, 
  WIND_Y       =  0.0200000E+00,
-
  HEATING_ON     = F,
  HEATING_TYPE   = 'flux',
  HEATING_KIND   = 'variable',
- HEATING_FILE   = 'nos.sfbofs.met.forecast.__CDATE__.t__HH__z.nc',
- 
+ HEATING_FILE   = 'sfbofs.t__HH__z.__CDATE__.met.forecast.nc',
  HEATING_LONGWAVE_LENGTHSCALE  = 1.4,
  HEATING_LONGWAVE_PERCTAGE     = 0.78,
  HEATING_SHORTWAVE_LENGTHSCALE = 6.3,
  HEATING_RADIATION  = 0.0000000E+00,
  HEATING_NETFLUX    = 0.0000000E+00,
-
  PRECIPITATION_ON   = F,
  PRECIPITATION_KIND = 'variable',
  PRECIPITATION_FILE = 'wrf_for.nc',
@@ -145,24 +144,36 @@
  
  AIRPRESSURE_ON    = T,                       
  AIRPRESSURE_KIND  = 'variable',
- AIRPRESSURE_FILE  = 'nos.sfbofs.met.forecast.__CDATE__.t__HH__z.nc',
- AIRPRESSURE_VALUE =  0.005500000E+00
+ AIRPRESSURE_FILE  = 'sfbofs.t__HH__z.__CDATE__.met.forecast.nc',
+ AIRPRESSURE_VALUE =  0.005500000E+00,
+ WAVE_ON = F,
+ WAVE_FILE       = 'none'                                                    ,
+ WAVE_KIND       = 'none'                                                    ,
+ WAVE_HEIGHT     =  0.0000000E+00,
+ WAVE_LENGTH     =  0.0000000E+00,
+ WAVE_DIRECTION  =  0.0000000E+00,
+ WAVE_PERIOD     =  0.0000000E+00,
+ WAVE_PER_BOT    =  0.0000000E+00,
+ WAVE_UB_BOT     =  0.0000000E+00
  /
 
  &NML_HEATING_CALCULATED
  HEATING_CALCULATE_ON   = T,
  HEATING_CALCULATE_TYPE = 'flux',
- HEATING_CALCULATE_FILE = 'nos.sfbofs.hflux.forecast.__CDATE__.t__HH__z.nc',
+ HEATING_CALCULATE_FILE = 'sfbofs.t__HH__z.__CDATE__.hflux.forecast.nc',
  HEATING_CALCULATE_KIND = 'variable',
+ HEATING_FRESHWATER      = F,
  COARE_VERSION          = 'COARE26Z',
- ZUU                    = 10,
- ZTT                    = 2,
- ZQQ                    = 2,
- AIR_TEMPERATURE        = 10.0,
- RELATIVE_HUMIDITY      = 0.0,
- SURFACE_PRESSURE       = 1000.0,
- LONGWAVE_RADIATION     = 10.0,
- SHORTWAVE_RADIATION    = 100.0
+ ZTT                    = 2.0000000E+00,
+ ZQQ                    = 2.0000000E+00,
+ AIR_TEMPERATURE =  0.000000000000000E+000,
+ RELATIVE_HUMIDITY       =  0.000000000000000E+000,
+ SURFACE_PRESSURE        =  0.000000000000000E+000,
+ LONGWAVE_RADIATION      =  0.000000000000000E+000,
+ SHORTWAVE_RADIATION     =  0.000000000000000E+000,
+ HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX   =  0.780000000000000,
+ HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX        =   1.40000000000000,
+ HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX       =   6.30000000000000
  /
 
  &NML_PHYSICS
@@ -174,13 +185,11 @@
  VERTICAL_MIXING_TYPE            = 'closure',
  VERTICAL_MIXING_COEFFICIENT     = 1.0000E-05,
  VERTICAL_PRANDTL_NUMBER         = 1.0000,
- 
  BOTTOM_ROUGHNESS_TYPE   = 'orig',
  BOTTOM_ROUGHNESS_KIND   = 'static',
  BOTTOM_ROUGHNESS_FILE   = 'sfbofs_brf.nc' ,
  BOTTOM_ROUGHNESS_LENGTHSCALE    =  0.003,
  BOTTOM_ROUGHNESS_MINIMUM        =  0.0025,
- 
  CONVECTIVE_OVERTURNING       = F,
  SCALAR_POSITIVITY_CONTROL    = T,
  BAROTROPIC                   = F,
@@ -191,13 +200,13 @@
  TEMPERATURE_ACTIVE           = T,
  SALINITY_ACTIVE              = T,
  SURFACE_WAVE_MIXING          = F,
- WETTING_DRYING_ON            = T,
- ADCOR_ON                     = T
+ WETTING_DRYING_ON            = T
  /
 
  &NML_RIVER_TYPE
  RIVER_NUMBER    =          9,
  RIVER_TS_SETTING        = 'calculated', !'specified',
+ TS_ADJUST_METHOD = 'average', ! or 'maximum',
  RIVER_INFLOW_LOCATION   = 'node',
  RIVER_INFO_FILE   = 'RIVERS_NAMELIST.nml',
  RIVER_KIND        = 'variable'
@@ -207,28 +216,30 @@
  OBC_ON                     = T,
  OBC_NODE_LIST_FILE         = 'sfbofs_obc.dat',
  OBC_ELEVATION_FORCING_ON   = T,
- OBC_ELEVATION_FILE         = 'nos.sfbofs.obc.__CDATE__.t__HH__z.nc',
+ OBC_ELEVATION_FILE         = 'sfbofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TS_TYPE                = 1,
  OBC_TEMP_NUDGING           = T,
- OBC_TEMP_FILE              = 'nos.sfbofs.obc.__CDATE__.t__HH__z.nc',
+ OBC_TEMP_FILE              = 'sfbofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TEMP_NUDGING_TIMESCALE =  0.002,
  OBC_SALT_NUDGING           = T,
- OBC_SALT_FILE              = 'nos.sfbofs.obc.__CDATE__.t__HH__z.nc',
+ OBC_SALT_FILE              = 'sfbofs.t__HH__z.__CDATE__.obc.nc',
  OBC_SALT_NUDGING_TIMESCALE =  0.002,
  OBC_MEANFLOW               = F,
  OBC_MEANFLOW_FILE          = 'none',
+ OBC_TIDEOUT_INITIAL     =           0,
+ OBC_TIDEOUT_INTERVAL    =           0,
  OBC_LONGSHORE_FLOW_ON      = F,
  OBC_LONGSHORE_FLOW_FILE    = 'none'
  /
 
  &NML_GRID_COORDINATES
- GRID_FILE            = 'nos.sfbofs_grd.dat',
+ GRID_FILE            = 'sfbofs_grd.dat',
  GRID_FILE_UNITS      = 'degrees',
  PROJECTION_REFERENCE = 'init=nad83:402',
- SIGMA_LEVELS_FILE    = 'nos.sfbofs_sigma.dat',
- DEPTH_FILE      = 'nos.sfbofs_dep.dat',
- CORIOLIS_FILE   = 'nos.sfbofs_cor.dat',
- SPONGE_FILE     = 'nos.sfbofs_spg.dat'
+ SIGMA_LEVELS_FILE    = 'sfbofs_sigma.dat',
+ DEPTH_FILE      = 'sfbofs_dep.dat',
+ CORIOLIS_FILE   = 'sfbofs_cor.dat',
+ SPONGE_FILE     = 'sfbofs_spg.dat'
  /
  
  &NML_GROUNDWATER
@@ -252,13 +263,28 @@
  LAG_SCAL_CHOICE = 'none'                                                              
  /
 
-&NML_ADDITIONAL_MODELS
+ &NML_ADDITIONAL_MODELS
  DATA_ASSIMILATION       = F,
- DATA_ASSIMILATION_FILE  = 'none',
+ DATA_ASSIMILATION_FILE  = 'none'                                  ,
  BIOLOGICAL_MODEL        = F,
- SEDIMENT_MODEL          = F,
- ICING_MODEL             = F,
- ICE_MODEL               = F,
+ BIOLOGICAL_MODEL_FILE   = 'none'                                            ,
+ SEDIMENT_MODEL  = F,
+ SEDIMENT_MODEL_FILE     = 'none'                                            ,
+ SEDIMENT_PARAMETER_TYPE = 'none'                                            ,
+ SEDIMENT_PARAMETER_FILE = 'none'                                            ,
+ ICING_MODEL     = F,
+ ICING_FORCING_FILE      = 'none'                                  ,
+ ICING_FORCING_KIND      = 'variable'                                        ,
+ ICING_AIR_TEMP  =  0.0000000E+00,
+ ICING_WSPD      =  0.0000000E+00,
+ ICE_MODEL       = F,
+ ICE_FORCING_FILE        = 'none'                                            ,
+ ICE_FORCING_KIND        = 'none'                                            ,
+ ICE_SEA_LEVEL_PRESSURE  =  0.0000000E+00,
+ ICE_AIR_TEMP    =  0.0000000E+00,
+ ICE_SPEC_HUMIDITY       =  0.0000000E+00,
+ ICE_SHORTWAVE   =  0.0000000E+00,
+ ICE_CLOUD_COVER =  0.0000000E+00
  /
 
  &NML_PROBES
@@ -271,6 +297,7 @@
  OUT_STATION_TIMESERIES_ON = T,
  STATION_FILE              = 'sfbofs_station.dat',
  LOCATION_TYPE             = 'node',
+ GRID_EDGE_FILE_NAME       = 'sfbofs_station_edge.dat'
  OUT_ELEVATION             = T,
  OUT_VELOCITY_3D           = T,
  OUT_VELOCITY_2D           = F,
@@ -288,7 +315,24 @@
  &NML_NESTING
  NESTING_ON        = F,
  NESTING_BLOCKSIZE = 5,
- NESTING_FILE_NAME = 'nos.sfbofs.obc.__CDATE__.t__HH__z.nc'
+ NESTING_FILE_NAME = 'sfbofs.t__HH__z.__CDATE__.obc.nc'
+ /
+
+ &NML_MLD
+ NC_MLD  = F,
+ GAMMA_MIN       =  3.9999999E-05,
+ MLD_DEFAULT     =   5.000000    ,
+ DEEPWATER_DEPTH =   100.0000    ,
+ DEEPWATER_GAMMA =  2.9999999E-05
+ /
+ &NML_HEATFLUX_SEDIMENT
+ HEATFLUX_SEDIMENT_ON    = F,
+ MUD_INITIAL_TEMP_FILE   = none                  ,
+ VOLUMETRIC_HEAT_CAPACITY        =   3.650000    ,
+ THERMAL_DIFFUSIVITY     =  0.3800000    ,
+ EFFECTIVE_THICKNESS     =  9.9999998E-03,
+ CRITICAL_DEPTH  =   1.000000    ,
+ SEDIMENT_TEMPERATURE    =   10.00000
  /
 
  &NML_BOUNDSCHK
