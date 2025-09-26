@@ -22,6 +22,7 @@ echo "Cloud-Sandbox/ directory is: $CSHOME"
 export REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
 export BRANCH="v3.6.6.dev"
 export MODEL_VERSION='nosofs.v3.6.6'
+export MODULEFILE=intel_x86_64
 
 export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 
@@ -36,13 +37,13 @@ if [ ! -d $MODEL_DIR ]; then
   git submodule update --init --recursive
 
 else
-  echo "it appears $MODEL_DIR is already present, not fetching it from the repository"
+  echo "$MODEL_DIR is already present, not fetching it from the repository"
 fi
 
 
 # Build it
 echo "Building everything ... "
-cp $CURHOME/modulefiles/intel_x86_64 $MODEL_DIR/modulefiles/intel_x86_64
+cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
 cd $MODEL_DIR/sorc
 
 echo "The build scripts can be modified to only build specific models."
@@ -56,8 +57,8 @@ echo "The build scripts can be modified to only build specific models."
 # You can run the below script to download all of the fixed field files from the IOOS-cloud-sandbox S3 bucket.
 # You can edit the script to only download a subset.
 
-mkdir -p $SAVEDIR/$MODEL_DIR/fix
-cd $SAVEDIR/$MODEL_DIR/fix
+mkdir -p $MODEL_DIR/fix
+cd $MODEL_DIR/fix
 
 echo "Retrieving the fixed field files from S3"
 $CURHOME/get_fixfiles_s3.sh

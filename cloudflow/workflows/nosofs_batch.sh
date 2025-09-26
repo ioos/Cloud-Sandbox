@@ -5,10 +5,10 @@ cd ..
 nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
 nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sscofs sfbofs"
 
-#ofslist='ciofs loofs dbofs lsofs'
-#ofslist='loofs gomofs tbofs'
-#ofslist='lsofs ngofs2 wcofs'
-ofslist='sscofs sfbofs'
+#nosofs_roms=" cbofs ciofs  "
+#nosofs_fvcom="leofs lmhofs "
+
+ofslist="$nosofs_roms $nosofs_fvcom"
 
 create_ccfg () {
   ofs=$1
@@ -42,11 +42,12 @@ EOL
 for ofs in $ofslist
 do
 
+  echo "ofs: $ofs"
+  
   job=job/jobs/$ofs.fcst
   ccfg=./$ofs.cluster
   create_ccfg $ofs $ccfg
   
-  # nohup workflows/workflow_main.py cluster/configs/RPS/nosofs.hpc6 job/jobs/sscofs.fcst > & out.sscofs &
   echo "nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &"
   nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &
 

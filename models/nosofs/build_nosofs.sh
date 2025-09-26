@@ -15,6 +15,7 @@ echo "Cloud-Sandbox/ directory is: $CSHOME"
 export REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
 export BRANCH="v3.6.6.dev"
 export MODEL_VERSION='nosofs.v3.6.6'
+export MODULEFILE=intel_x86_64
 
 export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 
