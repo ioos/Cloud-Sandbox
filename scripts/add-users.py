@@ -12,12 +12,19 @@ from datetime import datetime
 from botocore.exceptions import ClientError
 from create_image import create_snapshot, create_image_from_snapshot
 
+# TODO: get this from environment-vars.sh somehow
+# SPACK_DIR
+SPACK_VERSION = 'spack.v0.22.5'
+
 """
     To run this with the needed permissions:
     1. sudo -i
-    2. aws sso login --profile ioos-sb-vmadmin
-    3. run it
+    2. source ~/venv/bin/activate (create a python3 venv for root that includes boto3)
+    3. (maybe) aws sso login --profile ioos-sb-vmadmin
+    4. run it
 """
+# TODO: create a python3 venv for root user in setup-instance.sh
+
 
 def change_file_ownership(file_path, username):
     try:
@@ -31,7 +38,9 @@ def change_file_ownership(file_path, username):
         print(f"Error changing ownership of {file_path}: {e}")
 
 
+
 def setup_shell_configs(username):
+
     home_dir = f"/home/{username}"
     tcshrc = os.path.join(home_dir, ".tcshrc")
     bashrc = os.path.join(home_dir, ".bashrc")
@@ -49,7 +58,7 @@ def setup_shell_configs(username):
 
     bashrc_lines = [
         ". /usr/share/Modules/init/bash",
-        ". /save/environments/spack/share/spack/setup-env.sh",
+        f". /save/environments/{SPACK_VERSION}/share/spack/setup-env.sh",
         "",
         "alias lsl='ls -al'",
         "alias lst='ls -altr'",
@@ -60,13 +69,15 @@ def setup_shell_configs(username):
     ]
 
 
+
     # spack find needs this since we are padding the install location
     spackcfg_lines = [
       "config:",
       "  install_tree:",
-      "    root: /save/environments/spack.v0.22.5/opt/spack/__spack_path_place"
+      f"    root: /save/environments/{SPACK_VERSION}/opt/spack/__spack_path_place"
     ]
 
+    
     # Append lines to .tcshrc and update ownership
     try:
         with open(tcshrc, "a") as f:
@@ -89,6 +100,7 @@ def setup_shell_configs(username):
 
 
     # Create the .spack/config.yaml
+    os.makedirs(os.path.join(home_dir, ".spack"), exist_ok=True)
     try:
         with open(spackcfg, "w") as f:
             for line in spackcfg_lines:
@@ -416,16 +428,18 @@ def main():
 
 
         if len(filtered_lines) != 0:
-            print("Finished adding users, creating new ami image")
+            print("Finished adding users, if everything looks correct I can create a new AMI")
+
+        response = input("Are you ready to create a new image? (yes/No): ").strip().lower()
 
         # Create new AMI for root volume after all users are added
-        #instance_id = "i-070b64b46dd7aef33"
-        instance_id = get_instance_id()
+        if response in ("yes", "y"):
+            instance_id = get_instance_id()
 
-        now = datetime.now().strftime("%Y-%m-%d_%H-%M")
-        image_name = f"{now}-ioos-sandbox-ami"
-        project_tag = "IOOS-Cloud-Sandbox"
-        create_ami(instance_id, image_name, project_tag)
+            now = datetime.now().strftime("%Y-%m-%d_%H-%M")
+            image_name = f"{now}-ioos-sandbox-ami"
+            project_tag = "IOOS-Cloud-Sandbox"
+            create_ami(instance_id, image_name, project_tag)
 
 
 if __name__ == "__main__":

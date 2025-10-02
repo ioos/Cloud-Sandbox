@@ -53,6 +53,7 @@ setup_environment () {
   sudo yum -y install subversion
   sudo yum -y install bc
   sudo yum -y install htop
+  sudo yum -y libtool
 
   sudo yum -y install python3.11-devel
   sudo alternatives --set python3 /usr/bin/python3.11
@@ -492,15 +493,8 @@ install_intel_oneapi_spack () {
 
   source /opt/rh/gcc-toolset-11/enable
 
-  #GCC_COMPILER=`spack compilers | grep "gcc@11\."`
   GCC_COMPILER=gcc@$GCC_VER
 
-  # spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
-
-  # gmake@4.4.1 build fails when built here
-  # gmake.4.2.1 build does not work either
-  # gmake.4.2.1 as a pre-req works when specifying it as an external in /etc/spack/packages.yaml
-  #spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} ^gmake@4.2.1 $SPACKTARGET
   spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
 
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
@@ -518,24 +512,7 @@ install_intel-oneapi-mkl_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  source /opt/rh/gcc-toolset-11/enable
-
-  spack load intel-oneapi-compilers@$ONEAPI_VER
-
-  # Build with Intel OneApi compilers
-  # use m4@1.4.17     - intel compiler fails with newer versions
-
-  # netcdf-c@4.8.0 ^hdf5@1.10.7+cxx+fortran+hl+szip+threadsafe \
-  #    ^intel-oneapi-mpi@${INTEL_VER}%gcc@${GCC_VER} ^diffutils@3.7 ^m4@1.4.17 %${COMPILER}
-
-  #spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} %oneapi@${ONEAPI_VER} $SPACKTARGET
-  #/tmp/ec2-user/spack-stage/spack-stage-m4-1.4.19-36watno3kqa6bsuopisfn3jq72cp247y/spack-build-out.txt
-  # It is not finding libimf.so - intel math library - annoying
-  # Need to imanually add rpath to compilers.yaml - but this worked before wth!
-  # trying witn m4@1.4.17 since it is a previous make error before libimf.so error - nope, still cant find it
-  # spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.17 %oneapi@${ONEAPI_VER} $SPACKTARGET
-  # ran spack external find m4, found v 1.4.18 on system, trying that
-  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER} ^m4@1.4.18 %oneapi@${ONEAPI_VER} $SPACKTARGET
+  spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER}%oneapi@${ONEAPI_VER} $SPACKTARGET
 
   cd $home
 }
@@ -1002,43 +979,14 @@ install_esmf_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  #spack load intel-oneapi-compilers@${ONEAPI_VER}
-  #spack load intel-oneapi-mkl@${ONEAPI_VER}
-
   COMPILER=intel@${INTEL_COMPILER_VER}
-  #COMPILER=oneapi@${ONEAPI_VER}   # v8.5 and v8.6 build errors with oneapi compilers, use intel classic, maybe try a newer version of oneapi compilers
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
       # Enable external libfabric dependency
 
-  # diffutils 3.10 build fails
-  #    using ^diffutils@3.7
-  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
-
-  # Using built in externals diffutils
-  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER}%${COMPILER} %${COMPILER} $SPACKTARGET
-  #spack install -j 4 $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
-
-  # esmf 8.5.0 getting segmentation error during build, trying 8.6.0
-  # 8.6.0 had same error - rebooting setting -j 4 sometimes parallel compilation causes weird errors
-#         #17 0x000014b6651587e5 __libc_start_main + 229
-#         #18 0x0000000001cf1729
-#
-#/tmp/ifx1897599690HSlFpB/ifxvctKti.i90: error #5633: **Internal compiler error: segmentation violation signal raised** Please report this error along with the circumstances in which it occurred in a Software Problem Report.  Note: File and line given may not be explicit cause of this error.
-#
-  #spack install $SPACKOPTS esmf@${ESMF_VER}%${COMPILER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
-  #spack install -j1 $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
-
-  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
-  #spack install $SPACKOPTS esmf  ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
-  # Errors with netcdf.mod, unexpected EOF, maybe corrupted file
-
-  # This is working
-  # Did a spack clean and removed ^intel-oneapi-mpi, but but it did not rebuild intel mpi so that probably didn't fix it
-  # also removed spack load intel oneapi compilers but that is needed for libimf library maybe for netcdf prereq
   spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} $SPACKTARGET
-  # Try using a new netcdf version
+
   # Can tell mpiifort to use ifx:
   # export FC=ifx
   # export CC=icx
@@ -1047,32 +995,15 @@ install_esmf_spack () {
   # export I_MPI_CXX=icpx
   # export I_MPI_FC=ifx 
 
-# /mnt/efs/fs1/save/environments/spack/var/spack/cache/_source-cache/archive/ac/acd0b2641587007cc3ca318427f47b9cae5bfd2da8d2a16ea778f637107c29c4.tar.gz
-#[+] /usr (external glibc-2.28-xw6lb4vknvfv2xu2vq56ndjocpqslk5b)
-#[+] /usr (external glibc-2.28-2uwzqhmprowfl2cm2khpzd2otvfnrprb)
-
-#==> Installing esmf-8.5.0-u4hek76jvy5tklkz3rfde2wtbr3dlu5e [19/19]
-#==> Using cached archive: /mnt/efs/fs1/save/environments/spack/var/spack/cache/_source-cache/archive/ac/acd0b2641587007cc3ca318427f47b9cae5bfd2da8d2a16ea778f637107c29c4.tar.gz
-#==> Applied patch /mnt/efs/fs1/save/environments/spack/var/spack/repos/builtin/packages/esmf/esmf_cpp_info.patch
-#==> esmf: Executing phase: 'edit'
-#==> esmf: Executing phase: 'build'
-#==> [2025-07-30-22:00:47.876804] '/usr/bin/chmod' '+x' 'scripts/libs.mvapich2f90'
-#==> [2025-07-30-22:00:47.879392] 'make' '-j1'
-
-# j1 same error
-# clean out /tmp/spack-stage, remove .lock
-# next, try removing some externals from /etc/spack/packages
-# need to use a newer version of intel oneapi compiler
-
-  # spack --debug install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
-  # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} ^diffutils@3.7 %${COMPILER} $SPACKTARGET
-
   # Install fails with the following
-  #COMPILER=oneapi@${ONEAPI_VER}
+  # COMPILER=oneapi@${ONEAPI_VER}
+  # v8.5 and v8.6 build errors with oneapi compilers, use intel classic, maybe try a newer version of oneapi compilers
   #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }
+
+
 
 
 #-----------------------------------------------------------------------------#
@@ -1125,33 +1056,18 @@ install_fsx_driver () {
 }
 
 
+
 #-----------------------------------------------------------------------------#
 install_petsc_intelmpi-spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  #module use /save/patrick/Cloud-Sandbox/models/modulefiles/
-  #module load intel_x86_64.impi_2021.12.1
-
   COMPILER=oneapi@$ONEAPI_VER
-  #module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-aimw7vu
-  #module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
-  #module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
-  #module load hdf5/1.14.3-oneapi-2023.1.0-wdcqims
 
   spack load intel-oneapi-compilers@$ONEAPI_VER
-  #spack load intel-oneapi-mpi@$INTEL_MPI_VER%$COMPILER
-  #spack load intel-oneapi-runtime@$ONEAPI_VER%$COMPILER
-
   # COMPILER=intel@${INTEL_COMPILER_VER}
   # gettext-0.22.5 fails to build with intel icc
   #  >> 5440    malloca.c(49): error #3895: expected a comma (the one-argument version of static_assert is not enabled in this mode)
-  # spack load intel-oneapi-compilers@${ONEAPI_VER}
-  #module load intel-oneapi-compilers
-  # try getting this to work, maybe try a previous version of gettext
-  # spack install $SPACKOPTS gettext %${COMPILER} $SPACKTARGET
-  # icc is deprecated anyways
-
 
   ######################################################
   # The PETSc library is required for some FVCOM builds.
@@ -1167,11 +1083,48 @@ install_petsc_intelmpi-spack () {
 }
 
 #-----------------------------------------------------------------------------#
+# Install NCEP Libs via Spack
+
+install_nceplibs-spack () {
+
+    . $SPACK_DIR/share/spack/setup-env.sh
+
+    COMPILER=oneapi@$ONEAPI_VER
+
+    package_list='
+      prod-util
+      bacio
+      bufr
+      g2
+      nemsio
+      sigio
+      w3emc
+      w3nco
+      grib-util
+    '
+
+    for package in $package_list
+    do
+      echo "Package: $package"
+      spack install $SPACKOPTS ${package}%${COMPILER} $SPACKTARGET
+    done
+
+    # source /opt/rh/gcc-toolset-11/enable
+    # wgrib2 builds fine with gcc, fails with intel
+    COMPILER=gcc@$GCC_VER
+    spack install $SPACKOPTS wgrib2%${COMPILER} $SPACKTARGET
+
+    # spack install $SPACKOPTS wgrib2%${COMPILER} ^zlib@1.2.13 $SPACKTARGET # nope
+    # zlib is packaged within wgrib2 - sigh
+    # spack install $SPACKOPTS wgrib2@3.1.0%${COMPILER} $SPACKTARGET # nope
+    # spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-error" $SPACKTARGET # nope
+}
+#-----------------------------------------------------------------------------#
+
 #-----------------------------------------------------------------------------#
 
 install_base_rpms () {
 
-  # TODO: refactor into one "install_nco_libs" function
   echo "Running ${FUNCNAME[0]} ..."
 
   home=$PWD
@@ -1257,6 +1210,12 @@ install_ncep_rpms () {
 
   cd $home
 }
+
+#-----------------------------------------------------------------------------#
+install_ncep_libs_spack () {
+    return
+}
+
 
 #-----------------------------------------------------------------------------#
 

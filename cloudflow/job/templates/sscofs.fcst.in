@@ -1,0 +1,328 @@
+!================================================================!
+  _______  _     _  _______  _______  _______  ______     _____  
+ (_______)(_)   (_)(_______)(_______)(_______)(_____ \   (_____) 
+  _____    _     _  _        _     _  _  _  _  _____) )  _  __ _ 
+ |  ___)  | |   | || |      | |   | || ||_|| |(_____ (  | |/ /| |
+ | |       \ \ / / | |_____ | |___| || |   | | _____) )_|   /_| |
+ |_|        \___/   \______) \_____/ |_|   |_|(______/(_)\_____/ 
+ -- Beta Release
+!================================================================!
+!                                                                !
+!========DOMAIN DECOMPOSITION USING: METIS 4.0.1 ================!
+!======Copyright 1998, Regents of University of Minnesota========!
+!                                                                ! 
+
+ &NML_CASE
+ CASE_TITLE      = 'SSCOFS',  
+ TIMEZONE        = 'UTC',
+ DATE_FORMAT     = 'YMD',
+ DATE_REFERENCE  = '__DATE_REFERENCE__',
+ START_DATE      = '__START_DATE__ __HHMMSS__'
+ END_DATE        = '__END_DATE__ __END_HHMMSS__'
+ /
+
+ &NML_STARTUP
+ STARTUP_TYPE      =    'hotstart',          
+ STARTUP_FILE      =    'sscofs.t__HH__z.__CDATE__.rst.nowcast.nc',          
+ STARTUP_UV_TYPE   = 'set values',
+ STARTUP_TURB_TYPE = 'set values',
+ STARTUP_TS_TYPE   = 'set values',
+ STARTUP_T_VALS    = 8.0,
+ STARTUP_S_VALS    = 34.0,
+ STARTUP_U_VALS    = 0.0,
+ STARTUP_V_VALS    = 0.0,
+ STARTUP_DMAX      = -10.0
+ /
+
+ &NML_IO
+ INPUT_DIR       =  './',
+ OUTPUT_DIR      =  './',
+ IREPORT         =  100,
+ VISIT_ALL_VARS  = F,
+ WAIT_FOR_VISIT  = F,
+ OLD_STYLE_TIME  = F,
+ USE_MPI_IO_MODE = F
+ /
+
+ &NML_INTEGRATION
+ EXTSTEP_SECONDS =  1.0,  
+ ISPLIT          =  5,     
+ IRAMP           =  8640,    
+ MIN_DEPTH       =  0.3, 
+ STATIC_SSH_ADJ  =  0.0
+ /
+
+ &NML_RESTART
+ RST_ON  = T,
+ RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ RST_OUT_INTERVAL   = 'seconds=21600.0'
+ RST_OUTPUT_STACK   =    1
+ /
+
+ &NML_NETCDF
+ NC_ON   = T,
+ NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ NC_OUT_INTERVAL =  'seconds=3600.0',
+ NC_OUTPUT_STACK =  1,
+ NC_SUBDOMAIN_FILES = 'FVCOM',
+ NC_GRID_METRICS = T,
+ NC_VELOCITY     = T,
+ NC_SALT_TEMP    = T,
+ NC_TURBULENCE   = F,
+ NC_AVERAGE_VEL  = F,
+ NC_VERTICAL_VEL = T,
+ NC_WIND_VEL     = T,
+ NC_WIND_STRESS  = F,
+ NC_ATM_PRESS    = T,
+ NC_EVAP_PRECIP  = F,
+ NC_SURFACE_HEAT = T,
+ NC_GROUNDWATER = F
+ /
+
+ &NML_NETCDF_SURFACE
+ NCSF_ON = F,
+ NCSF_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ NCSF_OUT_INTERVAL = 'seconds=3600.0',
+ NCSF_OUTPUT_STACK       = 1,
+ NCSF_SUBDOMAIN_FILES    = FVCOM ,
+ NCSF_GRID_METRICS = T,
+ NCSF_FILE_DATE    = F,
+ NCSF_VELOCITY     = T,
+ NCSF_SALT_TEMP    = T,
+ NCSF_TURBULENCE   = F,
+ NCSF_WIND_VEL     = T,
+ NCSF_ATM_PRESS    = F,
+ NCSF_WIND_STRESS  = F,
+ NCSF_EVAP_PRECIP  = F,
+ NCSF_SURFACE_HEAT = T
+ /
+
+ &NML_NETCDF_AV
+ NCAV_ON = F,
+ NCAV_FIRST_OUT  = 'none'
+ NCAV_OUT_INTERVAL       = 'none',
+ NCAV_OUTPUT_STACK       = 0,
+ NCAV_GRID_METRICS       = F,
+ NCAV_FILE_DATE  = F,
+ NCAV_VELOCITY   = F,
+ NCAV_SALT_TEMP  = F,
+ NCAV_TURBULENCE = F,
+ NCAV_AVERAGE_VEL        = F,
+ NCAV_VERTICAL_VEL       = F,
+ NCAV_WIND_VEL   = F,
+ NCAV_WIND_STRESS        = F,
+ NCAV_EVAP_PRECIP        = F,
+ NCAV_SURFACE_HEAT       = F,
+ NCAV_GROUNDWATER        = F,
+ NCAV_BIO        = F,
+ NCAV_WQM        = F,
+ NCAV_VORTICITY  = F
+/
+
+ &NML_SURFACE_FORCING
+ WIND_ON = T,
+ WIND_TYPE = 'speed',
+ WIND_STRESS_METHOD = 'LP1981',
+ WIND_FILE = 'sscofs.t__HH__z.__CDATE__.met.forecast.nc', 
+ WIND_KIND = 'variable',
+ WIND_X             = 0.0400000E+00,
+ WIND_Y             = 0.0200000E+00,
+
+ HEATING_ON = F,
+ HEATING_TYPE  = 'flux',
+ HEATING_KIND = 'variable',
+ HEATING_FILE = 'sscofs.t__HH__z.__CDATE__.met.forecast.nc',
+ HEATING_LONGWAVE_LENGTHSCALE  = 1.4,
+ HEATING_LONGWAVE_PERCTAGE     = 0.78,
+ HEATING_SHORTWAVE_LENGTHSCALE = 6.3,
+ HEATING_RADIATION             = 0.0000000E+00,
+ HEATING_NETFLUX               = 0.0000000E+00,
+
+ PRECIPITATION_ON  = F,
+ PRECIPITATION_KIND = 'variable',
+ PRECIPITATION_FILE = 'sscofs.t__HH__z.__CDATE__.met.forecast.nc',
+ PRECIPITATION_PRC  = 0.0000000E+00,
+ PRECIPITATION_EVP  = 0.0000000E+00,
+
+ AIRPRESSURE_ON = T,
+ AIRPRESSURE_KIND = 'variable',
+ AIRPRESSURE_FILE = 'sscofs.t__HH__z.__CDATE__.met.forecast.nc',
+ AIRPRESSURE_VALUE = 101325.0E+00
+ /
+
+ &NML_HEATING_CALCULATED
+ HEATING_CALCULATE_ON   = T,
+ HEATING_CALCULATE_TYPE = 'flux',
+ HEATING_CALCULATE_FILE = 'sscofs.t__HH__z.__CDATE__.hflux.forecast.nc',  
+ HEATING_CALCULATE_KIND = 'variable',
+ HEATING_FRESHWATER      = F,
+ COARE_VERSION          = 'COARE26Z',
+ ZTT     =   2.00000000000000     ,
+ ZQQ     =   2.00000000000000     ,
+ AIR_TEMPERATURE =  1.000000000000000E+001,
+ RELATIVE_HUMIDITY       =  0.000000000000000E+000,
+ SURFACE_PRESSURE        =  1.000000000000000E+003,
+ LONGWAVE_RADIATION      =  1.000000000000000E+001,
+ SHORTWAVE_RADIATION     =  1.000000000000000E+002,
+ HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX   =  0.780000000000000     ,
+ HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX        =   1.40000000000000     ,
+ HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX       =   6.30000000000000
+ /
+
+ &NML_PHYSICS
+ HORIZONTAL_MIXING_TYPE          = 'closure',
+ HORIZONTAL_MIXING_KIND          = 'constant',
+ HORIZONTAL_MIXING_COEFFICIENT   = 2.0E-1,
+ HORIZONTAL_PRANDTL_NUMBER       = 1.0,
+ VERTICAL_MIXING_TYPE            = 'closure',
+ VERTICAL_MIXING_COEFFICIENT     = 1.0E-6,
+ VERTICAL_PRANDTL_NUMBER         = 1.0,
+ BOTTOM_ROUGHNESS_MINIMUM        =  0.002,   
+ !BOTTOM_ROUGHNESS_LENGTHSCALE    =  0.001,
+ BOTTOM_ROUGHNESS_KIND           = 'static',  
+ BOTTOM_ROUGHNESS_TYPE           = 'orig',
+ BOTTOM_ROUGHNESS_FILE           = 'sscofs_brf.nc',
+ CONVECTIVE_OVERTURNING          = T,
+ SCALAR_POSITIVITY_CONTROL       = T,
+ BAROTROPIC                      = F,
+ BAROCLINIC_PRESSURE_GRADIENT    = 'sigma levels',
+ SEA_WATER_DENSITY_FUNCTION      = 'dens2',
+ RECALCULATE_RHO_MEAN           = F,
+ INTERVAL_RHO_MEAN              = 'seconds=1800.',
+ TEMPERATURE_ACTIVE              = T,
+ SALINITY_ACTIVE                 = T,
+ SURFACE_WAVE_MIXING             = F,
+ WETTING_DRYING_ON               = T
+ /
+
+ &NML_RIVER_TYPE
+ RIVER_NUMBER    =  38,
+ RIVER_KIND      =         'variable'   ,
+ RIVER_TS_SETTING        = 'specified'  ,
+ TS_ADJUST_METHOD = 'average', 
+ RIVER_INFO_FILE   = 'RIVERS_NAMELIST.nml' , !Note river file has to be named "nos.sscofs_riv.nc"
+ RIVER_INFLOW_LOCATION   = 'node' 
+ /
+
+  &NML_OPEN_BOUNDARY_CONTROL
+ OBC_ON                      = T,
+ OBC_NODE_LIST_FILE          = 'sscofs_obc.dat',
+ OBC_ELEVATION_FORCING_ON    = T,
+ OBC_ELEVATION_FILE          = 'sscofs.t__HH__z.__CDATE__.obc.nc',  
+ OBC_TS_TYPE                 = 1,
+ OBC_TEMP_NUDGING            = T,
+ OBC_TEMP_FILE               = 'sscofs.t__HH__z.__CDATE__.obc.nc',
+ OBC_TEMP_NUDGING_TIMESCALE  = 0.0014,
+ OBC_SALT_NUDGING            = T,
+ OBC_SALT_FILE               = 'sscofs.t__HH__z.__CDATE__.obc.nc',
+ OBC_SALT_NUDGING_TIMESCALE  = 0.0014,  
+ OBC_MEANFLOW                = F,
+ OBC_MEANFLOW_FILE           = 'none',
+ OBC_LONGSHORE_FLOW_ON      = F,
+ OBC_LONGSHORE_FLOW_FILE    = 'none'
+ /
+
+ &NML_GRID_COORDINATES
+ GRID_FILE       = 'sscofs_grd.dat',
+ GRID_FILE_UNITS = 'degrees',
+ PROJECTION_REFERENCE  = 'proj=utm +ellps=WGS84 +zone=10',
+ SIGMA_LEVELS_FILE    = 'sscofs_sigma.dat',
+ DEPTH_FILE      = 'sscofs_dep.dat',
+ CORIOLIS_FILE   = 'sscofs_cor.dat',
+ SPONGE_FILE     = 'sscofs_spg.dat'
+ /
+
+ &NML_GROUNDWATER
+ GROUNDWATER_ON          = F,
+ GROUNDWATER_TEMP_ON     = F,
+ GROUNDWATER_SALT_ON     = F,
+ GROUNDWATER_KIND        = 'none',
+ GROUNDWATER_FILE        = 'none',
+ GROUNDWATER_FLOW        = 0.0000000E+00,
+ GROUNDWATER_TEMP        = 0.0000000E+00,
+ GROUNDWATER_SALT        = 0.0000000E+00
+ /
+
+ &NML_LAG
+ LAG_PARTICLES_ON        = F           ,
+ LAG_START_FILE   = 'lag_init.nc'      ,
+ LAG_OUT_FILE     = 'lag_out.nc'       ,
+ LAG_FIRST_OUT    = 'cycle=0'          ,
+ LAG_RESTART_FILE = 'junk.nc'          ,
+ LAG_OUT_INTERVAL = 'cycle=30'         , 
+ LAG_SCAL_CHOICE  = 'none'
+ /
+
+ &NML_ADDITIONAL_MODELS
+ DATA_ASSIMILATION       = F,
+ DATA_ASSIMILATION_FILE  = 'none',
+ BIOLOGICAL_MODEL        = F,
+ SEDIMENT_MODEL          = F,
+ ICING_MODEL             = F,
+ ICE_MODEL               = F
+ /
+
+
+ &NML_PROBES
+ PROBES_ON       = F,
+ PROBES_NUMBER   = 1,
+ PROBES_FILE     = 'sscofs_probes.nml'                                                        
+ /
+
+&NML_STATION_TIMESERIES
+OUT_STATION_TIMESERIES_ON = T,
+STATION_FILE    = 'sscofs_station.dat',
+LOCATION_TYPE   = 'node',
+GRID_EDGE_FILE_NAME       = 'sscofs_station_edge.dat',
+OUT_ELEVATION   = T,
+OUT_VELOCITY_3D = T,
+OUT_VELOCITY_2D = F,
+OUT_WIND_VELOCITY = T,
+OUT_SALT_TEMP   = T,
+OUT_INTERVAL    = 'seconds = 360.0'
+/
+
+&NML_NESTING
+NESTING_ON = F,
+NESTING_BLOCKSIZE= 2,
+NESTING_FILE_NAME='trnch_nest.nc'
+/
+
+&NML_NCNEST
+NCNEST_ON = F,
+NCNEST_BLOCKSIZE= 20,
+NCNEST_NODE_FILES= 'testnodes.dat'
+/
+
+&NML_BOUNDSCHK
+BOUNDSCHK_ON  = F,
+CHK_INTERVAL  = 1,
+VELOC_MAG_MAX = 20.,   
+ZETA_MAG_MAX  = 15., 
+TEMP_MAX      = 40.,
+TEMP_MIN      = -40.,
+SALT_MAX      = 100.,
+SALT_MIN      = -5. 
+/
+
+&NML_NUMDIFF
+NUMDIFF_ON = F        ,
+NUMDIFF_VAR = 'salt'  ,
+NUMDIFF_INT = 1
+/
+&NML_MLD
+NC_MLD  = F,
+GAMMA_MIN       =  3.9999999E-05,
+MLD_DEFAULT     =   5.000000    ,
+DEEPWATER_DEPTH =   100.0000    ,
+DEEPWATER_GAMMA =  2.9999999E-05
+/
+&NML_HEATFLUX_SEDIMENT
+HEATFLUX_SEDIMENT_ON    = F,
+MUD_INITIAL_TEMP_FILE   = none                  ,
+VOLUMETRIC_HEAT_CAPACITY        =   3.650000    ,
+THERMAL_DIFFUSIVITY     =  0.3800000    ,
+EFFECTIVE_THICKNESS     =  9.9999998E-03,
+CRITICAL_DEPTH  =   1.000000    ,
+SEDIMENT_TEMPERATURE    =   10.00000
+/
