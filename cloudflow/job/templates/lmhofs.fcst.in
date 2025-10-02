@@ -1,8 +1,4 @@
- !================================================================!
- !                                                                !
- !========DOMAIN DECOMPOSITION USING: METIS 4.0.1 ================!
- !======Copyright 1998, Regents of University of Minnesota========!
- !                                                                !
+ STARTUP_TURB_TYPE = 'default',
  ! _______  _     _  _______  _______  _______  ______     _____
  !(_______)(_)   (_)(_______)(_______)(_______)(_____ \   (_____)
  ! _____    _     _  _        _     _  _  _  _  _____) )  _  __ _
@@ -14,25 +10,27 @@
  !                                                                !
  !========DOMAIN DECOMPOSITION USING: METIS 4.0.1 ================!
  !======Copyright 1998, Regents of University of Minnesota========!
-
+ !                                                                !
  &NML_CASE
- CASE_TITLE      = 'Lake Michigan & Huron OFS (LMHOFS) - IOOS Cloud Sandbox',
+ CASE_TITLE      = 'LMHOFS',
  TIMEZONE        = 'UTC',
  DATE_FORMAT     = 'YMD',
  DATE_REFERENCE  = '__DATE_REFERENCE__',
- START_DATE      = '__START_DATE__ __HHMMSS__',
+ START_DATE      = '__START_DATE__ __HHMMSS__'
  END_DATE        = '__END_DATE__ __END_HHMMSS__'
  /
 
  &NML_STARTUP
- STARTUP_TYPE      = 'hotstart',
- STARTUP_FILE      = 'nos.lmhofs.rst.nowcast.__CDATE__.t__HH__z.nc',
+STARTUP_TYPE      = 'hotstart',
+ STARTUP_FILE      = 'lmhofs.t__HH__z.__CDATE__.rst.nowcast.nc',
  STARTUP_UV_TYPE   = 'set values',
  STARTUP_TURB_TYPE = 'set values',
  STARTUP_TS_TYPE   = 'set values',
- STARTUP_T_VALS    = 3.45,
- STARTUP_S_VALS    = 0.0,
- STARTUP_DMAX      = -10.0   ! a reference level for
+ STARTUP_T_VALS  = 20.0000000E+00  ,
+ STARTUP_S_VALS  = 0.0000000E+00  ,
+ STARTUP_U_VALS  =  0.0000000E+00,
+ STARTUP_V_VALS  =  0.0000000E+00,
+ STARTUP_DMAX    =  -10.0000000E+00
  /
 
  &NML_IO
@@ -41,6 +39,7 @@
  IREPORT         = 100,
  VISIT_ALL_VARS  = F,
  WAIT_FOR_VISIT  = F,
+ OLD_STYLE_TIME  = F,
  USE_MPI_IO_MODE = F
  /
 
@@ -49,14 +48,14 @@
  ISPLIT          =  2,
  IRAMP           =  0,
  MIN_DEPTH       =  0.1,
- STATIC_SSH_ADJ  =  0.0
+ STATIC_SSH_ADJ  =  0.0000000E+00
  /
 
  &NML_RESTART
  RST_ON           = T,
- RST_FIRST_OUT    = '__END_DATE__ __END_HHMMSS__',
- RST_OUT_INTERVAL = 'seconds=172800.0',
- RST_OUTPUT_STACK = 1
+ RST_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
+ RST_OUT_INTERVAL = 'seconds=21600.0',
+ RST_OUTPUT_STACK = 1   
  /
 
  &NML_NETCDF
@@ -64,8 +63,9 @@
  NC_FIRST_OUT    = '__START_DATE__ __HHMMSS__',
  NC_OUT_INTERVAL = 'seconds=3600.0',
  NC_OUTPUT_STACK = 1,
- NC_SUBDOMAIN_FILES = 'FVCOM',
+ NC_SUBDOMAIN_FILES      = FVCOM,
  NC_GRID_METRICS = T,
+ NC_FILE_DATE    = F,
  NC_VELOCITY     = T,
  NC_SALT_TEMP    = T,
  NC_TURBULENCE   = T,
@@ -73,13 +73,15 @@
  NC_VERTICAL_VEL = T,
  NC_WIND_VEL     = T,
  NC_WIND_STRESS  = F,
- NC_ATM_PRESS    = T,
+ NC_ATM_PRESS  =   T,
  NC_EVAP_PRECIP  = F,
  NC_SURFACE_HEAT = T,
  NC_GROUNDWATER  = F,
+ NC_ICE          = T,
  NC_BIO          = F,
  NC_WQM          = F,
- NC_VORTICITY    = F
+ NC_VORTICITY    = F,
+ NC_UARD_OBCN    = F
  /
 
 &NML_NETCDF_SURFACE
@@ -97,7 +99,7 @@
  NCSF_ATM_PRESS    = T,
  NCSF_WIND_STRESS  = F,
  NCSF_EVAP_PRECIP  = F,
- NCSF_SURFACE_HEAT = T
+ NCSF_SURFACE_HEAT = F
  /
 
  &NML_NETCDF_AV
@@ -125,60 +127,57 @@
 
  &NML_SURFACE_FORCING
  WIND_ON      = T,
- WIND_TYPE    = 'speed',         ! 'stress',
- WIND_FILE    = 'nos.lmhofs.met.forecast.__CDATE__.t__HH__z.nc',
- WIND_KIND    = 'variable',      ! 'constant',
- WIND_X       =  0.0000000E+00,
- WIND_Y       =  0.0000000E+00,
-
- HEATING_ON                    = F,
- HEATING_TYPE                  = 'flux',
- HEATING_KIND                  = 'variable',
- HEATING_FILE                  = 'nos.lmhofs.met.forecast.__CDATE__.t__HH__z.nc',
+ WIND_TYPE    = 'speed',
+ WIND_STRESS_METHOD = 'LP1981' , 
+ WIND_FILE    = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc',
+ WIND_KIND    = 'variable',
+ WIND_X       =  0.0400000E+00, 
+ WIND_Y       =  0.0200000E+00,
+ HEATING_ON     = F,
+ HEATING_TYPE   = 'flux',
+ HEATING_KIND   = 'variable',
+ HEATING_FILE   = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc',
  HEATING_LONGWAVE_LENGTHSCALE  = 3.6,
  HEATING_LONGWAVE_PERCTAGE     = 0.55,
  HEATING_SHORTWAVE_LENGTHSCALE = 0.35,
-
  HEATING_RADIATION  = 0.0000000E+00,
  HEATING_NETFLUX    = 0.0000000E+00,
-
  PRECIPITATION_ON   = T,
  PRECIPITATION_KIND = 'variable',
- PRECIPITATION_FILE = 'nos.lmhofs.met.forecast.__CDATE__.t__HH__z.nc',
+ PRECIPITATION_FILE = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc',
  PRECIPITATION_PRC  = 0.0000000E+00,
  PRECIPITATION_EVP  = 0.0000000E+00,
-
- AIRPRESSURE_ON    = T,
+ 
+ AIRPRESSURE_ON    = T,                       
  AIRPRESSURE_KIND  = 'variable',
- AIRPRESSURE_FILE  = 'nos.lmhofs.met.forecast.__CDATE__.t__HH__z.nc',
+ AIRPRESSURE_FILE  = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc',
  AIRPRESSURE_VALUE =  0.005500000E+00
  /
 
  &NML_HEATING_CALCULATED
- HEATING_CALCULATE_ON    = T,
- HEATING_CALCULATE_TYPE  = 'flux',
- HEATING_CALCULATE_FILE  = 'nos.lmhofs.hflux.forecast.__CDATE__.t__HH__z.nc',
- HEATING_CALCULATE_KIND  = 'variable',
+ HEATING_CALCULATE_ON   = T,
+ HEATING_CALCULATE_TYPE = 'flux',
+ HEATING_CALCULATE_FILE = 'lmhofs.t__HH__z.__CDATE__.hflux.forecast.nc',
+ HEATING_CALCULATE_KIND = 'variable',
+ HEATING_FRESHWATER      = F,
  COARE_VERSION          = 'COARE26Z',
- ZUU     =   10.000000,
- ZTT     =   2.000000,
- ZQQ     =   2.000000,
- AIR_TEMPERATURE =  0.0000000E+00,
- RELATIVE_HUMIDITY       =  0.0000000E+00,
- SURFACE_PRESSURE        =  0.0000000E+00,
- LONGWAVE_RADIATION      =  0.0000000E+00,
- SHORTWAVE_RADIATION     =  0.0000000E+00,
- HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX = 0.55,
- HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX = 3.6,
- HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX= 0.35
+ ZTT                    = 2.0000000E+00,
+ ZQQ                    = 2.0000000E+00,
+ AIR_TEMPERATURE =  0.000000000000000E+000,
+ RELATIVE_HUMIDITY       =  0.000000000000000E+000,
+ SURFACE_PRESSURE        =  0.000000000000000E+000,
+ LONGWAVE_RADIATION      =  0.000000000000000E+000,
+ SHORTWAVE_RADIATION     =  0.000000000000000E+000,
+ HEATING_LONGWAVE_PERCTAGE_IN_HEATFLUX   =  0.550000000000000,
+ HEATING_LONGWAVE_LENGTHSCALE_IN_HEATFLUX        =   3.60000000000000,
+ HEATING_SHORTWAVE_LENGTHSCALE_IN_HEATFLUX       =   0.35000000000000
  /
-
  &NML_HEATING_SOLAR
  HEATING_SOLAR_ON        = F,
  HEATING_SOLAR_TYPE      = 'flux',
- HEATING_SOLAR_FILE      = 'nos.lmhofs.met.forecast.__CDATE__.t__HH__z.nc',
+ HEATING_SOLAR_FILE      = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc',
  HEATING_SOLAR_KIND      = 'variable',
- ZM                      = 10.0,	! Units = meters
+ ZM                      = 10.0,        ! Units = meters
  LATITUDE_REFERENCE      = 0.0,
  LONGITUDE_REFERENCE     = 0.0,
  JULIANDAY_REFERENCE     = 0.0
@@ -193,20 +192,18 @@
  VERTICAL_MIXING_TYPE            = 'closure',
  VERTICAL_MIXING_COEFFICIENT     = 1.0000E-06,
  VERTICAL_PRANDTL_NUMBER         = 1.0000,
-
  BOTTOM_ROUGHNESS_TYPE   = 'orig',
  BOTTOM_ROUGHNESS_KIND   = 'constant',
  BOTTOM_ROUGHNESS_FILE   = 'none' ,
  BOTTOM_ROUGHNESS_LENGTHSCALE    =  0.002,
  BOTTOM_ROUGHNESS_MINIMUM        =  0.0025,
-
  CONVECTIVE_OVERTURNING       = F,
  SCALAR_POSITIVITY_CONTROL    = T,
- BAROTROPIC                   = F,   ! orignal in test case 1: F,
+ BAROTROPIC                   = F,
  BAROCLINIC_PRESSURE_GRADIENT = 'sigma levels',
  SEA_WATER_DENSITY_FUNCTION   = 'dens2',
  RECALCULATE_RHO_MEAN         = F,
- INTERVAL_RHO_MEAN            = 'seconds=1800.0',
+ INTERVAL_RHO_MEAN            = 'days=1.0',
  TEMPERATURE_ACTIVE           = T,
  SALINITY_ACTIVE              = F,
  SURFACE_WAVE_MIXING          = F,
@@ -215,7 +212,7 @@
  /
 
  &NML_RIVER_TYPE
- RIVER_NUMBER    =           12,
+ RIVER_NUMBER    =          12,
  RIVER_TS_SETTING        = 'specified',
  RIVER_INFLOW_LOCATION   = 'edge',
  RIVER_INFO_FILE   = 'RIVERS_NAMELIST.nml',
@@ -226,30 +223,32 @@
  OBC_ON                     = T,
  OBC_NODE_LIST_FILE         = 'lmhofs_obc.dat',
  OBC_ELEVATION_FORCING_ON   = T,
- OBC_ELEVATION_FILE         = 'nos.lmhofs.obc.__CDATE__.t__HH__z.nc',
+ OBC_ELEVATION_FILE         = 'lmhofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TS_TYPE                = 1,
  OBC_TEMP_NUDGING           = T,
- OBC_TEMP_FILE              = 'nos.lmhofs.obc.__CDATE__.t__HH__z.nc',
+ OBC_TEMP_FILE              = 'lmhofs.t__HH__z.__CDATE__.obc.nc',
  OBC_TEMP_NUDGING_TIMESCALE =  1.0000000E+00,
  OBC_SALT_NUDGING           = F,
  OBC_SALT_FILE              = 'none',
- OBC_SALT_NUDGING_TIMESCALE = 0.0000000E+00,
+ OBC_SALT_NUDGING_TIMESCALE =  0.0000000E+00,
  OBC_MEANFLOW               = F,
  OBC_MEANFLOW_FILE          = 'none',
+ OBC_TIDEOUT_INITIAL     =           0,
+ OBC_TIDEOUT_INTERVAL    =           0,
  OBC_LONGSHORE_FLOW_ON      = F,
  OBC_LONGSHORE_FLOW_FILE    = 'none'
  /
 
  &NML_GRID_COORDINATES
- GRID_FILE            = 'nos.lmhofs.grd.dat',
+ GRID_FILE            = 'lmhofs_grd.dat',
  GRID_FILE_UNITS      = 'degrees',
- PROJECTION_REFERENCE = 'proj=utm +zone=16 +datum=NAD83',    !'none'
- SIGMA_LEVELS_FILE    = 'nos.lmhofs.sigma.dat',
- DEPTH_FILE      = 'nos.lmhofs.dep.dat',
- CORIOLIS_FILE   = 'nos.lmhofs.cor.dat',
- SPONGE_FILE     = 'nos.lmhofs.spg.dat'
+ PROJECTION_REFERENCE = 'proj=utm +zone=16 +datum=NAD83',    
+ SIGMA_LEVELS_FILE    = 'lmhofs_sigma.dat',
+ DEPTH_FILE      = 'lmhofs_dep.dat',
+ CORIOLIS_FILE   = 'lmhofs_cor.dat',
+ SPONGE_FILE     = 'lmhofs_spg.dat'
  /
-
+ 
  &NML_GROUNDWATER
  GROUNDWATER_ON      = F,
  GROUNDWATER_TEMP_ON = F,
@@ -268,81 +267,102 @@
  LAG_FIRST_OUT   = 'none',
  LAG_RESTART_FILE        = 'none',
  LAG_OUT_INTERVAL        = 'none',
- LAG_SCAL_CHOICE = 'none'
+ LAG_SCAL_CHOICE = 'none'                                                              
  /
 
  &NML_ADDITIONAL_MODELS
  DATA_ASSIMILATION       = F,
- DATA_ASSIMILATION_FILE  = 'none',
+ DATA_ASSIMILATION_FILE  = 'none'                                  ,
  BIOLOGICAL_MODEL        = F,
- STARTUP_BIO_TYPE        = 'observed', ! constant, linear, observed, set values,
- SEDIMENT_MODEL          = F,
- SEDIMENT_MODEL_FILE     = 'none',
- ICING_MODEL             = F,
- ICING_FORCING_FILE      = 'wrf_for.nc',
- ICING_FORCING_KIND      = 'variable',
- ICING_AIR_TEMP          = 0.0000000E+00,
- ICING_WSPD              = 0.0000000E+00,
- ICE_MODEL               = F,
- ICE_FORCING_FILE        = 'lmhofs_forcing.nc',
- ICE_FORCING_KIND        = 'variable',
- ICE_SEA_LEVEL_PRESSURE  = 0.0000000E+00,
- ICE_AIR_TEMP            = 0.0000000E+00,
- ICE_SPEC_HUMIDITY       = 0.0000000E+00,
- ICE_SHORTWAVE           = 0.0000000E+00,
- ICE_CLOUD_COVER         = 0.0000000E+00
+ BIOLOGICAL_MODEL_FILE   = 'none'                                            ,
+ SEDIMENT_MODEL  = F,
+ SEDIMENT_MODEL_FILE     = 'none'                                            ,
+ SEDIMENT_PARAMETER_TYPE = 'none'                                            ,
+ SEDIMENT_PARAMETER_FILE = 'none'                                            ,
+ ICING_MODEL     = F,
+ ICING_FORCING_FILE      = 'none'                                  ,
+ ICING_FORCING_KIND      = 'variable'                                        ,
+ ICING_AIR_TEMP  =  0.0000000E+00,
+ ICING_WSPD      =  0.0000000E+00,
+ ICE_MODEL       = T,
+ ICE_FORCING_FILE        = 'lmhofs.t__HH__z.__CDATE__.met.forecast.nc'                                            ,
+ ICE_FORCING_KIND        = 'variable'                                            ,
+ ICE_SEA_LEVEL_PRESSURE  =  0.0000000E+00,
+ ICE_AIR_TEMP            =  0.0000000E+00,
+ ICE_SPEC_HUMIDITY       =  0.0000000E+00,
+ ICE_SHORTWAVE           =  0.0000000E+00,
+ ICE_LONGWAVE_TYPE       = 'PW',
+ ICE_CLOUD_COVER         =  0.0000000E+00
  /
+ &NML_ICE
+ kstrength = 0,
+ krdg_partic = 1,
+ krdg_redist =  1,
+ albicev = 0.78,
+ albicei = 0.36,
+ albsnowv = 0.98,
+ albsnowi = 0.70,
+ kitd = 1,
+ kcatbound = 1,
+ i0vis = 0.70,
+ floediam = 300.
+/
 
  &NML_PROBES
  PROBES_ON       = F,
- PROBES_NUMBER   = 16,
- PROBES_FILE     = 'probes.nml'
+ PROBES_NUMBER   = 2,
+ PROBES_FILE     = 'PROBE_sta.nml'
+ /
+
+ &NML_STATION_TIMESERIES
+ OUT_STATION_TIMESERIES_ON = T,
+ STATION_FILE              = 'lmhofs_station.dat',
+ LOCATION_TYPE             = 'node',
+ GRID_EDGE_FILE_NAME       = 'lmhofs_station_edge.dat'
+ OUT_ELEVATION             = T,
+ OUT_VELOCITY_3D           = T,
+ OUT_VELOCITY_2D           = F,
+ OUT_WIND_VELOCITY         = T,
+ OUT_SALT_TEMP             = T,
+ OUT_INTERVAL              = 'seconds = 360.0'
  /
 
  &NML_NCNEST
  NCNEST_ON        = F,
  NCNEST_BLOCKSIZE = 120,
- NCNEST_NODE_FILES= 'lmhofs_coarse_nodes.dat'
+ NCNEST_NODE_FILES= 'lmhofs_nestnode.dat'
  /
 
  &NML_NESTING
  NESTING_ON        = F,
- NESTING_BLOCKSIZE = 120,
- NESTING_FILE_NAME = 'node_nest.nc'
+ NESTING_BLOCKSIZE = 5,
+ NESTING_FILE_NAME = 'lmhofs.t__HH__z.__CDATE__.obc.nc'
  /
 
-&NML_STATION_TIMESERIES
-OUT_STATION_TIMESERIES_ON       = T,
-STATION_FILE    = 'nos.lmhofs_station.dat',
-LOCATION_TYPE   = 'node',
-OUT_ELEVATION   = T,
-OUT_VELOCITY_3D = T,
-OUT_VELOCITY_2D = F,
-OUT_WIND_VELOCITY  = T,
-OUT_SALT_TEMP   = T,
-OUT_INTERVAL    = 'seconds=360.0'
-/
+ &NML_MLD
+ NC_MLD  = F,
+ GAMMA_MIN       =  3.9999999E-05,
+ MLD_DEFAULT     =   5.000000    ,
+ DEEPWATER_DEPTH =   100.0000    ,
+ DEEPWATER_GAMMA =  2.9999999E-05
+ /
+ &NML_HEATFLUX_SEDIMENT
+ HEATFLUX_SEDIMENT_ON    = F,
+ MUD_INITIAL_TEMP_FILE   = none                  ,
+ VOLUMETRIC_HEAT_CAPACITY        =   3.650000    ,
+ THERMAL_DIFFUSIVITY     =  0.3800000    ,
+ EFFECTIVE_THICKNESS     =  9.9999998E-03,
+ CRITICAL_DEPTH  =   1.000000    ,
+ SEDIMENT_TEMPERATURE    =   10.00000
+ /
 
  &NML_BOUNDSCHK
  BOUNDSCHK_ON    = F,
- CHK_INTERVAL    = 0,
- VELOC_MAG_MAX   =  0.0000000E+00,
- ZETA_MAG_MAX    =  0.0000000E+00,
- TEMP_MAX        =  0.0000000E+00,
+ CHK_INTERVAL    = 100,
+ VELOC_MAG_MAX   = 10.0000000E+00,
+ ZETA_MAG_MAX    = 10.0000000E+00,
+ TEMP_MAX        = 50.0000000E+00,
  TEMP_MIN        =  0.0000000E+00,
- SALT_MAX        =  0.0000000E+00,
+ SALT_MAX        = 45.0000000E+00,
  SALT_MIN        =  0.0000000E+00
- /
-
- &NML_DYE_RELEASE
- DYE_ON             = F,
- DYE_RELEASE_START  = '2004-06-01 00:00:00',
- DYE_RELEASE_STOP   = '2004-09-01 00:00:00',
- KSPE_DYE           = 21,
- MSPE_DYE           = 3,
- K_SPECIFY          = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21,
- M_SPECIFY          = 1913 2827 3055,
- DYE_SOURCE_TERM    = 1.0
- /
-
-
+/

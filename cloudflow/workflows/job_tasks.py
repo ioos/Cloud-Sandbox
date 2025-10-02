@@ -246,7 +246,7 @@ def get_baseline(job: Job, sshuser=None):
 
 
 @task
-def get_forcing_multi(job: Job, sshuser=None):
+def get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
 
     Parameters
@@ -289,10 +289,8 @@ def get_forcing_multi(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
-    # ROMS models
-    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
-
-        # script = f"{curdir}/scripts/getICsROMS.py"
+    # ROMS and FVCOM NOSOFS models
+    elif ofs in util.nosofs_models:
 
         cdate = sdate
 
@@ -300,20 +298,12 @@ def get_forcing_multi(job: Job, sshuser=None):
 
             comdir = f"{comrot}/{ofs}.{cdate}"
             try:
-                getICsNOSOFS.getICsROMS(cdate, hh, ofs, comdir)
-                #result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-                #if result.returncode != 0:
-                #    log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-                #    raise signals.FAIL()
+                getICsNOSOFS.getICs(cdate, hh, ofs, comdir)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
                 raise signals.FAIL()
 
             cdate = util.ndate(cdate, 1)
-
-    # FVCOM models
-    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
-        log.info(f"get forcing stub: {ofs}")
 
     elif ofs in ('secofs', 'eccofs', 'necofs'):
         print(f"only using pre-downloaded forcing files for {ofs} test case")
@@ -324,7 +314,7 @@ def get_forcing_multi(job: Job, sshuser=None):
     return
 
 @task
-def get_forcing(job: Job, sshuser=None):
+def old_get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
 
     Parameters
@@ -343,36 +333,8 @@ def get_forcing(job: Job, sshuser=None):
 
     comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
-    if ofs == 'liveocean':
-        
-        frcdir = job.COMROT + '/liveocean'
-        try:
-            util.get_ICs_lo(cdate, frcdir, sshuser)
-        except Exception as e:
-            log.exception('Problem encountered with downloading forcing data ...')
-            raise signals.FAIL()
-
-    # ROMS models
-    elif ofs in ('cbofs', 'dbofs', 'tbofs', 'gomofs', 'ciofs'):
-        #comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/scripts/getICsROMS.sh"
-
-        result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-        if result.returncode != 0:
-            log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-            raise signals.FAIL()
-
-    # FVCOM models
-    elif ofs in ('ngofs', 'nwgofs', 'negofs', 'leofs', 'sfbofs', 'lmhofs'):
-        #comdir = f"{comrot}/{ofs}.{cdate}"
-        script = f"{curdir}/scripts/getICsFVCOM.sh"
-
-        result = subprocess.run([script, cdate, hh, ofs, comdir], stderr=subprocess.STDOUT)
-        if result.returncode != 0:
-            log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-            raise signals.FAIL()
     # Coupled WRF/ROMS
-    elif ofs == 'wrfroms':
+    if ofs == 'wrfroms':
         #comdir = f"{comrot}/{ofs}/{cdate}"
         script = f"{curdir}/scripts/getICsWRFROMS.sh"
 
@@ -386,9 +348,7 @@ def get_forcing(job: Job, sshuser=None):
         #result = subprocess.run([script])
         print('Not required to download forcing') 
     else:
-        log.warning(f"{ofs} has no script to download initial conditions, forcing data")
-        #log.error("Unsupported forecast: ", ofs)
-        #raise signals.FAIL()
+        log.warning(f"Could not download initial conditions for {ofs}")
 
     return
 
@@ -545,7 +505,6 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     if baselen != explen:
         log.warning(f"BASELINE and EXPERIMENT length mismatch: BASELINE {baselen}, EXPERIMENT {explen}" )
 
-    #lastbase = BASELINE[baselen-1]
     # Refactored this to support short experiment runs
     lastbase = BASELINE[explen-1]
     lastexp = EXPERIMENT[explen-1]

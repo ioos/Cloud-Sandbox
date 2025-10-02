@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -x
 
 SAVE_DIR="/save/$USER"
-MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
+MODULEFILE=intel_x86_64
 
 if [ ! -d $SAVE_DIR ]; then
   echo "Error: $SAVE_DIR does not exist"
@@ -37,7 +38,7 @@ fi
 cmake -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441" \
        -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
 
-make -j2
+make -j1
 
 if [ ! -d ../bin ]; then
     mkdir ../bin

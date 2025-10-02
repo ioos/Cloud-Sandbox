@@ -338,7 +338,7 @@ def simple_run(cluster: Cluster, job: Job):
     #HH = job.HH
     #OUTDIR = job.OUTDIR
 
-    SAVEDIR = job.SAVEDIR
+    SAVEDIR = getattr(job, "SAVEDIR", 'none')
     RUNDIR = job.RUNDIR
     INPUTFILE = job.INPUTFILE
     EXEC = job.EXEC
@@ -404,8 +404,8 @@ def forecast_run(cluster: Cluster, job: Job):
     OFS = job.OFS
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
-    SAVEDIR = job.SAVEDIR
 
+    SAVEDIR = getattr(job, "SAVEDIR", 'none')
     PTMP = getattr(job, "PTMP", 'none')
 
     # for secofs
@@ -466,7 +466,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     NPROCS = job.NPROCS
     XTRA_ARGS = ""
 
-    SAVEDIR = job.SAVEDIR
+    SAVEDIR = getattr(job, "SAVEDIR", 'none')
 
     PTMP = getattr(job, "PTMP", 'none')
 

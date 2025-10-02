@@ -143,7 +143,7 @@ def multi_hindcast_flow(hcstconf, jobfile, sshuser) -> Flow:
         job = tasks.job_init(cluster, jobfile)
 
         # Get forcing data
-        forcing = jtasks.get_forcing_multi(job, sshuser)
+        forcing = jtasks.get_forcing(job, sshuser)
 
         # scratch = tasks.create_scratch('FSx',jobfile,'/ptmp', upstream_tasks=[forcing])
 

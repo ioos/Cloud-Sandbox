@@ -47,7 +47,7 @@ class ROMSForecast(Job):
         The base directory for the scratch disk, usually /ptmp
 
     EXEC : str
-        The model executable to run. Only used for ADNOC currently.
+        The model executable to run.
 
     TIME_REF : str
         Templated TIME_REF field value for ROMS ocean.in
@@ -126,13 +126,16 @@ class ROMSForecast(Job):
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']
+        self.SAVEDIR = cfDict['SAVEDIR']
         self.PTMP = cfDict['PTMP']
-        self.EXEC = cfDict['EXEC']
+
+        #PT can make attributes optional if they aren't needed in your workflow
+        self.EXEC = cfDict.get('EXEC', "")
         self.TIME_REF = cfDict['TIME_REF']
         self.BUCKET = cfDict['BUCKET']
         self.BCKTFLDR = cfDict['BCKTFLDR']
         self.NTIMES = cfDict['NTIMES']
-        self.ININAME = cfDict['ININAME']
+        self.ININAME = cfDict.get('ININAME', "")
         self.OUTDIR = cfDict['OUTDIR']
         self.OCEANIN = cfDict['OCEANIN']
         self.OCNINTMPL = cfDict['OCNINTMPL']
@@ -140,6 +143,10 @@ class ROMSForecast(Job):
         if self.CDATE == "today":
             today = datetime.date.today().strftime("%Y%m%d")
             self.CDATE = today
+
+        if self.CDATE == "yesterday":
+            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y%m%d")
+            self.CDATE = yesterday
 
         # Coupled models have additional input files 
         if 'CPLINTMPL' in cfDict:
@@ -171,7 +178,7 @@ class ROMSForecast(Job):
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs"):
+        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs","wcofs"):
             self.__make_oceanin_nosofs()
         elif OFS == 'wrfroms':
             self.__make_oceanin_wrfroms()
@@ -241,7 +248,7 @@ class ROMSForecast(Job):
         template = self.OCNINTMPL
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}{HH}"
+            self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -273,7 +280,7 @@ class ROMSForecast(Job):
         # ratio is used to better balance NtileI/NtileJ with the specific grid
         # This can impact performance
         if self.OCEANIN == "auto":
-            outfile = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+            outfile = f"{self.OUTDIR}/{OFS}.t{HH}z.{CDATE}.forecast.in"
             if OFS == 'dbofs':
                 ratio = 0.16
             else:
