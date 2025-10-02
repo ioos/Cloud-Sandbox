@@ -30,16 +30,12 @@ fi
 # Public Key
 KEY=F525C05B06DCA266
 
-#spack buildcache keys --install --trust --force
 spack buildcache keys --install --trust
 spack buildcache update-index $SPACK_MIRROR
 
 SPEC_LIST='%gcc@11.2.1 %intel@2021.9.0 %oneapi@2023.1.0'
-#SPEC_LIST='%gcc@11.2.1'
-#SPEC_LIST='%intel@2021.9.0'
-#SPEC_LIST='%oneapi@2023.1.0'
-#SPEC_LIST='%intel@2021.9.0 %oneapi@2023.1.0'
-SPEC_LIST=''
+
+#SPEC_LIST=''
 
 for SPEC in $SPEC_LIST
 do
@@ -62,14 +58,19 @@ do
 done
 ##################################################################
 
+
+
 # These are not publicly redistributable, specify --private
 PRIVLIST='
+
+ intel-oneapi-mkl@2023.1.0%oneapi@=2023.1.0/4xphygacsfh5rgmu26oq4gk46ndurhxq
+ intel-oneapi-mkl@2023.1.0%oneapi@=2023.1.0/ueed5wr45skemrbctnhqb4chdiew2jti
+
  intel-oneapi-mkl@2023.1.0%gcc@=11.2.1/5o3qp7opeqmn2cuuxasowddoj4iwzsqr
  intel-oneapi-compilers@2023.1.0%gcc@=11.2.1/3rbcwfi7uuxvqgntbpytpylhmns3vg6l
 
  intel-oneapi-mpi@2021.12.1%intel@=2021.9.0/6nra3z4zqx5yvtxykhbeueq64da6xvmu
 
- intel-oneapi-mkl@2023.1.0%oneapi@=2023.1.0/vyukg6ud6te3ni7idtm2orghkme5b33y
  intel-oneapi-mpi@2021.12.1%oneapi@=2023.1.0/p5npcbixovlsmdotpfqwydphcezlcjgs
 '
 

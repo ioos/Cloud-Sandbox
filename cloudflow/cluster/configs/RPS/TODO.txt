@@ -1,0 +1,9 @@
+TODO: add descriptive Name tag for the job via command line and not here. 
+Change the configs:
+1. deployment and image, subnet, security groups, ami, etc.
+2. job configuration - number of nodes, descriptive name, job specific stuff
+
+Config 1 is set someplace automatically on deployment or image update
+Config 2 is per user, some stuff is needed for cluster, some stuff is needed for job.
+Make it yaml with different sections instead of JSON
+

@@ -26,5 +26,7 @@ set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
 
 set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -g -traceback -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
+# no noticeable performance improvement using skylake-avx512 build
+# set(CMAKE_Fortran_FLAGS_RELEASE "-march=skylake-avx512 -O3 -g -traceback -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
 # Note: hp7a support avx-512, hpc6a does not

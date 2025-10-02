@@ -13,11 +13,11 @@ ulimit -s unlimited
 
 
 if [ $# -lt 8 ] ; then
-  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs|liveocean|adnoc|etc.>"
+  echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs2|liveocean|secofs etc.>"
   exit 1
 fi
 
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
 export FI_PROVIDER=efa
 export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
@@ -26,7 +26,6 @@ export I_MPI_OFI_PROVIDER=efa
 
 # LiveOcean
 #export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-#export I_MPI_OFI_LIBRARY_INTERNAL=1
 #export I_MPI_OFI_PROVIDER=efa
 #export I_MPI_FABRICS=ofi
 #export I_MPI_DEBUG=1      # Will output the details of the fabric being used
@@ -35,7 +34,6 @@ export I_MPI_OFI_PROVIDER=efa
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
-
 
 export CDATE=$1
 export HH=$2
@@ -98,8 +96,29 @@ fi
 #export MPIOPTS="-hosts $HOSTS -np $NPROCS -ppn $PPN"
 result=0
 
+#nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs"
+#nosofs_fvcom="leofs lmhofs loofs lsofs ngofs2 sscofs sfbofs"
+
+shopt -s extglob
+nosofs_fvcom='leofs|lmhofs|loofs|lsofs|ngofs2|sscofs|sfbofs'
+nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs'
+
+
 # Can put domain specific options here
 case $OFS in
+
+    @($nosofs_roms) | @($nosofs_fvcom))
+    export HOMEnos=$SAVEDIR
+    export JOBDIR=$HOMEnos/jobs
+    export JOBSCRIPT=$JOBDIR/fcstrun.sh
+    export cyc=$HH
+    export JOBARGS="$CDATE $HH"
+    cd "$JOBDIR" || exit 1
+    $JOBSCRIPT $JOBARGS
+    result=$?
+    ;;
+
+
   liveocean)
     export HOMEnos=$SAVEDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
@@ -108,16 +127,6 @@ case $OFS in
     cd "$JOBDIR" || exit 1
 
     echo "About to run $JOBSCRIPT $JOBDIR"
-    $JOBSCRIPT $JOBARGS
-    result=$?
-    ;;
-  cbofs | ciofs | dbofs | gomofs | tbofs | leofs | lmhofs | negofs | ngofs | nwgofs | sfbofs )
-    export HOMEnos=$SAVEDIR/nosofs-3.5.0
-    export JOBDIR=$HOMEnos/jobs
-    export JOBSCRIPT=$JOBDIR/fcstrun.sh
-    export cyc=$HH
-    export JOBARGS="$CDATE $HH"
-    cd "$JOBDIR" || exit 1
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;
@@ -149,7 +158,7 @@ case $OFS in
     # SAVEDIR is job.SAVEDIR
     # e.g. /save/patrick/schism
     module use -a $SAVEDIR
-    MODULEFILE=intel_x86_64_mpi-2021.12.1-oneapi-2023.1.0
+    MODULEFILE=intel_x86_64
 
     #TODO: make this part of the job config
     module load $MODULEFILE
@@ -212,7 +221,6 @@ case $OFS in
 
 
   necofs)
-    
     cd "$COMOUT" || exit 1
     echo "Current dir is: $PWD"
     if [ ! -d output ]; then
@@ -235,7 +243,6 @@ case $OFS in
     starttime=`date +%R`
 
     echo "STARTING RUN AT $starttime"
-    #mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
     result=$?
     echo "wth mpirun result: $result"
