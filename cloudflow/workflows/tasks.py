@@ -401,7 +401,7 @@ def forecast_run(cluster: Cluster, job: Job):
     PPN = cluster.PPN
     CDATE = job.CDATE
     HH = job.HH
-    OFS = job.OFS
+    JOBTYPE = job.jobtype
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
 
@@ -421,11 +421,11 @@ def forecast_run(cluster: Cluster, job: Job):
 
     try:
 
-        if OFS == "adnoc":
+        if JOBTYPE == "adnoc":
             time.sleep(60)
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
         else:
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -439,7 +439,7 @@ def forecast_run(cluster: Cluster, job: Job):
 
     curfcst=f"{job.COMROT}/current.fcst"
     with open(curfcst, 'w') as cf:
-        cf.write(f"{OFS}.{CDATE}{HH}\n")
+        cf.write(f"{JOBTYPE}.{CDATE}{HH}\n")
 
     return
 
@@ -462,7 +462,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     SDATE = getattr(job,"SDATE", job.CDATE)
     EDATE = getattr(job,"EDATE", job.CDATE)
     HH = getattr(job,"HH", "00")
-    OFS = job.OFS
+    JOBTYPE = job.jobtype
     NPROCS = job.NPROCS
     XTRA_ARGS = ""
 
@@ -472,7 +472,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
     # Use an environment variable for FSx signal
 
-    if OFS == "secofs":
+    if JOBTYPE == "secofs":
        XTRA_ARGS = getattr(job, "NSCRIBES", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
@@ -491,10 +491,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
         print(f'In hindcast run multi: job.CDATE: {job.CDATE}')
 
         # Create ocean in file
-        print(f"Calling job.make_oceanin() for {OFS}")
+        print(f"Calling job.make_oceanin() for {JOBTYPE}")
         job.make_oceanin()
 
-        if OFS == "eccofs":
+        if JOBTYPE == "eccofs":
             XTRA_ARGS = getattr(job, "OCEANIN", '')
 
         OUTDIR = job.OUTDIR
@@ -504,7 +504,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, OFS, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -541,7 +541,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 
     # Easier to read
     YYYY = job.YYYY
-    OFS = job.OFS
+    JOBTYPE = job.jobtype
     NPROCS = job.NPROCS
     ProjectHome = job.ProjectHome
     CONFIG=job.CONFIG
@@ -573,10 +573,10 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 
 
 ###############################################################################
-# model baseline template
+# model basic run implementation
 
 @task
-def template_run(cluster: Cluster, job: Job):
+def basic_run(cluster: Cluster, job: Job):
     """ Run the forecast
 
     Parameters
@@ -592,13 +592,13 @@ def template_run(cluster: Cluster, job: Job):
     # defined variables withing
     # the Python job class reading
     # in the job configuration file
-    OFS = job.OFS
+    JOBTYPE = job.jobtype
     NPROCS = job.NPROCS
     MODEL_DIR = job.MODEL_DIR
     EXEC = job.EXEC
 
-    # template shell launcher script
-    runscript = f"{curdir}/template_launcher.sh"
+    # basic shell launcher script
+    runscript = f"{curdir}/basic_launcher.sh"
     print(f'runscript: {runscript}')
 
     # Extract the AWS cloud cluster environment
@@ -620,103 +620,105 @@ def template_run(cluster: Cluster, job: Job):
    
     # SCHISM needs to know the number of scribes as well
     # for it's model execution, so we have a special section
-    if(OFS=='schism'):
+    if(JOBTYPE=='schism_basic'):
         NSCRIBES = job.NSCRIBES
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'SCHISM model run failed ... result: {result.returncode}')
+                log.exception(f'SCHISM basic model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info('SCHISM model run finished successfully')
+        log.info('SCHISM basic model run finished successfully')
 
-    # For D-Flow FM model execution, we will need to define and append the location of
+    # For DFlow FM model execution, we will need to define and append the location of
     # the model library suite within the shell launcher script to properly run the model
-    elif(OFS=='dflowfm'):
+    elif(JOBTYPE=='dflowfm_basic'):
         DFLOW_LIB = job.DFLOW_LIB
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'DFlowFM model run failed ... result: {result.returncode}')
+                log.exception(f'DFlowFM basic model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info('DFlowFM model run finished successfully')
+        log.info('DFlowFM basic model run finished successfully')
 
     # For ROMS model execution, we need to know the name and location of the
     # master file ".in" input that tells ROMS the model run configuration
-    elif(OFS=='roms'):
+    elif(JOBTYPE=='roms_basic'):
         IN_FILE = job.IN_FILE
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'ROMS model run failed ... result: {result.returncode}')
+                log.exception(f'ROMS basic model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info('ROMS model run finished successfully')
+        log.info('ROMS basic model run finished successfully')
 
-    elif(OFS=='ucla-roms'):
+    # For UCLA ROMS model, we need to know the "*.in" file name and location
+    # as well as the number of cores to run their grid methodology
+    elif(JOBTYPE=='ucla-roms'):
         IN_FILE = job.IN_FILE
         RUNCORES = job.RUNCORES
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'ROMS model run failed ... result: {result.returncode}')
+                log.exception(f'UCLA ROMS model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info('ROMS model run finished successfully')
+        log.info('UCLA ROMS model run finished successfully')
 
-    # For FVCOM model execution, we need to know the casename of the master
-    # .nml file that tells FVCOM the model run configuration
-    elif(OFS=='fvcom'):
+    # For FVCOM baseline model execution, we need to know the casename
+    # of the master .nml file that tells FVCOM the model run configuration
+    elif(JOBTYPE=='fvcom_basic'):
         CASE_FILE = job.CASE_FILE
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(CASE_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(CASE_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'FVCOM model run failed ... result: {result.returncode}')
+                log.exception(f'FVCOM basic model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info('FVCOM model run finished successfully')
+        log.info('FVCOM basic model run finished successfully')
 
-    # Template setup for a model run if the model simply only needs the executable
-    # information to run the model
+    # Basic setup for a model run if the model simply only needs the
+    # location of the model run directory and its executable
     else:
         try:
-            result = subprocess.run([runscript, str(OFS), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
-                log.exception(f'{OFS} model run failed ... result: {result.returncode}')
+                log.exception(f'{JOBTYPE} basic model run failed ... result: {result.returncode}')
                 raise signals.FAIL('FAILED')
 
         except Exception as e:
             log.exception('In driver: Exception during subprocess.run :' + str(e))
             raise signals.FAIL('FAILED')
 
-        log.info(f'{OFS} model run finished successfully')
+        log.info(f'{JOBTYPE} basic model run finished successfully')
 
 ###############################################################################
 

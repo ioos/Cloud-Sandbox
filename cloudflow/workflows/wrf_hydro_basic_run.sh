@@ -30,14 +30,14 @@ export EXEC=$2
 
 echo "---" 
 echo "------------------------"
-echo "NWMv3 model working directory is $MODEL_DIR"
+echo "WRF-Hydro model working directory is $MODEL_DIR"
 echo "------------------------"
 cd $MODEL_DIR
 
 SECONDS=0
 
 echo "--- " 
-echo "--- Running NWMv3 -----------------"
+echo "--- Running WRF-Hydro -----------------"
 echo "---"
 
 mpirun $MPIOPTS $EXEC
@@ -46,7 +46,7 @@ mpirun $MPIOPTS $EXEC
 if [ $? -ne 0 ]; then
   echo "ERROR returned from mpirun"
 else
-  echo "NWMv3 model has succesfully completed on the cloud!"
+  echo "WRF-Hydro model has succesfully completed on the cloud!"
   duration=$SECONDS
-  echo "NWMv3 simulation took $((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
+  echo "WRF-Hydro simulation took $((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
 fi

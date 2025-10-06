@@ -17,7 +17,7 @@ ulimit -s unlimited
 #__license__ = "BSD 3-Clause"
 
 if [ $# -lt 6 ] ; then
-  echo "Usage: $0 OFS NPROCS PPN HOSTS MODEL_DIR EXEC"
+  echo "Usage: $0 JOBTYPE NPROCS PPN HOSTS MODEL_DIR EXEC"
   exit 1
 fi
 
@@ -25,8 +25,8 @@ fi
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
 
-# Export user defined options within the tasks.template_run Python function
-export OFS=$1
+# Export user defined options within the tasks.basic_run Python function
+export JOBTYPE=$1
 export NPROCS=$2
 export PPN=$3
 export HOSTS=$4
@@ -34,28 +34,28 @@ export MODEL_DIR=$5
 export EXEC=$6
 
 # Unique extra option required for SCHISM
-if [[ "$OFS" == "schism" ]]; then
+if [[ "$JOBTYPE" == "schism_basic" ]]; then
   export NSCRIBES=$7
 fi
 
-#Unique extra option required for D-Flow FM
-if [[ "$OFS" == "dflowfm" ]]; then
+#Unique extra option required for DFlow FM
+if [[ "$JOBTYPE" == "dflowfm_basic" ]]; then
   export DFLOW_LIB=$7
 fi
 
 #Unique extra option required for ROMS
-if [[ "$OFS" == "roms" ]]; then
+if [[ "$JOBTYPE" == "roms_basic" ]]; then
   export IN_FILE=$7
 fi
 
 #Unique extra option required for ROMS
-if [[ "$OFS" == "ucla-roms" ]]; then
+if [[ "$JOBTYPE" == "ucla-roms" ]]; then
   export IN_FILE=$7
   export RUNCORES=$8
 fi
 
 #Unique extra option required for FVCOM
-if [[ "$OFS" == "fvcom" ]]; then
+if [[ "$JOBTYPE" == "fvcom_basic" ]]; then
   export CASE_FILE=$7
 fi
 
@@ -85,23 +85,14 @@ impi=1
 if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
 elif [ $impi -eq 1 ]; then
-  # Since the current Cloud-Sandbox module compatibility with ROMS
-  # main branch only allows for the OPENMP parallelization option,
-  # we will need to include special MPI options for the model to
-  # correctly run OPENMP code structure within the allocated AWS
-  # cloud resources specified by the given user
-  if [[ "$OFS" == "roms" ]]; then
-    #PT -np 1 ??? 
-    #PT export MPIOPTS="-launcher ssh -hosts $HOSTS --bind-to none -np 1"
-    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
-  elif [[ "$OFS" == "ucla-roms" ]]; then
+ if [[ "$JOBTYPE" == "ucla-roms" ]]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $RUNCORES"
   # Slice up SCHISM tasks between OpenMP and MPI protocols to 
   # optimize memory allocation for the slave ranks. This method
   # will allow the hpc node instances to work with large SCHISM
   # meshes. For smaller meshes, consider revising $SCHISM_ntasks
   # and $SCHISM_NPROCS to just both be equal to $NPROCS
-  elif [[ "$OFS" == "schism" ]]; then
+  elif [[ "$JOBTYPE" == "schism_basic" ]]; then
     export SCHISM_ntasks=70
     export OMP_NUM_THREADS=1
     export SCHISM_NPROCS=$((SCHISM_ntasks*(NPROCS/96)))
@@ -124,11 +115,11 @@ echo "**********************************************************"
 ###### executing a new model suite to the Cloud-Sandbox, where ######
 ###### this section essentially just locates a user-defined    ######
 ###### shell launcher script for your given model and executes ######
-###### it within this template launcher script after we have   ######
+###### it within this basic launcher script after we have      ######
 ###### predefined all the required environmental variables     ######
 ###### for you properly within the cloud cluster initilaized   ######
 
-if [[ "$OFS" == "nwmv3_wrf_hydro" ]]; then
+if [[ "$JOBTYPE" == "wrf_hydro_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -136,13 +127,13 @@ if [[ "$OFS" == "nwmv3_wrf_hydro" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./nwmv3_wrf_hydro_template_run.sh $MODEL_DIR $EXEC"
+    RUNSCRIPT="./wrf_hydro_basic_run.sh $MODEL_DIR $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
-elif [[ "$OFS" == "schism" ]]; then
+elif [[ "$JOBTYPE" == "schism_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -150,13 +141,13 @@ elif [[ "$OFS" == "schism" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./schism_template_run.sh $MODEL_DIR $NSCRIBES $EXEC"
+    RUNSCRIPT="./schism_basic_run.sh $MODEL_DIR $NSCRIBES $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
-elif [[ "$OFS" == "dflowfm" ]]; then
+elif [[ "$JOBTYPE" == "dflowfm_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -164,13 +155,13 @@ elif [[ "$OFS" == "dflowfm" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./dflowfm_template_run.sh $MODEL_DIR $DFLOW_LIB $EXEC"
+    RUNSCRIPT="./dflowfm_basic_run.sh $MODEL_DIR $DFLOW_LIB $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
-elif [[ "$OFS" == "adcirc" ]]; then
+elif [[ "$JOBTYPE" == "adcirc_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -178,14 +169,13 @@ elif [[ "$OFS" == "adcirc" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./adcirc_template_run.sh $MODEL_DIR $EXEC"
+    RUNSCRIPT="./adcirc_basic_run.sh $MODEL_DIR $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
-#PT roms is a base model, many OFS use roms, OFS probably not the best variable name anymore
-elif [[ "$OFS" == "roms" ]]; then
+elif [[ "$JOBTYPE" == "roms_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -193,13 +183,13 @@ elif [[ "$OFS" == "roms" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./roms_template_run.sh $MODEL_DIR $IN_FILE $EXEC"
+    RUNSCRIPT="./roms_basic_run.sh $MODEL_DIR $IN_FILE $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
-elif [[ "$OFS" == "ucla-roms" ]]; then
+elif [[ "$JOBTYPE" == "ucla-roms" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -213,8 +203,7 @@ elif [[ "$OFS" == "ucla-roms" ]]; then
     $RUNSCRIPT
     result=$?
 
-#PT fvcom is a base model, many OFS use fvcom, OFS probably not the best variable name anymore
-elif [[ "$OFS" == "fvcom" ]]; then
+elif [[ "$JOBTYPE" == "fvcom_basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -222,14 +211,14 @@ elif [[ "$OFS" == "fvcom" ]]; then
     # TODO:
     cd "$JOBDIR" || exit 1
 
-    RUNSCRIPT="./fvcom_template_run.sh $MODEL_DIR $CASE_FILE $EXEC"
+    RUNSCRIPT="./fvcom_basic_run.sh $MODEL_DIR $CASE_FILE $EXEC"
 
     # Run it
     $RUNSCRIPT
     result=$?
 
 else
-    echo "Model not supported $OFS"
+    echo "Model not supported $JOBTYPE"
     exit 1
 fi
 

@@ -26,7 +26,7 @@ export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
 
-export OFS=$1
+export JOBTYPE=$1
 export HOSTS=$2
 export NPROCS=$3
 export PPN=$4
@@ -37,7 +37,7 @@ export INPUTFILE=$7
 export EXEC=$8
 
 # TODO: INPUTFILE isn't used, FVCOM expects casename, and the exec expects a nml file that matches the casename
-#       or in this case we can use OFS
+#       or in this case we can use JOBTYPE
 
 # TODO: put the following back in
 # mpirun --version | grep Intel
@@ -48,10 +48,10 @@ export EXEC=$8
 
 # for openMPI openmpi=1
 # for Intel MPI set impi=1
-if [[ $OFS == "adnoc" ]]; then
+if [[ $JOBTYPE == "adnoc" ]]; then
   openmpi=1
   impi=0
-elif [[ $OFS == "nyh-hindcast" ]]; then
+elif [[ $JOBTYPE == "nyh-hindcast" ]]; then
   openmpi=1
   impi=0
 else
@@ -76,7 +76,7 @@ fi
 result=0
 
 # Can put domain specific options here
-case $OFS in
+case $JOBTYPE in
     
   necofs_hot | necofs_cold)
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
@@ -86,19 +86,19 @@ case $OFS in
     module use -a $SAVEDIR/modulefiles
     module load intel_x86_64.impi_2021.12.1
     # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
-    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out"
+    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$JOBTYPE --LOGFILE=$JOBTYPE.out"
     starttime=`date +%R`
     
     echo "STARTING RUN AT $starttime"
-    #mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
-    mpirun $MPIOPTS $EXEC --casename=$OFS --LOGFILE=$OFS.out
+    #mpirun $MPIOPTS $EXEC --casename=$JOBTYPE --LOGFILE=$JOBTYPE.out
+    mpirun $MPIOPTS $EXEC --casename=$JOBTYPE --LOGFILE=$JOBTYPE.out
     result=$?
     echo "wth mpirun result: $result"
     endtime=`date +%R`
     echo "RUN FINISHED AT $endtime"
     ;;
   *)
-    echo "$OFS is not supported by this script $0"
+    echo "$JOBTYPE is not supported by this script $0"
     exit 1
     ;;
 esac

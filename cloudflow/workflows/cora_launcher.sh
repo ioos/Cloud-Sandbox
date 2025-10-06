@@ -60,7 +60,7 @@ else
   exit 1
 fi
 
-OFS='adcirc-cora'
+JOBTYPE='adcirc-cora'
 
 echo "**********************************************************"
 echo "Current directory is $PWD"
@@ -68,7 +68,7 @@ echo "**********************************************************"
 
 #TODO: Make this section a switch statement instead
 # Can put domain specific options here
-if [[ "$OFS" == "adcirc-cora" ]]; then
+if [[ "$JOBTYPE" == "adcirc-cora" ]]; then
     
     export JOBDIR=$PROJHOME
 
@@ -89,7 +89,7 @@ if [[ "$OFS" == "adcirc-cora" ]]; then
     result=$?
 
 else
-    echo "Model not supported $OFS"
+    echo "Model not supported $JOBTYPE"
     exit 1
 fi
 

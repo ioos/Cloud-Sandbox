@@ -40,13 +40,6 @@ cd $MODEL_DIR
 
 SECONDS=0
 
-# Since Cloud-Sandbox can only currently compile
-# ROMS with OPENMP capabilites only, we will go
-# ahead here and export the number of threads
-# for OPENMP code based on what the user configured
-# for AWS cloud resources
-export OMP_NUM_THREAD=$NPROCS
-
 echo "--- " 
 echo "--- Running ROMS -----------------"
 echo "---"
