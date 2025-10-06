@@ -84,7 +84,7 @@ class JobFactory:
                 raise Exception('Unsupported jobtype')
 
         if(model == 'ADCIRC'):
-            elif jobtype == 'adcircforecast':
+            if jobtype == 'adcircforecast':
                 newjob = ADCIRCForecast(configfile, NPROCS)
             elif (jobtype == 'adcircreanalysis'):
                 newjob = ADCIRCReanalysis(configfile, NPROCS)
