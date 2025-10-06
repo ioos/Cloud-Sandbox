@@ -16,13 +16,16 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class ROMS_Template(Job):
-    """ Implementation of Job class for a simple ROMS model template
+class FVCOM_Basic(Job):
+    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
 
     Attributes
     ----------
+    MODEL : str
+        The model affiliation class to reference for cloudflow
+
     jobtype : str
-        User defined job type based on model of interest, should always be roms_template
+        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -30,17 +33,15 @@ class ROMS_Template(Job):
     NPROCS : int
         Total number of processors in this cluster.
 
-    OFS : str
-        The model setup type to run
-
     EXEC : str
         The model executable to run.
     
     MODEL_DIR : str
         The location of the model run directory to execute
 
-    IN_FILE : str
-        The ROMS .in input file for a given model configuration
+    CASE_FILE : str
+        The input FVCOM case file name required to execute the model. For example, if the
+        fvcom case file inlet_run.nml then CASE_FILE=inlet
     """
 
 
@@ -62,7 +63,7 @@ class ROMS_Template(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in ROMS Template init")
+            print(f"DEBUG: in FVCOM Basic init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -80,11 +81,11 @@ class ROMS_Template(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.IN_FILE = cfDict['IN_FILE']
+        self.CASE_FILE = cfDict['CASE_FILE']
         return
 
 

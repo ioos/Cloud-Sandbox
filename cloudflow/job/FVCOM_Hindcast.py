@@ -24,17 +24,20 @@ class FVCOM_Hindcast(Job):
 
     Attributes
     ----------
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         Always 'fvcomhindcast' for this class.
+
+    OFS : str
+        The ocean forecast to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster. Determined by cluster config.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -114,6 +117,7 @@ class FVCOM_Hindcast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.OFS = cfDict['OFS']
 
         self.SDATE = cfDict['SDATE']

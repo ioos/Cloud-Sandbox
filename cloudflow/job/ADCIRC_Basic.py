@@ -16,22 +16,22 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class Template(Job):
-    """ Implementation of Job class for a simple model template
+class ADCIRC_Basic(Job):
+    """ Implementation of Job class for a basic ADCIRC model run (model run directory, executable, and executable args if necessary) 
 
     Attributes
     ----------
+    MODEL : str
+        The model affiliation class to reference for cloudflow
+
     jobtype : str
-        User defined job type based on model of interest
+        User defined job type based on an ADCIRC basic simulation, should always be adcirc_basic
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The model setup type to run
 
     EXEC : str
         The model executable to run.
@@ -59,7 +59,7 @@ class Template(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in Template init")
+            print(f"DEBUG: in ADCIRC Basic init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -76,9 +76,9 @@ class Template(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-
+        
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
         return

@@ -21,17 +21,21 @@ class Plotting(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     jobtype : str
         The specific type of plotting job.
 
-    NPROCS : int
-        Total number of processors in this cluster.
-
     OFS : str
         The ocean forecast to run.
+
+    NPROCS : int
+        Total number of processors in this cluster.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -99,6 +103,7 @@ class Plotting(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
         self.OFS = cfDict['OFS']
         self.CDATE = cfDict['CDATE']

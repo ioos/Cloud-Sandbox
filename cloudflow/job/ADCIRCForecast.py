@@ -17,21 +17,25 @@ debug = False
 
 
 class ADCIRCForecast(Job):
-    """ Implementation of Job class for ADCIRC Forecasts
+    """ Implementation of Job class for ADCIRC Forecasts for NECOFS, SECOFS, and ECOFS workflows
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
-        Always 'adcircforecast' for this class.
+        Always 'adcirc_ofs_forecast' for this class.
+
+    OFS : str
+        The ocean forecast to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -107,6 +111,7 @@ class ADCIRCForecast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.OFS = cfDict['OFS']
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']

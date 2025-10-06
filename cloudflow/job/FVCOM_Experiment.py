@@ -23,17 +23,21 @@ class FVCOM_Experiment(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         Always 'fvcom' for this class.
+
+    OFS : str
+        The ocean forecast system to run. e.g. ngofs2, necofs, etc.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast system to run. e.g. ngofs2, necofs, etc.
 
     RUNDIR : str
         The full path to the run folder
@@ -79,6 +83,7 @@ class FVCOM_Experiment(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.OFS = cfDict['OFS']
         self.RUNDIR = cfDict['RUNDIR']
         self.SAVEDIR = cfDict['SAVEDIR']

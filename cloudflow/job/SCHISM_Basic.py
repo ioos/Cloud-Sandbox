@@ -16,13 +16,16 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class DFLOWFM_Template(Job):
-    """ Implementation of Job class for DFlowFM model runs
+class SCHISM_Basic(Job):
+    """ Implementation of Job class for a basic SCHISM model run (model run directory, executable, and executable args if necessary)
 
     Attributes
     ----------
+    MODEL : str
+        The model affiliation class to reference for cloudflow
+
     jobtype : str
-        Job type configuration description for NWM WRF Hydro simulation. Should always be dflowfm_template
+        Job type configuration description for a SCHISM basic simulation. Should always be schism_basic
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -30,17 +33,14 @@ class DFLOWFM_Template(Job):
     NPROCS : int
         Total number of processors in this cluster.
 
-    OFS : str
-        The DFlowFM model to run
-
     EXEC : str
         The model executable to run.
-
-    DFLOW_LIB : str
-        The pathway to the DFlowFM compiled library suite for executable to link with.
     
     MODEL_DIR : str
-        The location of the DFlowFM model run directory to execute
+        The location of the SCHISM model run to execute
+
+    NSCRIBES: str
+        The number of cpus dedicated to SCHISM I/O procedures, which is a function of user specified output fields for out2d_1.nc file
     """
 
 
@@ -62,7 +62,7 @@ class DFLOWFM_Template(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in DFLOWFM Template init")
+            print(f"DEBUG: in SCHISM Basic init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -80,11 +80,11 @@ class DFLOWFM_Template(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
         self.EXEC = cfDict['EXEC']
-        self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']
+        self.NSCRIBES = cfDict['NSCRIBES']
 
         return
 

@@ -22,17 +22,21 @@ class ROMSHindcast(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         Always 'romshindcast' for this class.
+
+    OFS : str
+        The ocean forecast to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The current rundate format YYYYMMDD
@@ -126,6 +130,7 @@ class ROMSHindcast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.OFS = cfDict['OFS']
         self.SDATE = cfDict['SDATE']
         self.CDATE = self.SDATE

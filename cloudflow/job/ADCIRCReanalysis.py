@@ -22,6 +22,12 @@ class ADCIRCReanalysis(Job):
 
     Attributes
     ----------
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
+    OFS : str
+        The ocean forecast to run.
+
     jobtype : str
         Always 'adcircforecast' for this class.
 
@@ -31,10 +37,7 @@ class ADCIRCReanalysis(Job):
         Usually in job/jobs folder. 
 
     NPROCS : int
-        Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
+        Total number of processors in this cluster
 
     YYYY : str
         The run date in format YYYY
@@ -103,6 +106,7 @@ class ADCIRCReanalysis(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.OFS = cfDict['OFS']
         self.YYYY = cfDict['YYYY']
         self.BUCKET = cfDict['BUCKET']
