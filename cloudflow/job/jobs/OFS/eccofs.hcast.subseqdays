@@ -1,0 +1,23 @@
+{
+  "MODEL"     : "ROMS",
+  "JOBTYPE"   : "romshindcast",
+  "OFS"       : "eccofs",
+  "CDATE"     : "20190102",
+  "SDATE"     : "20190102",
+  "EDATE"     : "20190102",
+  "HH"        : "00",
+  "COMROT"    : "/com/patrick/eccofs",
+  "SAVEDIR"   : "/save/patrick/nosofs.3.5.0",
+  "PTMP"      : "/ptmp/patrick",
+  "EXEC"      : "/save/patrick/nosofs.3.5.0/exec/eccofs_roms_mpi",
+  "TIME_REF"  : "20110101.0d0",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "NTIMES"    : "2160",
+  "DT"        : "120.0d0 not-implemented yet",
+  "ININAME"   : "",
+  "OCNINTMPL" : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/roms_nl_eccofs_subseq_days.in",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto"
+}
+

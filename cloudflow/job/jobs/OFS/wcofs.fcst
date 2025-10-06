@@ -1,0 +1,21 @@
+{
+  "MODEL"     : "ROMS",
+  "JOBTYPE"   : "romsforecast",
+  "OFS"       : "wcofs",
+  "CDATE"     : "yesterday",
+  "HH"        : "03",
+  "COMROT"    : "/com/patrick/nosofs",
+  "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",
+  "PTMP"      : "/ptmp/patrick",
+  "TIME_REF"  : "20160101.0d0",
+  "BUCKET"    : "ioos-sandbox-use2",
+  "BCKTFLDR"  : "nosofs",
+  "NTIMES"    : "960",
+  "72HR_NTIMES" : "2880",
+  "24HR_NTIMES" : "960",
+  "6HR_NTIMES"  : "240",
+  "1HR_NTIMES"  : "40",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}

@@ -1,0 +1,18 @@
+{
+  "MODEL"     : "FVCOM",
+  "JOBTYPE"   : "fvcomforecast",
+  "OFS"       : "leofs",
+  "CDATE"     : "today",
+  "HH"        : "00",
+  "NHOURS"    : "24",
+  "OP_NHOURS" : "120",
+  "COMROT"    : "/com/patrick/nosofs",
+  "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",
+  "PTMP"      : "/ptmp/patrick",
+  "DATE_REF"  : "2015-01-01 00:00:00",
+  "BUCKET"    : "ioos-sandbox-use2",
+  "BCKTFLDR"  : "nosofs",
+  "OUTDIR"    : "auto",
+  "INPUTFILE" : "auto",
+  "INTMPL"    : "auto"
+}

@@ -1,0 +1,9 @@
+{
+  "MODEL"     : "FVCOM",
+  "JOBTYPE"   : "fvcom_experiment",
+  "OFS"       : "necofs_hot",
+  "RUNDIR"    : "/com/patrick/necofs/necofs.20190101/run",
+  "SAVEDIR"   : "/save/patrick/necofs",
+  "INPUTFILE" : "notused",
+  "EXEC"      : "/save/patrick/necofs/NECOFS_v2.4/hindcast/FVCOMv4.4.8/necofs_fvcom"
+}
