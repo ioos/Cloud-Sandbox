@@ -71,7 +71,7 @@ class JobFactory:
             else:
                 raise Exception('Unsupported jobtype')
 
-        if(model == 'FVCOM'):
+        elif(model == 'FVCOM'):
             if jobtype == 'fvcomforecast':
                 newjob = FVCOMForecast(configfile, NPROCS)
             elif jobtype == 'fvcomhindcast':
@@ -83,7 +83,7 @@ class JobFactory:
             else:
                 raise Exception('Unsupported jobtype')
 
-        if(model == 'ADCIRC'):
+        elif(model == 'ADCIRC'):
             if jobtype == 'adcircforecast':
                 newjob = ADCIRCForecast(configfile, NPROCS)
             elif (jobtype == 'adcircreanalysis'):
@@ -101,19 +101,19 @@ class JobFactory:
             else:
                 raise Exception('Unsupported jobtype')
 
-        if(model == 'DFLOWFM'):
+        elif(model == 'DFLOWFM'):
             if (jobtype == 'dflowfm_basic'):
                 newjob = DFLOWFM_Basic(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
-        if(model == 'WRF_HYDRO'):
+        elif(model == 'WRF_HYDRO'):
             if (jobtype == 'wrf_hydro_basic'):
                 newjob = WRF_Hydro_Basic(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
-        if(model == 'PYTHON'):
+        elif(model == 'PYTHON'):
             if (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
                 newjob = Plotting(configfile, NPROCS)
             else:
