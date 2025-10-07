@@ -1,4 +1,4 @@
-1. Once you’ve logged into the head node of Cloud-Sandbox, go into the `/save/ec2-user` directory and create a new directory based on your affiliated organization. (Ex. `mkdir OWP`). Go into the newly made directory for the next step.
+1. Once you’ve logged into the head node of Cloud-Sandbox, go into the `/save/ec2-user` directory and create a new directory based on your affiliated organization. (Ex. `mkdir USER_AFFILIATION`). Go into the newly made directory for the next step.
 
 2. Clone the latest Cloud-Sandbox code repository off the GitHub repository: 
 ~~~bash
@@ -11,9 +11,9 @@ Change directory into
 ~~~bash
 Cloud-Sandbox/cloudflow/job/jobs
 ~~~ 
-Copy the `cloud_sandbox.template` file into a new file called `your_model_name.exp`. Inside that new file, you must specify at minimum the: 
-- JOBTYPE (model job type, can also be model name)
-- OFS (model name) 
+Copy the `cloud_sandbox_basic.template` file into a new file called `your_model_name.basic`. Inside that new file, you must specify at minimum the: 
+- MODEL (model name/class) 
+- JOBTYPE (model job type, be explicit on the workflow name for the given model class)
 - EXEC (executable) 
 - any executable dependencies as a new variable (such as an input file) 
 - MODEL_DIR (path to model directory on the Cloud-Sandbox) 
@@ -22,9 +22,9 @@ Copy the `cloud_sandbox.template` file into a new file called `your_model_name.e
 Change directory into 
 ~~~bash
 Cloud-Sandbox/cloudflow/cluster/config 
-~~~ 
-Copy `template.ioos` into a new file called `your_model_name.config` to specify the AWS cloud resource configuration you would like your model to run on. In that file you can edit the following variables: 
-- nodeType (Eligible AWS node instances are listed within the `cloudflow/cluster/AWSCluster.py` Python script under variable “awsTypes” with the associated CPU core count) 
+~~~
+Create a new directory based on your affiliated organization. (Ex. `mkdir USER_AFFILIATION`). Copy `template.ioos` into a new file called `your_model_name.config` to specify the AWS cloud resource configuration you would like your model to run on. Move the new file `your_model_name.config` in your user affiliation directory. In that file you can edit the following variables: 
+- nodeType (Eligible AWS node instances are listed within the `cloudflow/cluster/AWSCluster.py` Python script under variable `awsTypes` with the associated CPU core count) 
 - nodeCount (Number of nodes you want to utilize of the given AWS node instance. A word of caution as the Cloud-Sandbox AWS account does have caps on the number of nodes you can allocate for a given instance)
 - tags (The Values for “Name” and “Project” should reflect your model name and affiliation). 
 
@@ -46,11 +46,11 @@ Change directory into
 ~~~bash
 Cloud-Sandbox/cloudflow/job
 ~~~ 	
-Within that directory, you will want to copy the file called `Template.py` to `your_model_name.py`. Within the `your_model_name.py` file, you will see that the original configuration of this file is reflected strictly based on the `cloud_sandbox.template` job file you’ve copied and modified in Step #3. 
-- Rename the “Template” Python class name to “your_model_name” so this can now reflect a unique Python class for your own specific model. 
+Within that directory, you will want to copy the file called `Basic_Template.py` to `your_model_name.py`. Within the `your_model_name.py` file, you will see that the original configuration of this file is reflected strictly based on the `cloud_sandbox_basic.template` job file you’ve copied and modified in Step #3. 
+- Rename the “Basic_Template” Python class name to “your_model_name_basic” so this can now reflect a unique Python class for your own specific model with the basic approach for model execution. 
 - If your model execution only needs to know essentially the location of the model run directory and then executable itself, then you don’t need to modify anything else in this file. 
-- If your model executable needs more information (e.g, model argument, specific model libraries to be linked) that you’ve included `your_model_name.exp` file in Step #3, then you will need to include that information within the `parseConfig` function inside your new Python class.
-   - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.exp` job file, then you will need to add `self.IN_FILE = cfDict['IN_FILE']` in under `parseConfig`
+- If your model executable needs more information (e.g, model argument, specific model libraries to be linked) that you’ve included `your_model_name.basic` file in Step #3, then you will need to include that information within the `parseConfig` function inside your new Python class.
+   - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.basic` job file, then you will need to add `self.IN_FILE = cfDict['IN_FILE']` in under `parseConfig`
 
 7. **Build the workflow for your model - `JobFactory.py`**	
 Edit `JobFactory.py` file and at the very top of the script, you will now add a new import statement to reflect the new “your_model” Python class you’ve constructed from the `your_model_name.py` file you created in Step #6 
@@ -59,12 +59,12 @@ Edit `JobFactory.py` file and at the very top of the script, you will now add a 
 from cloudflow.job.your_model_name import your_model_name
 ~~~
 Inside `class JobFactory`, edit the `job` function 
-- Insert an `elif` statement that reflects your “jobtype” variable defined in your `your_model_name.exp` file constructed in Step #3 
+- Insert an `elif` statement that reflects your `MODEL` `jobtype` variable defined in your `your_model_name.basic` file constructed in Step #3 
 - Call the new Python class you created in Step #6 and imported here
   - `newjob = your_model_name(configfile, NPROCS)`
 
 8. **Build the workflow for your model - `tasks.py`**	
-If your model executable does not need more information than the template job file (just the pathway to the model run directory and the executable in `your_model_name.exp` job file in Step #3) then skip this step and move to the next one. If you added variables to your job file, read this step.
+If your model executable does not need more information than the template job file (just the pathway to the model run directory and the executable in `your_model_name.basic` job file in Step #3) then skip this step and move to the next one. If you added variables to your job file, read this step.
 
 Change directory into 
 ~~~bash
@@ -72,21 +72,21 @@ Cloud-Sandbox/cloudflow/workflows
 ~~~ 	
 Edit `tasks.py`
 - Edit the `template_run` function 
-  - Inside that function, add an `elif` statement within the code block to include the extra arguments for your model from your job file `your_model_name.exp` created in Step #3 to include in the launcher script that you will modify in Step #9. 
+  - Inside that function, add an `elif` statement within the code block to include the extra arguments for your model from your job file `your_model_name.basic` created in Step #3 to include in the launcher script that you will modify in Step #9. 
   - Add the new variable(s) you created in your job file to the `result` command. 
-    - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.exp` job file, 
+    - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.basic` job file, 
       - define the variable `IN_FILE = job.IN_FILE` and add `str(IN_FILE)` in the `subprocess.run` command within the square brackets. 
     - Make sure you put the new variables at the end of the other strings in the square brackets. 
   - Copy and modify the code logic like in the `schism`, `dflowfm`, or `ucla-roms` code blocks.
   
 
-9. **Build the workflow for your model - `template_launcher.py`**	
+9. **Build the workflow for your model - `basic_launcher.py`**	
 This controls the launch of your model inside the Cloud-Sandbox.
 Change directory into 
 ~~~bash
 Cloud-Sandbox/cloudflow/workflows
 ~~~ 	
-Modify `template_launcher.sh` 
+Modify `basic_launcher.sh` 
 - If you completed Step #8 due to model information required from the job file to kick start the executable, 
   - make an `if` shell script block to ingest the special input argument(s) 
     - You can simply follow along with the code blocks for `schism`, `dflowfm`, or `ucla-roms` for the `export` statements. 
@@ -98,12 +98,12 @@ Next, go towards the bottom of the script where you see a set of if/elif blocks 
   - The default requirements for each of the launcher scripts are the model run directory and the pathway to the model executable. If more is required for your given model to launch, then include those as well similar to the code logic you see in the other if/elif code blocks.
 
 10. **Build the workflow for your model - `your_model_run.sh`**		
-Copy the `model_template_run.sh` file to a new file called `your_model_run.sh`. Inside that file, you will see the general workflow template that you will need to modify: 
+Copy the `model_basic_run.sh` file to a new file called `your_model_run.sh`. Inside that file, you will see the general workflow template that you will need to modify: 
 (1) Load the required compilers and libraries used to compile your model 
 (2) Export any required environmental variables needed for the AWS cloud environment to run your given model executable and 
 (3) Call the method to run your model with the given executable (e.g., mpirun or mpiexec). 
 
-11. Now, go back to `template_launcher.sh` and ensure that the if/elif code block you’ve constructed in Step #9 is matching the syntax of calling that specific shell script. Check that the code logic also includes the script arguments required to properly run the given model suite. 
+11. Now, go back to `basic_launcher.sh` and ensure that the if/elif code block you’ve constructed in Step #9 is matching the syntax of calling that specific shell script. Check that the code logic also includes the script arguments required to properly run the given model suite. 
 - You may need to add an `if` statement for `MPIOPTS` for your model depending on how your model is configured.
 
 12. **Run your model**
