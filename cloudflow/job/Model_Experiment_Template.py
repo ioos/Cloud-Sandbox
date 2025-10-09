@@ -16,7 +16,7 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class Basic_Template(Job):
+class Model_Experiment_Template(Job):
     """ Implementation of Job class for a simple basic model template
 
     Attributes
