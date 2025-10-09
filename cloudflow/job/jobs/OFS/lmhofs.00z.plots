@@ -1,7 +1,7 @@
 {
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "plotting",
-  "OFS"       : "lmhofs",
+  "APP"       : "lmhofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "INDIR"     : "auto",

@@ -1,7 +1,7 @@
 {
   "MODEL"     : "FVCOM",
   "JOBTYPE"   : "fvcom_experiment",
-  "OFS"       : "necofs_cold",
+  "APP"       : "necofs_cold",
   "RUNDIR"    : "/com/patrick/necofs/tidal_simulation/NECOFS_v2.4_tide_barotropic_2noaa/run",
   "SAVEDIR"   : "/save/patrick/necofs",
   "INPUTFILE" : "necofs_cold_run.nml",

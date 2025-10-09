@@ -1,7 +1,7 @@
 {
   "MODEL"     : "SCHISM",
   "JOBTYPE"   : "schism_hindcast",
-  "OFS"       : "secofs",
+  "APP"       : "secofs",
   "CDATE"     : "20171201",
   "SDATE"     : "20171201",
   "EDATE"     : "20171201",

@@ -1,7 +1,7 @@
 {
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "plotting",
-  "OFS"       : "liveocean",
+  "APP"       : "liveocean",
   "CDATE"     : "20191106",
   "HH"        : "00",
   "INDIR"     : "/Users/patrick.tripp/NOSOFS/COMROT/liveocean/f2019.11.06",

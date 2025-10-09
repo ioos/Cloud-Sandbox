@@ -1,7 +1,7 @@
 {
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "plotting_diff",
-  "OFS"       : "sfbofs",
+  "APP"       : "sfbofs",
   "CDATE"     : "today",
   "HH"        : "03",
   "INDIR"     : "auto",

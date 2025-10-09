@@ -1,6 +1,7 @@
 {
   "MODEL"     : "ADCIRC",
-  "JOBTYPE"   : "adcirc_basic",
+  "JOBTYPE"   : "adcirc_experiment",
+  "APP"       : "basic",
   "EXEC"      : "/save/ec2-user/OWP/adcirc/build",
   "MODEL_DIR" : "/save/ec2-user/OWP/adcirc-testsuite/adcirc/adcirc_global-alidisp+buoyancy-2d-parallel"
 }

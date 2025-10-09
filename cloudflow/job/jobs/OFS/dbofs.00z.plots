@@ -1,7 +1,7 @@
 {
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "plotting",
-  "OFS"       : "dbofs",
+  "APP"       : "dbofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "INDIR"     : "auto",

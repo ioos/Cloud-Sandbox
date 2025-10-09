@@ -28,6 +28,9 @@ class ucla_roms(Job):
     jobtype : str
         User defined job type based on model of interest, should always be roms_template
 
+    APP : str
+        The model workflow application to run.
+
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
@@ -63,7 +66,7 @@ class ucla_roms(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in ROMS Template init")
+            print(f"DEBUG: in UCLA ROMS init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -83,6 +86,7 @@ class ucla_roms(Job):
 
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
+        self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
         self.IN_FILE = cfDict['IN_FILE']

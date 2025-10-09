@@ -16,8 +16,8 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class FVCOM_Experiment(Job):
-    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
+class Basic_Template(Job):
+    """ Implementation of Job class for a simple basic model template
 
     Attributes
     ----------
@@ -25,7 +25,7 @@ class FVCOM_Experiment(Job):
         The model affiliation class to reference for cloudflow
 
     jobtype : str
-        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
+        User defined job type based on model of interest
 
     APP : str
         The model workflow application to run.
@@ -41,10 +41,6 @@ class FVCOM_Experiment(Job):
     
     MODEL_DIR : str
         The location of the model run directory to execute
-
-    CASE_FILE : str
-        The input FVCOM case file name required to execute the model. For example, if the
-        fvcom case file inlet_run.nml then CASE_FILE=inlet
     """
 
 
@@ -66,7 +62,7 @@ class FVCOM_Experiment(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in FVCOM Experiment init")
+            print(f"DEBUG: in Basic Template init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -83,13 +79,11 @@ class FVCOM_Experiment(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
         self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.CASE_FILE = cfDict['CASE_FILE']
         return
 
 

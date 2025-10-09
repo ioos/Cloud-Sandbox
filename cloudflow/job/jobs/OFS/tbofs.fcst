@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "tbofs",
+  "APP"       : "tbofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/nosofs",

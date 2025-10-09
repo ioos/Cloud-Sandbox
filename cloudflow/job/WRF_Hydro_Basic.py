@@ -16,7 +16,7 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class WRF_Hydro_Basic(Job):
+class WRF_Hydro_Experiment(Job):
     """ Implementation of Job class for a basic WRF-Hydro model run (model run directory, executable, and executable args if necessary)
 
     Attributes
@@ -26,6 +26,9 @@ class WRF_Hydro_Basic(Job):
 
     jobtype : str
         Job type configuration description for a basic WRF Hydro simulation. Should always be wrf_hydro_basic
+
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -59,7 +62,7 @@ class WRF_Hydro_Basic(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in WRF Hydro Basic init")
+            print(f"DEBUG: in WRF Hydro Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -79,6 +82,7 @@ class WRF_Hydro_Basic(Job):
 
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
+        self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
 

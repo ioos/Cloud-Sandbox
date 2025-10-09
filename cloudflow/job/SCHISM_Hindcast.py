@@ -31,8 +31,8 @@ class SCHISM_Hindcast(Job):
     jobtype : str
         Job type configuration description for NWM WRF Hydro simulation. Should always be schism_template
 
-    OFS : str
-        The ocean forecast to run.
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -110,7 +110,7 @@ class SCHISM_Hindcast(Job):
 
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
+        self.APP = cfDict.get('APP', "default")
         self.CDATE = cfDict['CDATE']
         if 'SDATE' in cfDict: self.SDATE = cfDict['SDATE']
         if 'EDATE' in cfDict: self.EDATE = cfDict['EDATE']
@@ -136,10 +136,10 @@ class SCHISM_Hindcast(Job):
 
     def make_parmnml(self):
 
-        if self.OFS == "secofs":
+        if self.APP == "secofs":
             self.__make_parmnml_secofs()
         else:
-            print(f"WARNING: make_parmnml is not implemented for {self.OFS}")
+            print(f"WARNING: make_parmnml is not implemented for {self.APP}")
 
         return
 

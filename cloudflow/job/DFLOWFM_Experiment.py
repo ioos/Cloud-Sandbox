@@ -16,8 +16,8 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class FVCOM_Experiment(Job):
-    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
+class DFLOWFM_Experiment(Job):
+    """ Implementation of Job class for a basic Deltares DFlow-FM model run (model run directory, executable, and executable args if necessary)
 
     Attributes
     ----------
@@ -25,7 +25,7 @@ class FVCOM_Experiment(Job):
         The model affiliation class to reference for cloudflow
 
     jobtype : str
-        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
+        Job type configuration description for a DFlow-FM basic simulation. Should always be dflowfm_basic
 
     APP : str
         The model workflow application to run.
@@ -38,13 +38,12 @@ class FVCOM_Experiment(Job):
 
     EXEC : str
         The model executable to run.
+
+    DFLOW_LIB : str
+        The pathway to the DFlowFM compiled library suite for executable to link with.
     
     MODEL_DIR : str
-        The location of the model run directory to execute
-
-    CASE_FILE : str
-        The input FVCOM case file name required to execute the model. For example, if the
-        fvcom case file inlet_run.nml then CASE_FILE=inlet
+        The location of the DFlowFM model run directory to execute
     """
 
 
@@ -66,7 +65,7 @@ class FVCOM_Experiment(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in FVCOM Experiment init")
+            print(f"DEBUG: in DFLOWFM Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -88,8 +87,9 @@ class FVCOM_Experiment(Job):
         self.jobtype = cfDict['JOBTYPE']
         self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
+        self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.CASE_FILE = cfDict['CASE_FILE']
+
         return
 
 

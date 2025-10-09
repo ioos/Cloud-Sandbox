@@ -28,8 +28,8 @@ class ADCIRCForecast(Job):
     jobtype : str
         Always 'adcirc_ofs_forecast' for this class.
 
-    OFS : str
-        The ocean forecast to run.
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -112,7 +112,7 @@ class ADCIRCForecast(Job):
         """
 
         self.MODEL = cfDict['MODEL']
-        self.OFS = cfDict['OFS']
+        self.APP = cfDict.get('APP', "default")
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.COMROT = cfDict['COMROT']

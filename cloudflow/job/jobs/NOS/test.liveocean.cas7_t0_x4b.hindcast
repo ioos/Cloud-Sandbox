@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romshindcast",
-  "OFS"       : "liveocean",
+  "APP"       : "liveocean",
   "EXPNAME"   : "cas7_t0_x4b",
   "CDATE"     : "20121009",
   "SDATE"     : "20121009",

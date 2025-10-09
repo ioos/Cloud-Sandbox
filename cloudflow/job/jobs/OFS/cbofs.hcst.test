@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romshindcast",
-  "OFS"       : "cbofs",
+  "APP"       : "cbofs",
   "CDATE"     : "20250520",
   "SDATE"     : "20250520",
   "EDATE"     : "20250520",

@@ -1,7 +1,7 @@
 {
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "plotting_diff",
-  "OFS"       : "leofs",
+  "APP"       : "leofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "INDIR"     : "auto",

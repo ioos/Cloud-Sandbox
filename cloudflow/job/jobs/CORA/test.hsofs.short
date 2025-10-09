@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ADCIRC",
   "JOBTYPE"   : "adcircreanalysis",
-  "OFS"       : "adcirc-cora",
+  "APP"       : "adcirc-cora",
   "YYYY"      : "2018",
   "BUCKET"    : "",
   "BCKTFLDR"  : "",

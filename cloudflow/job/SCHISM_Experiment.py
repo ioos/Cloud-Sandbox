@@ -16,8 +16,8 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class FVCOM_Experiment(Job):
-    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
+class SCHISM_Experiment(Job):
+    """ Implementation of Job class for a basic SCHISM model run (model run directory, executable, and executable args if necessary)
 
     Attributes
     ----------
@@ -25,7 +25,7 @@ class FVCOM_Experiment(Job):
         The model affiliation class to reference for cloudflow
 
     jobtype : str
-        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
+        Job type configuration description for a SCHISM basic simulation. Should always be schism_basic
 
     APP : str
         The model workflow application to run.
@@ -40,11 +40,10 @@ class FVCOM_Experiment(Job):
         The model executable to run.
     
     MODEL_DIR : str
-        The location of the model run directory to execute
+        The location of the SCHISM model run to execute
 
-    CASE_FILE : str
-        The input FVCOM case file name required to execute the model. For example, if the
-        fvcom case file inlet_run.nml then CASE_FILE=inlet
+    NSCRIBES: str
+        The number of cpus dedicated to SCHISM I/O procedures, which is a function of user specified output fields for out2d_1.nc file
     """
 
 
@@ -66,7 +65,7 @@ class FVCOM_Experiment(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in FVCOM Experiment init")
+            print(f"DEBUG: in SCHISM Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -89,7 +88,8 @@ class FVCOM_Experiment(Job):
         self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.CASE_FILE = cfDict['CASE_FILE']
+        self.NSCRIBES = cfDict['NSCRIBES']
+
         return
 
 

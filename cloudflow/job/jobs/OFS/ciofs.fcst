@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "ciofs",
+  "APP"       : "ciofs",
   "CDATE"     : "today",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/nosofs",

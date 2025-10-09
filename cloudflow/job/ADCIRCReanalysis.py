@@ -25,8 +25,8 @@ class ADCIRCReanalysis(Job):
     MODEL : str
        The model affiliation class to reference for cloudflow
 
-    OFS : str
-        The ocean forecast to run.
+    APP : str
+        The model workflow application to run.
 
     jobtype : str
         Always 'adcircforecast' for this class.
@@ -107,7 +107,7 @@ class ADCIRCReanalysis(Job):
         """
 
         self.MODEL = cfDict['MODEL']
-        self.OFS = cfDict['OFS']
+        self.APP = cfDict.get('APP', "default")
         self.YYYY = cfDict['YYYY']
         self.BUCKET = cfDict['BUCKET']
         self.BCKTFLDR = cfDict['BCKTFLDR']
@@ -125,10 +125,10 @@ class ADCIRCReanalysis(Job):
 
     def make_config(self):
 
-        if self.OFS == 'adcirc-cora':
+        if self.APP == 'adcirc-cora':
             self.__make_cora_config()
         else:
-            raise Exception(f"I don't know how to create a config for {OFS}")
+            raise Exception(f"I don't know how to create a config for {APP}")
 
 
     def __make_cora_config(self):

@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "nyh-hindcast",
+  "APP"       : "nyh-hindcast",
   "OUTDIR"    : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations/2020",
   "OCEANIN"   : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations/2020/ocean.in",
   "COMROT"    : "/mnt/efs/ROMS/OUTPUT/NYB_C07_Jan_WithStations",

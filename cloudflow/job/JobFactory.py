@@ -5,25 +5,24 @@ from cloudflow.job.Job import Job
 from cloudflow.job.ROMSForecast import ROMSForecast
 from cloudflow.job.ROMSHindcast import ROMSHindcast
 from cloudflow.job.ucla_roms import ucla_roms
-from cloudflow.job.ROMS_Basic import ROMS_Basic
+from cloudflow.job.ROMS_Experiment import ROMS_Experiment
 
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.FVCOM_Hindcast import FVCOM_Hindcast
 from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
-from cloudflow.job.FVCOM_Basic import FVCOM_Basic
 
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
-from cloudflow.job.ADCIRC_Basic import ADCIRC_Basic
+from cloudflow.job.ADCIRC_Experiment import ADCIRC_Experiment
 
 from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
-from cloudflow.job.SCHISM_Basic import SCHISM_Basic
+from cloudflow.job.SCHISM_Experiment import SCHISM_Experiment
 
 from cloudflow.job.Plotting import Plotting
 
-from cloudflow.job.WRF_Hydro_Basic import WRF_Hydro_Basic
+from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
 
-from cloudflow.job.DFLOWFM_Basic import DFLOWFM_Basic
+from cloudflow.job.DFLOWFM_Experiment import DFLOWFM_Experiment
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -66,8 +65,8 @@ class JobFactory:
                 newjob = ROMSHindcast(configfile, NPROCS)
             elif jobtype == 'ucla-roms':
                 newjob = ucla_roms(configfile, NPROCS)
-            elif (jobtype == 'roms_basic'):
-                newjob = ROMS_Basic(configfile, NPROCS)
+            elif (jobtype == 'roms_experiment'):
+                newjob = ROMS_Experiment(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
@@ -78,8 +77,6 @@ class JobFactory:
                 newjob = FVCOM_Hindcast(configfile, NPROCS)
             elif (jobtype == 'fvcom_experiment'):
                 newjob = FVCOM_Experiment(configfile, NPROCS)
-            elif (jobtype == 'fvcom_basic'):
-                newjob = FVCOM_Basic(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
@@ -88,28 +85,28 @@ class JobFactory:
                 newjob = ADCIRCForecast(configfile, NPROCS)
             elif (jobtype == 'adcircreanalysis'):
                 newjob = ADCIRCReanalysis(configfile, NPROCS)
-            elif (jobtype == 'adcirc_basic'):
-                newjob = ADCIRC_Basic(configfile, NPROCS)
+            elif (jobtype == 'adcirc_experiment'):
+                newjob = ADCIRC_Experiment(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
         if(model == 'SCHISM'):
             if (jobtype == 'schism_hindcast'):
                 newjob = SCHISM_Hindcast(configfile, NPROCS)
-            elif (jobtype == 'schism_basic'):
-                newjob = SCHISM_Basic(configfile, NPROCS)
+            elif (jobtype == 'schism_experiment'):
+                newjob = SCHISM_Experiment(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
         elif(model == 'DFLOWFM'):
-            if (jobtype == 'dflowfm_basic'):
-                newjob = DFLOWFM_Basic(configfile, NPROCS)
+            if (jobtype == 'dflowfm_experiment'):
+                newjob = DFLOWFM_Experiment(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 
         elif(model == 'WRF_HYDRO'):
-            if (jobtype == 'wrf_hydro_basic'):
-                newjob = WRF_Hydro_Basic(configfile, NPROCS)
+            if (jobtype == 'wrf_hydro_experiment'):
+                newjob = WRF_Hydro_Experiment(configfile, NPROCS)
             else:
                 raise Exception('Unsupported jobtype')
 

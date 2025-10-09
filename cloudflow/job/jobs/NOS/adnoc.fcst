@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",  
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "adnoc",
+  "APP"       : "adnoc",
   "CDATE"     : "20191211",
   "HH"        : "00",
   "COMROT"    : "/mnt/efs/ROMS",

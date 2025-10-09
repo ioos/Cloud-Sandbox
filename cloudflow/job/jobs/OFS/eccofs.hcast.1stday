@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
   "JOBTYPE"   : "romshindcast",
-  "OFS"       : "eccofs",
+  "APP"       : "eccofs",
   "CDATE"     : "20190101",
   "SDATE"     : "20190101",
   "EDATE"     : "20190101",

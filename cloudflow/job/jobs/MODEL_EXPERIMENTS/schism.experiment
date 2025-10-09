@@ -1,6 +1,7 @@
 {
   "MODEL"     : "SCHISM",
-  "JOBTYPE"   : "schism_basic",
+  "JOBTYPE"   : "schism_experiment",
+  "APP"       : "basic",
   "EXEC"      : "/save/ec2-user/OWP/schism_jerome_hpc7a/build/bin/pschism_TVD-VL",
   "MODEL_DIR" : "/save/ec2-user/OWP/laura",
   "NSCRIBES"  : "4"

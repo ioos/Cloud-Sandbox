@@ -1,7 +1,7 @@
 {
   "MODEL"     : "FVCOM",
   "JOBTYPE"   : "fvcomforecast",
-  "OFS"       : "sscofs",
+  "APP"       : "sscofs",
   "CDATE"     : "today",
   "HH"        : "03",
   "NHOURS"    : "24",

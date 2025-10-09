@@ -1,7 +1,7 @@
 {
   "MODEL"     : "FVCOM",
   "JOBTYPE"   : "fvcomforecast",
-  "OFS"       : "ngofs2",
+  "APP"       : "ngofs2",
   "CDATE"     : "today",
   "HH"        : "03",
   "NHOURS"    : "24",

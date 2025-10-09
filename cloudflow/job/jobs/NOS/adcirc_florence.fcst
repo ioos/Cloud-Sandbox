@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ADCIRC",
-  "JOBTYPE"   : "adcircofs",
-  "OFS"       : "adcircofs",
+  "JOBTYPE"   : "adcircforecast",
+  "APP"       : "florence",
   "CDATE"     : "today",
   "HH"        : "00",
   "EXEC"      : "",

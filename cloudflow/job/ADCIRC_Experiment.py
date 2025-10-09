@@ -16,8 +16,9 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class FVCOM_Experiment(Job):
-    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
+class ADCIRC_Experiment(Job):
+    """ Implementation of Job class for a basic ADCIRC model run (model run directory, executable, and executable args if necessary) 
+        along with seperate necofs experiment dependencies
 
     Attributes
     ----------
@@ -25,10 +26,7 @@ class FVCOM_Experiment(Job):
         The model affiliation class to reference for cloudflow
 
     jobtype : str
-        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
-
-    APP : str
-        The model workflow application to run.
+        User defined job type based on an ADCIRC basic simulation, should always be adcirc_basic
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -42,9 +40,14 @@ class FVCOM_Experiment(Job):
     MODEL_DIR : str
         The location of the model run directory to execute
 
-    CASE_FILE : str
-        The input FVCOM case file name required to execute the model. For example, if the
-        fvcom case file inlet_run.nml then CASE_FILE=inlet
+    Optional Attributes
+    ----------
+    INPUTFILE : str 
+       path/filename - path and filename expected by the model
+
+    SAVEDIR : str
+       path to place ADCIRC output in the system
+
     """
 
 
@@ -66,7 +69,7 @@ class FVCOM_Experiment(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in FVCOM Experiment init")
+            print(f"DEBUG: in ADCIRC Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -83,13 +86,15 @@ class FVCOM_Experiment(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-
+        
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
         self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.CASE_FILE = cfDict['CASE_FILE']
+        self.SAVEDIR = cfDict.get('SAVEDIR', None)
+        self.INPUTFILE = cfDict.get('INPUTFILE', None)
+
         return
 
 
