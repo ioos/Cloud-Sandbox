@@ -205,9 +205,9 @@ def save_history(job: Job, service: StorageService, filespecs: list, public=Fals
     CDATE = job.CDATE
     path = job.OUTDIR
 
-    OFS = job.OFS
+    APP = job.APP
 
-    if OFS == "liveocean":
+    if APP == "liveocean":
         # If liveocean use fYYYY.MM.DD for folder ex. f2020.06.23
         CDATE = util.lo_date(job.CDATE)
     else:
@@ -261,7 +261,7 @@ def save_to_cloud(job: Job, service: StorageService, filespecs: list, public=Fal
     CDATE = job.CDATE
     path = job.OUTDIR
 
-    OFS = job.OFS
+    APP = job.APP
 
     # Forecast output
     # ocean_his_0002.nc
@@ -330,7 +330,7 @@ def simple_run(cluster: Cluster, job: Job):
     """
 
     # Easier to read
-    OFS = job.OFS
+    APP = job.APP
     PPN = cluster.PPN
     NPROCS = job.NPROCS
 
@@ -340,7 +340,7 @@ def simple_run(cluster: Cluster, job: Job):
 
     SAVEDIR = getattr(job, "SAVEDIR", 'none')
     RUNDIR = job.RUNDIR
-    INPUTFILE = job.INPUTFILE
+    INPUTFILE = getattr(job, "INPUTFILE", 'none')
     EXEC = job.EXEC
 
     PTMP = getattr(job, "PTMP", 'none')
@@ -354,9 +354,9 @@ def simple_run(cluster: Cluster, job: Job):
     runscript = f"{curdir}/simple_launcher.sh"
 
     try:
-        if OFS in ('necofs_cold', 'necofs_hot', 'necofs'):
+        if APP in ('necofs_cold', 'necofs_hot', 'necofs'):
 
-        # export OFS=$1
+        # export APP=$1
         # export HOSTS=$2
         # export NPROCS=$3
         # export PPN=$4
@@ -365,10 +365,10 @@ def simple_run(cluster: Cluster, job: Job):
         # export INPUTFILE=$7
         # export EXEC=$8
 
-            args = [ runscript, OFS, HOSTS, str(NPROCS), str(PPN), SAVEDIR, RUNDIR, INPUTFILE, EXEC ]
+            args = [ runscript, APP, HOSTS, str(NPROCS), str(PPN), SAVEDIR, RUNDIR, INPUTFILE, EXEC ]
             result = subprocess.run(args, stderr=subprocess.STDOUT, universal_newlines=True)
         else:
-            raise signals.FAIL(f"ERROR: don't know how to run {OFS}")
+            raise signals.FAIL(f"ERROR: don't know how to run {APP}")
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -401,7 +401,7 @@ def forecast_run(cluster: Cluster, job: Job):
     PPN = cluster.PPN
     CDATE = job.CDATE
     HH = job.HH
-    JOBTYPE = job.jobtype
+    APP = job.APP
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
 
@@ -421,11 +421,11 @@ def forecast_run(cluster: Cluster, job: Job):
 
     try:
 
-        if JOBTYPE == "adnoc":
+        if APP == "adnoc":
             time.sleep(60)
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
         else:
-            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -439,7 +439,7 @@ def forecast_run(cluster: Cluster, job: Job):
 
     curfcst=f"{job.COMROT}/current.fcst"
     with open(curfcst, 'w') as cf:
-        cf.write(f"{JOBTYPE}.{CDATE}{HH}\n")
+        cf.write(f"{APP}.{CDATE}{HH}\n")
 
     return
 
@@ -462,7 +462,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
     SDATE = getattr(job,"SDATE", job.CDATE)
     EDATE = getattr(job,"EDATE", job.CDATE)
     HH = getattr(job,"HH", "00")
-    JOBTYPE = job.jobtype
+    APP = job.APP
     NPROCS = job.NPROCS
     XTRA_ARGS = ""
 
@@ -472,7 +472,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
 
     # Use an environment variable for FSx signal
 
-    if JOBTYPE == "secofs":
+    if APP == "secofs":
        XTRA_ARGS = getattr(job, "NSCRIBES", '')
 
     runscript = f"{curdir}/fcst_launcher.sh"
@@ -491,10 +491,10 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
         print(f'In hindcast run multi: job.CDATE: {job.CDATE}')
 
         # Create ocean in file
-        print(f"Calling job.make_oceanin() for {JOBTYPE}")
+        print(f"Calling job.make_oceanin() for {APP}")
         job.make_oceanin()
 
-        if JOBTYPE == "eccofs":
+        if APP == "eccofs":
             XTRA_ARGS = getattr(job, "OCEANIN", '')
 
         OUTDIR = job.OUTDIR
@@ -504,7 +504,7 @@ def hindcast_run_multi(cluster: Cluster, job: Job):
             # TODO: too many script levels?
             # TODO: where should this be encapsulated? 
             # Maybe do it in python instead of bash, can have named arguments or use args**
-            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, JOBTYPE, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
+            result = subprocess.run([runscript, job.CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, XTRA_ARGS], stderr=subprocess.STDOUT, universal_newlines=True)
 
             if result.returncode != 0:
                 log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -541,7 +541,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 
     # Easier to read
     YYYY = job.YYYY
-    JOBTYPE = job.jobtype
+    APP = job.APP
     NPROCS = job.NPROCS
     ProjectHome = job.ProjectHome
     CONFIG=job.CONFIG
@@ -559,7 +559,7 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
         raise signals.FAIL('FAILED')
 
     try:
-        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG, GRID], universal_newlines=True, stderr=subprocess.STDOUT)
+        result = subprocess.run([runscript, YYYY, ProjectHome, str(NPROCS), str(PPN), HOSTS, CONFIG, GRID, APP], universal_newlines=True, stderr=subprocess.STDOUT)
 
         if result.returncode != 0:
             log.exception(f'Forecast failed ... result: {result.returncode}')
@@ -592,13 +592,15 @@ def basic_run(cluster: Cluster, job: Job):
     # defined variables withing
     # the Python job class reading
     # in the job configuration file
+    MODEL = job.MODEL
     JOBTYPE = job.jobtype
+    APP = job.APP
     NPROCS = job.NPROCS
     MODEL_DIR = job.MODEL_DIR
     EXEC = job.EXEC
 
-    # basic shell launcher script
-    runscript = f"{curdir}/basic_launcher.sh"
+    # experiment shell launcher script
+    runscript = f"{curdir}/experiment_launcher.sh"
     print(f'runscript: {runscript}')
 
     # Extract the AWS cloud cluster environment
@@ -620,10 +622,10 @@ def basic_run(cluster: Cluster, job: Job):
    
     # SCHISM needs to know the number of scribes as well
     # for it's model execution, so we have a special section
-    if(JOBTYPE=='schism_basic'):
+    if(JOBTYPE=='schism_experiment' and APP='basic'):
         NSCRIBES = job.NSCRIBES
         try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'SCHISM basic model run failed ... result: {result.returncode}')
@@ -637,10 +639,10 @@ def basic_run(cluster: Cluster, job: Job):
 
     # For DFlow FM model execution, we will need to define and append the location of
     # the model library suite within the shell launcher script to properly run the model
-    elif(JOBTYPE=='dflowfm_basic'):
+    elif(JOBTYPE=='dflowfm_experiment' and APP='basic'):
         DFLOW_LIB = job.DFLOW_LIB
         try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'DFlowFM basic model run failed ... result: {result.returncode}')
@@ -654,10 +656,10 @@ def basic_run(cluster: Cluster, job: Job):
 
     # For ROMS model execution, we need to know the name and location of the
     # master file ".in" input that tells ROMS the model run configuration
-    elif(JOBTYPE=='roms_basic'):
+    elif(JOBTYPE=='roms_experiment' and APP=='basic'):
         IN_FILE = job.IN_FILE
         try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'ROMS basic model run failed ... result: {result.returncode}')
@@ -675,7 +677,7 @@ def basic_run(cluster: Cluster, job: Job):
         IN_FILE = job.IN_FILE
         RUNCORES = job.RUNCORES
         try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(IN_FILE), str(RUNCORES)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'UCLA ROMS model run failed ... result: {result.returncode}')
@@ -689,10 +691,10 @@ def basic_run(cluster: Cluster, job: Job):
 
     # For FVCOM baseline model execution, we need to know the casename
     # of the master .nml file that tells FVCOM the model run configuration
-    elif(JOBTYPE=='fvcom_basic'):
+    elif(JOBTYPE=='fvcom_experiment' and APP=='basic'):
         CASE_FILE = job.CASE_FILE
         try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(CASE_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(CASE_FILE)], universal_newlines=True, stderr=subprocess.STDOUT)
 
             if result.returncode != 0:
                 log.exception(f'FVCOM basic model run failed ... result: {result.returncode}')
@@ -707,18 +709,23 @@ def basic_run(cluster: Cluster, job: Job):
     # Basic setup for a model run if the model simply only needs the
     # location of the model run directory and its executable
     else:
-        try:
-            result = subprocess.run([runscript, str(JOBTYPE), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC)], universal_newlines=True, stderr=subprocess.STDOUT)
+        if(APP=='basic'):
+            try:
+                result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC)], universal_newlines=True, stderr=subprocess.STDOUT)
 
-            if result.returncode != 0:
-                log.exception(f'{JOBTYPE} basic model run failed ... result: {result.returncode}')
+                if result.returncode != 0:
+                    log.exception(f'{JOBTYPE} basic model run failed ... result: {result.returncode}')
+                    raise signals.FAIL('FAILED')
+
+            except Exception as e:
+                log.exception('In driver: Exception during subprocess.run :' + str(e))
                 raise signals.FAIL('FAILED')
 
-        except Exception as e:
-            log.exception('In driver: Exception during subprocess.run :' + str(e))
-            raise signals.FAIL('FAILED')
+            log.info(f'{JOBTYPE} basic model run finished successfully')
 
-        log.info(f'{JOBTYPE} basic model run finished successfully')
+         else:
+             log.exception(f'{MODEL} model jobtype {JOBTYPE} and application {APP} workflow not found.')
+             raise signals.FAIL('FAILED')
 
 ###############################################################################
 
@@ -792,7 +799,7 @@ def fetchpy_and_run(job: Job, service: StorageService, notebook = ''):
     # retrieved the python file, use the current job object to set up parameters/arguments
 
     arg1 = job.INDIR
-    arg2 = job.OFS
+    arg2 = job.APP
     arg3 = job.HH 
  
     curdir = os.getcwd()

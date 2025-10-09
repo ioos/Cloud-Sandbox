@@ -27,6 +27,7 @@ export PPN=$4
 export HOSTS=$5
 export CONFIG=$6
 export GRID=$7
+export APP=$8
 
 #OpenMPI
 #mpirun --version
@@ -60,15 +61,13 @@ else
   exit 1
 fi
 
-JOBTYPE='adcirc-cora'
-
 echo "**********************************************************"
 echo "Current directory is $PWD"
 echo "**********************************************************"
 
 #TODO: Make this section a switch statement instead
 # Can put domain specific options here
-if [[ "$JOBTYPE" == "adcirc-cora" ]]; then
+if [[ "$APP" == "adcirc-cora" ]]; then
     
     export JOBDIR=$PROJHOME
 
@@ -89,7 +88,7 @@ if [[ "$JOBTYPE" == "adcirc-cora" ]]; then
     result=$?
 
 else
-    echo "Model not supported $JOBTYPE"
+    echo "Model not supported $APP"
     exit 1
 fi
 

@@ -17,7 +17,7 @@ ulimit -s unlimited
 #__license__ = "BSD 3-Clause"
 
 if [ $# -lt 6 ] ; then
-  echo "Usage: $0 JOBTYPE NPROCS PPN HOSTS MODEL_DIR EXEC"
+  echo "Usage: $0 JOBTYPE APP NPROCS PPN HOSTS MODEL_DIR EXEC"
   exit 1
 fi
 
@@ -27,36 +27,37 @@ fi
 
 # Export user defined options within the tasks.basic_run Python function
 export JOBTYPE=$1
-export NPROCS=$2
-export PPN=$3
-export HOSTS=$4
-export MODEL_DIR=$5
-export EXEC=$6
+export APP=$2
+export NPROCS=$3
+export PPN=$4
+export HOSTS=$5
+export MODEL_DIR=$6
+export EXEC=$7
 
 # Unique extra option required for SCHISM
-if [[ "$JOBTYPE" == "schism_basic" ]]; then
-  export NSCRIBES=$7
+if [[ "$JOBTYPE" == "schism_experiment" && "APP" == "basic"]]; then
+  export NSCRIBES=$8
 fi
 
 #Unique extra option required for DFlow FM
-if [[ "$JOBTYPE" == "dflowfm_basic" ]]; then
-  export DFLOW_LIB=$7
+if [[ "$JOBTYPE" == "dflowfm_experiment"  && "APP" == "basic"]]; then
+  export DFLOW_LIB=$8
 fi
 
 #Unique extra option required for ROMS
-if [[ "$JOBTYPE" == "roms_basic" ]]; then
-  export IN_FILE=$7
+if [[ "$JOBTYPE" == "roms_experiment" && "APP" == "basic"]]; then
+  export IN_FILE=$8
 fi
 
 #Unique extra option required for ROMS
-if [[ "$JOBTYPE" == "ucla-roms" ]]; then
-  export IN_FILE=$7
-  export RUNCORES=$8
+if [[ "$JOBTYPE" == "ucla-roms" && "APP" == "basic"]]; then
+  export IN_FILE=$8
+  export RUNCORES=$9
 fi
 
 #Unique extra option required for FVCOM
-if [[ "$JOBTYPE" == "fvcom_basic" ]]; then
-  export CASE_FILE=$7
+if [[ "$JOBTYPE" == "fvcom_experiment" && "APP" == "basic"]]; then
+  export CASE_FILE=$8
 fi
 
 #OpenMPI
@@ -119,7 +120,7 @@ echo "**********************************************************"
 ###### predefined all the required environmental variables     ######
 ###### for you properly within the cloud cluster initilaized   ######
 
-if [[ "$JOBTYPE" == "wrf_hydro_basic" ]]; then
+if [[ "$JOBTYPE" == "wrf_hydro_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -133,7 +134,7 @@ if [[ "$JOBTYPE" == "wrf_hydro_basic" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "schism_basic" ]]; then
+elif [[ "$JOBTYPE" == "schism_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -147,7 +148,7 @@ elif [[ "$JOBTYPE" == "schism_basic" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "dflowfm_basic" ]]; then
+elif [[ "$JOBTYPE" == "dflowfm_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -161,7 +162,7 @@ elif [[ "$JOBTYPE" == "dflowfm_basic" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "adcirc_basic" ]]; then
+elif [[ "$JOBTYPE" == "adcirc_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -175,7 +176,7 @@ elif [[ "$JOBTYPE" == "adcirc_basic" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "roms_basic" ]]; then
+elif [[ "$JOBTYPE" == "roms_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -203,7 +204,7 @@ elif [[ "$JOBTYPE" == "ucla-roms" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "fvcom_basic" ]]; then
+elif [[ "$JOBTYPE" == "fvcom_experiment" && "APP" == "basic"]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -218,7 +219,7 @@ elif [[ "$JOBTYPE" == "fvcom_basic" ]]; then
     result=$?
 
 else
-    echo "Model not supported $JOBTYPE"
+    echo "Model jobtype $JOBTYPE and application $APP not supported"
     exit 1
 fi
 
