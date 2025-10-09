@@ -622,7 +622,7 @@ def basic_run(cluster: Cluster, job: Job):
    
     # SCHISM needs to know the number of scribes as well
     # for it's model execution, so we have a special section
-    if(JOBTYPE=='schism_experiment' and APP='basic'):
+    if(JOBTYPE=='schism_experiment' and APP=='basic'):
         NSCRIBES = job.NSCRIBES
         try:
             result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(NSCRIBES)], universal_newlines=True, stderr=subprocess.STDOUT)
@@ -639,7 +639,7 @@ def basic_run(cluster: Cluster, job: Job):
 
     # For DFlow FM model execution, we will need to define and append the location of
     # the model library suite within the shell launcher script to properly run the model
-    elif(JOBTYPE=='dflowfm_experiment' and APP='basic'):
+    elif(JOBTYPE=='dflowfm_experiment' and APP=='basic'):
         DFLOW_LIB = job.DFLOW_LIB
         try:
             result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(DFLOW_LIB)], universal_newlines=True, stderr=subprocess.STDOUT)
@@ -723,9 +723,9 @@ def basic_run(cluster: Cluster, job: Job):
 
             log.info(f'{JOBTYPE} basic model run finished successfully')
 
-         else:
-             log.exception(f'{MODEL} model jobtype {JOBTYPE} and application {APP} workflow not found.')
-             raise signals.FAIL('FAILED')
+        else:
+            log.exception(f'{MODEL} model jobtype {JOBTYPE} and application {APP} workflow not found.')
+            raise signals.FAIL('FAILED')
 
 ###############################################################################
 
