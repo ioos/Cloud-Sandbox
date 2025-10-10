@@ -248,6 +248,7 @@ def get_baseline(job: Job, sshuser=None):
 @task
 def get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
+        TODO: might be time to create separate functions for the specific applications
 
     Parameters
     ----------
@@ -294,6 +295,50 @@ def get_forcing(job: Job, sshuser=None):
 
         cdate = sdate
 
+        if ofs == "eccofs":
+
+            # Temporary hack here until eccofs realtime ICs become available
+            print(f"INFO: {ofs} getICs for non-operational ECCOFS dev")
+            print(f"INFO: only copying previous day restart file for ini")
+            print(f"INFO: restart file must be from coldstart or previous run")
+            print(f"INFO: restart file must be on local disk")
+            print(f"INFO: if restart file is missing, assumes it is a cold start") 
+
+            print(f"INFO: eccofs can continue a previous run")
+            print(f"INFO: specify ININAME in job config file instead of using prevoius day restart file")
+
+            ininame = getattr(job,"ININAME", "")
+
+            comdir = f"{comrot}/{ofs}.{cdate}"
+
+            pdate = util.ndate(cdate, -1)
+            prev_comdir = f"{comrot}/{ofs}.{pdate}"
+
+            # OFS uses the previous nowcast for INI (files are saved a little different on NOMADS/NODD)
+            # INIFILE=cbofs.t__HH__z.__CDATE__.rst.nowcast.nc
+            # RSTNAME == cbofs.t__HH__z.__CDATE__.rst.forecast.nc
+
+            # We are using the previous run or coldstart restart for INI
+            # ININAME == eccofs.20190102.ini.nc
+            # RSTNAME=eccofs.20190101.rst.nc
+
+            # copy previous day rst to current day ini
+            # or use definied ININAME
+            if ininame != "":
+                rfile = ininame
+            else:
+                rfile = f'{prev_comdir}/{ofs}.{pdate}.rst.nc'
+
+            ifile = f'{comdir}/{ofs}.{cdate}.ini.nc'
+            
+            if os.path.exists(rfile):
+                shutil.copy2(rfile, ifile)
+                return
+            else:
+               log.info(f"{ofs} restart does not exist, assuming a cold start")
+               log.info(f"{ofs} run will fail if an ini/restart file isn't present")
+               return
+            
         while cdate <= edate:
 
             comdir = f"{comrot}/{ofs}.{cdate}"
@@ -305,13 +350,14 @@ def get_forcing(job: Job, sshuser=None):
 
             cdate = util.ndate(cdate, 1)
 
-    elif ofs in ('secofs', 'eccofs', 'necofs'):
+    elif ofs in ('secofs', 'necofs'):
         print(f"only using pre-downloaded forcing files for {ofs} test case")
     else:
         log.error(f"Unsupported forecast: {ofs}")
         raise signals.FAIL()
 
     return
+
 
 @task
 def old_get_forcing(job: Job, sshuser=None):

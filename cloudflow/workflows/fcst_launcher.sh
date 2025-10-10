@@ -101,7 +101,7 @@ result=0
 
 shopt -s extglob
 nosofs_fvcom='leofs|lmhofs|loofs|lsofs|ngofs2|sscofs|sfbofs'
-nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs'
+nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs|eccofs'
 
 
 # Can put domain specific options here

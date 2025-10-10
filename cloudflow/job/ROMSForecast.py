@@ -174,12 +174,12 @@ class ROMSForecast(Job):
         OFS = self.OFS
 
         # Create the ocean.in file from a template
-        if OFS == 'liveocean':
+        if OFS in util.nosofs_roms_models:
+            self.__make_oceanin_nosofs()
+        elif OFS == 'liveocean':
             self.__make_oceanin_lo()
         elif OFS == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs","wcofs"):
-            self.__make_oceanin_nosofs()
         elif OFS == 'wrfroms':
             self.__make_oceanin_wrfroms()
         else:
@@ -256,6 +256,7 @@ class ROMSForecast(Job):
         # The restart date is 6 hours prior to CDATE
         # DSTART = days from TIME_REF to start of forecast day
         # ndays returns arg1 - arg2
+        # TODO: check this for correctness Oct-2025
         prev6hr = util.ndate_hrs(f"{CDATE}{HH}", -6)
         DSTART = util.ndays(prev6hr, self.TIME_REF)
         # Reformat the date

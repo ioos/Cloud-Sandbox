@@ -985,7 +985,8 @@ install_esmf_spack () {
       # external-libfabric [false]        false, true
       # Enable external libfabric dependency
 
-  spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} $SPACKTARGET
+  #spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} $SPACKTARGET
+  spack install $SPACKOPTS esmf@${ESMF_VER} +pnetcdf %${COMPILER} $SPACKTARGET
 
   # Can tell mpiifort to use ifx:
   # export FC=ifx

@@ -3,17 +3,19 @@
 "region"    : "us-east-2",
 "nodeType"  : "hpc6a.48xlarge",
 "nodeCount" : 4,
-"tags"      : [ 
+"vm_retry_delay": 300,
+"vm_max_retries": 5,
+"tags"      : [
                 { "Key": "Name", "Value": "eccofs" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "key_name"  : "ioos-sandbox",
-"image_id"  : "ami-03e854ffba37e01cc",
+"image_id"  : "ami-05b76b2fbe321afef",
 "sg_ids"    : [
-  "sg-06f872237e3c34f00",
-  "sg-03c2f65207b22676e",
-  "sg-08f3162d6cded1567"
+  "sg-07875712ac6c56ff0",
+  "sg-0ae91116e5c06332e",
+  "sg-0083673d340d5838d"
 ],
-"subnet_id" : "subnet-091bcf131af86e9f9",
-"placement_group" : "cloud-sandbox-07292025-us-east-2b_Terraform_Placement_Group"
+"subnet_id" : "subnet-0be869ddbf3096968",
+"placement_group" : "cloud-sandbox-08202025-us-east-2b_Terraform_Placement_Group"
 }

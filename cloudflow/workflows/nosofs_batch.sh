@@ -5,8 +5,8 @@ cd ..
 nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
 nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sscofs sfbofs"
 
-#nosofs_roms=" cbofs ciofs  "
-#nosofs_fvcom="leofs lmhofs "
+nosofs_roms="eccofs"
+nosofs_fvcom=""
 
 ofslist="$nosofs_roms $nosofs_fvcom"
 
@@ -19,7 +19,7 @@ create_ccfg () {
 	"platform"  : "AWS",
 	"region"    : "us-east-2",
 	"nodeType"  : "hpc6a.48xlarge",
-	"nodeCount" : 1,
+	"nodeCount" : 4,
 	"tags"      : [
                 { "Key": "Name", "Value": "$ofs-fcst" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
@@ -35,7 +35,6 @@ create_ccfg () {
 	"placement_group" : "cloud-sandbox-08202025-us-east-2b_Terraform_Placement_Group"
 	}
 EOL
-
 }
 
 

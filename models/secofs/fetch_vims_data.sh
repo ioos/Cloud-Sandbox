@@ -22,7 +22,7 @@ wget --user=$USERNAME --ask-password --no-check-certificate $WGET_OPTS $RETRY $T
 
 mv ccrm.vims.edu/yinglong/NOAA/COOPS/RUN08j_JZ/ .
 rm -Rf ccrm.vims.edu/
-cd RUN08j_JZ | exit 1
+cd RUN08j_JZ || exit 1
 rm *index.html*
 rm sflux/*index.html*
 

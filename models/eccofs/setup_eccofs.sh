@@ -29,18 +29,35 @@ export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 # Get the nosofs source code and scripts
 cd $SAVEDIR
 if [ ! -d $MODEL_DIR ]; then
-  echo "it appears $MODEL_DIR is missing"
-  exit 1
+
+  echo "Obtaining the NOSOFS source code, cloning the repository ... "
+  git clone $REPO $MODEL_DIR
+  cd $MODEL_DIR
+  git checkout $BRANCH
+  git submodule update --init --recursive
+
+else
+  echo "$MODEL_DIR is already present, not fetching it from the repository"
 fi
 
-# Build it
+### TODO add ECCOFS as submodule to nosofs
+## Clone the ROMS used for eccofs
+#if [ ! -d $MODEL_DIR/sorc/ROMS.eccofs ]; then
+#
+#  echo "Obtaining the ECCOFS ROMS source code ... "
+#  cd $MODEL_DIR/sorc
+#  git clone -b ioos-sandbox-eccofs https://github.com/asascience-open/roms.git ROMS.eccofs
+#
+#else
+#  echo "$MODEL_DIR/sorc/ROMS.eccofs is already present, not fetching it from the repository"
+#fi
+
 cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
 
-# This will also build some binaries used by the nosofs framework needed to run
-cd $MODEL_DIR/sorc
-./build-eccofs-only.sh
+# Build it
+# echo "Building eccofs ... "
+cd $MODEL_DIR/sorc/ROMS.eccofs
+./COMPILE_ROMS.sh
 
-# This can be used to just build the ROMS model
-# cd $MODEL_DIR/sorc/ROMS.eccofs
-# ./COMPILE_ROMS.sh
+# Get test-case data
 

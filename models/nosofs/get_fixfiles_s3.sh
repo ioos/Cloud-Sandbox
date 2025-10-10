@@ -22,6 +22,7 @@ tbofs
 wcofs
 wcofs_da
 wcofs_free
+eccofs
 '
 
 # Optionally only download some
