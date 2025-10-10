@@ -17,7 +17,7 @@ debug = False
 
 
 class ADCIRCForecast(Job):
-    """ Implementation of Job class for ADCIRC Forecasts for NECOFS, SECOFS, and ECOFS workflows
+    """ Implementation of Job class for ADCIRC Forecasts
 
     Attributes
     ----------
@@ -26,7 +26,7 @@ class ADCIRCForecast(Job):
        The model affiliation class to reference for cloudflow
 
     jobtype : str
-        Always 'adcirc_ofs_forecast' for this class.
+        Always 'adcircforecast' for this class.
 
     APP : str
         The model workflow application to run.
