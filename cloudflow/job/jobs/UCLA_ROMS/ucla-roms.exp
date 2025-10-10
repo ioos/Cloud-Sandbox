@@ -1,0 +1,9 @@
+{
+  "MODEL"     : "ROMS",
+  "JOBTYPE"   : "ucla-roms",
+  "APP"       : "basic",
+  "RUNCORES"  : 6,
+  "EXEC"      : "/save/ec2-user/ucla-roms/Examples/Rivers_real/roms",
+  "MODEL_DIR" : "/save/ec2-user/ucla-roms/Examples/Rivers_real",
+  "IN_FILE"   : "/save/ec2-user/ucla-roms/Examples/Rivers_real/rivers.in"
+}

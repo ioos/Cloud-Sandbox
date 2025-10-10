@@ -88,7 +88,7 @@ def com2ptmp(job: Job):
     # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB 
     # If done in the cluster ~$5.18 of compute cost, do it in the head node instead
     # NOS does it in the forecast script and renames the files in the process 
-    if job.OFS == "liveocean":
+    if job.APP == "liveocean":
         fdate = util.lo_date(job.CDATE)
         ptmp = f'{job.PTMP}/liveocean/{fdate}/*'
         comout = job.COMROT + '/liveocean/' + fdate
@@ -107,7 +107,7 @@ def com2ptmp(job: Job):
             log.exception(result.stdout)
             log.exception(f'exception moving data from {ptmp} to {comout}')
             raise signals.FAIL()
-    elif job.OFS == "secofs":
+    elif job.APP == "secofs":
         log.debug(f"Copying data to {job.PTMP}")
 
         comout = job.OUTDIR
@@ -143,7 +143,7 @@ def ptmp2com(job: Job):
     # It takes 20 minutes to copy liveocean data from ptmp to /com 132GB 
     # If done in the cluster ~$5.18 of compute cost, do it in the head node instead
     # NOS does it in the forecast script and renames the files in the process 
-    if job.OFS == "liveocean":
+    if job.APP == "liveocean":
         fdate = util.lo_date(job.CDATE)
         ptmp = f'{job.PTMP}/liveocean/{fdate}/*'
         comout = job.COMROT + '/liveocean/' + fdate
@@ -163,7 +163,7 @@ def ptmp2com(job: Job):
             log.exception(f'exception moving data from {ptmp} to {comout}')
             raise signals.FAIL()
 
-    elif job.OFS == "secofs":
+    elif job.APP == "secofs":
 
         comout = job.OUTDIR
         log.debug(f"Copying output data from {job.PTMP} to {comout}")
@@ -222,25 +222,25 @@ def get_baseline(job: Job, sshuser=None):
     """
 
     cdate = job.CDATE
-    ofs = job.OFS
+    app = job.APP
     vdir = job.VERIFDIR
     hh = job.HH
 
-    if ofs == 'liveocean':
+    if app == 'liveocean':
         try:
             util.get_baseline_lo(cdate, vdir, sshuser)
         except Exception as e:
             log.exception(f'Retrieving baselines failed ...')
             raise signals.FAIL()
-    elif ofs in util.nosofs_models:
+    elif app in util.nosofs_models:
         script = f"{curdir}/scripts/getNomadsProd.sh"
 
-        result = subprocess.run([script, ofs, cdate, hh, vdir], stderr=subprocess.STDOUT)
+        result = subprocess.run([script, app, cdate, hh, vdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
             raise signals.FAIL()
     else:
-        log.exception(f'{ofs} is not supported')
+        log.exception(f'{app} is not supported')
         raise signals.FAIL()
     return
 
@@ -258,7 +258,7 @@ def get_forcing(job: Job, sshuser=None):
         The user and host to use for retrieving data from a remote server. Required for LiveOcean.
     """
 
-    ofs = job.OFS
+    app = job.APP
 
     sdate = getattr(job,"SDATE", job.CDATE)
     edate = getattr(job,"EDATE", job.CDATE)
@@ -266,7 +266,7 @@ def get_forcing(job: Job, sshuser=None):
 
     comrot = job.COMROT
 
-    if ofs == 'liveocean':
+    if app == 'liveocean':
 
         comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
@@ -290,25 +290,25 @@ def get_forcing(job: Job, sshuser=None):
             cdate = util.ndate(cdate, 1)
 
     # ROMS and FVCOM NOSOFS models
-    elif ofs in util.nosofs_models:
+    elif app in util.nosofs_models:
 
         cdate = sdate
 
         while cdate <= edate:
 
-            comdir = f"{comrot}/{ofs}.{cdate}"
+            comdir = f"{comrot}/{app}.{cdate}"
             try:
-                getICsNOSOFS.getICs(cdate, hh, ofs, comdir)
+                getICsNOSOFS.getICs(cdate, hh, app, comdir)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
                 raise signals.FAIL()
 
             cdate = util.ndate(cdate, 1)
 
-    elif ofs in ('secofs', 'eccofs', 'necofs'):
-        print(f"only using pre-downloaded forcing files for {ofs} test case")
+    elif app in ('secofs', 'eccofs', 'necofs'):
+        print(f"only using pre-downloaded forcing files for {app} test case")
     else:
-        log.error(f"Unsupported forecast: {ofs}")
+        log.error(f"Unsupported forecast: {app}")
         raise signals.FAIL()
 
     return
@@ -327,28 +327,28 @@ def old_get_forcing(job: Job, sshuser=None):
     """
 
     cdate = job.CDATE
-    ofs = job.OFS
+    app = job.APP
     comrot = job.COMROT
     hh = job.HH
 
     comdir = job.OUTDIR    # ex: /com/liveocean/f2020.MM.DD
 
     # Coupled WRF/ROMS
-    if ofs == 'wrfroms':
-        #comdir = f"{comrot}/{ofs}/{cdate}"
+    if app == 'wrfroms':
+        #comdir = f"{comrot}/{app}/{cdate}"
         script = f"{curdir}/scripts/getICsWRFROMS.sh"
 
         result = subprocess.run([script, cdate, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
             raise signals.FAIL()
-    elif ofs == 'adcircofs':
+    elif app == 'adcircofs':
 	
         #script = f"{curdir}/fcstrun_adcirc_prep.sh"
         #result = subprocess.run([script])
         print('Not required to download forcing') 
     else:
-        log.warning(f"Could not download initial conditions for {ofs}")
+        log.warning(f"Could not download initial conditions for {app}")
 
     return
 
@@ -428,9 +428,9 @@ def daskmake_plots(client: Client, FILES: list, job: Job):
 
     plot_function : callable
 
-    if job.OFS in util.roms_models:
+    if job.APP in util.roms_models:
       plot_function = plot_roms.plot
-    elif job.OFS in util.fvcom_models:
+    elif job.APP in util.fvcom_models:
       plot_function = plot_fvcom.plot
 
 
@@ -494,9 +494,9 @@ def daskmake_diff_plots(client: Client, EXPERIMENT: list, BASELINE: list, job: J
     #vminmax : callable
 
     # ROMS and FVCOM grids are handled differently
-    if job.OFS in util.roms_models:
+    if job.APP in util.roms_models:
       plot_module = plot_roms
-    elif job.OFS in util.fvcom_models:
+    elif job.APP in util.fvcom_models:
       plot_module = plot_fvcom
 
     baselen = len(BASELINE)

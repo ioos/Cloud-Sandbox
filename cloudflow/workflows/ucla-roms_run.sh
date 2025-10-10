@@ -34,14 +34,14 @@ export EXEC=$3
 
 echo "---" 
 echo "------------------------"
-echo "ROMS model working directory is $MODEL_DIR"
+echo "UCLA ROMS model working directory is $MODEL_DIR"
 echo "------------------------"
 cd $MODEL_DIR
 
 SECONDS=0
 
 echo "--- " 
-echo "--- Running ROMS -----------------"
+echo "--- Running UCLA ROMS -----------------"
 echo "---"
 
 echo "infile is "
@@ -53,7 +53,7 @@ mpirun $MPIOPTS $EXEC $IN_FILE
 if [ $? -ne 0 ]; then
   echo "ERROR returned from mpirun"
 else
-  echo "ROMS model has succesfully completed on the cloud!"
+  echo "UCLA ROMS model has succesfully completed on the cloud!"
   duration=$SECONDS
-  echo "ROMS simulation took $((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
+  echo "UCLA ROMS simulation took $((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
 fi

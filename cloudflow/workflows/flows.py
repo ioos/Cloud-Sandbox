@@ -247,9 +247,10 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
 ######################################################################
 
-def template_flow(conf, jobfile) -> Flow:
+def basic_flow(conf, jobfile) -> Flow:
     """ Provides a Simple workflow execution in Cloud-Sandbox
         for any given model setup that a user wants to execute
+        using the basic job configuration setup template
 
     Parameters
     ----------
@@ -261,10 +262,10 @@ def template_flow(conf, jobfile) -> Flow:
 
     Returns
     -------
-    flow : template.Flow
+    flow : basic.Flow
     """
 
-    with Flow('template workflow') as template_flow:
+    with Flow('basic workflow') as basic_flow:
         #####################################################################
         # FORECAST
         #####################################################################
@@ -273,21 +274,21 @@ def template_flow(conf, jobfile) -> Flow:
         cluster = ctasks.cluster_init(conf)
 
         # Setup the job
-        template_job = tasks.job_init(cluster, jobfile)
+        basic_job = tasks.job_init(cluster, jobfile)
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster)
 
         # Run the model
-        template_run = tasks.template_run(cluster, template_job, upstream_tasks=[cluster_start])
+        basic_run = tasks.basic_run(cluster, basic_job, upstream_tasks=[cluster_start])
 
         # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[template_run])
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[basic_run])
 
         # If the model run fails, then set the whole flow to fail
-        template_flow.set_reference_tasks([template_run])
+        basic_flow.set_reference_tasks([basic_run])
 
-    return template_flow
+    return basic_flow
 
 
 ######################################################################

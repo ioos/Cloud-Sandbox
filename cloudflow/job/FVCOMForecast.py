@@ -23,6 +23,12 @@ class FVCOMForecast(Job):
 
     Attributes
     ----------
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
+    APP : str
+        The model workflow application to run.
+
     jobtype : str
         Always 'fvcomforecast' for this class.
 
@@ -31,9 +37,6 @@ class FVCOMForecast(Job):
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -110,7 +113,8 @@ class FVCOMForecast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
-        self.OFS = cfDict['OFS']
+        self.MODEL = cfDict['MODEL']
+        self.APP = cfDict.get('APP', "default")
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.NHOURS = cfDict['NHOURS']
@@ -130,10 +134,10 @@ class FVCOMForecast(Job):
             self.CDATE = today
 
         if self.INTMPL == "auto":
-            self.INTMPL = f"{self.TEMPLPATH}/{self.OFS}.fcst.in"
+            self.INTMPL = f"{self.TEMPLPATH}/{self.APP}.fcst.in"
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}"
+            self.OUTDIR = f"{self.COMROT}/{self.APP}.{self.CDATE}"
 
 
         return
@@ -142,13 +146,13 @@ class FVCOMForecast(Job):
     def make_fcstin(self):
         """ Create the input namelist .in file """
 
-        OFS = self.OFS
+        APP = self.APP
 
         # Create the ocean.in file from a template
-        if OFS in util.nosofs_fvcom_models:
+        if APP in util.nosofs_fvcom_models:
             self.__make_fcstin_nosofs()
         else:
-            print(f"WARNING: unknown model {OFS}, not making input namelist file") 
+            print(f"WARNING: unknown model {APP}, not making input namelist file") 
 
         return
 
@@ -158,7 +162,7 @@ class FVCOMForecast(Job):
 
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
         NHOURS = self.NHOURS
         template = self.INTMPL
@@ -187,7 +191,7 @@ class FVCOMForecast(Job):
 
         # Create the ocean.in
         if self.INPUTFILE == "auto":
-            outfile = f"{self.OUTDIR}/{OFS}.t{HH}z.{CDATE}.forecast.in"
+            outfile = f"{self.OUTDIR}/{APP}.t{HH}z.{CDATE}.forecast.in"
             util.sedoceanin(template, outfile, settings)
 
         return

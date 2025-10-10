@@ -21,17 +21,21 @@ class Plotting(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     jobtype : str
         The specific type of plotting job.
 
+    APP : str
+        The model workflow application to run.
+
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -99,8 +103,9 @@ class Plotting(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
+        self.APP = cfDict.get('APP', "default")
         self.CDATE = cfDict['CDATE']
         self.HH = cfDict['HH']
         self.INDIR = cfDict['INDIR']
@@ -124,7 +129,7 @@ class Plotting(Job):
         CDATE = self.CDATE
 
 
-        if self.OFS == "liveocean":
+        if self.APP == "liveocean":
             fdate = f"f{CDATE[0:4]}.{CDATE[4:6]}.{CDATE[6:8]}"
             if self.INDIR == "auto":
                 self.INDIR = f"/com/liveocean/{fdate}"
@@ -133,24 +138,24 @@ class Plotting(Job):
             if self.VERIFDIR == "auto":
                 self.VERIFDIR = f"/com/liveocean-uw/{fdate}"
 
-        elif self.OFS in util.nosofs_models:
+        elif self.APP in util.nosofs_models:
             if self.INDIR == "auto":
-                self.INDIR = f"/com/nos/{self.OFS}.{self.CDATE}{self.HH}"
+                self.INDIR = f"/com/nos/{self.APP}.{self.CDATE}{self.HH}"
             if self.OUTDIR == "auto":
-                self.OUTDIR = f"/com/nos/plots/{self.OFS}.{self.CDATE}{self.HH}"
+                self.OUTDIR = f"/com/nos/plots/{self.APP}.{self.CDATE}{self.HH}"
             if self.VERIFDIR == "auto":
-                self.VERIFDIR = f"/com/nos-noaa/{self.OFS}.{self.CDATE}"
+                self.VERIFDIR = f"/com/nos-noaa/{self.APP}.{self.CDATE}"
 
-        elif self.OFS == "adnoc":
+        elif self.APP == "adnoc":
             if self.INDIR == "auto":
-                self.INDIR = f"/com/adnoc/{self.OFS}.{self.CDATE}"
+                self.INDIR = f"/com/adnoc/{self.APP}.{self.CDATE}"
             if self.OUTDIR == "auto":
-                self.OUTDIR = f"/com/adnoc/plots/{self.OFS}.{self.CDATE}"
+                self.OUTDIR = f"/com/adnoc/plots/{self.APP}.{self.CDATE}"
             if self.VERIFDIR == "auto":
-                self.VERIFDIR = f"/com/adnoc-baseline/{self.OFS}.{self.CDATE}"
+                self.VERIFDIR = f"/com/adnoc-baseline/{self.APP}.{self.CDATE}"
 
         else:
-            raise Exception(f"{self.OFS} is not a supported forecast")
+            raise Exception(f"{self.APP} is not a supported forecast")
 
 
         return

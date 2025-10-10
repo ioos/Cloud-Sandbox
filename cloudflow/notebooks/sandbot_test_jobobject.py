@@ -128,7 +128,7 @@ def plot_rho(ds, variable, s3upload=False) -> str:
 def main(job: Plotting):
 
     COMDIR = job.INDIR
-    OFS = job.OFS
+    OFS = job.APP
     HH = job.HH
     rho_vars = job.VARS
 
