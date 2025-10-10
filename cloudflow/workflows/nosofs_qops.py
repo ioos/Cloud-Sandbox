@@ -72,7 +72,7 @@ def main():
     for jobfile in joblist:
         jobdict = util.readConfig(jobfile)
         jobtype = jobdict["JOBTYPE"]
-        OFS = jobdict["OFS"]
+        APP = jobdict["APP"]
 
         print('JOBTYPE: ', jobtype)
 
@@ -118,7 +118,7 @@ def main():
 
         if re.search("fcst", aflow.name):
             start_time = time.time()
-            log.info(f"Forecast flow starting - {OFS}")
+            log.info(f"Forecast flow starting - {APP}")
 
         state = aflow.run()
 
@@ -129,12 +129,12 @@ def main():
                 mins = math.ceil(elapsed / 60.0)
                 hrs = mins / 60.0
                 if ntimes:
-                    log.info(f"Elapsed Time: {mins:.0f} minutes, ntimes:{ntimes}, {nodecnt}x {nodetype} - {OFS}")
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, ntimes:{ntimes}, {nodecnt}x {nodetype} - {APP}")
                 else:
-                    log.info(f"Elapsed Time: {mins:.0f} minutes, nhours:{nhours}, {nodecnt}x {nodetype} - {OFS}")
+                    log.info(f"Elapsed Time: {mins:.0f} minutes, nhours:{nhours}, {nodecnt}x {nodetype} - {APP}")
             continue
         else:
-            log.error(f"{aflow.name} failed - {OFS}")
+            log.error(f"{aflow.name} failed - {APP}")
             break
 
 

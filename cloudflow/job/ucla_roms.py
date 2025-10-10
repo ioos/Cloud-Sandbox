@@ -21,17 +21,21 @@ class ucla_roms(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         User defined job type based on model of interest, should always be roms_template
+
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     RUNCORES : int
         Total number of processors (cores) ucla-roms will use.
-
-    OFS : str
-        The model setup type to run
 
     EXEC : str
         The model executable to run.
@@ -62,7 +66,7 @@ class ucla_roms(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in ROMS Template init")
+            print(f"DEBUG: in UCLA ROMS init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -80,8 +84,9 @@ class ucla_roms(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
+        self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.OFS = cfDict['OFS']
+        self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
         self.MODEL_DIR = cfDict['MODEL_DIR']
         self.IN_FILE = cfDict['IN_FILE']

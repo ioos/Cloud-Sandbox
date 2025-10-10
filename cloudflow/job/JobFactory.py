@@ -1,23 +1,28 @@
 import json
 
 from cloudflow.job.Job import Job
+
 from cloudflow.job.ROMSForecast import ROMSForecast
 from cloudflow.job.ROMSHindcast import ROMSHindcast
+from cloudflow.job.ucla_roms import ucla_roms
+from cloudflow.job.ROMS_Experiment import ROMS_Experiment
+
 from cloudflow.job.FVCOMForecast import FVCOMForecast
 from cloudflow.job.FVCOM_Hindcast import FVCOM_Hindcast
 from cloudflow.job.FVCOM_Experiment import FVCOM_Experiment
+
 from cloudflow.job.ADCIRCForecast import ADCIRCForecast
 from cloudflow.job.ADCIRCReanalysis import ADCIRCReanalysis
+from cloudflow.job.ADCIRC_Experiment import ADCIRC_Experiment
+
 from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
+from cloudflow.job.SCHISM_Experiment import SCHISM_Experiment
+
 from cloudflow.job.Plotting import Plotting
 
-from cloudflow.job.NWMv3_WRF_Hydro_Template import NWMv3_WRF_Hydro_Template
-from cloudflow.job.DFLOWFM_Template import DFLOWFM_Template
-from cloudflow.job.SCHISM_Template import SCHISM_Template
-from cloudflow.job.ADCIRC_Template import ADCIRC_Template
-from cloudflow.job.ROMS_Template import ROMS_Template
-from cloudflow.job.FVCOM_Template import FVCOM_Template
-from cloudflow.job.ucla_roms import ucla_roms
+from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
+
+from cloudflow.job.DFLOWFM_Experiment import DFLOWFM_Experiment
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -26,7 +31,7 @@ debug = False
 
 # noinspection PyCallingNonCallable
 class JobFactory:
-    """ Class factory for different Job implementations """
+    """ Class factory for different Job implementations based on model class """
 
     def __init__(self):
         return
@@ -51,44 +56,69 @@ class JobFactory:
 
         cfdict = self.readconfig(configfile)
         jobtype = cfdict['JOBTYPE']
+        model = cfdict['MODEL']
 
-        # TODO: use something more elegant than if elf
-        if jobtype == 'romsforecast':
-            newjob = ROMSForecast(configfile, NPROCS)
-        elif jobtype == 'romshindcast':
-            newjob = ROMSHindcast(configfile, NPROCS)
-        elif jobtype == 'ucla-roms':
-            newjob = ucla_roms(configfile, NPROCS)
-        elif jobtype == 'fvcomforecast':
-            newjob = FVCOMForecast(configfile, NPROCS)
-        elif jobtype == 'fvcomhindcast':
-            newjob = FVCOM_Hindcast(configfile, NPROCS)
-        elif (jobtype == 'fvcom_experiment'):
-            newjob = FVCOM_Experiment(configfile, NPROCS)
+        if(model == 'ROMS'):
+            if jobtype == 'romsforecast':
+                newjob = ROMSForecast(configfile, NPROCS)
+            elif jobtype == 'romshindcast':
+                newjob = ROMSHindcast(configfile, NPROCS)
+            elif jobtype == 'ucla-roms':
+                newjob = ucla_roms(configfile, NPROCS)
+            elif (jobtype == 'roms_experiment'):
+                newjob = ROMS_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
 
-        elif jobtype == 'adcircforecast':
-            newjob = ADCIRCForecast(configfile, NPROCS)
-        elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
-            newjob = Plotting(configfile, NPROCS)
-        elif (jobtype == 'adcircreanalysis'):
-            newjob = ADCIRCReanalysis(configfile, NPROCS)
-        elif (jobtype == 'schism_hindcast'):
-            newjob = SCHISM_Hindcast(configfile, NPROCS)
+        elif(model == 'FVCOM'):
+            if jobtype == 'fvcomforecast':
+                newjob = FVCOMForecast(configfile, NPROCS)
+            elif jobtype == 'fvcomhindcast':
+                newjob = FVCOM_Hindcast(configfile, NPROCS)
+            elif (jobtype == 'fvcom_experiment'):
+                newjob = FVCOM_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
 
-        elif (jobtype == 'dflowfm_template'):
-            newjob = DFLOWFM_Template(configfile, NPROCS)
-        elif (jobtype == 'schism_template'):
-            newjob = SCHISM_Template(configfile, NPROCS)
-        elif (jobtype == 'nwmv3_wrf_hydro_template'):
-            newjob = NWMv3_WRF_Hydro_Template(configfile, NPROCS)
-        elif (jobtype == 'adcirc_template'):
-            newjob = ADCIRC_Template(configfile, NPROCS)
-        elif (jobtype == 'roms_template'):
-            newjob = ROMS_Template(configfile, NPROCS)
-        elif (jobtype == 'fvcom_template'):
-            newjob = FVCOM_Template(configfile, NPROCS)
+        elif(model == 'ADCIRC'):
+            if jobtype == 'adcircforecast':
+                newjob = ADCIRCForecast(configfile, NPROCS)
+            elif (jobtype == 'adcircreanalysis'):
+                newjob = ADCIRCReanalysis(configfile, NPROCS)
+            elif (jobtype == 'adcirc_experiment'):
+                newjob = ADCIRC_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
+
+        if(model == 'SCHISM'):
+            if (jobtype == 'schism_hindcast'):
+                newjob = SCHISM_Hindcast(configfile, NPROCS)
+            elif (jobtype == 'schism_experiment'):
+                newjob = SCHISM_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
+
+        elif(model == 'DFLOWFM'):
+            if (jobtype == 'dflowfm_experiment'):
+                newjob = DFLOWFM_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
+
+        elif(model == 'WRF_HYDRO'):
+            if (jobtype == 'wrf_hydro_experiment'):
+                newjob = WRF_Hydro_Experiment(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
+
+        elif(model == 'PYTHON'):
+            if (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
+                newjob = Plotting(configfile, NPROCS)
+            else:
+                raise Exception('Unsupported jobtype')
+
+    
         else:
-            raise Exception('Unsupported jobtype')
+            raise Exception('Unsupported MODEL')
 
         return newjob
 

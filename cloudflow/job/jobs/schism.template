@@ -1,7 +1,0 @@
-{
-  "JOBTYPE"   : "schism_template",
-  "OFS"       : "schism",
-  "EXEC"      : "/save/ec2-user/OWP/schism_jerome_hpc7a/build/bin/pschism_TVD-VL",
-  "MODEL_DIR" : "/save/ec2-user/OWP/laura",
-  "NSCRIBES"  : "4"
-}
