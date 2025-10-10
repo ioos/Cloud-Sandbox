@@ -43,7 +43,7 @@ export PTMP=$5
 export NPROCS=$6
 export PPN=$7
 export HOSTS=$8
-export JOBTYPE=$9
+export APP=$9
 export EXEC=${10}
 export XTRA_ARGS=${11}   # extra args needed for schism/secofs, and eccofs
 
@@ -67,10 +67,10 @@ export XTRA_ARGS=${11}   # extra args needed for schism/secofs, and eccofs
 
 # for openMPI openmpi=1
 # for Intel MPI set impi=1
-if [[ $JOBTYPE == "adnoc" ]]; then
+if [[ $APP == "adnoc" ]]; then
   openmpi=1
   impi=0
-elif [[ $JOBTYPE == "nyh-hindcast" ]]; then
+elif [[ $APP == "nyh-hindcast" ]]; then
   openmpi=1
   impi=0
 else
@@ -105,7 +105,7 @@ nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs'
 
 
 # Can put domain specific options here
-case $JOBTYPE in
+case $APP in
 
     @($nosofs_roms) | @($nosofs_fvcom))
     export HOMEnos=$SAVEDIR
@@ -239,11 +239,11 @@ case $JOBTYPE in
     export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 
     # mpiexec --machinefile $PBS_NODEFILE -np $CPUS ./fvcom --casename=necofs_cold --LOGFILE=tide.out
-    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$JOBTYPE --LOGFILE=$JOBTYPE.out"
+    echo "Calling: mpirun $MPIOPTS $EXEC --casename=$APP --LOGFILE=$APP.out"
     starttime=`date +%R`
 
     echo "STARTING RUN AT $starttime"
-    mpirun $MPIOPTS $EXEC --casename=$JOBTYPE --LOGFILE=$JOBTYPE.out
+    mpirun $MPIOPTS $EXEC --casename=$APP --LOGFILE=$APP.out
     result=$?
     echo "wth mpirun result: $result"
     endtime=`date +%R`
@@ -274,7 +274,7 @@ case $JOBTYPE in
     result=$?
     ;;
   *)
-    echo "Model not supported $JOBTYPE"
+    echo "Model not supported $APP"
     exit 1
     ;;
 esac
