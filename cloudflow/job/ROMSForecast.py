@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import json
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -107,6 +108,9 @@ class ROMSForecast(Job):
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
+        if (debug):
+            print(json.dumps(cfDict, indent=4))
+
         self.parseConfig(cfDict)
         if self.OCEANIN == "auto":
             self.make_oceanin()

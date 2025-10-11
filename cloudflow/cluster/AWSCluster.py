@@ -229,7 +229,7 @@ class AWSCluster(Cluster):
 
         if (debug):
             print(json.dumps(cfDict, indent=4))
-            print(str(cfDict))
+            # print(str(cfDict))
 
         # Single responsibility says I should only read it here
         return cfDict

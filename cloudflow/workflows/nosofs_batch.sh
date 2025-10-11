@@ -43,7 +43,7 @@ do
 
   echo "ofs: $ofs"
   
-  job=job/jobs/$ofs.fcst
+  job=job/jobs/OFS/$ofs.fcst
   ccfg=./$ofs.cluster
   create_ccfg $ofs $ccfg
   

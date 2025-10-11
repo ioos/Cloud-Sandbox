@@ -1,6 +1,7 @@
 {
+  "MODEL"     : "ROMS",
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "eccofs",
+  "APP"       : "eccofs",
   "CDATE"     : "20190102",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/nosofs",
@@ -9,7 +10,8 @@
   "TIME_REF"  : "20110101.0d0",
   "BUCKET"    : "",
   "BCKTFLDR"  : "",
-  "NTIMES"    : "1440",
+  "NTIMES"    : "720",
+  "24HR_NTIMES"   : "720",
   "48HR_NTIMES"    : "1440",
   "72HR_NTIMES"    : "2160",
   "OUTDIR"    : "auto",

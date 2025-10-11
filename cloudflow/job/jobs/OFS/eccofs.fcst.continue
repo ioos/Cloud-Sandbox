@@ -1,6 +1,7 @@
 {
+  "MODEL"     : "ROMS",
   "JOBTYPE"   : "romsforecast",
-  "OFS"       : "eccofs",
+  "APP"       : "eccofs",
   "CDATE"     : "20190104",
   "HH"        : "00",
   "COMROT"    : "/com/patrick/nosofs",
