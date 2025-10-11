@@ -1,0 +1,20 @@
+{
+  "MODEL"     : "ROMS",
+  "JOBTYPE"   : "romsforecast",
+  "APP"       : "eccofs",
+  "CDATE"     : "20190102",
+  "HH"        : "00",
+  "COMROT"    : "/com/patrick/nosofs",
+  "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",
+  "PTMP"      : "/ptmp/patrick",
+  "TIME_REF"  : "20110101.0d0",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "NTIMES"    : "1440",
+  "48HR_NTIMES"    : "1440",
+  "72HR_NTIMES"    : "2160",
+  "OUTDIR"    : "auto",
+  "OCEANIN"   : "auto",
+  "OCNINTMPL" : "auto"
+}
+

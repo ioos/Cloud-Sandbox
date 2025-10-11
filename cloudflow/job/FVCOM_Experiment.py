@@ -1,30 +1,34 @@
-""" Implementation of Job class for FVCOM Forecasts """
 import datetime
 import os
 import sys
-import shutil
-import warnings
-
-from cloudflow.job.Job import Job
-from cloudflow.utils import modelUtil as util
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
 curdir = os.path.dirname(os.path.abspath(__file__))
+
+from cloudflow.job.Job import Job
+
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
+
 debug = False
 
+
 class FVCOM_Experiment(Job):
-    """ Bare bones implementation of Job class for FVCOM runs
-        This is for a completely manual run setup
+    """ Implementation of Job class for a basic FVCOM model run (model run directory, executable, and executable args if necessary)
 
     Attributes
     ----------
+    MODEL : str
+        The model affiliation class to reference for cloudflow
+
     jobtype : str
-        Always 'fvcom' for this class.
+        User defined job type based on an FVCOM basic simulation, should always be fvcom_basic
+
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
@@ -32,18 +36,19 @@ class FVCOM_Experiment(Job):
     NPROCS : int
         Total number of processors in this cluster.
 
-    OFS : str
-        The ocean forecast system to run. e.g. ngofs2, necofs, etc.
+    EXEC : str
+        The model executable to run.
+    
+    MODEL_DIR : str
+        The location of the model run directory to execute
 
-    RUNDIR : str
-        The full path to the run folder
-
-    INPUTFILE : str
-       path/filename - path and filename expected by the model
-
+    CASE_FILE : str
+        The input FVCOM case file name required to execute the model. For example, if the
+        fvcom case file inlet_run.nml then CASE_FILE=inlet
     """
 
-    # TODO: make attributes consistent, add initialization here
+
+    # TODO: make self and cfDict consistent
     def __init__(self, configfile, NPROCS):
         """ Constructor
 
@@ -56,18 +61,18 @@ class FVCOM_Experiment(Job):
 
         """
 
-        self.jobtype = 'fvcomexperiment'
         self.configfile = configfile
 
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in FVCOMForecast init")
+            print(f"DEBUG: in FVCOM Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
 
+        return
 
 
     def parseConfig(self, cfDict):
@@ -79,13 +84,14 @@ class FVCOM_Experiment(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
-        self.OFS = cfDict['OFS']
-        self.RUNDIR = cfDict['RUNDIR']
-        self.SAVEDIR = cfDict['SAVEDIR']
-        self.INPUTFILE = cfDict['INPUTFILE']
+        self.MODEL = cfDict['MODEL']
+        self.jobtype = cfDict['JOBTYPE']
+        self.APP = cfDict.get('APP', "default")
         self.EXEC = cfDict['EXEC']
-
+        self.MODEL_DIR = cfDict['MODEL_DIR']
+        self.CASE_FILE = cfDict['CASE_FILE']
         return
+
 
 if __name__ == '__main__':
     pass

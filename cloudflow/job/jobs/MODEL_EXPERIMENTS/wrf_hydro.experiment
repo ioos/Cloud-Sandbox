@@ -1,0 +1,7 @@
+{
+  "MODEL"     : "WRF_HYDRO",
+  "JOBTYPE"   : "wrf_hydro_experiment",
+  "APP"       : "basic",
+  "EXEC"      : "/save/ec2-user/OWP/chps-wrf-hydro/trunk/NWC/nwm.vX.X/sorc/nwm.fd/build/Run/wrf_hydro_NoahMP.exe",
+  "MODEL_DIR" : "/save/ec2-user/OWP/NWM_v3_retrospective_run"
+}

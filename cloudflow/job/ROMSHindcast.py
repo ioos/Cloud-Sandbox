@@ -22,17 +22,21 @@ class ROMSHindcast(Job):
 
     Attributes
     ----------
+
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         Always 'romshindcast' for this class.
+
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The current rundate format YYYYMMDD
@@ -126,7 +130,8 @@ class ROMSHindcast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
-        self.OFS = cfDict['OFS']
+        self.MODEL = cfDict['MODEL']
+        self.APP = cfDict.get('APP', "default")
         self.SDATE = cfDict['SDATE']
         self.CDATE = self.SDATE
         self.EDATE = cfDict['EDATE']
@@ -145,7 +150,7 @@ class ROMSHindcast(Job):
         self.OCNINTMPL = cfDict['OCNINTMPL']
 
         # LiveOcean experiment
-        if self.OFS == "liveocean":
+        if self.APP == "liveocean":
             if 'EXPNAME' in cfDict:
                 self.EXPNAME = cfDict["EXPNAME"]
             else:
@@ -156,7 +161,7 @@ class ROMSHindcast(Job):
         if 'CPLINTMPL' in cfDict:
             self.CPLINTMPL = cfDict['CPLINTMPL']
             if self.CPLINTMPL == "auto":
-                self.CPLINTMPL = f"{self.TEMPLPATH}/{self.OFS}.coupling.in"
+                self.CPLINTMPL = f"{self.TEMPLPATH}/{self.APP}.coupling.in"
         else:
             self.CPLINTMPL = None
 
@@ -168,26 +173,26 @@ class ROMSHindcast(Job):
             self.WRFINTMPL = None
 
         if self.OCNINTMPL == "auto":
-            self.OCNINTMPL = f"{self.TEMPLPATH}/{self.OFS}.ocean.in"
+            self.OCNINTMPL = f"{self.TEMPLPATH}/{self.APP}.ocean.in"
 
         return
 
 
     def make_oceanin(self):
         """ Create the ocean.in file from a template"""
-        OFS = self.OFS
+        APP = self.APP
 
         # Create the ocean.in file from a template
-        if OFS == 'liveocean':
+        if APP == 'liveocean':
             self.__make_oceanin_lo()
-        elif OFS == 'adnoc':
+        elif APP == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif OFS in ("cbofs","ciofs","dbofs","gomofs","tbofs", "eccofs"):
+        elif APP in ("cbofs","ciofs","dbofs","gomofs","tbofs", "eccofs"):
             self.__make_oceanin_nosofs()
-        elif OFS == 'wrfroms':
+        elif APP == 'wrfroms':
             self.__make_oceanin_wrfroms()
         else:
-            raise Exception(f"I don't know how to create an ocean.in for {OFS}")
+            raise Exception(f"I don't know how to create an ocean.in for {APP}")
 
         return
 
@@ -196,7 +201,7 @@ class ROMSHindcast(Job):
         """ Create the ocean.in file for liveocean forecasts """
 
         CDATE = self.CDATE
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
         PTMP = self.PTMP
         EXPNAME = self.EXPNAME
@@ -257,10 +262,10 @@ class ROMSHindcast(Job):
 
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
 
-        self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
+        self.OUTDIR = f"{COMROT}/{APP}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -304,13 +309,13 @@ class ROMSHindcast(Job):
         # This can impact performance
 
         # squareness of decomposition i,j tiling 
-        if OFS == 'dbofs':
+        if APP == 'dbofs':
             squareness = 0.16
         else:
             squareness = 1.0
 
         if self.OCEANIN == "auto":
-            self.OCEANIN = f"{self.OUTDIR}/nos.{OFS}.forecast.{CDATE}.t{HH}z.in"
+            self.OCEANIN = f"{self.OUTDIR}/nos.{APP}.forecast.{CDATE}.t{HH}z.in"
         elif self.OCEANIN == "":
             raise Exception(f"No ocean.in file specified")
             
@@ -322,11 +327,11 @@ class ROMSHindcast(Job):
         """ Create the ocean.in file for adnoc forecasts """
 
         CDATE = self.CDATE
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}"
+            self.OUTDIR = f"{COMROT}/{APP}/{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -352,11 +357,11 @@ class ROMSHindcast(Job):
 
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
+            self.OUTDIR = f"{COMROT}/{APP}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -405,11 +410,11 @@ class ROMSHindcast(Job):
         #coupling_esmf_atm_sbl.in
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
+            self.OUTDIR = f"{COMROT}/{APP}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -458,12 +463,12 @@ class ROMSHindcast(Job):
 
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
 
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{COMROT}/{OFS}/{CDATE}{HH}"
+            self.OUTDIR = f"{COMROT}/{APP}/{CDATE}{HH}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)

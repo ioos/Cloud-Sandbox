@@ -24,17 +24,20 @@ class FVCOM_Hindcast(Job):
 
     Attributes
     ----------
+    MODEL : str
+       The model affiliation class to reference for cloudflow
+
     jobtype : str
         Always 'fvcomhindcast' for this class.
+
+    APP : str
+        The model workflow application to run.
 
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
     NPROCS : int
         Total number of processors in this cluster. Determined by cluster config.
-
-    OFS : str
-        The ocean forecast to run.
 
     CDATE : str
         The forecast date in format YYYYMMDD
@@ -114,7 +117,8 @@ class FVCOM_Hindcast(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
-        self.OFS = cfDict['OFS']
+        self.MODEL = cfDict['MODEL']
+        self.jobtype = cfDict['JOBTYPE']
 
         self.SDATE = cfDict['SDATE']
         self.CDATE = self.SDATE
@@ -135,10 +139,10 @@ class FVCOM_Hindcast(Job):
         self.EXEC = cfDict['EXEC']
 
         if self.INTMPL == "auto":
-            self.INTMPL = f"{self.TEMPLPATH}/{self.OFS}.fcst.in"
+            self.INTMPL = f"{self.TEMPLPATH}/{self.APP}.fcst.in"
 
         if self.OUTDIR == "auto":
-            self.OUTDIR = f"{self.COMROT}/{self.OFS}.{self.CDATE}"
+            self.OUTDIR = f"{self.COMROT}/{self.APP}.{self.CDATE}"
 
         return
 
@@ -151,13 +155,13 @@ class FVCOM_Hindcast(Job):
     def make_fcstin(self):
         """ Create the input namelist .in file """
 
-        OFS = self.OFS
+        APP = self.APP
 
         # Create the namelist in file from a template
-        if OFS in ('ngofs2', 'sfbofs', 'leofs', 'lmhofs', 'necofs'):
+        if APP in ('ngofs2', 'sfbofs', 'leofs', 'lmhofs', 'necofs'):
             self.__make_fcstin_nosofs()
         else:
-            #raise Exception(f"{OFS} is not a supported forecast")
+            #raise Exception(f"{APP} is not a supported forecast")
             warnings.warn(f"Not generating a namelist .in file")
 
         return
@@ -169,13 +173,13 @@ class FVCOM_Hindcast(Job):
 
         CDATE = self.CDATE
         HH = self.HH
-        OFS = self.OFS
+        APP = self.APP
         COMROT = self.COMROT
         NHOURS = self.NHOURS
         template = self.INTMPL
 
         # NOTE: self.OUTDIR needs to be specified here since CDATE can change outside of this
-        self.OUTDIR = f"{COMROT}/{OFS}.{CDATE}"
+        self.OUTDIR = f"{COMROT}/{APP}.{CDATE}"
 
         if not os.path.exists(self.OUTDIR):
             os.makedirs(self.OUTDIR)
@@ -202,7 +206,7 @@ class FVCOM_Hindcast(Job):
         # Create the namelist.in file
         if self.INPUTFILE == "auto":
             # This is how the operational nosofs names it
-            self.INPUTFILE = f"nos.{OFS}.hindcast.{CDATE}.t{HH}z.in"
+            self.INPUTFILE = f"nos.{APP}.hindcast.{CDATE}.t{HH}z.in"
         elif self.INPUTFILE == "":
             raise Exception(f"No namelist input file specified")
 

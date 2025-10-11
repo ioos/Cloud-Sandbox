@@ -18,7 +18,7 @@ class Job(ABC):
     jobtype : str
     CDATE : str
     HH : str
-    OFS : str
+    APP : str
     OUTDIR : str
     INDIR : str
     NPROCS : int
@@ -37,7 +37,7 @@ class Job(ABC):
         self.jobtype = ''
         self.CDATE = ''
         self.HH = ''
-        self.OFS = ''
+        self.APP = ''
         self.OUTDIR = ''
         self.INDIR = ''
         self.NPROCS = 0
