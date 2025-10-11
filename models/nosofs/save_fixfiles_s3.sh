@@ -4,15 +4,13 @@ set -x
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-# Use this script update the fixed fields files to the current operational version
-# and save to an S3 bucket.
+# Use this script to save fix files to an S3 bucket.
 # These files are too large to store in a gitHub repo.
 
-
-version="v3.6.11"
-noaaurl="https://www.nco.ncep.noaa.gov/pmb/codes/nwprod/nosofs.${version}"
-
-opts="-nc -np -r"
+fix_version="v3.6.11"
+nosofs_version="v3.6.6"
+nosofsHOME=/save/patrick/nosofs.$nosofs_version
+bucket="s3://ioos-sandbox-use2/public/nosofs/fix"
 
 fixdirs='
 cbofs
@@ -33,18 +31,14 @@ wcofs_free
 shared
 '
 
-fixdirs='eccofs'
-
 # Tar each one and save to S3
-cd nosofs.${version}/fix
-
-bucket="ioos-sandbox-use2"
+cd $nosofsHOME/fix
 
 for dir in $fixdirs
 do
   tarfile=$dir.${version}.fix.tgz
   tar -czvf $tarfile $dir
-  aws s3 cp $tarfile s3://${bucket}/public/nosofs/fix/${tarfile}
+  aws s3 cp $tarfile ${bucket}/${tarfile}
   rm $tarfile
 done
 

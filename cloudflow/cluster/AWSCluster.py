@@ -370,6 +370,8 @@ class AWSCluster(Cluster):
                     'ThreadsPerCore': 1
                 }
               )
+
+        # TODO: refactor this loop so it is not a duplication of the above code
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 

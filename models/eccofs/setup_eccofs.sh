@@ -23,7 +23,6 @@ export REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
 export BRANCH="v3.6.6.dev"
 export MODEL_VERSION='nosofs.v3.6.6'
 export MODULEFILE=intel_x86_64
-
 export MODEL_DIR=$SAVEDIR/$MODEL_VERSION
 
 # Get the nosofs source code and scripts
@@ -40,24 +39,19 @@ else
   echo "$MODEL_DIR is already present, not fetching it from the repository"
 fi
 
-### TODO add ECCOFS as submodule to nosofs
-## Clone the ROMS used for eccofs
-#if [ ! -d $MODEL_DIR/sorc/ROMS.eccofs ]; then
-#
-#  echo "Obtaining the ECCOFS ROMS source code ... "
-#  cd $MODEL_DIR/sorc
-#  git clone -b ioos-sandbox-eccofs https://github.com/asascience-open/roms.git ROMS.eccofs
-#
-#else
-#  echo "$MODEL_DIR/sorc/ROMS.eccofs is already present, not fetching it from the repository"
-#fi
-
-cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
+# Copy the eccofs fix files
+echo "Retrieving the fixed field files ..."
+cd $MODEL_DIR
+$CURHOME/get_eccofs_fixfiles_s3.sh
 
 # Build it
-# echo "Building eccofs ... "
-cd $MODEL_DIR/sorc/ROMS.eccofs
-./COMPILE_ROMS.sh
+echo "Building eccofs ... "
+cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
+cd $MODEL_DIR/sorc
+./build-eccofs-only.sh
 
 # Get test-case data
+echo "Retrieving the forcing data from S3 ..."
+./get_forcing_data_s3.sh
 
+echo "Done."

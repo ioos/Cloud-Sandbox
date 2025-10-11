@@ -2,19 +2,14 @@
 set -euo pipefail
 
 # Use this to:
-#   fetch the operational NOSOFS source codes
 #   build the models and other executables needed by the production suite
 #   retrieve the fixed fields needed to run the models
-#   
+
 # If you are using a shared "USER" account, make sure to
 # set the below path to your own SAVE space 
 # or provide it as a command argument
 
 export SAVEDIR=${1:-"/save/$USER"}
-if [ ! -d $SAVEDIR ]; then
-    mkdir -p $SAVEDIR | echo "Can not create $SAVEDIR"; exit 1
-fi
-
 export CURHOME=$PWD
 export CSHOME="${PWD%/*/*}"
 echo "Cloud-Sandbox/ directory is: $CSHOME"
@@ -40,7 +35,7 @@ cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
 cd $MODEL_DIR/sorc
 ./build-eccofs-only.sh
 
-# This can be used to just build the ROMS model
+# The below can be used to just build the ROMS model
 # cd $MODEL_DIR/sorc/ROMS.eccofs
 # ./COMPILE_ROMS.sh
 
