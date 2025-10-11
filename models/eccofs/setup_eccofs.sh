@@ -41,7 +41,10 @@ fi
 
 # Copy the eccofs fix files
 echo "Retrieving the fixed field files ..."
-cd $MODEL_DIR
+if [ ! -d $MODEL_DIR/fix ]; then
+  mkdir $MODEL_DIR/fix
+fi
+cd $MODEL_DIR/fix
 $CURHOME/get_eccofs_fixfiles_s3.sh
 
 # Build it
@@ -52,6 +55,8 @@ cd $MODEL_DIR/sorc
 
 # Get test-case data
 echo "Retrieving the forcing data from S3 ..."
+cd $CURHOME
 ./get_forcing_data_s3.sh
 
 echo "Done."
+

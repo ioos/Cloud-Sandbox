@@ -43,10 +43,10 @@ Modify and use the following job config files for each step.
       Set NTIMES= how ever many days you want to run
   template: templates/eccofs.ocean.in
   The workflow will copy the coldstart restart file automatically
-  in the getICs step of the workflow. For now it will only copy the day previous to CDATE
+  in the get_forcing step of the workflow. For now it will only copy the day previous to CDATE
   restart file if it exists in the expected /com folder.
 
-3. Run any continuing runs:
+3. Continuing runs:
   See jobs/ config: eccofs.fcst.continue
   CDATE and ININAME need to be manually configured based on your previous run date 
   and forecast length.
@@ -62,7 +62,7 @@ Modify and use the following job config files for each step.
     Then launch the job.
 
 You can use cloudflow/worflows/workflow_main.py to run your job. 
-It is currently setup and testing using the flows.py::forecast_flow().
+It is currently setup and tested using the flows.py::forecast_flow().
 This uses the same workflow and scripts used for the nosofs forecasts.
 
 

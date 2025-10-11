@@ -305,7 +305,7 @@ def get_forcing(job: Job, sshuser=None):
             print(f"INFO: if restart file is missing, assumes it is a cold start") 
 
             print(f"INFO: eccofs can continue a previous run")
-            print(f"INFO: specify ININAME in job config file instead of using prevoius day restart file")
+            print(f"INFO: specify ININAME in job config file instead of using previous day restart file")
 
             ininame = getattr(job,"ININAME", "")
 
@@ -332,7 +332,10 @@ def get_forcing(job: Job, sshuser=None):
             ifile = f'{comdir}/{ofs}.{cdate}.ini.nc'
             
             if os.path.exists(rfile):
+                print(f"Found local restart file")
+                print(f"copying {rfile} to {ifile} ...")
                 shutil.copy2(rfile, ifile)
+                print("... done.")
                 return
             else:
                log.info(f"{ofs} restart does not exist, assuming a cold start")
