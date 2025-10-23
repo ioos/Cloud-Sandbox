@@ -64,7 +64,7 @@
 !
 ! Application title.
 
-       TITLE = ECCOFS forward run
+       TITLE = ECCOFS cold start
 
 ! C-preprocessing Flag.
 
@@ -73,8 +73,7 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-     VARNAME =  /com/eccofs/input/varinfo.yaml
-!     VARNAME =  varinfo.yaml
+     VARNAME = /com/eccofs/input/varinfo.yaml
 
 ! Number of nested grids.
 
@@ -107,9 +106,8 @@ GridsInLayer =  1
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-!      NtileI == 16                               ! I-direction partition
-!      NtileI == 10                               ! I-direction partition
-!      NtileJ == 8                               ! J-direction partition
+!      NtileI == 12                               ! I-direction partition
+!      NtileJ == 12                               ! J-direction partition
 
      NtileI == __NTILEI__  ! I-direction partition
      NtileJ == __NTILEJ__  ! J-direction partition
@@ -226,11 +224,10 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-!      NTIMES = 2160
-      NTIMES = __NTIMES__
+      NTIMES = 1920
 !      NTIMES = 269280
-          DT == 120.0d0           ! 720 timesteps per day
-!          DT == 45.0d0           ! 1920 timesteps per day
+!          DT == 120.0d0           ! 720 timesteps per day
+          DT == 45.0d0           ! 1920 timesteps per day
      NDTFAST == 30
 
 ! Number of timesteps for computing observation impacts during the
@@ -259,25 +256,25 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
        NRREC == 0
    LcycleRST == T
-        NRST == 720
+        NRST == 1920
         NSTA == 1
         NFLT == 1
-       NINFO == 720
+       NINFO == 1920
 
 ! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
-        NHIS == 720
-     NDEFHIS == 720
-        NXTR == 180           ! 6 hourly
-     NDEFXTR == 720
-        NQCK == 90            ! 3 hourly
-     NDEFQCK == 720
+        NHIS == 21600
+     NDEFHIS == 21600
+        NXTR == 1920           ! 6 hourly
+     NDEFXTR == 1920
+        NQCK == 1920           ! 3 hourly 1920 is not 3 hourly
+     NDEFQCK == 1920
       NTSAVG == 1
-        NAVG == 720           ! daily 
-     NDEFAVG == 720
+        NAVG == 1920          ! daily 
+     NDEFAVG == 1920
       NTSDIA == 1
-        NDIA == 720
+        NDIA == 1920
      NDEFDIA == 0
 
 ! Output tangent linear and adjoint models parameters.
@@ -987,17 +984,16 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
  ExtractFlag == 2
 
+!     GRXNAME == eccofs.romsgrid.6km.nc
      GRXNAME == /com/eccofs/input/grid_eccofs_6km_08_b7.nc
 
 ! Input NetCDF file names, [1:Ngrids].
 
+!     GRDNAME == eccofs.romsgrid.3km.nc
      GRDNAME == /com/eccofs/input/grid_eccofs_3km_08_b7.nc
-!     ININAME == /com/eccofs/input/eccofs3km_ini_Mercator_20171101_avg_BiasCor.nc
-!     ININAME == eccofs_ini_20221207.nc
-!     ININAME == eccofs_ini_20190102.nc
 
-!! TODO Template this
-     ININAME == ../eccofs.20190101/eccofs_rst.nc
+!     ININAME == /projects/f_omg_1/eccofs/eccofs3km_ini_Mercator_20171101_avg_BiasCor.nc
+     ININAME == /com/eccofs/input/eccofs_ini_Mercator_daily_2019_01_01.nc
      ITLNAME == ocean_itl.nc
      IRPNAME == ocean_irp.nc
      IADNAME == ocean_iad.nc
@@ -1039,7 +1035,6 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
     NBCFILES == 1                          ! number of boundary files
 
-!     BRYNAME == /com/eccofs/input/Z_corr_daily/eccofs3km_bry_Mercator_daily_2019_01_1-9_BiasCor.nc
      BRYNAME == /com/eccofs/input/eccofs_bry_mercator_19932023_monthly_Zcorr.nc
 
 ! Input climatology file names. The USER has the option to separate the
@@ -1052,14 +1047,12 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
    NCLMFILES == 1                          ! number of climatology files
 
-!   CLMNAME == /com/eccofs/input/Z_corr_daily/eccofs3km_clm_Mercator_daily_2019_01_1-9_BiasCor.nc
    CLMNAME == /com/eccofs/input/eccofs_mercator_19932023_monthly.nc
 
      NUDNAME == /com/eccofs/input/eccofs_nudgcoef_3km_10days.nc
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-!     SSFNAME == /com/eccofs/input/rivers/eccofs_3km_rivers_GloFAS_2011-2024_v5.nc
      SSFNAME == /com/eccofs/input/eccofs_3km_rivers_GloFAS_2011-2024_MonClm.nc
 
 ! Input tidal forcing file name.
@@ -1087,15 +1080,7 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
      NFFILES == 1                          ! number of unique forcing files
 
-     FRCNAME == /com/eccofs/input/frc_eccofs_ERA5_allflux_2011.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2012.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2013.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2014.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2015.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2016.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2017.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2018.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2019.nc4 |
+     FRCNAME == /com/eccofs/input/frc_eccofs_ERA5_allflux_2019.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2020.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2021.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2022.nc4 |
@@ -1105,7 +1090,8 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
      DAINAME == eccofs_dai.nc
      GSTNAME == eccofs_gst.nc
-     RSTNAME == eccofs_rst.nc
+!     RSTNAME == eccofs_rst.nc
+     RSTNAME == eccofs.__CDATE__.rst.nc
      HISNAME == eccofs_his.nc
      XTRNAME == eccofs6km_xtr.nc
      QCKNAME == eccofs_qck.nc

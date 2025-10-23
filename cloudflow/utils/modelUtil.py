@@ -17,8 +17,8 @@ roms_models = ["adnoc","cbofs","ciofs","dbofs","gomofs","tbofs","wcofs","liveoce
 fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
 ############################
 
-nosofs_roms_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs","wcofs" ]
-nosofs_fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sscofs","sfbofs" ]
+nosofs_roms_models = [ "cbofs","ciofs","dbofs","gomofs","tbofs","wcofs","eccofs" ]
+nosofs_fvcom_models = [ "leofs","lmhofs","loofs","lsofs","ngofs2","sfbofs","sscofs" ]
 nosofs_models = nosofs_roms_models + nosofs_fvcom_models
 
 def nosofs_cyc0(ofs : str) -> str:
@@ -175,6 +175,31 @@ def ndate_hrs(cdate :str, hours :int):
     strdate = date2.strftime("%Y%m%d%H")
 
     return strdate
+
+#####################################################################
+
+
+
+def ndate_secs(cdate :str, seconds :int):
+    """ return the YYYYMMDDHH for CDATE +/- hours """
+
+    y1 = int(cdate[0:4])
+    m1 = int(cdate[4:6].lstrip("0"))
+    d1 = int(cdate[6:8].lstrip("0"))
+
+    hh = cdate[8:10]
+    if hh == '00':
+        h1 = 0
+    else:
+        h1 = int(cdate[8:10].lstrip("0"))
+
+    dt = datetime.timedelta(seconds=seconds)
+
+    date2 = datetime.datetime(y1, m1, d1, h1) + dt
+    strdate = date2.strftime("%Y%m%d%H")
+
+    return strdate
+
 
 
 #####################################################################

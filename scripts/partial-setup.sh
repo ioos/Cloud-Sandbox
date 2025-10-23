@@ -32,10 +32,9 @@ source funcs-setup-instance.sh
 #remove_spack
 #install_spack
 #install_intel_oneapi_spack
+#install_intel-oneapi-mkl_spack
 
-install_intel-oneapi-mkl_spack
-
-#install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
+install_esmf_spack          # also installs netcdf, hdf5, intel-mpi
 #install_petsc_intelmpi-spack
 
 # TODO: Install these libraries via spack

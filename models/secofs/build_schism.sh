@@ -19,6 +19,7 @@ cp -p $SCRIPTS/modulefiles/$MODULEFILE  $SAVE_DIR/schism
 
 cd $SAVE_DIR/schism/cmake
 
+#TODO - add -qopenmp to build flags to include openMP support
 cp $SCRIPTS/SCHISM.local.build .
 cp $SCRIPTS/SCHISM.aws.ioos .
 

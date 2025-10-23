@@ -1,17 +1,68 @@
-ECCOFS is a ROMS based model and has been setup to build in the nosofs.v3.5.0 build framework.
+ECCOFS is a ROMS based model and has been setup to build and run in the nosofs.v3.6.6 framework.
+
+Notes:
+Real time initial conditions are still in development.
+We have forcing data available for 2011-2023 for running hindcasts.
+We have a coldstart initial condition for 2019010100 we can use to start.
+
+Certain fixed field files are required by the operational run scripts which we are using here.
+The fix files are incomplete and are really just there to make the operational run-scripts happy without making major changes to the operational scripts.
+It's a step towards eccofs becoming operational.
+These are downloaded and placed in the proper "fix" folder within the nosofs folder.
 
 To setup:
-Make sure the paths are set to use your personal directories before running the scripts:
-get_src_and_build.sh
-get_testcase_inputs.sh
+(Make sure the paths are set to use your personal directories before running the scripts)
+
+setup_eccofs.sh    - This script clones the nosofs source and ROMS eccofs, builds it, and also
+                     retrieves the forcing files and fix field files.
+
+    setup_eccofs.sh calls the following scripts:
+        get_eccofs_fixfiles_s3.sh
+        get_forcing_data_s3.sh
+        $MODEL_DIR/sorc/build-eccofs-only.sh  - contained in nosofs repository
+
+build_eccofs.sh    - This script can be used to just rebuild the ROMS eccofs executable.
+
+restart_date.sh    - A helper script to get the next available start date from a restart file,
+                     to help setup a run to continue a previous run.
 
 To run:
-See example job configs in cloudflow/job/jobs:
-eccofs.hcast.1stday
-eccofs.hcast.subseqdays
 
-You can use cloudflow/worflows/workflow_main.py to run your job. It is setup to use the flows.py::multi_hindcast_flow().
+You can use cloudflow/worflows/workflow_main.py to run your job.
+It is currently setup and tested using the flows.py::forecast_flow().
+This uses the same workflow and scripts used for the nosofs forecasts.
 
-ROMS namelist input ocean.in is templated using job/templates:
-roms_nl_eccofs_1st_day.in
-roms_nl_eccofs_subseq_days.in
+Modify and use the following job config files for each step.
+
+1. Run the 1 day coldstart for 20190101
+  jobs/ config: eccofs.coldstart
+  template: templates/eccofs.coldstart.ocean.in
+
+2. Run the forecast for 20190102
+  jobs/ config: eccofs.fcst
+      Set NTIMES= how ever many days you want to run
+  template: templates/eccofs.ocean.in
+  The workflow will copy the coldstart restart file automatically
+  in the get_forcing step of the workflow. For now it will only copy the day previous to CDATE
+  restart file if it exists in the expected /com folder.
+
+3. Continuing runs:
+  See jobs/ config: eccofs.fcst.continue
+  CDATE and ININAME need to be manually configured based on your previous run date 
+  and forecast length.
+  Use restart_date.sh script to help setup the job if not sure how long the previous one ran.
+  Example: 
+    Assume the run in 2. above was set to run 48 hours
+    The next date to run to contiue it will be 20190104 00Z 
+    The restart file needed to start the new run will be in 
+    under /com/<username>/nosofs/eccofs.20190102/eccofs.20190102.rst.nc
+    Run ./restart_date.sh /com/<username>/nosofs/eccofs.20190102/eccofs.20190102.rst.nc
+    This will output 2019010400, confirming that the restart exists for that CDATE.
+    Set CDATE to that date (YYYYMMDD) and ININAME to that restart file.
+    Then launch the job.
+
+You can use cloudflow/worflows/workflow_main.py to run your job. 
+It is currently setup and tested using the flows.py::forecast_flow().
+This uses the same workflow and scripts used for the nosofs forecasts.
+
+

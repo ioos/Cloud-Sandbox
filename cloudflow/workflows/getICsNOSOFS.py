@@ -10,6 +10,7 @@ NODD   = 'https://noaa-ofs-pds.s3.amazonaws.com'
 
 # TODO: Refactor this, too much duplicate code
 
+
 def getICs(cdate, hh, ofs, comdir):
 
     errors=0

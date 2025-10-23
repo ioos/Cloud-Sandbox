@@ -32,6 +32,11 @@ module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 module load metis/5.1.0-intel-2021.9.0-fdsd6ir
 module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
 
+# Need to test build with these, I don't think they are being used yet
+module load parallel-netcdf/1.12.3-intel-2021.9.0-o334gxk  
+module load parallelio/2.6.2-intel-2021.9.0-mznk65v  
+###########################################################
+
 set METIS [exec spack location -i metis]
 regsub {\n$} $METIS {} METIS
 setenv METIS $METIS

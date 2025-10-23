@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import json
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -10,7 +11,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 from cloudflow.job.Job import Job
 from cloudflow.utils import modelUtil as util
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 
@@ -107,6 +108,9 @@ class ROMSForecast(Job):
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
+        if (debug):
+            print(json.dumps(cfDict, indent=4))
+
         self.parseConfig(cfDict)
         if self.OCEANIN == "auto":
             self.make_oceanin()
@@ -179,12 +183,12 @@ class ROMSForecast(Job):
         APP = self.APP
 
         # Create the ocean.in file from a template
-        if APP == 'liveocean':
+        if APP in util.nosofs_roms_models:
+            self.__make_oceanin_nosofs()
+        elif APP == 'liveocean':
             self.__make_oceanin_lo()
         elif APP == 'adnoc':
             self.__make_oceanin_adnoc()
-        elif APP in ("cbofs","ciofs","dbofs","gomofs","tbofs","wcofs"):
-            self.__make_oceanin_nosofs()
         elif APP == 'wrfroms':
             self.__make_oceanin_wrfroms()
         else:
@@ -261,6 +265,7 @@ class ROMSForecast(Job):
         # The restart date is 6 hours prior to CDATE
         # DSTART = days from TIME_REF to start of forecast day
         # ndays returns arg1 - arg2
+        # TODO: check this for correctness Oct-2025
         prev6hr = util.ndate_hrs(f"{CDATE}{HH}", -6)
         DSTART = util.ndays(prev6hr, self.TIME_REF)
         # Reformat the date
