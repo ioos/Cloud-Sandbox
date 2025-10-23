@@ -26,7 +26,7 @@ from cloudflow.plotting import shared as plot_shared
 from cloudflow.utils import modelUtil as util
 from cloudflow.workflows import getICsNOSOFS
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 debug = False
@@ -248,6 +248,7 @@ def get_baseline(job: Job, sshuser=None):
 @task
 def get_forcing(job: Job, sshuser=None):
     """ Retrieve operational moddel forcing data and initial conditions
+        TODO: might be time to create separate functions for the specific applications
 
     Parameters
     ----------
@@ -293,25 +294,73 @@ def get_forcing(job: Job, sshuser=None):
     elif app in util.nosofs_models:
 
         cdate = sdate
+        ofs = app
 
+        if ofs == "eccofs":
+
+            # Temporary hack here until eccofs realtime ICs become available
+            print(f"INFO: {ofs} getICs for non-operational ECCOFS dev")
+            print(f"INFO: only copying previous day restart file for ini")
+            print(f"INFO: restart file must be from coldstart or previous run")
+            print(f"INFO: restart file must be on local disk")
+            print(f"INFO: if restart file is missing, assumes it is a cold start") 
+
+            print(f"INFO: eccofs can continue a previous run")
+            print(f"INFO: specify ININAME in job config file instead of using previous day restart file")
+
+            ininame = getattr(job,"ININAME", "")
+
+            comdir = f"{comrot}/{ofs}.{cdate}"
+
+            pdate = util.ndate(cdate, -1)
+            prev_comdir = f"{comrot}/{ofs}.{pdate}"
+
+            # OFS uses the previous nowcast for INI (files are saved a little different on NOMADS/NODD)
+            # INIFILE=cbofs.t__HH__z.__CDATE__.rst.nowcast.nc
+            # RSTNAME == cbofs.t__HH__z.__CDATE__.rst.forecast.nc
+
+            # We are using the previous run or coldstart restart for INI
+            # ININAME == eccofs.20190102.ini.nc
+            # RSTNAME=eccofs.20190101.rst.nc
+
+            # copy previous day rst to current day ini
+            # or use definied ININAME
+            if ininame != "":
+                rfile = ininame
+            else:
+                rfile = f'{prev_comdir}/{ofs}.{pdate}.rst.nc'
+
+            ifile = f'{comdir}/{ofs}.{cdate}.ini.nc'
+            
+            if os.path.exists(rfile):
+                print(f"Found local restart file")
+                print(f"copying {rfile} to {ifile} ...")
+                shutil.copy2(rfile, ifile)
+                print("... done.")
+                return
+            else:
+               log.info(f"{ofs} restart does not exist, assuming a cold start")
+               log.info(f"{ofs} run will fail if an ini/restart file isn't present")
+               return
+            
         while cdate <= edate:
 
-            comdir = f"{comrot}/{app}.{cdate}"
+            comdir = f"{comrot}/{ofs}.{cdate}"
             try:
-                getICsNOSOFS.getICs(cdate, hh, app, comdir)
+                getICsNOSOFS.getICs(cdate, hh, ofs, comdir)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
                 raise signals.FAIL()
 
             cdate = util.ndate(cdate, 1)
 
-    elif app in ('secofs', 'eccofs', 'necofs'):
+    elif app in ('secofs', 'necofs'):
         print(f"only using pre-downloaded forcing files for {app} test case")
     else:
-        log.error(f"Unsupported forecast: {app}")
-        raise signals.FAIL()
+        log.warning(f"Unable to download forcing for: {app}, not implemented")
 
     return
+
 
 @task
 def old_get_forcing(job: Job, sshuser=None):

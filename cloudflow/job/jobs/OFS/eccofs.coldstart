@@ -11,6 +11,7 @@
   "BUCKET"    : "",
   "BCKTFLDR"  : "",
   "NTIMES"    : "1920",
+  "24HR_NTIMES"    : "1920",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
   "OCNINTMPL" : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/eccofs.coldstart.ocean.in"

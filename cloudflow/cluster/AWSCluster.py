@@ -229,7 +229,7 @@ class AWSCluster(Cluster):
 
         if (debug):
             print(json.dumps(cfDict, indent=4))
-            print(str(cfDict))
+            # print(str(cfDict))
 
         # Single responsibility says I should only read it here
         return cfDict
@@ -370,6 +370,8 @@ class AWSCluster(Cluster):
                     'ThreadsPerCore': 1
                 }
               )
+
+        # TODO: refactor this loop so it is not a duplication of the above code
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 

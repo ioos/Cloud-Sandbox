@@ -96,18 +96,19 @@ fi
 #export MPIOPTS="-hosts $HOSTS -np $NPROCS -ppn $PPN"
 result=0
 
-#nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs"
+#nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs eccofs"
 #nosofs_fvcom="leofs lmhofs loofs lsofs ngofs2 sscofs sfbofs"
 
 shopt -s extglob
 nosofs_fvcom='leofs|lmhofs|loofs|lsofs|ngofs2|sscofs|sfbofs'
-nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs'
+nosofs_roms='cbofs|ciofs|dbofs|gomofs|tbofs|wcofs|eccofs'
 
 
 # Can put domain specific options here
 case $APP in
 
-    @($nosofs_roms) | @($nosofs_fvcom))
+  @($nosofs_roms) | @($nosofs_fvcom))
+    export OFS=$APP
     export HOMEnos=$SAVEDIR
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
@@ -120,6 +121,7 @@ case $APP in
 
 
   liveocean)
+    export OFS=$APP
     export HOMEnos=$SAVEDIR/LiveOcean
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh
@@ -133,6 +135,7 @@ case $APP in
 
 
   wrfroms)
+    export OFS=$APP
     export HOMEnos=$SAVEDIR/WRF-ROMS-Coupled
     export JOBDIR=$HOMEnos/jobs
     export JOBSCRIPT=$JOBDIR/fcstrun.sh 
@@ -189,37 +192,6 @@ case $APP in
     ;;
 
 
-  eccofs)
-    # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
-    cd "$COMOUT" || exit 1
-    # If using scratch disk use PTMP
-    # cd $PTMP || exit 1
-    echo "Current dir is: $PWD"
-
-    # SAVEDIR is job.SAVEDIR
-    module use -a $SAVEDIR/modulefiles
-    module load intel_x86_64
-
-    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
-    export I_MPI_OFI_PROVIDER=efa
-    export I_MPI_FABRICS=ofi
-    export FI_PROVIDER=efa
-    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-
-    OCEANIN=$XTRA_ARGS
-    echo "Calling: mpirun $MPIOPTS $EXEC $OCEANIN"
-    starttime=`date +%R`
-    #echo "Testing ... sleeping"
-    #sleep 300
-    echo "STARTING RUN AT $starttime"
-    mpirun $MPIOPTS $EXEC $OCEANIN
-    result=$?
-    echo "wth mpirun result: $result"
-    endtime=`date +%R`
-    echo "RUN FINISHED AT $endtime"
-    ;;
-
-
   necofs)
     cd "$COMOUT" || exit 1
     echo "Current dir is: $PWD"
@@ -249,6 +221,7 @@ case $APP in
     endtime=`date +%R`
     echo "RUN FINISHED AT $endtime"
     ;;
+
 
   adnoc)
     EXEC=${EXEC:-roms}

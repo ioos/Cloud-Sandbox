@@ -1,0 +1,11 @@
+Work on optimizing disk i/o performance. 
+Try building model with pio and/or parallel netcdf as mentioned by John W.
+Don't output restart every day, just the last day of run.
+Test i/o again using FSx Lustre workflow.
+Skip copy to/from /ptmp in operational scripts.
+    Since /ptmp and /com are on same EFS volume, can change cp to mv for forecast results copy back to /com
+
+ Nonlinear model elapsed CPU time profile, Grid: 01
+  Reading of input data ............................     64162.368  ( 6.0661 %)
+  Writing of output data ...........................    572665.865  (54.1418 %)
+

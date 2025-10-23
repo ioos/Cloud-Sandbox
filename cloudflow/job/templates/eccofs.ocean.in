@@ -73,8 +73,8 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-     VARNAME =  /com/eccofs/input/varinfo.yaml
-!     VARNAME =  varinfo.yaml
+! using varinfo.yaml provided by JoeZ in base folder
+     VARNAME = /com/eccofs/input/varinfo.yaml
 
 ! Number of nested grids.
 
@@ -226,9 +226,10 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-!      NTIMES = 2160
+!      NTIMES = 2160              ! 3 days @ 120s
+!      NTIMES = 1440              ! 2 days @ 120s
       NTIMES = __NTIMES__
-!      NTIMES = 269280
+!      NTIMES = 269280            ! 374 days @ 120s
           DT == 120.0d0           ! 720 timesteps per day
 !          DT == 45.0d0           ! 1920 timesteps per day
      NDTFAST == 30
@@ -259,7 +260,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
        NRREC == 0
    LcycleRST == T
-        NRST == 720
+        NRST == 720            ! daily
+        ! NRST == __NTIMES__   ! only write a restart at end of run
         NSTA == 1
         NFLT == 1
        NINFO == 720
@@ -439,6 +441,12 @@ LtracerSponge == F F                            ! temperature, salinity, inert
       DSTART =  0.0d0                      ! days
   TIDE_START =  0.0d0                      ! days
     TIME_REF =  20110101.0d0               ! yyyymmdd.dd
+
+!PT The model blows up if I set these ocean_time NetCDF Invalid unit
+!PT Verified ocean_time is correct using the above 0.0d0 values for 20190102 fcst
+!PT Tide phase might be wrong though, but we are using climatalogical tides so might be ok
+!         DSTART = __DSTART__       ! days
+!     TIDE_START = __TIDE_START__   ! days
 
 ! Nudging/relaxation time scales, inverse scales will be computed
 ! internally, [1:Ngrids].
@@ -987,17 +995,17 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
  ExtractFlag == 2
 
+!     GRXNAME == eccofs.romsgrid.6km.nc
      GRXNAME == /com/eccofs/input/grid_eccofs_6km_08_b7.nc
 
 ! Input NetCDF file names, [1:Ngrids].
 
+!     GRDNAME == eccofs.romsgrid.3km.nc
      GRDNAME == /com/eccofs/input/grid_eccofs_3km_08_b7.nc
-!     ININAME == /com/eccofs/input/eccofs3km_ini_Mercator_20171101_avg_BiasCor.nc
-!     ININAME == eccofs_ini_20221207.nc
-!     ININAME == eccofs_ini_20190102.nc
 
-!! TODO Template this
-     ININAME == ../eccofs.20190101/eccofs_rst.nc
+
+!     ININAME == ../eccofs.20190101/eccofs_rst.nc
+     ININAME == eccofs.__CDATE__.ini.nc
      ITLNAME == ocean_itl.nc
      IRPNAME == ocean_irp.nc
      IADNAME == ocean_iad.nc
@@ -1087,15 +1095,7 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
      NFFILES == 1                          ! number of unique forcing files
 
-     FRCNAME == /com/eccofs/input/frc_eccofs_ERA5_allflux_2011.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2012.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2013.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2014.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2015.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2016.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2017.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2018.nc4 |
-                /com/eccofs/input/frc_eccofs_ERA5_allflux_2019.nc4 |
+     FRCNAME == /com/eccofs/input/frc_eccofs_ERA5_allflux_2019.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2020.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2021.nc4 |
                 /com/eccofs/input/frc_eccofs_ERA5_allflux_2022.nc4 |
@@ -1105,7 +1105,8 @@ PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
 
      DAINAME == eccofs_dai.nc
      GSTNAME == eccofs_gst.nc
-     RSTNAME == eccofs_rst.nc
+     ! RSTNAME == eccofs_rst.nc
+     RSTNAME == eccofs.__CDATE__.rst.nc
      HISNAME == eccofs_his.nc
      XTRNAME == eccofs6km_xtr.nc
      QCKNAME == eccofs_qck.nc
