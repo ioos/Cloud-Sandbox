@@ -24,7 +24,7 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 #SCRATCH_TYPE = 'FSx'

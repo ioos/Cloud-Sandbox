@@ -19,7 +19,7 @@ from haikunator import Haikunator
 from cloudflow.cluster import AWSHelper
 from cloudflow.cluster.Cluster import Cluster
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 debug = False

@@ -3,7 +3,7 @@ set -x
 # This receives the forcing data required to run CBOFS prep step
 # It needs to be modified to support any ROMS based model
 
-#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
 

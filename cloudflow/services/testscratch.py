@@ -18,7 +18,7 @@ from cloudflow.services import ScratchDisk
 #from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
 from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 

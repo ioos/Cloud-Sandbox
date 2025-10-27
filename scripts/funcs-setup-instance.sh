@@ -11,7 +11,7 @@ fi
 # This script will setup the required system components, libraries
 # and tools needed for ROMS forecast models on CentOS 7
 
-#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
 # This has been tested on RHEL8 

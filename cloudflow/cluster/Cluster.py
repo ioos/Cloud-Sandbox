@@ -5,7 +5,7 @@ This class needs to be implemented and extended for specific cloud providers.
 from abc import ABC, abstractmethod
 from subprocess import Popen
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 

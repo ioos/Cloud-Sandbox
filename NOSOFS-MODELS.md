@@ -180,4 +180,4 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
 
-*Copyright © 2023 RPS Group, Inc. All rights reserved.*
+*Copyright © 2025 Tetra Tech, Inc. All rights reserved.*

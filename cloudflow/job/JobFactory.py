@@ -24,7 +24,7 @@ from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
 
 from cloudflow.job.DFLOWFM_Experiment import DFLOWFM_Experiment
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 debug = False

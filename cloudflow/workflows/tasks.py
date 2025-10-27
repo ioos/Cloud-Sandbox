@@ -39,7 +39,7 @@ from cloudflow.services.FSxScratchDisk import FSxScratchDisk
 
 from cloudflow.utils import modelUtil as util
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 pp = pprint.PrettyPrinter()

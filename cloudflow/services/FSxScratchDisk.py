@@ -18,7 +18,7 @@ from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
 
 import cloudflow.services.ScratchDisk as ScratchDiskModule
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 log = logging.getLogger('workflow')

@@ -16,8 +16,8 @@ It provides repeatable configurations, model code and required libraries, input 
 ### Deployment options
 
 - **Self deployed/hosted**: Deploy using your own AWS cloud account
-- **IOOS hosted**: NOAA AWS Government Cloud – Lynker contract
-- **RPS hosted**: Isolated secure Virtual Private Cloud (VPC)
+- **NOS hosted**: NOAA AWS Government Cloud – Lynker contract
+- **Tetra Tech hosted**: Isolated secure Virtual Private Cloud (VPC)
 
 ### The Cloud Sandbox has been used to run:
 
