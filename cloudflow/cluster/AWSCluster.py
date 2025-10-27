@@ -208,34 +208,6 @@ class AWSCluster(Cluster):
     """ Implemented abstract methods """
     ########################################################################
 
-    def readConfig(self, configfile):
-        """ Reads a JSON configuration file into a dictionary.
-
-        Parameters
-        ----------
-        configfile : str
-          Full path and filename of a JSON configuration file for this cluster.
-
-        Returns
-        -------
-        cfDict : dict
-          Dictionary containing this cluster parameterized settings.
-        """
-
-        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
-
-        with open(configfile, 'r') as cf:
-            cfDict = json.load(cf)
-
-        if (debug):
-            print(json.dumps(cfDict, indent=4))
-            # print(str(cfDict))
-
-        # Single responsibility says I should only read it here
-        return cfDict
-
-    ########################################################################
-
 
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
