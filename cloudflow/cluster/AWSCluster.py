@@ -141,7 +141,9 @@ class AWSCluster(Cluster):
         self.platform = 'AWS'
         self.__configfile = configfile
         self.__state = None  # This could be an enumeration of none, running, stopped, error
-        self.__instances = []
+
+        # Only save what we need
+        self.instances = []
         self.__start_time = time.time()
         self.region = ""
         self.nodeType = ''
@@ -156,6 +158,7 @@ class AWSCluster(Cluster):
         self.sg_ids = []
         self.subnet_id = ''
         self.placement_group = ''
+        # self.hosts = ''
 
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
@@ -292,13 +295,11 @@ class AWSCluster(Cluster):
         return self.PPN
 
 
-    # TODO: use gp3 volume instead of default gp2
-    def start(self):
+    def create_instances(self):
         """ Provision the configured cluster in the cloud.
 
-        Returns
-        -------
-        self.__instances : list of EC2.Intance
+        Returns 
+        instances : list of EC2.Intance
             the list of Instances started. See boto3 documentation.
         """
 
@@ -309,67 +310,108 @@ class AWSCluster(Cluster):
         # Programmatically determine these options
         max_network_cards = AWSHelper.maxNetworkCards(self.nodeType, self.region)
         log.debug(f"max_network_cards: {max_network_cards}")
-
+ 
         smt_supported = AWSHelper.supportsThreadsPerCoreOption(self.nodeType, self.region)
         log.debug(f"smt_supported: {smt_supported}")
         # hpc6a and hpc7a and some others do not support the CpuOptions={ 'ThreadsPerCore': option }
+ 
+        if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
+            # EFA supported:           NO                  YES
+  
+            response = ec2.create_instances(
+              ImageId=self.image_id,
+              InstanceType=self.nodeType,
+              KeyName=self.key_name,
+              MinCount=self.nodeCount,
+              MaxCount=self.nodeCount,
+              TagSpecifications=[
+                  {   
+                      'ResourceType': 'instance',
+                      'Tags': self.tags
+                  }
+              ],
+              Placement=self.__placementGroup(),
+              NetworkInterfaces=self.__netInterfaces(count = 1)
+            )
+        elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
+            response = ec2.create_instances(
+              ImageId=self.image_id,
+              InstanceType=self.nodeType,
+              KeyName=self.key_name,
+              MinCount=self.nodeCount,
+              MaxCount=self.nodeCount,
+              TagSpecifications=[
+                  {
+                      'ResourceType': 'instance',
+                      'Tags': self.tags
+                  }
+              ],
+              Placement=self.__placementGroup(),
+              NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
+            )
+        else:  # supports the ThreadsPerCore option and setting it to 1
+            reponse = ec2.create_instances(
+              ImageId=self.image_id,
+              InstanceType=self.nodeType,
+              KeyName=self.key_name,
+              MinCount=self.nodeCount,
+              MaxCount=self.nodeCount,
+              TagSpecifications=[
+                  {
+                      'ResourceType': 'instance',
+                      'Tags': self.tags
+                  }
+              ],
+              Placement=self.__placementGroup(),
+              NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
+              CpuOptions={
+                  'CoreCount': self.PPN,
+                  'ThreadsPerCore': 1
+              }
+            )
+ 
+        # response should be an array/list of ec2 instances, see boto3 documentation for spec
+        instances = response
+        #instance_list = response['Instances']
+        #self.instances = instance_list
+        print("PT DEBUG instances ------------------------------------------")
+        print("PT DEBUG instances ------------------------------------------")
+        print(instances)
+        #print(instance_list)
+        print("PT DEBUG instances ------------------------------------------")
+        print("PT DEBUG instances ------------------------------------------")
+        self.save_instance_data(instances)
+        return instances
 
+
+ 
+    def save_instance_data(self, instances):
+
+        self.instances = []
+        for instance in instances:
+            instance_data = {
+                "instance_id": instance.instance_id,
+                "instance_type": instance.instance_type,
+                "state": instance.state['Name'],
+                "host": instance.private_ip_address
+            }
+            print(json.dumps(instance_data))
+            self.instances.append(instance_data)
+    
+ 
+ 
+    # TODO: make sure use of gp3 volume instead of gp2
+    def start(self):
+        """ Provision the configured cluster in the cloud.
+        """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        ec2 = boto3.resource('ec2', region_name=self.region)
+
+        instances = []
         try:
-          if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
-          # EFA supported:           NO                  YES
-              self.__instances = ec2.create_instances(
-                ImageId=self.image_id,
-                InstanceType=self.nodeType,
-                KeyName=self.key_name,
-                MinCount=self.nodeCount,
-                MaxCount=self.nodeCount,
-                TagSpecifications=[
-                    {
-                        'ResourceType': 'instance',
-                        'Tags': self.tags
-                    }
-                ],
-                Placement=self.__placementGroup(),
-                NetworkInterfaces=self.__netInterfaces(count = 1)
-              )
-
-          elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
-              self.__instances = ec2.create_instances(
-                ImageId=self.image_id,
-                InstanceType=self.nodeType,
-                KeyName=self.key_name,
-                MinCount=self.nodeCount,
-                MaxCount=self.nodeCount,
-                TagSpecifications=[
-                    {
-                        'ResourceType': 'instance',
-                        'Tags': self.tags
-                    }
-                ],
-                Placement=self.__placementGroup(),
-                NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
-              )
-
-          else:  # supports the ThreadsPerCore option and setting it to 1
-              self.__instances = ec2.create_instances(
-                ImageId=self.image_id,
-                InstanceType=self.nodeType,
-                KeyName=self.key_name,
-                MinCount=self.nodeCount,
-                MaxCount=self.nodeCount,
-                TagSpecifications=[
-                    {
-                        'ResourceType': 'instance',
-                        'Tags': self.tags
-                    }
-                ],
-                Placement=self.__placementGroup(),
-                NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
-                CpuOptions={
-                    'CoreCount': self.PPN,
-                    'ThreadsPerCore': 1
-                }
-              )
+           instances = self.create_instances()
 
         # TODO: refactor this loop so it is not a duplication of the above code
         except ClientError as e:
@@ -380,63 +422,7 @@ class AWSCluster(Cluster):
 
                  while retries < self.vm_max_retries:
                      try:
-                         if self.nodeType in ['x2idn.24xlarge', 'x2idn.32xlarge']:
-                             # EFA supported:           NO                  YES
-                             self.__instances = ec2.create_instances(
-                               ImageId=self.image_id,
-                               InstanceType=self.nodeType,
-                               KeyName=self.key_name,
-                               MinCount=self.nodeCount,
-                               MaxCount=self.nodeCount,
-                               TagSpecifications=[
-                                   {
-                                       'ResourceType': 'instance',
-                                       'Tags': self.tags
-                                   }
-                               ],
-                               Placement=self.__placementGroup(),
-                               NetworkInterfaces=self.__netInterfaces(count = 1)
-                             )
-
-                         elif not smt_supported: # Does NOT support CpuOptions ThreadsPerCore option
-                             self.__instances = ec2.create_instances(
-                               ImageId=self.image_id,
-                               InstanceType=self.nodeType,
-                               KeyName=self.key_name,
-                               MinCount=self.nodeCount,
-                               MaxCount=self.nodeCount,
-                               TagSpecifications=[
-                                   {
-                                       'ResourceType': 'instance',
-                                       'Tags': self.tags
-                                   }
-                               ],
-                               Placement=self.__placementGroup(),
-                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
-                             )
-
-                         else:  # supports the ThreadsPerCore option and setting it to 1
-                             self.__instances = ec2.create_instances(
-                               ImageId=self.image_id,
-                               InstanceType=self.nodeType,
-                               KeyName=self.key_name,
-                               MinCount=self.nodeCount,
-                               MaxCount=self.nodeCount,
-                               TagSpecifications=[
-                                   {
-                                       'ResourceType': 'instance',
-                                       'Tags': self.tags
-                                   }
-                               ],
-                               Placement=self.__placementGroup(),
-                               NetworkInterfaces=self.__netInterfaces(count = max_network_cards),
-                               CpuOptions={
-                                   'CoreCount': self.PPN,
-                                   'ThreadsPerCore': 1
-                               }
-                             )
-
-                         
+                         instances = self.create_instances()
                          break  
                      except ClientError as e:
                          if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
@@ -468,7 +454,7 @@ class AWSCluster(Cluster):
         client = boto3.client('ec2', self.region)
         waiter = client.get_waiter('instance_running')
 
-        for instance in self.__instances:
+        for instance in instances:
             waiter.wait(
                 InstanceIds=[instance.instance_id],
                 WaiterConfig={
@@ -488,7 +474,8 @@ class AWSCluster(Cluster):
 
         # if any instance is not running, ready=False
         inum = 1
-        for instance in self.__instances:
+
+        for instance in instances:
             state = ec2.Instance(instance.instance_id).state['Name']
             print('instance ' + str(inum) + ' : ' + state)
             if state != 'running':
@@ -501,7 +488,7 @@ class AWSCluster(Cluster):
 
         self.__start_time = time.time()
 
-        return self.__instances
+        return
 
 
 
@@ -522,16 +509,16 @@ class AWSCluster(Cluster):
         # Terminate any running dask scheduler
         self.terminateDaskScheduler()
 
-        log.info(f"Terminating instances: {self.__instances}")
-
+        log.info(f"Terminating instances: {self.instances}")
 
         responses = []
 
         try:
             ec2 = boto3.resource('ec2', region_name=self.region)
 
-            for instance in self.__instances:
-                response = instance.terminate()['TerminatingInstances']
+            for instance in self.instances:
+                ec2_instance = ec2.Instance(instance.get("instance_id"))
+                response = ec2_instance.terminate()['TerminatingInstances']
                 responses.append(response)
 
             end_time = time.time()
@@ -564,9 +551,8 @@ class AWSCluster(Cluster):
         hosts = []
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
-        for instance in self.__instances:
-            # hosts.append(instance.private_dns_name)
-            hosts.append(instance.private_ip_address)
+        for instance in self.instances:
+            hosts.append(instance.get("host"))
         return hosts
 
 
@@ -581,18 +567,42 @@ class AWSCluster(Cluster):
 
         hosts = ''
 
-        instcnt = len(self.__instances)
+        instcnt = len(self.instances)
         cnt = 0
-        for instance in self.__instances:
+        for instance in self.instances: 
             cnt += 1
-            hostname = instance.private_ip_address
+            host = instance.get("host")
             # no comma on last host
             if cnt == instcnt:
-                hosts += hostname
+                hosts += host
             else:
-                hosts += hostname + ','
+                hosts += host + ','
         return hosts
 
+
+    def dict(self):
+       return {
+         "platform"     : self.platform,
+         "__configfile" : self.__configfile,
+         "__state"      : self.__state,
+         "__start_time" : self.__start_time,
+         "instances"  : self.instances,
+         "region" : self.region,
+         "nodeType" : self.nodeType,
+         "nodeCount" : self.nodeCount,
+         "NPROCS" : self.NPROCS,
+         "PPN" : self.PPN,
+         "vm_retry_delay" : self.vm_retry_delay,
+         "vm_max_retries" : self.vm_max_retries,
+         "tags" : self.tags,
+         "image_id" : self.image_id,
+         "key_name" : self.key_name,
+         "sg_ids" : self.sg_ids,
+         "subnet_id" : self.subnet_id,
+         "placement_group" : self.placement_group,
+         "daskscheduler" : self.daskscheduler,
+         "daksworker" : self.daskworker
+       }
 
 
     def __placementGroup(self):

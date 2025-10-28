@@ -13,8 +13,6 @@ import subprocess
 import pprint
 from distributed import Client
 from prefect import task
-from prefect.engine import signals
-from prefect.triggers import all_finished
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -73,7 +71,7 @@ def cluster_start(cluster):
         cluster.start()
     except Exception as e:
         log.exception('In driver: Exception while creating nodes :' + str(e))
-        raise signals.FAIL()
+        raise Exception()
     return
 
 
@@ -81,7 +79,7 @@ def cluster_start(cluster):
 
 
 # cluster
-@task(trigger=all_finished)
+@task
 def cluster_terminate(cluster):
     """ Terminate the cluster
 
@@ -201,7 +199,7 @@ def start_dask(cluster) -> Client:
             num += 1
             if (num + 1) == maxtries:
                 log.exception(f'Unable to ssh to host {host}')
-                raise signals.FAIL()
+                raise Exception()
  
         try:
             log.info('Starting dask and connecting a client ...')
@@ -213,7 +211,7 @@ def start_dask(cluster) -> Client:
         except Exception as e:
             log.info("In start_dask during subprocess.Popen :" + str(e))
             traceback.print_stack()
-            raise signals.FAIL()
+            raise Exception()
 
         daskclient = Client(f"{host}:{port}")
 

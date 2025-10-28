@@ -8,7 +8,6 @@ import fcntl
 import traceback
 import time
 import logging
-from prefect.engine import signals
 
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
@@ -84,7 +83,7 @@ def _acquire(mountpath: str):
         
     log.exception(f'ERROR: Unable to obtain lock on {lockfile}. You may need to delete it.')
     traceback.print_stack()
-    raise signals.FAIL() 
+    raise Exception() 
     return
 
  
@@ -95,7 +94,7 @@ def _release(mountpath: str):
         #print('lock released')
     except Exception as e:
         log.exception(f'ERROR: error releasing lock {_LOCKROOT}{mountpath}/.lockctl')
-        raise signals.FAIL()
+        raise Exception()
     return
 
 
