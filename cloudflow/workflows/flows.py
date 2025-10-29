@@ -70,10 +70,6 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser):
 
     sshuser : str
         The user and host to use for retrieving data from a remote server.
-
-    Returns
-    -------
-    fcstflow : prefect.Flow
     """
 
     #####################################################################
@@ -90,11 +86,9 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser):
     jtasks.get_forcing(fcstjob, sshuser)
 
     # Start the cluster
-    #cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing])
     ctasks.cluster_start(cluster)
 
     # Run the forecast
-    #fcst_run = tasks.forecast_run(cluster, fcstjob, upstream_tasks=[cluster_start])
     try:
       tasks.forecast_run(cluster, fcstjob)
     except Exception as e:
