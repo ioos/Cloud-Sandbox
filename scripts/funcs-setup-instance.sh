@@ -60,6 +60,9 @@ setup_environment () {
   sudo yum -y install python3.11-pip
   sudo yum -y install jq
 
+  sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+  # sudo systemctl status amazon-ssm-agent
+
   # Additional packages for spack-stack
   #sudo yum -y install git-lfs
   #sudo yum -y install bash-completion
