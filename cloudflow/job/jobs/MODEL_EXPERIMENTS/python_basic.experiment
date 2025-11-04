@@ -1,0 +1,7 @@
+{
+  "MODEL"     : "PYTHON",
+  "JOBTYPE"   : "python_experiment",
+  "APP"       : "basic",
+  "EXEC"      : "/save/ec2-user/OWP/Jason.Ducker_Anaconda/anaconda3/envs/nwmv3_fe/bin/python",
+  "SCRIPT"    : "/save/ec2-user/OWP"
+}

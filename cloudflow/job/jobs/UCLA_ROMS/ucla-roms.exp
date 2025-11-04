@@ -1,7 +1,7 @@
 {
   "MODEL"     : "ROMS",
-  "JOBTYPE"   : "ucla-roms",
-  "APP"       : "basic",
+  "JOBTYPE"   : "roms_experiment",
+  "APP"       : "ucla-roms",
   "RUNCORES"  : 6,
   "EXEC"      : "/save/ec2-user/ucla-roms/Examples/Rivers_real/roms",
   "MODEL_DIR" : "/save/ec2-user/ucla-roms/Examples/Rivers_real",

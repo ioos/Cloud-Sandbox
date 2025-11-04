@@ -82,9 +82,9 @@ def local_test_simple_fcst(fcstconf, fcstjobfile) -> Flow:
 
 def simple_experiment_flow(cluster_conf, job_config) -> Flow:
 
-    with Flow('simple workflow') as expflow:
+    with Flow('model experiment workflow') as expflow:
         #####################################################################
-        # FORECAST
+        # Model Experiment Workflow
         #####################################################################
 
         # Create the cluster object
@@ -92,8 +92,6 @@ def simple_experiment_flow(cluster_conf, job_config) -> Flow:
 
         # Setup the job
         expjob = tasks.job_init(cluster, job_config)
-
-        # Get forcing data here
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[expjob])
@@ -247,7 +245,41 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
 
 ######################################################################
 
-def basic_flow(conf, jobfile) -> Flow:
+def python_experiment_dask_flow(conf, jobfile) -> Flow:
+
+    with Flow('python dask experiment workflow') as expflow:
+        #####################################################################
+        # Python Experiment Workflow
+        #####################################################################
+
+        # Start a machine
+        cluster = ctasks.cluster_init(conf)
+
+        # Setup the post job
+        python_job = tasks.job_init(cluster, jobfile)
+
+        # Start the machine
+        cluster_online = ctasks.cluster_start(cluster)
+
+        # Push the env, install required libs on post machine
+        # TODO: install all of the 3rd party dependencies on AMI
+        pushPy = ctasks.push_pyEnv(cluster, upstream_tasks=[cluster_online])
+
+        # Start a dask scheduler on the new post machine
+        daskclient: Client = ctasks.start_dask(cluster, upstream_tasks=[cluster_online])
+
+        python_dask_experiment_run = tasks.python_dask_experiment_run(daskclient, python_job)
+        python_dask_experiment_run.set_upstream([daskclient])
+     
+        # Teriminate the dask clinet session along with the cluster nodes
+        closedask = ctasks.dask_client_close(daskclient,upstream_tasks=[python_dask_experiment_run])
+        pmTerminated = ctasks.cluster_terminate(cluster,upstream_tasks=[python_dask_experiment_run,closedask])
+
+    return expflow
+
+######################################################################
+
+def experiment_flow(conf, jobfile) -> Flow:
     """ Provides a Simple workflow execution in Cloud-Sandbox
         for any given model setup that a user wants to execute
         using the basic job configuration setup template
@@ -262,10 +294,10 @@ def basic_flow(conf, jobfile) -> Flow:
 
     Returns
     -------
-    flow : basic.Flow
+    flow : experiment.Flow
     """
 
-    with Flow('basic workflow') as basic_flow:
+    with Flow('experiment workflow') as experiment_flow:
         #####################################################################
         # FORECAST
         #####################################################################
@@ -274,21 +306,21 @@ def basic_flow(conf, jobfile) -> Flow:
         cluster = ctasks.cluster_init(conf)
 
         # Setup the job
-        basic_job = tasks.job_init(cluster, jobfile)
+        experiment_job = tasks.job_init(cluster, jobfile)
 
         # Start the cluster
         cluster_start = ctasks.cluster_start(cluster)
 
         # Run the model
-        basic_run = tasks.basic_run(cluster, basic_job, upstream_tasks=[cluster_start])
+        experiment_run = tasks.experiment_run(cluster, experiment_job, upstream_tasks=[cluster_start])
 
         # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[basic_run])
+        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[experiment_run])
 
         # If the model run fails, then set the whole flow to fail
-        basic_flow.set_reference_tasks([basic_run])
+        experiment_flow.set_reference_tasks([experiment_run])
 
-    return basic_flow
+    return experiment_flow
 
 
 ######################################################################

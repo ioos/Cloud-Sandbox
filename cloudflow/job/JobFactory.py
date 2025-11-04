@@ -4,7 +4,6 @@ from cloudflow.job.Job import Job
 
 from cloudflow.job.ROMSForecast import ROMSForecast
 from cloudflow.job.ROMSHindcast import ROMSHindcast
-from cloudflow.job.ucla_roms import ucla_roms
 from cloudflow.job.ROMS_Experiment import ROMS_Experiment
 
 from cloudflow.job.FVCOMForecast import FVCOMForecast
@@ -18,6 +17,7 @@ from cloudflow.job.ADCIRC_Experiment import ADCIRC_Experiment
 from cloudflow.job.SCHISM_Hindcast import SCHISM_Hindcast
 from cloudflow.job.SCHISM_Experiment import SCHISM_Experiment
 
+from cloudflow.job.PYTHON_Experiment import PYTHON_Experiment
 from cloudflow.job.Plotting import Plotting
 
 from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
@@ -58,69 +58,69 @@ class JobFactory:
         jobtype = cfdict['JOBTYPE']
         model = cfdict['MODEL']
 
-        if model == 'ROMS':
+        if(model == 'ROMS'):
             if jobtype == 'romsforecast':
                 newjob = ROMSForecast(configfile, NPROCS)
             elif jobtype == 'romshindcast':
                 newjob = ROMSHindcast(configfile, NPROCS)
-            elif jobtype == 'ucla-roms':
-                newjob = ucla_roms(configfile, NPROCS)
-            elif jobtype == 'roms_experiment':
+            elif (jobtype == 'roms_experiment'):
                 newjob = ROMS_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'FVCOM':
+        elif(model == 'FVCOM'):
             if jobtype == 'fvcomforecast':
                 newjob = FVCOMForecast(configfile, NPROCS)
             elif jobtype == 'fvcomhindcast':
                 newjob = FVCOM_Hindcast(configfile, NPROCS)
-            elif jobtype == 'fvcom_experiment':
+            elif (jobtype == 'fvcom_experiment'):
                 newjob = FVCOM_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'ADCIRC':
+        elif(model == 'ADCIRC'):
             if jobtype == 'adcircforecast':
                 newjob = ADCIRCForecast(configfile, NPROCS)
-            elif jobtype == 'adcircreanalysis':
+            elif (jobtype == 'adcircreanalysis'):
                 newjob = ADCIRCReanalysis(configfile, NPROCS)
-            elif jobtype == 'adcirc_experiment':
+            elif (jobtype == 'adcirc_experiment'):
                 newjob = ADCIRC_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'SCHISM':
-            if jobtype == 'schism_hindcast':
+        if(model == 'SCHISM'):
+            if (jobtype == 'schism_hindcast'):
                 newjob = SCHISM_Hindcast(configfile, NPROCS)
-            elif jobtype == 'schism_experiment':
+            elif (jobtype == 'schism_experiment'):
                 newjob = SCHISM_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'DFLOWFM':
-            if jobtype == 'dflowfm_experiment':
+        elif(model == 'DFLOWFM'):
+            if (jobtype == 'dflowfm_experiment'):
                 newjob = DFLOWFM_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'WRF_HYDRO':
-            if jobtype == 'wrf_hydro_experiment':
+        elif(model == 'WRF_HYDRO'):
+            if (jobtype == 'wrf_hydro_experiment'):
                 newjob = WRF_Hydro_Experiment(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
 
-        elif model == 'PYTHON':
-            if (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
+        elif(model == 'PYTHON'):
+            if (jobtype == 'python_experiment'):
+                newjob = PYTHON_Experiment(configfile, NPROCS)
+            elif (jobtype == 'plotting') or (jobtype == 'plotting_diff'):
                 newjob = Plotting(configfile, NPROCS)
             else:
-                raise Exception('Unsupported jobtype')
+                raise Exception(f'Unsupported {model} jobtype')
+
     
         else:
-            raise Exception('Unsupported MODEL')
+            raise Exception('Unsupported MODEL class')
 
         return newjob
-
 
 
     def readconfig(self,configfile):
