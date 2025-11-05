@@ -94,7 +94,7 @@ class PYTHON_Experiment(Job):
 
         # Optional to specify your own Python executable,
         # otherwise default to the system Python executable
-        self.EXEC = cfDict.get('EXEC','Python')
+        self.EXEC = cfDict.get('EXEC','python3')
 
         self.SCRIPT = cfDict['SCRIPT']
 
