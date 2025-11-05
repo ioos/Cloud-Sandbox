@@ -51,7 +51,8 @@ Within that directory, you will want to copy the file called `Model_Experiment_T
 - Rename the “Model_Experiment_Template” Python class name to “your_model_name_Experiment” so this can now reflect a unique Python class for your own specific model with the basic approach for model execution. 
 - If your model execution only needs to know essentially the location of the model run directory and then executable itself, then you don’t need to modify anything else in this file. 
 - If your model executable needs more information (e.g, model argument, specific model libraries to be linked) that you’ve included `your_model_name.exp` file in Step #3, then you will need to include that information within the `parseConfig` function inside your new Python class.
-   - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.exp` job file, then you will need to add `self.IN_FILE = cfDict['IN_FILE']` in under `parseConfig`
+   - e.g., if you added the variable `"IN_FILE" : "path/to/inputfile"` in your `your_model_name.exp` job file, then you will need to add `self.IN_FILE = cfDict['IN_FILE']` in under the `parseConfig` function. 
+   - If you want to add more optional arguments for your model experiement workflow besides its standard model execution that's defined in your `your_model_name.exp` job file, then you will also need to add `self.OPTIONAL_ARGUMENT_NAME = cfDict.get('OPTIONAL_ARGUMENT_NAME', "DEFAULT_VALUE")` in under the `parseConfig` function. 
 
 7. **Build the workflow for your model - `JobFactory.py`**	
 Edit `JobFactory.py` file and at the very top of the script, you will now add a new import statement to reflect the new “your_model_Experiment” Python class you’ve constructed from the `your_model_name_Experiment.py` file you created in Step #6 
@@ -60,7 +61,7 @@ Edit `JobFactory.py` file and at the very top of the script, you will now add a 
 from cloudflow.job.your_model_name_Experiment import your_model_name_Experiment
 ~~~
 Inside `class JobFactory`, edit the `job` function 
-- Insert an `elif` statement that reflects your `MODEL` `jobtype` variable defined in your `your_model_name.exp` file constructed in Step #3 
+- Insert an `if/elif` statement that reflects your respective `MODEL` class and `jobtype` class variable defined in your `your_model_name.exp` file constructed in Step #3 
 - Call the new Python class you created in Step #6 and imported here
   - `newjob = your_model_name(configfile, NPROCS)`
 
