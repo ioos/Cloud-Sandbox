@@ -2,7 +2,7 @@
 "platform"  : "AWS",
 "region"    : "us-east-2",
 "nodeType"  : "hpc6a.48xlarge",
-"nodeCount" : 3,
+"nodeCount" : 1,
 "vm_retry_delay": 300,
 "vm_max_retries": 5,
 "tags"      : [ 
