@@ -9,6 +9,16 @@ set -u       # forces exit on undefined variables
 export SCRIPT=$1
 export EXEC=$2
 
+# Inquire whether or not if a user has attempted to specify
+# multiple host nodes to run a basic Python script. If so
+# we throw an error exit since Python cannot communicate
+# with multiple host nodes without a dask client implementation
+# or a MPI based Python application
+if [[ "$HOSTS" == *','* ]]; then
+    echo "Error: Multiple nodes have been specified for a basic Python script. Basic Python scripts can only run on a single node instance. Exiting..."
+    exit 1
+fi
+
 # Inquire if Python executable exists, otherwise throw error and exit
 if [ ! -x "$EXEC" ]; then
         echo "Error: Python pathway '$SCRIPT' is not an executable. Exiting..."
