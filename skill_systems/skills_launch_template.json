@@ -1,0 +1,38 @@
+{
+    "LaunchTemplateData": {
+        "ImageId": "ami-xxx",
+        "InstanceType": "r5.2xlarge",
+        "BlockDeviceMappings": [
+            {
+                "DeviceName": "/dev/sda1",
+                "Ebs": {
+                    "VolumeSize": 100,
+                    "VolumeType": "gp3",
+                    "DeleteOnTermination": true
+                }
+            }
+        ],
+        "TagSpecifications": [
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "IOOS-Cloud-Sandbox-Instance"
+                    }
+                ]
+            }
+        ],
+        "NetworkInterfaces": [
+            {
+                "DeviceIndex": 0,
+                "AssociatePublicIpAddress": true,
+                "DeleteOnTermination": true
+            }
+        ],
+        "MetadataOptions": {
+            "HttpTokens": "optional",
+            "HttpEndpoint": "enabled"
+        }
+    }
+}
