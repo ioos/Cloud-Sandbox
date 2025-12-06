@@ -59,7 +59,7 @@ toml==0.10.2
 toolz==1.0.0
 tornado==6.5.2
 tzdata==2025.2
-urllib3==2.5.0
+urllib3==2.6.0
 xarray==2025.8.0
 zict==3.0.0
 zipp==3.23.0
