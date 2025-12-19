@@ -85,7 +85,7 @@ class DFLOWFM_Experiment(Job):
 
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.APP = cfDict.get('APP', "default")
+        self.APP = cfDict.get('APP', "basic")
         self.EXEC = cfDict['EXEC']
         self.DFLOW_LIB = cfDict['DFLOW_LIB']
         self.MODEL_DIR = cfDict['MODEL_DIR']

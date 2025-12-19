@@ -85,6 +85,38 @@ def main():
 
         if re.search("forecast", jobtype):
             flows.fcst_flow(jobconfig, jobfile, sshuser)
+
+#            # Add the forecast flow
+#            fcstflow = flows.fcst_flow(jobconfig, jobfile, sshuser)
+#            flowdeq.appendleft(fcstflow)
+
+        elif re.search("hindcast", jobtype):
+           # Add the hindcast flow
+            hindcastflow = flows.multi_hindcast_flow(jobconfig, jobfile, sshuser)
+            flowdeq.appendleft(hindcastflow)
+
+        elif jobtype == "adcircreanalysis":
+            raflow = flows.reanalysis_flow(jobconfig, jobfile)
+            flowdeq.appendleft(raflow)
+
+        elif jobtype == "plotting":
+            # Add the plot flow
+            plotflow = flows.plot_flow(postconf, jobfile)
+            flowdeq.appendleft(plotflow)
+
+        elif jobtype == "plotting_diff":
+            # Add the diff plot flow
+            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
+            flowdeq.appendleft(diffplotflow)
+
+        elif re.search("experiment", jobtype):
+            if re.search("dask",jobdict["APP"]):
+                dask_experiment_flow = flows.python_experiment_dask_flow(jobconfig, jobfile)
+                flowdeq.appendleft(dask_experiment_flow)
+            else:
+                experiment_flow = flows.experiment_flow(jobconfig, jobfile)
+                flowdeq.appendleft(experiment_flow) 
+
         else:
             print(f"jobtype: {jobtype} is not supported")
             sys.exit()
