@@ -23,7 +23,7 @@ jmespath==1.0.1
 kiwisolver==1.4.9
 locket==1.0.0
 MarkupSafe==3.0.2
-marshmallow==4.0.1
+marshmallow==4.1.2
 marshmallow-oneofschema==3.2.0
 matplotlib==3.10.6
 msgpack==1.1.1
