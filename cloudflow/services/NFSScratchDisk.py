@@ -8,7 +8,6 @@ import re
 
 import boto3
 from botocore.exceptions import ClientError
-from prefect.engine import signals
 
 from cloudflow.services.ScratchDisk import ScratchDisk, readConfig
 import cloudflow.services.ScratchDisk as ScratchDiskModule
@@ -77,17 +76,25 @@ class NFSScratchDisk(ScratchDisk):
             # Now mount it
             log.info("Creating symbolic link ...")
 
-            # TODO: Check to make sure it is not in use
-            subprocess.run(['sudo', 'rm', '-Rf', self.mountpath],
-                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            try:
+                # TODO: Check to make sure it is not in use
+                subprocess.run(['sudo', 'rm', '-Rf', self.mountpath],
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    check=True)
 
-            result = subprocess.run(['sudo', 'ln', '-s', self.mount, self.mountpath],
-                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                result = subprocess.run(['sudo', 'ln', '-s', self.mount, self.mountpath],
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    check=True)
 
-            if result.returncode != 0:
-                print(result.stdout)
-                log.exception(f'error attempting to create link to scratch disk ...')
-                raise signals.FAIL()
+            except subprocess.CalledProcessError as e:
+                log.exception(
+                    "NFS scratch create failed: rc=%s cmd=%r output=%s",
+                    e.returncode, e.cmd, (e.stdout or "").strip() )
+                raise
 
             self.status='available'
         return
@@ -117,17 +124,23 @@ class NFSScratchDisk(ScratchDisk):
 
             try:
                 result = subprocess.run(['ssh', host, 'sudo', 'ln', '-s', self.mount, self.mountpath],
-                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    check=True,
+                    timeout=300      # 5 minute timeout
+                )
+            except subprocess.TimeoutExpired as e:
+                log.exception("subprocess timed out: cmd=%r after %ss", e.cmd, e.timeout)
+                raise
 
-                if result.returncode != 0:
-                    print(result.stdout)
-                    log.exception(f'Unable to mount scratch disk on {host}')
-                    raise signals.FAIL()
+            except subprocess.CalledProcessError as e:
+                log.exception("Unable to mount scratch disk on host: %s, output=%s", host, (e.stdout or "").strip())
+                raise
 
             except Exception as e:
                 log.exception(f'Unable to mount scratch disk on {host}')
-                traceback.print_stack()
-                raise signals.FAIL()
+                raise 
         return
 
 
