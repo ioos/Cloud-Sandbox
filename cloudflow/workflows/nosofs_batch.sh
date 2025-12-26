@@ -18,7 +18,7 @@ create_ccfg () {
 	{
 	"platform"  : "AWS",
 	"region"    : "us-east-2",
-	"nodeType"  : "hpc6a.48xlarge",
+	"nodeType"  : "hpc7a.96xlarge",
 	"nodeCount" : 4,
 	"tags"      : [
                 { "Key": "Name", "Value": "$ofs-fcst" },
