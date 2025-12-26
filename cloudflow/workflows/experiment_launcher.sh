@@ -16,7 +16,7 @@ ulimit -s unlimited
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-if [ $# -lt 6 ] ; then
+if [ $# -lt 7 ] ; then
   echo "Usage: $0 JOBTYPE APP NPROCS PPN HOSTS MODEL_DIR EXEC"
   exit 1
 fi
@@ -34,31 +34,42 @@ export HOSTS=$5
 export MODEL_DIR=$6
 export EXEC=$7
 
-# Unique extra option required for SCHISM
-if [[ "$JOBTYPE" == "schism_experiment" && "APP" == "basic"]]; then
+# Unique extra option required for SCHISM basic application
+if [[ "$JOBTYPE" == "schism_experiment" && "$APP" == "basic" ]]; then
   export NSCRIBES=$8
 fi
 
-#Unique extra option required for DFlow FM
-if [[ "$JOBTYPE" == "dflowfm_experiment"  && "APP" == "basic"]]; then
+#Unique extra option required for DFlow FM basic application
+if [[ "$JOBTYPE" == "dflowfm_experiment"  && "$APP" == "basic" ]]; then
   export DFLOW_LIB=$8
 fi
 
-#Unique extra option required for ROMS
-if [[ "$JOBTYPE" == "roms_experiment" && "APP" == "basic"]]; then
+#Unique extra option required for ROMS basic application
+if [[ "$JOBTYPE" == "roms_experiment" && "$APP" == "basic" ]]; then
   export IN_FILE=$8
 fi
 
-#Unique extra option required for ROMS
-if [[ "$JOBTYPE" == "ucla-roms" && "APP" == "basic"]]; then
+#Unique extra option required for UCLA ROMS application
+if [[ "$JOBTYPE" == "roms_experiment" && "$APP" == "ucla-roms" ]]; then
   export IN_FILE=$8
   export RUNCORES=$9
 fi
 
-#Unique extra option required for FVCOM
-if [[ "$JOBTYPE" == "fvcom_experiment" && "APP" == "basic"]]; then
+#Unique extra option required for FVCOM basic application
+if [[ "$JOBTYPE" == "fvcom_experiment" && "$APP" == "basic" ]]; then
   export CASE_FILE=$8
 fi
+
+#Unique extra option required for Python basic application
+if [[ "$JOBTYPE" == "python_experiment" && "$APP" == "basic" ]]; then
+  export SCRIPT=$8
+fi
+
+#Unique extra option required for Python mpi basic application
+if [[ "$JOBTYPE" == "python_experiment" && "$APP" == "mpi" ]]; then
+  export SCRIPT=$8
+fi
+
 
 #OpenMPI
 #mpirun --version
@@ -86,14 +97,14 @@ impi=1
 if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
 elif [ $impi -eq 1 ]; then
- if [[ "$JOBTYPE" == "ucla-roms" ]]; then
+ if [[ "$JOBTYPE" == "roms_experiment" && "$APP" == "ucla-roms" ]]; then
     export MPIOPTS="-launcher ssh -hosts $HOSTS -np $RUNCORES"
   # Slice up SCHISM tasks between OpenMP and MPI protocols to 
   # optimize memory allocation for the slave ranks. This method
   # will allow the hpc node instances to work with large SCHISM
   # meshes. For smaller meshes, consider revising $SCHISM_ntasks
   # and $SCHISM_NPROCS to just both be equal to $NPROCS
-  elif [[ "$JOBTYPE" == "schism_basic" ]]; then
+  elif [[ "$JOBTYPE" == "schism_experiment" && "$APP" == "basic" ]]; then
     export SCHISM_ntasks=70
     export OMP_NUM_THREADS=1
     export SCHISM_NPROCS=$((SCHISM_ntasks*(NPROCS/96)))
@@ -120,7 +131,7 @@ echo "**********************************************************"
 ###### predefined all the required environmental variables     ######
 ###### for you properly within the cloud cluster initilaized   ######
 
-if [[ "$JOBTYPE" == "wrf_hydro_experiment" && "APP" == "basic"]]; then
+if [[ "$JOBTYPE" == "wrf_hydro_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -134,7 +145,7 @@ if [[ "$JOBTYPE" == "wrf_hydro_experiment" && "APP" == "basic"]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "schism_experiment" && "APP" == "basic"]]; then
+elif [[ "$JOBTYPE" == "schism_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -148,7 +159,7 @@ elif [[ "$JOBTYPE" == "schism_experiment" && "APP" == "basic"]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "dflowfm_experiment" && "APP" == "basic"]]; then
+elif [[ "$JOBTYPE" == "dflowfm_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -162,7 +173,7 @@ elif [[ "$JOBTYPE" == "dflowfm_experiment" && "APP" == "basic"]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "adcirc_experiment" && "APP" == "basic"]]; then
+elif [[ "$JOBTYPE" == "adcirc_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -176,7 +187,7 @@ elif [[ "$JOBTYPE" == "adcirc_experiment" && "APP" == "basic"]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "roms_experiment" && "APP" == "basic"]]; then
+elif [[ "$JOBTYPE" == "roms_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -190,7 +201,7 @@ elif [[ "$JOBTYPE" == "roms_experiment" && "APP" == "basic"]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "ucla-roms" ]]; then
+elif [[ "$JOBTYPE" == "roms_experiment" && "$APP" == "ucla-roms" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -204,7 +215,7 @@ elif [[ "$JOBTYPE" == "ucla-roms" ]]; then
     $RUNSCRIPT
     result=$?
 
-elif [[ "$JOBTYPE" == "fvcom_experiment" && "APP" == "basic"]]; then
+elif [[ "$JOBTYPE" == "fvcom_experiment" && "$APP" == "basic" ]]; then
 
     # location of model shell launch script
     export JOBDIR=$PWD/workflows
@@ -213,6 +224,34 @@ elif [[ "$JOBTYPE" == "fvcom_experiment" && "APP" == "basic"]]; then
     cd "$JOBDIR" || exit 1
 
     RUNSCRIPT="./fvcom_basic_run.sh $MODEL_DIR $CASE_FILE $EXEC"
+
+    # Run it
+    $RUNSCRIPT
+    result=$?
+
+elif [[ "$JOBTYPE" == "python_experiment" && "$APP" == "basic" ]]; then
+
+    # location of model shell launch script
+    export JOBDIR=$PWD/workflows
+
+    # TODO:
+    cd "$JOBDIR" || exit 1
+
+    RUNSCRIPT="./python_basic_run.sh $SCRIPT $EXEC"
+
+    # Run it
+    $RUNSCRIPT
+    result=$?
+
+elif [[ "$JOBTYPE" == "python_experiment" && "$APP" == "mpi" ]]; then
+
+    # location of model shell launch script
+    export JOBDIR=$PWD/workflows
+
+    # TODO:
+    cd "$JOBDIR" || exit 1
+
+    RUNSCRIPT="./python_mpi_basic_run.sh $SCRIPT $EXEC"
 
     # Run it
     $RUNSCRIPT

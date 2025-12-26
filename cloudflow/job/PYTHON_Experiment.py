@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import re 
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -16,17 +17,16 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class ucla_roms(Job):
-    """ Implementation of Job class for a simple ROMS model template
+class PYTHON_Experiment(Job):
+    """ Implementation of Job class for a simple basic model template
 
     Attributes
     ----------
-
     MODEL : str
-       The model affiliation class to reference for cloudflow
+        The model affiliation class to reference for cloudflow
 
     jobtype : str
-        User defined job type based on model of interest, should always be roms_template
+        User defined job type based on model of interest
 
     APP : str
         The model workflow application to run.
@@ -34,17 +34,18 @@ class ucla_roms(Job):
     configfile : str
         A JSON configuration file containing the required parameters for this class.
 
-    RUNCORES : int
-        Total number of processors (cores) ucla-roms will use.
+    NPROCS : int
+        Total number of processors in this cluster.
 
     EXEC : str
-        The model executable to run.
+        The Python executable to run on cloudflow, default is the system Python executable
     
-    MODEL_DIR : str
-        The location of the model run directory to execute
+    SCRIPT : str
+        The Python script to execute on cloudflow, which is required except for dask implementation
 
-    IN_FILE : str
-        The ROMS .in input file for a given model configuration
+    ARG1 : str
+        The first Python argument in a given function needed to run a theoretical script
+
     """
 
 
@@ -57,7 +58,7 @@ class ucla_roms(Job):
         configfile : str
 
         NPROCS : int
-            The number of processors requested for the job
+            The number of processors to run the job on
 
         """
 
@@ -66,7 +67,7 @@ class ucla_roms(Job):
         self.NPROCS = NPROCS
 
         if debug:
-            print(f"DEBUG: in UCLA ROMS init")
+            print(f"DEBUG: in PYTHON Experiment init")
             print(f"DEBUG: job file is: {configfile}")
 
         cfDict = self.readConfig(configfile)
@@ -83,14 +84,20 @@ class ucla_roms(Job):
         cfDict : dict
           Dictionary containing this cluster parameterized settings.
         """
-
         self.MODEL = cfDict['MODEL']
         self.jobtype = cfDict['JOBTYPE']
-        self.APP = cfDict.get('APP', "default")
-        self.EXEC = cfDict['EXEC']
-        self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.IN_FILE = cfDict['IN_FILE']
-        self.RUNCORES = cfDict['RUNCORES']
+        self.APP = cfDict.get('APP', "basic")
+        # Script Argument inputs can be inserted here below
+        # This first dummy argument is used as a Python
+        # dask example
+        self.ARG1 = cfDict.get('ARG1',None)
+
+        # Optional to specify your own Python executable,
+        # otherwise default to the system Python executable
+        self.EXEC = cfDict.get('EXEC','python3')
+
+        self.SCRIPT = cfDict['SCRIPT']
+
         return
 
 

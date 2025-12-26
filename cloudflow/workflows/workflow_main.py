@@ -121,17 +121,13 @@ def main():
             diffplotflow = flows.diff_plot_flow(postconf, jobfile)
             flowdeq.appendleft(diffplotflow)
 
-        elif jobtype == "fvcom_experiment":
-            expflow = flows.simple_experiment_flow(jobconfig, jobfile)
-            flowdeq.appendleft(expflow) 
-
-        elif jobtype == "ucla-roms":
-            basic_flow = flows.basic_flow(jobconfig, jobfile)
-            flowdeq.appendleft(basic_flow) 
-
-        elif re.search("basic", jobtype):
-            basic_flow = flows.basic_flow(jobconfig, jobfile)
-            flowdeq.appendleft(basic_flow) 
+        elif re.search("experiment", jobtype):
+            if re.search("dask",jobdict["APP"]):
+                dask_experiment_flow = flows.python_experiment_dask_flow(jobconfig, jobfile)
+                flowdeq.appendleft(dask_experiment_flow)
+            else:
+                experiment_flow = flows.experiment_flow(jobconfig, jobfile)
+                flowdeq.appendleft(experiment_flow) 
 
         else:
             print(f"jobtype: {jobtype} is not supported")

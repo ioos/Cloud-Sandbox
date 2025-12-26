@@ -312,8 +312,10 @@ def job_init(cluster: Cluster, configfile) -> Job:
 
     log.debug(f"DEBUG: in tasks job_init configfile: {configfile}")
 
+    print('in job init')
     factory = JobFactory()
     job = factory.job(configfile, NPROCS)
+    print(job)
     return job
 
 # cluster, job
@@ -571,13 +573,46 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 
     log.info('Forecast finished successfully')
 
+###############################################################################
+# python dask experiment run implementation
+@task
+def python_dask_experiment_run(client, job):
+    """ Run the dask python function
+
+    Parameters
+    ----------
+    client : Client
+        The dask client linked with the cluster to run on
+    job : Job
+        The job to run
+    """
+
+    # Dask client needs your Python script main function
+    # imported here!
+    from python_example import load_and_process_xarray_example
+
+    # Easier to read the user
+    # defined variables withing
+    # the Python job class reading
+    # in the job configuration file
+    APP = job.APP
+    SCRIPT = job.SCRIPT
+
+    if(job.APP == 'dask_xarray_example'):
+        client.upload_file(job.SCRIPT)
+        future = client.submit(load_and_process_xarray_example,int(job.ARG1))
+ 
+    # Wait for the jobs to complete
+    future.result()
+
+
 
 ###############################################################################
-# model basic run implementation
+# model experiment run implementation
 
 @task
-def basic_run(cluster: Cluster, job: Job):
-    """ Run the forecast
+def experiment_run(cluster: Cluster, job: Job):
+    """ Run the model experiment
 
     Parameters
     ----------
@@ -596,8 +631,19 @@ def basic_run(cluster: Cluster, job: Job):
     JOBTYPE = job.jobtype
     APP = job.APP
     NPROCS = job.NPROCS
-    MODEL_DIR = job.MODEL_DIR
     EXEC = job.EXEC
+
+    # Model dependent variable, but not required
+    # for Python execution, so catch it here
+    if(MODEL=='PYTHON'):
+        try:
+            MODEL_DIR = job.MODEL_DIR
+        except:
+            MODEL_DIR = 'None'
+    else:
+        # If not Python model, then this job
+        # class variable is required
+        MODEL_DIR = job.MODEL_DIR
 
     # experiment shell launcher script
     runscript = f"{curdir}/experiment_launcher.sh"
@@ -673,7 +719,7 @@ def basic_run(cluster: Cluster, job: Job):
 
     # For UCLA ROMS model, we need to know the "*.in" file name and location
     # as well as the number of cores to run their grid methodology
-    elif(JOBTYPE=='ucla-roms'):
+    elif(JOBTYPE=='roms_experiment' and APP=='ucla-roms'):
         IN_FILE = job.IN_FILE
         RUNCORES = job.RUNCORES
         try:
@@ -705,6 +751,41 @@ def basic_run(cluster: Cluster, job: Job):
             raise signals.FAIL('FAILED')
 
         log.info('FVCOM basic model run finished successfully')
+
+    # For Python baseline model execution, we need to know the pathway
+    # to the Python script name in order to execute it on cloudflow
+    elif(JOBTYPE=='python_experiment' and APP=='basic'):
+        SCRIPT = job.SCRIPT
+        try:
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(SCRIPT)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'PYTHON basic script execution failed ... result: {result.returncode}')
+                raise signals.FAIL('FAILED')
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL('FAILED')
+
+        log.info('PYTHON basic script execution finished successfully')
+
+    # For Python baseline model execution, we need to know the pathway
+    # to the Python script name in order to execute it on cloudflow
+    elif(JOBTYPE=='python_experiment' and APP=='mpi'):
+        SCRIPT = job.SCRIPT
+        try:
+            result = subprocess.run([runscript, str(JOBTYPE), str(APP), str(NPROCS), str(PPN), HOSTS, str(MODEL_DIR), str(EXEC), str(SCRIPT)], universal_newlines=True, stderr=subprocess.STDOUT)
+
+            if result.returncode != 0:
+                log.exception(f'PYTHON mpi script execution failed ... result: {result.returncode}')
+                raise signals.FAIL('FAILED')
+
+        except Exception as e:
+            log.exception('In driver: Exception during subprocess.run :' + str(e))
+            raise signals.FAIL('FAILED')
+
+        log.info('PYTHON mpi script execution finished successfully')
+
 
     # Basic setup for a model run if the model simply only needs the
     # location of the model run directory and its executable

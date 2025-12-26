@@ -1,0 +1,7 @@
+{
+  "MODEL"     : "PYTHON",
+  "JOBTYPE"   : "python_experiment",
+  "APP"       : "dask_xarray_example",
+  "SCRIPT"    : "/save/ec2-user/OWP/New_Model_Naming_Class_PR/PR/Cloud-Sandbox_OWP/cloudflow/workflows/python_dask_example.py",
+  "ARG1"      : "100"
+}
