@@ -4,16 +4,11 @@
 import os
 import sys
 import time
-
-# TODO: add additional signal handlers for more robust cleanup of failed runs
-from signal import signal, SIGINT, SIGTERM, SIGQUIT
-
 import logging
+
 from distributed import Client
 import prefect
 from prefect import flow
-
-# Relook into prefect signal handling, i just had a case of Ctl-C causing a zombie node
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -45,8 +40,9 @@ log.addHandler(ch)
 
 # Fix the prefect logger to output local time instead of gmtime
 # Prefect uses this: formatter.converter = time.gmtime
-prelog = prefect.logging.loggers.get_logger()
 #prelog.handler.formatter.converter = time.localtime
+prelog = prefect.logging.loggers.get_logger()
+
 # Use the same handler for all of them
 for handler in prelog.handlers:
     pformatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(module)s.%(funcName)s | %(message)s')
@@ -54,47 +50,48 @@ for handler in prelog.handlers:
     handler.setFormatter(pformatter)
 
 
+
 ######################################################################
+@flow
+def simple_experiment_flow(conf, jobfile):
+    """
+    """
 
-#@flow(name="fcstflow")
-#def fcst_flow(fcstconf, fcstjobfile, sshuser):
+    #####################################################################
+    # Model Experiment Workflow
+    #####################################################################
 
-def simple_experiment_flow(cluster_conf, job_config) -> Flow:
+    # Create the cluster object
+    cluster = ctasks.cluster_init(conf)
 
-    with Flow('model experiment workflow') as expflow:
-        #####################################################################
-        # Model Experiment Workflow
-        #####################################################################
+    # Setup the job
+    expjob = tasks.job_init(cluster, jobfile)
 
-        # Create the cluster object
-        cluster = ctasks.cluster_init(cluster_conf)
+    # Start the cluster
+    ctasks.cluster_start(cluster)
 
-        # Setup the job
-        expjob = tasks.job_init(cluster, job_config)
+    # Run the forecast
+    tasks.simple_run(cluster, expjob)
 
-        # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[expjob])
+    # Terminate the cluster nodes
+    ctasks.cluster_terminate(cluster)
 
-        # Run the forecast
-        exp_run = tasks.simple_run(cluster, expjob, upstream_tasks=[cluster_start])
+    
 
-        # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[exp_run])
-
-        # If the exp fails, then set the whole flow to fail
-        expflow.set_reference_tasks([exp_run])
-
-    return expflow
 
 ######################################################################
 
-def multi_hindcast_flow(hcstconf, jobfile, sshuser) -> Flow: 
+@flow
+def multi_hindcast_flow(conf, jobfile, sshuser=None):
 
     """ Provides a Prefect Flow for a hindcast workflow.
+  
+        This flow is for running consectutive daily hindcasts/forecasts using 
+        the same on-demand cluster.
 
     Parameters
     ----------
-    hcstconf : str
+    conf : str
         The JSON configuration file for the Cluster to create
 
     jobfile : str
@@ -103,65 +100,56 @@ def multi_hindcast_flow(hcstconf, jobfile, sshuser) -> Flow:
     sshuser : str
         The user and host to use for retrieving data from a remote server.
 
-    Returns
-    -------
-    hindcastflow : prefect.Flow
     """
 
-    with Flow('multi hindcast workflow') as multiflow:
-        #####################################################################
-        # HINDCAST
-        #####################################################################
+    #####################################################################
+    # HINDCAST
+    #####################################################################
 
-        # Create the cluster object
-        cluster = ctasks.cluster_init(hcstconf)
+    # Create the cluster object
+    cluster = ctasks.cluster_init(conf)
 
-        # Setup the job
-        job = tasks.job_init(cluster, jobfile)
+    # Setup the job
+    job = tasks.job_init(cluster, jobfile)
 
-        # Get forcing data
-        forcing = jtasks.get_forcing(job, sshuser)
+    # Get forcing data
+    jtasks.get_forcing(job, sshuser)
 
-        # scratch = tasks.create_scratch('FSx',jobfile,'/ptmp', upstream_tasks=[forcing])
+    #tasks.create_scratch('FSx',jobfile,'/ptmp')
 
-        # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster, upstream_tasks=[forcing, job])
+    # Start the cluster
+    ctasks.cluster_start(cluster)
 
-        # Mount the scratch disk
-        #scratch_mount = tasks.mount_scratch(scratch, cluster, upstream_tasks=[cluster_start])
+    # Mount the scratch disk
+    # tasks.mount_scratch(scratch, cluster)
 
-        # Create the oceanin and run the forecasts
-        # This will run in a loop to complete all forecasts 
-        hcst_run = tasks.hindcast_run_multi(cluster, job, upstream_tasks=[cluster_start])
+    # Create the oceanin and run the forecasts
+    # This will run in a loop to complete all forecasts 
+    tasks.hindcast_run_multi(cluster, job)
 
-        # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[hcst_run])
+    # Terminate the cluster nodes
+    ctasks.cluster_terminate(cluster)
 
-        # Copy the results to /com (liveocean does not run in ptmp currently)
-        #cp2com = jtasks.ptmp2com(job, upstream_tasks=[hcst_run])
+    # Copy the results to /com (liveocean does not run in ptmp currently)
+    #jtasks.ptmp2com(job)
 
-        # Copy the results to S3 (optionally)
-        #cp2s3 = jtasks.cp2s3(job, upstream_tasks=[hcst_run])
-        #storage_service = tasks.storage_init(provider)
-        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
-        #pngtocloud.set_upstream(plots)
+    # Copy the results to S3 (optionally)
+    #jtasks.cp2s3(job)
+    #storage_service = tasks.storage_init(provider)
+    #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
 
-        # Copy the results to S3 (optionally. currently only saves LiveOcean)
-        #storage_service = tasks.storage_init(provider)
-        #cp2cloud = tasks.save_history(job, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
+    # Copy the results to S3 (optionally. currently only saves LiveOcean)
+    #storage_service = tasks.storage_init(provider)
+    #tasks.save_history(job, storage_service, ['*.nc'], public=True)
 
-        #pngtocloud.set_upstream(plots)
 
-        # If the hcst fails, then set the whole flow to fail
-        multiflow.set_reference_tasks([hcst_run])
 
-    return multiflow
+
 
 ######################################################################
 
-@flow(name="fcstflow")
-def fcst_flow(fcstconf, fcstjobfile, sshuser):
-# def fcst_flow(fcstconf, fcstjobfile, sshuser) -> Flow:
+@flow
+def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
     """ Provides a Prefect Flow for a forecast workflow.
 
     Parameters
@@ -201,63 +189,49 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser):
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
 
-#        # Copy the results to /com (liveocean does not run in ptmp currently)
-#        cp2com = jtasks.ptmp2com(fcstjob, upstream_tasks=[fcst_run])
-#
-#        # Copy the results to S3 (optionally)
-#        #cp2s3 = jtasks.cp2s3(fcstjob, upstream_tasks=[fcst_run])
-#        #storage_service = tasks.storage_init(provider)
-#        #pngtocloud = tasks.save_to_cloud(plotjob, storage_service, ['*.png'], public=True)
-#        #pngtocloud.set_upstream(plots)
-#
-#        # Copy the results to S3 (optionally. currently only saves LiveOcean)
-#        #storage_service = tasks.storage_init(provider)
-#        #cp2cloud = tasks.save_history(fcstjob, storage_service, ['*.nc'], public=True, upstream_tasks=[storage_service,cp2com])
-#
-#        #pngtocloud.set_upstream(plots)
-#
-#        # If the fcst fails, then set the whole flow to fail
-#        fcstflow.set_reference_tasks([fcst_run])
-#
-#    return fcstflow
+
+
 
 ######################################################################
+@flow
+def python_experiment_dask_flow(conf, jobfile):
+    """
+    """
 
-def python_experiment_dask_flow(conf, jobfile) -> Flow:
+    #####################################################################
+    # Python Experiment Workflow
+    #####################################################################
 
-    with Flow('python dask experiment workflow') as expflow:
-        #####################################################################
-        # Python Experiment Workflow
-        #####################################################################
+    # Start a machine
+    cluster = ctasks.cluster_init(conf)
 
-        # Start a machine
-        cluster = ctasks.cluster_init(conf)
+    # Setup the post job
+    python_job = tasks.job_init(cluster, jobfile)
 
-        # Setup the post job
-        python_job = tasks.job_init(cluster, jobfile)
+    # Start the machine
+    ctasks.cluster_start(cluster)
 
-        # Start the machine
-        cluster_online = ctasks.cluster_start(cluster)
+    # Push the env, install required libs on post machine
+    # TODO: install all of the 3rd party dependencies on AMI
+    ctasks.push_pyEnv(cluster)
 
-        # Push the env, install required libs on post machine
-        # TODO: install all of the 3rd party dependencies on AMI
-        pushPy = ctasks.push_pyEnv(cluster, upstream_tasks=[cluster_online])
+    # Start a dask scheduler on the new post machine
+    # Might get a not serializable error message from prefect 
+    # distributed.Client might not be serializable, Prefect 3 needs to pickle and store the data in the cache
+    daskclient: Client = ctasks.start_dask(cluster)
 
-        # Start a dask scheduler on the new post machine
-        daskclient: Client = ctasks.start_dask(cluster, upstream_tasks=[cluster_online])
-
-        python_dask_experiment_run = tasks.python_dask_experiment_run(daskclient, python_job)
-        python_dask_experiment_run.set_upstream([daskclient])
+    tasks.python_dask_experiment_run(daskclient, python_job)
      
-        # Teriminate the dask clinet session along with the cluster nodes
-        closedask = ctasks.dask_client_close(daskclient,upstream_tasks=[python_dask_experiment_run])
-        pmTerminated = ctasks.cluster_terminate(cluster,upstream_tasks=[python_dask_experiment_run,closedask])
+    # Teriminate the dask clinet session along with the cluster nodes
+    ctasks.dask_client_close(daskclient)
+    ctasks.cluster_terminate(cluster)
 
-    return expflow
+
+
 
 ######################################################################
-
-def experiment_flow(conf, jobfile) -> Flow:
+@flow
+def experiment_flow(conf, jobfile):
     """ Provides a Simple workflow execution in Cloud-Sandbox
         for any given model setup that a user wants to execute
         using the basic job configuration setup template
@@ -270,44 +244,35 @@ def experiment_flow(conf, jobfile) -> Flow:
     jobfile : str
         The JSON configuration file for the model Job
 
-    Returns
-    -------
-    flow : experiment.Flow
     """
 
-    with Flow('experiment workflow') as experiment_flow:
-        #####################################################################
-        # FORECAST
-        #####################################################################
+    #####################################################################
+    # FORECAST
+    #####################################################################
 
-        # Create the cluster object
-        cluster = ctasks.cluster_init(conf)
+    # Create the cluster object
+    cluster = ctasks.cluster_init(conf)
 
-        # Setup the job
-        experiment_job = tasks.job_init(cluster, jobfile)
+    # Setup the job
+    experiment_job = tasks.job_init(cluster, jobfile)
 
-        # Start the cluster
-        cluster_start = ctasks.cluster_start(cluster)
+    # Start the cluster
+    ctasks.cluster_start(cluster)
 
-        # Run the model
-        experiment_run = tasks.experiment_run(cluster, experiment_job, upstream_tasks=[cluster_start])
+    # Run the model
+    tasks.experiment_run(cluster, experiment_job)
 
-        # Terminate the cluster nodes
-        cluster_stop = ctasks.cluster_terminate(cluster, upstream_tasks=[experiment_run])
+    # Terminate the cluster nodes
+    ctasks.cluster_terminate(cluster)
 
-        # If the model run fails, then set the whole flow to fail
-        experiment_flow.set_reference_tasks([experiment_run])
 
-    return experiment_flow
 
 
 ######################################################################
 
 if __name__ == '__main__':
-    # signal(SIGINT, handler)
     pass
 
     # conf = f'./cluster/configs/debug.config'
     # jobfile = f'./job/jobs/ngofs.03z.fcst'
-    # testflow = debug_model(conf, jobfile, 'none')
-    # testflow.run()
+    # debug_model(conf, jobfile, 'none')

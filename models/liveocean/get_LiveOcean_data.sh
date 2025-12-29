@@ -15,7 +15,7 @@ datasets='
 '
 bucket="ioos-sandbox-use2/public/LiveOcean"
 
-COMDIR=/com/$(basename $(dirname $PWD))
+COMDIR=${COMDIR:-/com/liveocean}
 if [ ! -d $COMDIR ]; then
   mkdir -p $COMDIR
 fi
