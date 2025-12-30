@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOPDIR=${TOPDIR:-${PWD}}
+CURHOME=${CURHOME:-${PWD}}
 MODEL_DIR=${MODEL_DIR:-/save/$USER/liveocean}
 
 # LO:
@@ -62,4 +62,4 @@ else
     git checkout $ROMSGITVERSION
 fi
 
-cd $TOPDIR
+cd $CURHOME

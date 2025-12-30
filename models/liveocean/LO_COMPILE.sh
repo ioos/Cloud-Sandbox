@@ -1,8 +1,8 @@
 #!/bin/bash
 # set -x
 
-TOPDIR=${TOPDIR:-${PWD}}
-MODEL_DIR=${MODEL_DIR:-/save/$USER/liveocean}
+CURHOME=${CURHOME:-${PWD}}
+MODEL_DIR=${MODEL_DIR:-/save/$USER/LiveOcean}
 
 BUILDDIR="${MODEL_DIR}/LO_roms_user/x4b"
 BUILDSCRIPT=build_roms.sh
@@ -25,26 +25,24 @@ export MY_ROMS_SRC=${MY_ROOT_DIR}/LO_roms_source_git
 # Using a different makefile for Sandbox
 cp -p ./Compilers/Linux-ifort.mk $MY_ROMS_SRC/Compilers
 
-export COMP_F=ifort
-export COMP_F_MPI90=mpiifort
-export COMP_F_MPI=mpiifort
-export COMP_ICC=icc
-export COMP_CC=icc
-export COMP_CPP=cpp
-export COMP_MPCC='mpicc -fc=icc'
+#export COMP_F=ifort
+#export COMP_F_MPI90=mpiifort
+#export COMP_F_MPI=mpiifort
+#export COMP_ICC=icc
+#export COMP_CC=icc
+#export COMP_CPP=cpp
+#export COMP_MPCC='mpicc -fc=icc'
 
 # Compiler target machine
 TARGETMX=${TARGETMX:-'x86_64'}
 # TARGETMX=${TARGETMX:-'skylake_avx512'}
 # TARGETMX='haswell'
 
+module use -a ./modulefiles
+
 . modulefiles/load_modules.sh
 
 module list
-
-NETCDF=`nf-config --prefix`
-export NETCDF_INCDIR=`nf-config --includedir`
-export NETCDF_LIBDIR="${NETCDF}/lib"
 
 cd $BUILDDIR
 ./$BUILDSCRIPT $BUILDOPTS
