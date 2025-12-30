@@ -15,7 +15,7 @@ export MODULEFILE=intel_x86_64
 export MODEL_DIR=$SAVEDIR/LiveOcean
 
 # COMDIR is needed by get_LiveOcean_data.sh
-export COMDIR=${COMDIR:-/com/liveocean}
+export COMDIR=${COMDIR:-/com/$USER/liveocean}
 
 # Get the LiveOcean scripts
 cd $SAVEDIR
