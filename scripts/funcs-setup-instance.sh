@@ -1232,9 +1232,7 @@ install_python_modules_user () {
   #python3 -m venv /save/$USER/csvenv
   #source /save/$USER/csvenv/bin/activate
 
-  # https://docs-v1.prefect.io/api/0.15.13/
-
-  python3 -m pip install prefect==0.15.13
+  python3 -m pip install prefect==3.6.8
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
   python3 -m pip install --upgrade dask
@@ -1243,14 +1241,8 @@ install_python_modules_user () {
   python3 -m pip install --upgrade paramiko         # needed for dask-ssh
   python3 -m pip install --upgrade haikunator       # memorable Name tags
 
-  # SPACK has problems with botocore newer than below
-  # TODO: might be fixed with currently used Spack version
-  python3 -m pip install --upgrade botocore==1.23.46
-  # This is the most recent boto3 that is compatible with botocore above
-  python3 -m pip install --upgrade boto3==1.20.46
-
-  #python3 -m pip install --upgrade botocore
-  #python3 -m pip install --upgrade boto3
+  python3 -m pip install --upgrade botocore==1.40.22
+  python3 -m pip install --upgrade boto3==1.40.22
 
   # Install requirements for plotting module
   # cd ../cloudflow

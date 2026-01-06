@@ -322,7 +322,7 @@ class AWSCluster(Cluster):
               NetworkInterfaces=self.__netInterfaces(count = max_network_cards)
             )
         else:  # supports the ThreadsPerCore option and setting it to 1
-            reponse = ec2.create_instances(
+            response = ec2.create_instances(
               ImageId=self.image_id,
               InstanceType=self.nodeType,
               KeyName=self.key_name,
