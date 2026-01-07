@@ -16,6 +16,7 @@ class Job(ABC):
     ----------
     configfile : str
     jobtype : str
+
     CDATE : str
     HH : str
     APP : str

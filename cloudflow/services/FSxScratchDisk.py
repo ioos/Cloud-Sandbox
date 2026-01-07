@@ -9,7 +9,6 @@ import inspect
 
 import boto3
 from botocore.exceptions import ClientError
-from prefect.engine import signals
 
 from cloudflow.job.Job import Job
 from cloudflow.cluster.Cluster import Cluster
@@ -135,7 +134,7 @@ class FSxScratchDisk(ScratchDisk):
                     if index == len(filesystems):  # raise signal after exhausting list
                         log.exception(f'ERROR: a filesystem mount exists: {dfmountname} at {self.mountpath}, \
                                         but unable to locate a matching FSx disk') 
-                        raise signals.FAIL()
+                        raise Exception()
                     continue
             return  # scratch disk already exists, don't create a new one
 
@@ -166,7 +165,7 @@ class FSxScratchDisk(ScratchDisk):
 
             except ClientError as e:
                 log.exception('ClientError exception in create FSx mount' + str(e))
-                raise signals.FAIL()
+                raise Exception()
         
                 '''
                   'FileSystems': {
@@ -208,7 +207,7 @@ class FSxScratchDisk(ScratchDisk):
 
             if x == maxtries-1:
                 log.exception('maxtries exceeded waiting for disk to become available ...')
-                raise signals.FAIL()
+                raise Exception()
 
             response = client.describe_file_systems(FileSystemIds=[self.filesystemid])
             # print(response)
@@ -233,7 +232,7 @@ class FSxScratchDisk(ScratchDisk):
                     if result.returncode != 0:
                         log.debug(result.stdout)
                         log.exception('error attempting to mount scratch disk ...')
-                        raise signals.FAIL()
+                        raise Exception()
                     else:
                         # Note: sudoers privs need to be setup for users
                         result = subprocess.run(['sudo', 'chown', f'{self.username}:{self.username}', self.mountpath ],
@@ -242,7 +241,7 @@ class FSxScratchDisk(ScratchDisk):
                 except Exception as e:
                     log.exception('unable to mount scratch disk ...')
                     traceback.print_stack()
-                    raise signals.FAIL()
+                    raise Exception()
 
                 self.status='available'
                 log.info(f"FSx scratch is mounted locally at {self.mountpath}")
@@ -301,7 +300,7 @@ class FSxScratchDisk(ScratchDisk):
 
         except ClientError as e:
             log.exception('ClientError exception in AWSScratch.delete. ' + str(e))
-            raise signals.FAIL()
+            raise Exception()
 
 
     def remote_mount(self, hosts: list):
@@ -328,11 +327,11 @@ class FSxScratchDisk(ScratchDisk):
                 if result.returncode != 0:
                     print(result.stdout)
                     log.exception(f'unable to mount scratch disk on host: {host}')
-                    raise signals.FAIL()
+                    raise Exception()
             except Exception as e:
                 log.exception('unable to mount scratch disk on host...', host)
                 traceback.print_stack()
-                raise signals.FAIL()
+                raise Exception()
         return
 
 

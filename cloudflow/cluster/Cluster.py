@@ -2,12 +2,15 @@
 Abstract base class for a compute cluster. A cluster can also be a single machine.
 This class needs to be implemented and extended for specific cloud providers.
 """
+
 from abc import ABC, abstractmethod
+import json
+import logging
+import inspect
 from subprocess import Popen
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
-__license__ = "BSD 3-Clause"
-
+debug = False
+log = logging.getLogger('workflow')
 
 class Cluster(ABC):
     """Abstract base class for cloud clusters. It defines a generic interface to implement
@@ -36,6 +39,38 @@ class Cluster(ABC):
 
         self.configfile = None
         self.platform = None
+
+
+    ########################################################################
+
+    def readConfig(self, configfile):
+        """ Reads a JSON configuration file into a dictionary.
+
+        Parameters
+        ----------
+        configfile : str
+          Full path and filename of a JSON configuration file for this cluster.
+
+        Returns
+        -------
+        cfDict : dict
+          Dictionary containing this cluster parameterized settings.
+        """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        with open(configfile, 'r') as cf:
+            cfDict = json.load(cf)
+
+        if (debug):
+            print(json.dumps(cfDict, indent=4))
+            # print(str(cfDict))
+
+        # Single responsibility says I should only read it here
+        return cfDict
+
+    ########################################################################
+
 
 
     def setDaskScheduler(self, proc: Popen):
@@ -113,11 +148,6 @@ class Cluster(ABC):
         pass
 
     @abstractmethod
-    def readConfig(self):
-        """ Read the cluster configuration."""
-        pass
-
-    @abstractmethod
     def parseConfig(self, cfDict : dict):
         """ Parse the cluster configuration. This might contain parameters that are required by
         specific cloud providers.
@@ -152,3 +182,7 @@ class Cluster(ABC):
 
 if __name__ == '__main__':
     pass
+
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
+__license__ = "BSD 3-Clause"
+
