@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo $PWD
+
 cd ..
 
 nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
@@ -19,6 +21,7 @@ create_ccfg () {
 	"platform"  : "AWS",
 	"region"    : "us-east-2",
 	"nodeType"  : "hpc6a.48xlarge",
+	"nodeTypeNew"  : "hpc7a.96xlarge",
 	"nodeCount" : 4,
 	"tags"      : [
                 { "Key": "Name", "Value": "$ofs-fcst" },
@@ -50,8 +53,9 @@ do
   echo "nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &"
   nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &
 
-  echo "Sleeping for 10 seconds"
-  sleep 10
+  stime=5
+  echo "Sleeping for $stime seconds"
+  sleep $stime
 
 done
 

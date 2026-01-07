@@ -10,7 +10,6 @@ import glob
 import shutil
 
 from distributed import Client
-from prefect.engine import signals
 from prefect import task
 
 if os.path.abspath('..') not in sys.path:
@@ -106,7 +105,7 @@ def com2ptmp(job: Job):
         except Exception as e:
             log.exception(result.stdout)
             log.exception(f'exception moving data from {ptmp} to {comout}')
-            raise signals.FAIL()
+            raise
     elif job.APP == "secofs":
         log.debug(f"Copying data to {job.PTMP}")
 
@@ -121,7 +120,7 @@ def com2ptmp(job: Job):
         except Exception as e:
             log.exception(result.stdout)
             log.exception(f'exception copying data')
-            raise signals.FAIL()
+            raise
     else:
         log.info("Skipping ... NOSOFS does this in the forecast script, other modes not implemented")
         pass
@@ -161,7 +160,7 @@ def ptmp2com(job: Job):
         except Exception as e:
             log.exception(result.stdout)
             log.exception(f'exception moving data from {ptmp} to {comout}')
-            raise signals.FAIL()
+            raise
 
     elif job.APP == "secofs":
 
@@ -178,7 +177,7 @@ def ptmp2com(job: Job):
         except Exception as e:
             log.exception(result.stdout)
             log.exception(f'exception copying data')
-            raise signals.FAIL()
+            raise
 
     else:
         log.info("Skipping ... NOSOFS does this in the forecast script")
@@ -231,17 +230,17 @@ def get_baseline(job: Job, sshuser=None):
             util.get_baseline_lo(cdate, vdir, sshuser)
         except Exception as e:
             log.exception(f'Retrieving baselines failed ...')
-            raise signals.FAIL()
+            raise
     elif app in util.nosofs_models:
         script = f"{curdir}/scripts/getNomadsProd.sh"
 
         result = subprocess.run([script, app, cdate, hh, vdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'Retrieving baselines failed ... result: {result.returncode}')
-            raise signals.FAIL()
+            raise
     else:
         log.exception(f'{app} is not supported')
-        raise signals.FAIL()
+        raise
     return
 
 
@@ -286,7 +285,7 @@ def get_forcing(job: Job, sshuser=None):
                 util.get_ICs_lo_cas7_hindcast(cdate, frcdir, sshuser)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
-                raise signals.FAIL()
+                raise
 
             cdate = util.ndate(cdate, 1)
 
@@ -350,7 +349,7 @@ def get_forcing(job: Job, sshuser=None):
                 getICsNOSOFS.getICs(cdate, hh, ofs, comdir)
             except Exception as e:
                 log.exception('Problem encountered with downloading forcing data ...')
-                raise signals.FAIL()
+                raise
 
             cdate = util.ndate(cdate, 1)
 
@@ -390,7 +389,7 @@ def old_get_forcing(job: Job, sshuser=None):
         result = subprocess.run([script, cdate, comdir], stderr=subprocess.STDOUT)
         if result.returncode != 0:
             log.exception(f'Retrieving ICs failed ... result: {result.returncode}')
-            raise signals.FAIL()
+            raise
     elif app == 'adcircofs':
 	
         #script = f"{curdir}/fcstrun_adcirc_prep.sh"

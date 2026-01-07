@@ -1,0 +1,82 @@
+#%Module
+
+##############################################################
+### LiveOcean
+##############################################################
+proc ModulesHelp { } {
+puts stderr "Set environment veriables for LiveOcean"
+}
+
+module-whatis "This module sets the environment variables for \
+               LiveOcean forecast/hindcast"
+
+setenv COMP_F ifort
+setenv COMP_F_MPI90 mpiifort
+setenv COMP_F_MPI mpiifort
+# FC       = $(COMP_F_MPI) -fc=ifort
+setenv COMP_ICC icc
+setenv COMP_CC  icc
+setenv COMP_CPP cpp
+#setenv COMP_MPCC "mpicc -fc=icc"
+#setenv COMP_MPCC mpicc
+
+# AVX512 not available on hpc6a instances
+setenv NO_AVX512 1
+
+module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi 
+module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
+module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
+# module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
+# module load metis/5.1.0-intel-2021.9.0-fdsd6ir
+# module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
+
+# Need to test build with these, I don't think they are being used yet
+# module load parallel-netcdf/1.12.3-intel-2021.9.0-o334gxk  
+# module load parallelio/2.6.2-intel-2021.9.0-mznk65v  
+###########################################################
+
+#set METIS [exec spack location -i metis]
+#regsub {\n$} $METIS {} METIS
+#setenv METIS $METIS
+#prepend-path LD_LIBRARY_PATH "$env(METIS)/lib"
+
+setenv MPI_INC "$env(I_MPI_ROOT)/include"
+
+## Loding nceplibs modules
+#module load bacio
+#module load bufr
+#module load g2
+#module load w3emc
+#module load w3nco
+#module load prod-util
+#module load wgrib2
+#module load jasper
+
+set netcdf [exec nf-config --prefix]
+regsub {\n$} $netcdf {} netcdf
+setenv NETCDF $netcdf
+
+set netcdfc [exec nc-config --prefix]
+regsub {\n$} $netcdfc {} netcdfc
+setenv NETCDFC $netcdfc
+
+prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
+prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
+
+setenv NETCDF_INCDIR "$env(NETCDF)/include"
+
+
+# The following are needed for makefiles, will break if spack finds more than one match
+#set JASPER [exec spack location -i jasper]
+#regsub {\n$} $JASPER {} JASPER
+#setenv JASPER_LIB "-L$JASPER/lib64 -ljasper"
+
+#set BACIO [exec spack location -i bacio]
+#regsub {\n$} $BACIO {} BACIO
+#setenv BACIO_LIB4 "-L$BACIO/lib -lbacio_4"
+
+#set PNG [exec spack location -i libpng]
+#regsub {\n$} $PNG {} PNG
+#setenv PNG_LIB "-L$PNG/lib64 -lpng"
+
+

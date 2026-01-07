@@ -240,7 +240,7 @@ class ROMSHindcast(Job):
             "__FDATE__": fdate,
             "__ININAME__": self.ININAME,
             "__COMROT__": COMROT,
-            "__SAVEDIR": self.SAVEDIR,
+            "__SAVEDIR__": self.SAVEDIR,
             "__TRAPSDIR__" : TRAPSDIR
         }
 
@@ -251,7 +251,7 @@ class ROMSHindcast(Job):
         # squareness=0.5
         # squareness=0.02222
         print(f'calling util.makeOceanin')
-        util.makeOceanin(self.NPROCS, settings, template, outfile, squareness=squareness)
+        util.makeOceanin(self.NPROCS, settings, template, outfile, squareness)
 
         return
 

@@ -128,7 +128,7 @@ case $APP in
     export JOBARGS="$CDATE $COMOUT"
     cd "$JOBDIR" || exit 1
 
-    echo "About to run $JOBSCRIPT $JOBDIR"
+    echo "About to run $JOBSCRIPT"
     $JOBSCRIPT $JOBARGS
     result=$?
     ;;

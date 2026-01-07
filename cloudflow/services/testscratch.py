@@ -9,7 +9,6 @@ import uuid
 
 import boto3
 from botocore.exceptions import ClientError
-from prefect.engine import signals
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))

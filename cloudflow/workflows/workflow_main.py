@@ -32,12 +32,6 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 ############### Set these for your specific deployment ###############
 ######################################################################
 
-#jobconfig = f'{curdir}/../cluster/configs/NOS/cora.hsofs.cfg'
-#jobconfig = f'{curdir}/../cluster/configs/RPS/ioos.cora.cfg'
-#jobconfig = f'{curdir}/../cluster/configs/RPS/test.cora.cfg'
-#jobconfig = f'{curdir}/../cluster/configs/NOS/nos.cora.cfg'
-#postconf = f'{curdir}/../cluster/configs/local.config'
-
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
 sshuser = 'username@ocean.washington.edu'
@@ -49,8 +43,7 @@ def handler(signal_received, frame):
     print(msg)
     raise Exception(f"{signal_received} detected. Exiting gracefully.")
 
-# TODO: imrove on this
-
+    # TODO: improve on this
     # This might be better, or simply exit
     #signal.raise_signal(signum)
     # Sends a signal to the calling process. Returns nothing.
@@ -63,91 +56,48 @@ def main():
         signal(sig, handler)
 
     lenargs = len(sys.argv) - 1
-    joblist = []
 
     # TODO: require a cluster config file when starting a job, provide job-specific node Name tag
-    print(f"lenargs: {lenargs}")
-    if lenargs < 2:
-        print(f"Usage: {os.path.basename(__file__)} cluster_config job [job2 job3 ...]")
+
+    # PT 12/29/2025 Removed unused option of multiple jobs as parameters
+    #               users can easily script that if desired
+
+    #print(f"lenargs: {lenargs}")
+    if lenargs !=  2:
+        print(f"Usage: {os.path.basename(__file__)} cluster_config job_config")
         print(f"    example: {os.path.basename(__file__)} cluster/configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
         sys.exit(1)
+
+    conf = os.path.abspath(sys.argv[1])
+    jobfile = os.path.abspath(sys.argv[2])
+
+    jobdict = util.readConfig(jobfile)
+    jobtype = jobdict["JOBTYPE"]
+    print(f"jobtype: {jobtype}")
+
+    if re.search("forecast", jobtype):
+        flows.fcst_flow(conf, jobfile, sshuser)
+
+    elif re.search("hindcast", jobtype):
+        flows.multi_hindcast_flow(conf, jobfile, sshuser)
+
+    elif jobtype == "adcircreanalysis":
+        flows.reanalysis_flow(conf, jobfile)
+
+    elif jobtype == "plotting":
+        flows.plot_flow(postconf, jobfile)
+
+    elif jobtype == "plotting_diff":
+        flows.diff_plot_flow(postconf, jobfile)
+
+    elif re.search("experiment", jobtype):
+        if re.search("dask",jobdict["APP"]):
+            flows.python_experiment_dask_flow(conf, jobfile)
+        else:
+            flows.experiment_flow(conf, jobfile)
     else:
-        idx = 1
-        jobconfig = os.path.abspath(sys.argv[idx])
-
-    #if lenargs < 1:
-    #    print(f"Usage: {os.path.basename(__file__)} job_config [job2_config job3_config ...]")
-    #    print(f"    example: {os.path.basename(__file__)} myjobs/cora.reanalysis")
-    #    sys.exit(1)
-
-    idx = 2
-    while idx <= lenargs:
-        ajobfile = os.path.abspath(sys.argv[idx])
-        joblist.append(ajobfile)
-        idx += 1
-
-    print(f"joblist: {joblist}")
-
-    flowdeq = collections.deque()
-
-    for jobfile in joblist:
-        jobdict = util.readConfig(jobfile)
-        jobtype = jobdict["JOBTYPE"]
-        print('JOBTYPE: ', jobtype)
-
-        print(f"jobtype")
-
-        if re.search("forecast", jobtype):
-            # Add the forecast flow
-            fcstflow = flows.fcst_flow(jobconfig, jobfile, sshuser)
-            flowdeq.appendleft(fcstflow)
-
-        elif re.search("hindcast", jobtype):
-           # Add the hindcast flow
-            hindcastflow = flows.multi_hindcast_flow(jobconfig, jobfile, sshuser)
-            flowdeq.appendleft(hindcastflow)
-
-        elif jobtype == "adcircreanalysis":
-            raflow = flows.reanalysis_flow(jobconfig, jobfile)
-            flowdeq.appendleft(raflow)
-
-        elif jobtype == "plotting":
-            # Add the plot flow
-            plotflow = flows.plot_flow(postconf, jobfile)
-            flowdeq.appendleft(plotflow)
-
-        elif jobtype == "plotting_diff":
-            # Add the diff plot flow
-            diffplotflow = flows.diff_plot_flow(postconf, jobfile)
-            flowdeq.appendleft(diffplotflow)
-
-        elif re.search("experiment", jobtype):
-            if re.search("dask",jobdict["APP"]):
-                dask_experiment_flow = flows.python_experiment_dask_flow(jobconfig, jobfile)
-                flowdeq.appendleft(dask_experiment_flow)
-            else:
-                experiment_flow = flows.experiment_flow(jobconfig, jobfile)
-                flowdeq.appendleft(experiment_flow) 
-
-        else:
-            print(f"jobtype: {jobtype} is not supported")
-            sys.exit()
-
-    qlen = len(flowdeq)
-
-    idx = 0
-    # Run all of the flows in the queue
-    while idx < qlen:
-        aflow = flowdeq.pop()
-        idx += 1
-
-        # Stop if the flow failed
-        print(f"Starting aflow.run() for {aflow}")
-        state = aflow.run()
-        if state.is_successful():
-            continue
-        else:
-            break
+        print(f"jobtype: {jobtype} is not supported")
+        sys.exit()
 
 
 #####################################################################

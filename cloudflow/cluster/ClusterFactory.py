@@ -4,8 +4,6 @@ import json
 import logging
 import inspect
 
-from prefect.engine import signals
-
 from cloudflow.cluster.AWSCluster  import AWSCluster
 from cloudflow.cluster.LocalCluster  import LocalCluster
 
@@ -51,7 +49,8 @@ class ClusterFactory:
                 newcluster = AWSCluster(configfile)
             except Exception as e:
                 log.exception('Could not create cluster: ' + str(e))
-                raise signals.FAIL()
+                raise
+
         elif provider == 'Local':
             newcluster = LocalCluster(configfile)
 
