@@ -17,5 +17,5 @@
 ],
 "subnet_id" : "subnet-0be869ddbf3096968",
 "placement_group" : "cloud-sandbox-08202025-us-east-2b_Terraform_Placement_Group",
-        "table_name" : "IOOS-Sandbox-Compute-Nodes"
+"table_name" : "IOOS-Sandbox-Compute-Nodes"
 }

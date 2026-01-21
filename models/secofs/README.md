@@ -21,14 +21,17 @@ Steps to run SECOFS:
 4. Setup your job config file.
    e.g. cloudflow/jobs/jobs/OFS/secofs.coldstart or secofs.hotstart
    These will use the the model configuration template in: cloudflow/job/templates
-       secofs_coldstart.param.nml.in        - run day 1
-       secofs_hotstart.param.nml.in         - run day 2 to N
-       secofs_restart_continue.param.nml.in - can can also use to run day N to Z
+       secofs_coldstart.param.nml.in        - run day 1 from a cold start
+       secofs_hotstart.param.nml.in         - start run from coldstart provided day 2 to N
+       secofs_restart_continue.param.nml.in - use to continue a previous run with a newer hotstart, e.g. run day N to Z
 
 5. Run the job(s)
    e.g.
    cd cloudflow
    ./workflows/workflow_main.sh cluster/configs/IOOS/secofs.hpc6 jobs/jobs/OFS/secofs.coldstart >& secofs.cold.out &
+
+Model will run in the following output folder:
+/com/_your_folder_/secofs/20171201/outputs
 
 After running a coldstart and/or before continuing from a hoststart.nc file,
 the following script needs to be run. Edit the script as needed for your specific case.
@@ -50,3 +53,4 @@ hotstart:
     
 I have seen MPI ABORT on 8 hpc6a.48xlarge, not consistently though and not the ABORT wrong sign vsource error.
 
+When restarting, the run start date and time stays the same. The timestep the model run starts at is determined by the hotstart.nc file that is created from a prior run when using the restart option. See cloudflow/job/templates/secofs.__option__. 
