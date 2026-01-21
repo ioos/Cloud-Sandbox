@@ -12,12 +12,12 @@ export MODEL_DIR=${MODEL_DIR:-"/save/$USER"}
 export DATA_DIR=${DATA_DIR:-"/com/$USER"}
 
 ./get_schism.sh
-#cd $CURHOME
+cd $CURHOME
 
 ./build_schism.sh
-#cd $CURHOME
+cd $CURHOME
 
 ./get_testcase_inputs.sh
-#cd $CURHOME
+cd $CURHOME
 
 
