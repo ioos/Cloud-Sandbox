@@ -17,16 +17,62 @@
 
 #------------------------------------------------------------------------------
 # OAuth config
+#
+# This file supports multiple authenticators. By default the configuration
+# keeps the existing GoogleOAuthenticator behavior. To enable Okta (OIDC) set
+# the environment variable AUTH_PROVIDER=okta and provide the OKTA_ environment
+# variables described in jupyterhub/OKTA.md. Secrets and client IDs must be
+# provided via environment variables for security.
 #------------------------------------------------------------------------------
-from oauthenticator.google import GoogleOAuthenticator
-c.JupyterHub.authenticator_class = GoogleOAuthenticator
-c.GoogleOAuthenticator.oauth_callback_url = 'https://jupyterhub.rpsgroup.com/hub/oauth_callback'
-c.GoogleOAuthenticator.client_id = ''
-c.GoogleOAuthenticator.client_secret = ''
+import os
+
+AUTH_PROVIDER = os.environ.get('AUTH_PROVIDER', 'google').strip().lower()
+
+# Common settings preserved across authenticators
 c.LocalAuthenticator.create_system_users = True
 c.Authenticator.delete_invalid_users = False
 c.Authenticator.admin_users = {'jupyter', 'user1'}
+# Example mapping (override in env or by editing this file if necessary)
 c.Authenticator.username_map = { "user1@gmail.com": "user1", "user2@gmail.com": "user2" }
+
+if AUTH_PROVIDER == 'okta':
+	# Use GenericOAuthenticator configured for Okta (OIDC)
+	from oauthenticator.generic import GenericOAuthenticator
+	c.JupyterHub.authenticator_class = GenericOAuthenticator
+
+	OKTA_CLIENT_ID = os.environ.get('OKTA_CLIENT_ID', '')
+	OKTA_CLIENT_SECRET = os.environ.get('OKTA_CLIENT_SECRET', '')
+	# OKTA_ISSUER should be the full issuer URL, e.g. https://dev-12345.okta.com/oauth2/default
+	OKTA_ISSUER = os.environ.get('OKTA_ISSUER', '').rstrip('/')
+	# Optional: allow explicit callback URL (defaults to '<hub_url>/hub/oauth_callback' if unset)
+	OKTA_OAUTH_CALLBACK_URL = os.environ.get('OKTA_OAUTH_CALLBACK_URL', '')
+
+	c.GenericOAuthenticator.client_id = OKTA_CLIENT_ID
+	c.GenericOAuthenticator.client_secret = OKTA_CLIENT_SECRET
+	if OKTA_OAUTH_CALLBACK_URL:
+		c.GenericOAuthenticator.oauth_callback_url = OKTA_OAUTH_CALLBACK_URL
+
+	# Okta OIDC endpoints (standard):
+	# authorize: {issuer}/v1/authorize
+	# token:     {issuer}/v1/token
+	# userinfo:  {issuer}/v1/userinfo
+	if OKTA_ISSUER:
+		c.GenericOAuthenticator.authorize_url = OKTA_ISSUER + '/v1/authorize'
+		c.GenericOAuthenticator.token_url = OKTA_ISSUER + '/v1/token'
+		c.GenericOAuthenticator.userdata_url = OKTA_ISSUER + '/v1/userinfo'
+
+	# Standard OpenID Connect scopes
+	c.GenericOAuthenticator.scope = ['openid', 'profile', 'email']
+
+else:
+	# Default: Google OAuth (preserve existing behavior)
+	from oauthenticator.google import GoogleOAuthenticator
+	c.JupyterHub.authenticator_class = GoogleOAuthenticator
+	# Allow env overrides for Google credentials
+	GOOGLE_OAUTH_CALLBACK = os.environ.get('GOOGLE_OAUTH_CALLBACK_URL', 'https://jupyterhub.rpsgroup.com/hub/oauth_callback')
+	c.GoogleOAuthenticator.oauth_callback_url = GOOGLE_OAUTH_CALLBACK
+	c.GoogleOAuthenticator.client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
+	c.GoogleOAuthenticator.client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 
 ## Fill this out to make users administrators
 #c.Authenticator.admin_users = {'example_user@gmail.com'}
