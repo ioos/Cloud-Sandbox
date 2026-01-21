@@ -13,6 +13,7 @@ CloudFlow
    services/modules
    utils/modules
    workflows/modules
+   nwm_twl_retrospective
 
 Indices and tables
 ==================
