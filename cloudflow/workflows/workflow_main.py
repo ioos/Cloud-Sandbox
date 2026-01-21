@@ -34,7 +34,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 
 # This is used for obtaining liveocean forcing data
 # LiveOcean users need to obtain credentials from UW
-sshuser = 'username@ocean.washington.edu'
+sshuser = os.environ.get("LO_SSHUSER", "username@ocean.washington.edu")
 
 ######################################################################
 
