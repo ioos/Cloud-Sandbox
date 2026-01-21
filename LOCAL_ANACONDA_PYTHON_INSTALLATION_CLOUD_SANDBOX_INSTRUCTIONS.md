@@ -43,7 +43,7 @@ cd ${WORKINGDIR}/anaconda3/bin
 ./conda install -n base libarchive -c main --force-reinstall --solver classic
 # 
 ./conda update --all --solver=classic
-./conda install -c conda-forge pip boto3 prefect=0.15.13 dask distributed Pillow matplotlib netCDF4 numpy pyproj haikunator
+./conda install -c conda-forge pip boto3 prefect dask distributed Pillow matplotlib netCDF4 numpy pyproj haikunator
 
 echo "Your python3 executable is:\n\t ${WORKINGDIR}/anaconda3/bin/python3"
 ```
