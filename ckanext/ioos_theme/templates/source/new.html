@@ -1,0 +1,143 @@
+{# Minimal template override for harvest source "new" form.
+   This injects a small non-invasive JS snippet that:
+   - hides the Source Type and Update Frequency fields from users
+   - ensures the form still submits the values (creates hidden inputs when needed)
+  - selects matching select elements' options when available
+
+   Constraint: only UI/template changes, no backend or Python changes.
+#}
+
+{% block extra %}
+  {{ super() }}
+  <script>
+  (function(){
+    'use strict';
+
+    function normalize(s){ return (s||'').toString().trim().toLowerCase(); }
+
+    function hideClosestField(el){
+      if(!el) return;
+      var parent = el.closest('div.form-group, .field, .control-group, div.field, p, li');
+      if(parent) parent.style.display = 'none';
+      else el.style.display = 'none';
+    }
+
+    // Ensure a select has an accessible name for a11y tools.
+    // If a visible <label> exists nearby, associate it using for/id.
+    // Otherwise add an aria-label using the provided fallback.
+    function ensureAccessibleName(el, fallback){
+      if(!el) return;
+      if(el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')) return;
+      if(!el.id) el.id = 'ioos-select-' + Math.random().toString(36).slice(2,9);
+      var explicit = document.querySelector('label[for="'+el.id+'"]');
+      var wrapping = el.closest('label');
+      var nearby = null;
+      if(explicit) nearby = explicit;
+      else if(wrapping) nearby = wrapping;
+      else {
+        var parent = el.parentElement;
+        if(parent){
+          var lab = parent.querySelector('label');
+          if(lab) nearby = lab;
+        }
+      }
+      if(nearby){
+        try{ nearby.setAttribute('for', el.id); }catch(e){}
+        return;
+      }
+      try{ el.setAttribute('aria-label', fallback || ''); }catch(e){}
+    }
+
+    function ensureHiddenInput(form, name, value){
+      if(!form) form = document.querySelector('form');
+      if(!form) return;
+      // If there is an existing enabled input/select with this name, we still add a hidden override
+      // only when no matching option/value was set on the visible control.
+      var existingHidden = form.querySelector('input[type="hidden"][name="'+name+'"]');
+      if(existingHidden){ existingHidden.value = value; return; }
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    function setAndHide(nameVariants, defaultValue, accessibleLabel){
+      var foundAny = false;
+      var matchedOne = false;
+      var form = document.querySelector('form');
+
+      nameVariants.forEach(function(name){
+        var els = Array.prototype.slice.call(document.querySelectorAll('[name="'+name+'"]'));
+        if(!els || els.length===0) return;
+        foundAny = true;
+
+        els.forEach(function(el){
+          var tag = (el.tagName || '').toLowerCase();
+          if(tag === 'select'){
+            // try to pick an option whose text or value matches the default (case-insensitive)
+            var options = Array.prototype.slice.call(el.options || []);
+            var picked = false;
+            for(var i=0;i<options.length;i++){
+              try{
+                if(normalize(options[i].text) === normalize(defaultValue) || normalize(options[i].value) === normalize(defaultValue)){
+                  el.selectedIndex = i;
+                  picked = true;
+                  matchedOne = true;
+                  break;
+                }
+              }catch(e){ /* ignore */ }
+            }
+            // if nothing matched, attempt to match partial (e.g., labels like "IOOS WAF (custom)")
+            if(!picked){
+              for(var j=0;j<options.length;j++){
+                try{
+                  if(normalize(options[j].text).indexOf(normalize(defaultValue)) !== -1 || normalize(options[j].value).indexOf(normalize(defaultValue)) !== -1){
+                    el.selectedIndex = j;
+                    picked = true;
+                    matchedOne = true;
+                    break;
+                  }
+                }catch(e){ }
+              }
+            }
+
+            // ensure accessible name before hiding control
+            ensureAccessibleName(el, accessibleLabel || defaultValue || '');
+            // hide visible control
+            hideClosestField(el);
+
+            // If we couldn't pick an option, create a hidden input to ensure the backend gets the default
+            if(!picked){
+              ensureHiddenInput(form || document, el.name || nameVariants[0], defaultValue);
+            }
+          } else if(tag === 'input' || tag === 'textarea'){
+            try{ el.value = defaultValue; }catch(e){}
+            hideClosestField(el);
+            // also ensure a hidden input exists to avoid any form behaviour stripping the value
+            ensureHiddenInput(form || document, el.name || nameVariants[0], defaultValue);
+            matchedOne = true;
+          } else {
+            // fallback: hide label based on text and add hidden input
+            hideClosestField(el);
+            ensureHiddenInput(form || document, name, defaultValue);
+          }
+        });
+      });
+
+      if(!foundAny){
+        // no visible field(s) found for any variant; still ensure value exists in form
+        ensureHiddenInput(form || document, nameVariants[0], defaultValue);
+      }
+      return matchedOne || foundAny;
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      // Source Type -> IOOS WAF
+      setAndHide(['source_type','source-type','type','sourceType','Source_Type','sourceType'],'IOOS WAF','Source Type');
+      // Update Frequency -> Weekly
+      setAndHide(['update_frequency','update-frequency','frequency','updateFrequency','interval','Update_Frequency'],'Weekly','Update Frequency');
+    });
+  })();
+  </script>
+{% endblock %}
