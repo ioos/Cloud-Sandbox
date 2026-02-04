@@ -7,6 +7,7 @@ echo "Cloud-Sandbox/ directory is: $CSHOME"
 
 # This is for the files under /save
 export MODEL_DIR=${MODEL_DIR:-"/save/$USER"}
+export SAVE_DIR=$MODEL_DIR
 
 # This is for IC and forcing data under /com
 export DATA_DIR=${DATA_DIR:-"/com/$USER"}

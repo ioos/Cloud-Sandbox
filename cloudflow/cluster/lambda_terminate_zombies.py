@@ -4,19 +4,16 @@ import time
 import boto3
 from botocore.exceptions import ClientError
 
-#TABLE_NAME = os.environ["TABLE_NAME"]
-#AWS_REGION = os.environ["AWS_REGION"]
-
-TABLE_NAME = "IOOS-Sandbox-Compute-Nodes"
-AWS_REGION = "us-east-2"
-ORG_MAX_MINUTES = 5
+TABLE_NAME = os.environ["TABLE_NAME"]
+AWS_REGION = os.environ["AWS_REGION"]
+ORG_MAX_MINUTES = int(os.environ["ORG_MAX_MINUTES"])
+TERMINABLE_STATES = {"pending", "running", "stopping", "stopped"}
 
 ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
 table = ddb.Table(TABLE_NAME)
 ec2 = boto3.client("ec2", region_name=AWS_REGION)
 
-#def lambda_handler(event, context):
-def lambda_handler():
+def lambda_handler(event, context):
     now = int(time.time())
 
     expired_ids = []
@@ -46,7 +43,9 @@ def lambda_handler():
                 # Skip malformed items; optionally log/metrics here
                 continue
 
-            # Or if start_time + ORG_MAX
+            #Can modify this later and base it on idle time from a cloudwatch monitor
+            #Terminate instance if it has been running longer than max minutes
+            #Or if start_time + ORG_MAX
             #if (start_time + minutes_max * 60) <= now:
             if (start_time + ORG_MAX_MINUTES * 60) <= now:
                 print(f"Found expired instance, {item}")
@@ -62,21 +61,42 @@ def lambda_handler():
 
     print(f"expired_ids: {expired_ids}")
 
-    # Terminate instances (you are far below the 1000 ID limit)
-    try:
-        print(f"Terminating instances: {expired_ids}")
-        ec2.terminate_instances(InstanceIds=expired_ids)
-    except ClientError:
-        # You may choose to continue to deletion anyway
-        raise
+    terminated_ids = []
+    invalid_ids = []
+    failed_ids = []
 
-    # Delete the records so the table reflects "currently running only"
-    print(f"removing items from database: {expired_ids}")
+    for instance_id in expired_ids:
+
+        try:
+            print(f"Terminating instances: {expired_ids}")
+            ec2.terminate_instances(InstanceIds=[instance_id])
+            terminated_ids.append(instance_id)
+        except ClientError as e:
+            error_code = e.response["Error"].get("Code", "Unknown")
+
+            if error_code == "InvalidInstanceID.NotFound":
+                # Instance no longer exists — safe to clean up DB record
+                print(f"Instance not found: {instance_id}")
+                invalid_ids.append(instance_id)
+            else:
+                # Unexpected error — log and continue, should terminate next time around
+                print(f"Failed to terminate {instance_id}: {error_code}")
+                failed_ids.append(instance_id)
+
+    instance_ids_to_delete = terminated_ids + invalid_ids
+
+    # Delete the records from the database so the table reflects "currently running only"
+    print(f"removing items from database: {instance_ids_to_delete}")
     with table.batch_writer() as batch:
-        for iid in expired_ids:
+        for iid in instance_ids_to_delete:
             batch.delete_item(Key={"instance-id": iid})
 
-    return {"expired": len(expired_ids), "terminated": len(expired_ids), "deleted": len(expired_ids)}
+    print(f"Expired candidates: {len(expired_ids)}")
+    print(f"Terminated: {len(terminated_ids)}")
+    print(f"Invalid (already gone): {len(invalid_ids)}")
+    print(f"Other failures: {len(failed_ids)}")
+
+    return {"expired": len(expired_ids), "terminated": len(terminated_ids), "deleted DB items": len(instance_ids_to_delete)}
 
 
 if __name__ == '__main__':
