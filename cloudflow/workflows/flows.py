@@ -73,7 +73,10 @@ def simple_experiment_flow(conf, jobfile):
     ctasks.cluster_start(cluster)
 
     # Run the forecast
-    tasks.simple_run(cluster, expjob)
+    try:
+        tasks.simple_run(cluster, expjob)
+    except Exception as e:
+        log.exception('simple_run failed')
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
