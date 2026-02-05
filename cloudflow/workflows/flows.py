@@ -274,7 +274,10 @@ def experiment_flow(conf, jobfile):
     ctasks.cluster_start(cluster)
 
     # Run the model
-    tasks.experiment_run(cluster, experiment_job)
+    try:
+        tasks.experiment_run(cluster, experiment_job)
+    except Exception as e:
+        log.exception('experiment_run failed')
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
