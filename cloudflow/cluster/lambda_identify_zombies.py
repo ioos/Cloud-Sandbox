@@ -9,9 +9,29 @@ AWS_REGION = os.environ["AWS_REGION"]
 ORG_MAX_MINUTES = int(os.environ["ORG_MAX_MINUTES"])
 TERMINABLE_STATES = {"pending", "running", "stopping", "stopped"}
 
+s3_client = boto3.client('s3')
 ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
 table = ddb.Table(TABLE_NAME)
 ec2 = boto3.client("ec2", region_name=AWS_REGION)
+time_string = time.strftime('%Y-%m-%d-%H')
+file_name = filename = f"IOOS_Coastal_Sandbox_Suspect_Report_{time_string}.html"
+
+html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IOOS Coastal Sandbox Instance Monitor</title>
+</head>
+<body>
+    <h1>Instances</h1>
+    <p>Instances past their user alotted time: {expired_ids}</p>
+    <p>Suspected Zombies: {suspect_ids}</p>
+    <p>Successful shutdowns: {invalid_ids}</p>
+    <p>Unsuccessful shutdowns i.e. failed to terminate: {failed_ids}</p>
+    <p>Report Generated on: {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+</body>
+</html>
+"""
 
 def lambda_handler(event, context):
     now = int(time.time())
@@ -91,12 +111,19 @@ def lambda_handler(event, context):
             batch.delete_item(Key={"instance-id": iid})
 
     print(f"Expired candidates: {len(expired_ids)}")
-    print(f"Suspected: {len(terminated_ids)}")
+    print(f"Suspected: {len(suspect_ids)}")
     print(f"Invalid (already gone): {len(invalid_ids)}")
     print(f"Other failures: {len(failed_ids)}")
     
     #Write to HTML then push HTML to S3
-    
+    bucket_name = 'your-bucket-name'
+    s3_key = f"monitoring/{file_name}"    
+    s3_client.put_object(
+        Bucket=bucket_name,
+        Key=s3_key,
+        Body=html_content,
+        ContentType='text/html'
+    )
 
     return {"expired": len(expired_ids), "terminated": len(terminated_ids), "deleted DB items": len(instance_ids_to_delete)}
 
