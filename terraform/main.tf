@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     aws = {
@@ -369,7 +370,6 @@ resource "terraform_data" "send_outputs" {
   triggers_replace = [
     timestamp() 
   ]
-  # aws_instance.head_node.id
 
   provisioner "local-exec" {
     command = "./scp.terraform.output.sh"
