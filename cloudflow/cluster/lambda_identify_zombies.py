@@ -116,7 +116,7 @@ def lambda_handler(event, context):
     print(f"Other failures: {len(failed_ids)}")
     
     #Write to HTML then push HTML to S3
-    bucket_name = 'your-bucket-name'
+    bucket_name = 'ioos-bucket-name'
     s3_key = f"monitoring/{file_name}"    
     s3_client.put_object(
         Bucket=bucket_name,
@@ -124,6 +124,8 @@ def lambda_handler(event, context):
         Body=html_content,
         ContentType='text/html'
     )
+    
+    print(f"File uploaded successfully as {s3_key}")
 
     return {"expired": len(expired_ids), "terminated": len(terminated_ids), "deleted DB items": len(instance_ids_to_delete)}
 
