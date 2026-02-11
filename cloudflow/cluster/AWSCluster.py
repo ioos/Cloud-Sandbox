@@ -410,7 +410,7 @@ class AWSCluster(Cluster):
                     "name-tag": name_tag,
                     "instance-type": self.nodeType,
                     "start-time": now,
-                    "human-time": time.strftime('%Y-%m-%d-%H')
+                    "human-time": time.strftime('%Y-%m-%d-%H'),
                     "minutes-max": mm,
                     "username": self.username
                 }) 
