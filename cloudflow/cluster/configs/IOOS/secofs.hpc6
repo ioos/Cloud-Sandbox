@@ -2,10 +2,10 @@
 "platform"  : "AWS",
 "region"    : "us-east-2",
 "nodeType"  : "hpc6a.48xlarge",
-"nodeCount" : 8,
+"nodeCount" : 12,
 "minimumForSECOFS" : 6,
 "tags"      : [ 
-                { "Key": "Name", "Value": "seccofs" },
+                { "Key": "Name", "Value": "seccofs-hotstart-1_day-orgbuild-12nodes" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 "key_name"  : "ioos-sandbox",

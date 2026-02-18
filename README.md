@@ -33,8 +33,8 @@ It provides repeatable configurations, model code and required libraries, input 
 ## I want to...
 
 - Run a model in an existing cloud sandbox
-    - [NOS OFS Models](NOSOFS-MODELS.md)
-    - [LiveOcean Model](LIVEOCEAN-MODEL.md)
+    - [NOS OFS Models](models/nosofs/NOSOFS-MODELS.md)
+    - [LiveOcean Model](models/liveocean/LIVEOCEAN-MODEL.md)
 
 - [Deploy a new cloud sandbox](DEPLOYMENT.md)
 

@@ -70,7 +70,11 @@ def simple_experiment_flow(conf, jobfile):
     expjob = tasks.job_init(cluster, jobfile)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Run the forecast
     try:
@@ -123,7 +127,11 @@ def multi_hindcast_flow(conf, jobfile, sshuser=None):
     #tasks.create_scratch('FSx',jobfile,'/ptmp')
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Mount the scratch disk
     # tasks.mount_scratch(scratch, cluster)
@@ -192,7 +200,11 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
     jtasks.get_forcing(fcstjob, sshuser)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+      ctasks.cluster_start(cluster)
+    except Exception as e:
+      log.exception('cluster_start failed')
+      raise
 
     # Run the forecast
     try:
@@ -223,7 +235,11 @@ def python_experiment_dask_flow(conf, jobfile):
     python_job = tasks.job_init(cluster, jobfile)
 
     # Start the machine
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Push the env, install required libs on post machine
     # TODO: install all of the 3rd party dependencies on AMI
@@ -271,7 +287,11 @@ def experiment_flow(conf, jobfile):
     experiment_job = tasks.job_init(cluster, jobfile)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Run the model
     try:

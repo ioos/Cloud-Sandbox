@@ -5,28 +5,58 @@ set (SCHISM_EXE_BASENAME pschism_IOOSSB CACHE STRING "Base name (modules and fil
 ###Relative paths won't work
 # set(CMAKE_Fortran_COMPILER mpiifort CACHE PATH "Path to serial Fortran compiler")
 # Probably should use ifort, not sure why I switched it to mpiifort 
+
+#set(CMAKE_Fortran_COMPILER ifx   CACHE PATH "Path to serial Fortran compiler")
+#set(CMAKE_C_COMPILER       icx   CACHE PATH "Path to serial C compiler")
+#set(CMAKE_CXX_COMPILER     icpx  CACHE PATH "Path to serial C++ compiler")
+
 set(CMAKE_Fortran_COMPILER ifort CACHE PATH "Path to serial Fortran compiler")
-set(NetCDF_FORTRAN_DIR "$ENV{NETCDF}" CACHE PATH "Path to NetCDF Fortran library")
-set(NetCDF_C_DIR  "$ENV{NETCDFC}"  CACHE PATH "Path to NetCDF C library")
-set(CMAKE_C_COMPILER icc CACHE STRING "Path to serial C compiler")
-set(CMAKE_CXX_COMPILER icc CACHE STRING "Path to serial C++ compiler")
-#set(C_PREPROCESS_FLAG "-no-cpp" CACHE STRING "cpp is automatic with intel compiler")
+set(CMAKE_C_COMPILER       icc   CACHE PATH "Path to serial C compiler")
+set(CMAKE_CXX_COMPILER     icc   CACHE PATH  "Path to serial C++ compiler")
+set(NetCDF_FORTRAN_DIR "$ENV{NETCDF}"   CACHE PATH "Path to NetCDF Fortran library")
+set(NetCDF_C_DIR       "$ENV{NETCDFC}"  CACHE PATH "Path to NetCDF C library")
 set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
+
+#set(USE_TIMER ON CACHE BOOLEAN "Use TIMER")
+#set(USE_TIMER2 ON CACHE BOOLEAN "Use TIMER2")
+
+#set(CMAKE_Fortran_COMPILER mpiifort CACHE PATH "Path to serial Fortran compiler")
+#set(CMAKE_C_COMPILER mpiicc  CACHE PATH "Path to serial Fortran compiler")
+
+# CMake finds mpiifort and mpiicc and uses those automatically
+# CMAKE_MPI_Fortran_COMPILER
+# CMAKE_MPI_C_COMPILER
+
+# 54 minutes, I had the best settings already
+# ############################################
+#set(CMAKE_Fortran_COMPILER ifort CACHE PATH "Path to serial Fortran compiler")
+#set(NetCDF_FORTRAN_DIR "$ENV{NETCDF}" CACHE PATH "Path to NetCDF Fortran library")
+#set(NetCDF_C_DIR  "$ENV{NETCDFC}"  CACHE PATH "Path to NetCDF C library")
+#set(CMAKE_C_COMPILER icc CACHE STRING "Path to serial C compiler")
+#set(CMAKE_CXX_COMPILER icc CACHE STRING "Path to serial C++ compiler")
+#set(CMAKE_WARN_DEV OFF CACHE BOOLEAN "Disable warning messages")
 
 ###Compile flags
 
-#For Hybrid (remember to add OMP in the name above)
-# add -qopenmp
-
-# set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -mcmodel=medium -O2 -init=zero -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
-#
-# I did not specify march for eccofs nor necofs and they ran on both hpc7a and hpc6a without issue
-#
+#For Hybrid (remember to add OMP in the name above) add -qopenmp
 # set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -mcmodel=medium -O2 -init=zero -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
-set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -g -traceback -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+# Kuro cluster
+# # set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -mcmodel=medium -march=x86-64-v3 -init=zero" CACHE STRING "Fortran flags" FORCE)
+
+# set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -g -traceback -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
+#
+# 68 minutes/day using ifx and the following
+# set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -mcmodel=medium -march=x86-64-v3 -init=zero" CACHE STRING "Fortran flags" FORCE)
+# -no-prec-sqrt' not supported in ifx
+# set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -mcmodel=medium -march=x86-64-v3 -no-prec-div -align all -assume buffered_io -assume byterecl -init=zero" CACHE STRING "Fortran flags" FORCE)
+
+#set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -mcmodel=medium -march=x86-64-v3 -init=zero" CACHE STRING "Fortran flags" FORCE)
+
+set(CMAKE_Fortran_FLAGS_RELEASE "-march=core-avx2 -O3 -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
 # no noticeable performance improvement using skylake-avx512 build
 # set(CMAKE_Fortran_FLAGS_RELEASE "-march=skylake-avx512 -O3 -g -traceback -no-prec-sqrt -no-prec-div -align all -assume buffered_io -assume byterecl" CACHE STRING "Fortran flags" FORCE)
 
 # Note: hp7a support avx-512, hpc6a does not
+

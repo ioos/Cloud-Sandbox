@@ -164,8 +164,18 @@ class SCHISM_Hindcast(Job):
             # ! nohot_write = must be a multiple of ihfskip if nhot=1
             # ! 1 day == 86400 seconds
 
-            nhot_write = int(float(self.RNDAY) * 720)
+            # Should put DT in here also
+            # Assumes dt = 120. seconds 
+            # 720 * 120 = 86400 / 3600 seconds in an hour = 24 hours
+            # 86,400 / dt = timesteps in a day
             # nhot_write = 720
+
+            nhot_write = int(float(self.RNDAY) * 720)
+            ihfskip = 720
+
+            # This is needed for rapid testing of less than 1 day
+            if ihfskip > nhot_write:
+                ihfskip = nhot_write
 
             settings = {
                 "__RNDAY__": self.RNDAY,
@@ -173,6 +183,7 @@ class SCHISM_Hindcast(Job):
                 "__START_MONTH__": str(int(start_month)),
                 "__START_DAY__": str(int(start_day)),
                 "__START_HOUR__": str(start_hour),
+                "__IHFSKIP__": str(ihfskip),
                 "__NHOT_WRITE__": str(nhot_write)
             }
 

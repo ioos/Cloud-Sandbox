@@ -1,0 +1,6 @@
+#MYIPADDR=`hostname -I | awk '{print $1}'`
+
+MYIPADDR=127.0.0.1
+export PREFECT_API_URL="http://${MYIPADDR}:4200/api"
+export PREFECT_RESULTS_PERSIST_BY_DEFAULT = "true"
+export PREFECT_TASKS_DEFAULT_PERSIST_RESULT = "true"

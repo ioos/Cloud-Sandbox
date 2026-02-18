@@ -1,0 +1,16 @@
+[Unit]
+Description=Prefect Server
+After=network.target
+
+[Service]
+User=prefect
+Group=prefect
+WorkingDirectory=/home/prefect
+# Use a shell to evaluate the private IP address dynamically
+# ExecStart=/bin/sh -c 'HOST_IP=$(hostname -I | awk "{print \$1}"); /usr/local/bin/prefect server start --host $HOST_IP'
+ExecStart=/usr/local/bin/prefect server start --host 127.0.0.1
+Restart=always
+Environment=PREFECT_HOME=/save/environments/prefect/.prefect
+
+[Install]
+WantedBy=multi-user.target

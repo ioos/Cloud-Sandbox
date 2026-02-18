@@ -15,6 +15,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from haikunator import Haikunator
+import prefect
 
 # from cloudflow.cluster import AWSHelper
 from cloudflow.cluster import AWSHelper
@@ -192,11 +193,9 @@ class AWSCluster(Cluster):
 
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
-        haikumaker = Haikunator()
-
-        # Return a random two words, example: "shiny-wave"
-        haiku = haikumaker.haikunate(token_length=0)
-        suffix=f"-{haiku}"
+        # Using Prefect 3, has built in unique name generator
+        flow_run_name = prefect.runtime.flow_run.name
+        suffix=f"-{flow_run_name}"
 
         if not any(tag["Key"] == "Name" for tag in tags):
             raise ValueError("No 'Name' tag found")
@@ -244,8 +243,6 @@ class AWSCluster(Cluster):
         except KeyError:
             print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
 
-
-        print("running memorable_tags")
         self.tags = self.memorable_tags(cfDict['tags'])
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
@@ -253,13 +250,28 @@ class AWSCluster(Cluster):
         self.subnet_id = cfDict['subnet_id']
         self.placement_group = cfDict['placement_group']
 
+        # Enforce DynamoDB table usage
         if 'table_name' in cfDict:
             self.table_name = cfDict['table_name']
-        else:
-            log.warn("WARNING !!!!!! NO DB table specified for ZOMBIE node protection !!!!!!")
 
+            ddb_client = boto3.client('dynamodb', region_name=self.region)
+            try:
+                ddb_client.describe_table(TableName=self.table_name)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    log.error(f"DynamoDB table does not exists - {self.table_name}")
+                    raise
+                else:
+                    raise 
+        else:
+            log.error("ERROR !!!!!! NO DB table specified for ZOMBIE node protection !!!!!!")
+            raise ValueError("DynamoDB table_name is required but not provided")
+
+        # This is used to with EC2 policy to restrict ec2 visibility to current subnet
         self.tags.append({ "Key": "ApprovedSubnet", "Value": f"{self.subnet_id}" })
+
         print(f"self.tags: {self.tags}")
+
         return
 
     ########################################################################
@@ -410,7 +422,7 @@ class AWSCluster(Cluster):
                     "name-tag": name_tag,
                     "instance-type": self.nodeType,
                     "start-time": now,
-                    "human-time": time.strftime('%Y-%m-%d-%H'),
+                    "human-time": time.strftime('%Y-%m-%d %H:%M %Z'),
                     "minutes-max": mm,
                     "username": self.username
                 }) 
@@ -455,7 +467,7 @@ class AWSCluster(Cluster):
                              retries += 1
                              if(retries == self.vm_max_retries):
                                  print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
-                                 raise Exception() from e
+                                 raise
                              else:
                                  # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
                                  if(retries>1):
@@ -468,10 +480,10 @@ class AWSCluster(Cluster):
                          else:
                              # Re-raise the exception if it's not a capacity issue
                              log.exception('ClientError exception in createCluster' + str(e))
-                             raise Exception() from e
+                             raise
             else:
                 log.exception('ClientError exception in createCluster' + str(e))
-                raise Exception() from e
+                raise
 
 
         log.info('AWS resources have been allocated for cloudflow job. Waiting for nodes to enter running state ...')
@@ -581,7 +593,7 @@ class AWSCluster(Cluster):
         except Exception as e:
             log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
                            MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
-            raise Exception() from e
+            raise
 
 
         # Delete the ddb entries since these have been terminated
