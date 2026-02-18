@@ -14,8 +14,7 @@ deployments.
 
 ### Start the prefect server
 
-Example:
-`prefect server start >& ~/prefect.log &`
+`prefect server start --background`
 
 By default, the server will run on the localhost 127.0.0.1 port:4200
 
