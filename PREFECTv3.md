@@ -20,16 +20,18 @@ Example:
 By default, the server will run on the localhost 127.0.0.1 port:4200
 
 ### Configure your profile to use the running server
-prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"
+`prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"`
 
 ### Additional settings to persist results
-prefect config set PREFECT_RESULTS_PERSIST_BY_DEFAULT="true"
-prefect config set PREFECT_TASKS_DEFAULT_PERSIST_RESULT="true"
+`prefect config set PREFECT_RESULTS_PERSIST_BY_DEFAULT="true"`
+`prefect config set PREFECT_TASKS_DEFAULT_PERSIST_RESULT="true"`
 
 ### These settings will be added to ~/.prefect/profile.toml
+```
 export PREFECT_API_URL="http://localhost:4200/api"
 export PREFECT_RESULTS_PERSIST_BY_DEFAULT = "true"
 export PREFECT_TASKS_DEFAULT_PERSIST_RESULT = "true"
+```
 
 You can connect to the Prefect UI by using an ssh tunnel and connect
 to the webserver on your machine.
@@ -41,7 +43,7 @@ Example:
 `ssh -i ~/.ssh/id_rsa -L 4200:localhost:4200 username@sandbox`
 
 Open a web browser and open the URL:
-http://localhost:4200/dashboard
+`http://localhost:4200/dashboard`
 
 There are also useful Prefect CLI tools:
 prefect --help
@@ -53,6 +55,8 @@ flow-runs ls" command. The Name was output at the beginning of the run and can
 be found in your log output. 
 
 Example output:
+
+```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃                                   ID ┃ Flow          ┃ Name           ┃ State     ┃ When         ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
@@ -61,6 +65,7 @@ Example output:
 │ d92a59f0-7ac8-4b4f-9616-caade4a076cf │ hindcast-flow │ crafty-potoo   │ COMPLETED │ 20 hours ago │
 │ 199e77cb-99ed-4b12-8b8b-15f88d091399 │ hindcast-flow │ perky-hawk     │ COMPLETED │ 21 hours ago │
 └──────────────────────────────────────┴───────────────┴────────────────┴───────────┴──────────────┘
+```
 
 Example:
 `prefect flow-run cancel 'a55a4804-9e3c-4042-8b59-b3b6b7618736'`
