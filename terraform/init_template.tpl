@@ -73,10 +73,10 @@ export ami_name=${ami_name}
 echo "ami name : $ami_name"
 
 
-
 ## Install all of the software and drivers
 ##########################################
-sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
+# sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
+echo "IN DEVELOPLMENT: NOT RUNNING setup-instance.sh"
 
 # TODO: Check for errors returned from any step above
 

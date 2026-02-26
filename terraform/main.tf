@@ -196,14 +196,13 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 ##################################
 
 ################################################################
-# CLI search command for troubleshooting, specificity
+# CLI search command for troubleshooting and verifying available images
 #aws ec2 describe-images --owners 309956199498        \
 #    --filters "Name=name,Values=RHEL-8.*_HVM-*-x86_64-*-Hourly2-*"  \
 #    --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
 #    --output table
 # example:
-# |  RHEL-8.9.0_HVM-20240327-x86_64-4-Hourly2-GP3  |  ami-03b59d2a779dad4d3 |  2024-03-28T07:27:26.000Z  |
-# success: ami                                  = "ami-03b59d2a779dad4d3"
+# |  RHEL-8.10.0_HVM-20251214-x86_64-1988-Hourly2-GP3 |  ami-07885cd3cf11ed0b6 |  2025-12-15T01:40:39.000Z 
 
 data "aws_ami" "rhel_8" {
   owners = ["309956199498"]
@@ -211,7 +210,6 @@ data "aws_ami" "rhel_8" {
 
   filter {
     name = "name"
-    #values = ["RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2"]
     values = ["RHEL-8.10*_HVM-*-x86_64-*-Hourly2-*"]
   }
 
@@ -363,6 +361,22 @@ resource "aws_network_interface" "head_node" {
 }
 
 # https://developer.hashicorp.com/terraform/language/v1.5.x/resources/terraform-data
+
+#│ Error: local-exec provisioner error
+#│ 
+#│   with terraform_data.send_outputs,
+#│   on main.tf line 372, in resource "terraform_data" "send_outputs":
+#│  372:   provisioner "local-exec" {
+#│ 
+#│ Error running command './scp.terraform.output.sh': exit status 1. Output: usage: ssh-keyscan [-46cDHqv] [-f file] [-O
+#│ option] [-p port] [-T timeout]
+#│                    [-t type] [host | addrlist namelist]
+#│ Copying deployment.info to head node
+#│ ++++++++++++++++++++++++++++++++++++
+#│ scp -i  -p deployment.info :~/deployment.info
+#│ scp: :~/deployment.info: No such file or directory
+
+# This works if ran manually after deployment, added a 30 second sleep to script
 
 # scp deployment info to head node automatically
 resource "terraform_data" "send_outputs" {
