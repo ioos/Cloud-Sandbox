@@ -35,11 +35,12 @@ SECONDS=0
 
 export CLOUDFLOW_DIR=$(pwd)
 
+
 echo "--- " 
-echo "--- SSH Into AWS Worker Node and Running PYTHON Script-----------------"
+echo "--- SSH into AWS worker node, checking PYTHON script for syntax errors, and then and running PYTHON script-----------------"
 echo "---"
 
-ssh ec2-user@$HOSTS "cd $CLOUDFLOW_DIR && env && pwd && $EXEC $SCRIPT"
+ssh ec2-user@$HOSTS "cd $CLOUDFLOW_DIR && env && pwd && $EXEC -m py_compile $SCRIPT && $EXEC $SCRIPT"
 
 
 if [ $? -ne 0 ]; then
