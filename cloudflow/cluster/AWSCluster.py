@@ -416,6 +416,16 @@ class AWSCluster(Cluster):
             log.warn(f"minutes-max must be <= {MAX_MINUTES}")
    
         with table.batch_writer() as batch:
+            db_table={
+                "instance-id": iid,
+                "name-tag": name_tag,
+                "instance-type": self.nodeType,
+                "start-time": now,
+                "human-time": time.strftime('%Y-%m-%d %H:%M %Z'),
+                "minutes-max": mm,
+                "username": self.username
+            }
+            log.info(f"DB_table output for head node {db_table}")
             for iid in instance_ids:
                 batch.put_item(Item={
                     "instance-id": iid,
@@ -606,7 +616,7 @@ class AWSCluster(Cluster):
                 instance_id = instance_data["instance_id"]
                 instance_ids.append(instance_id)
 
-            self.__delete_instance_records(instance_ids)
+            #self.__delete_instance_records(instance_ids)
 
 
         return responses
