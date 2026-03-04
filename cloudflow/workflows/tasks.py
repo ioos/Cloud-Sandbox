@@ -649,7 +649,9 @@ def python_dask_experiment_run(dask_address, job):
                 results = client.gather(futures)
 
                 # User job argument in this case is the output directory pathway
-                output_dir = job.ARG2
+                # and ensure absolute path is defined so dask workers and scheduler
+                # can properly place output on the head node EFS volume
+                output_dir = os.path.abspath(job.ARG2)
 
                 # Create the directory, and do nothing if it already exists
                 os.makedirs(output_dir, exist_ok=True)
@@ -676,7 +678,9 @@ def python_dask_experiment_run(dask_address, job):
                 file_list = [f"sensor_{str(i).zfill(3)}" for i in range(0, 20 + 1)]
 
                 # User job argument in this case is the output directory pathway
-                output_dir = job.ARG1
+                # and ensure absolute path is defined so dask workers and scheduler
+                # can properly place output on the head node EFS volume
+                output_dir = os.path.abspath(job.ARG1)
 
                 # Create the directory, and do nothing if it already exists
                 os.makedirs(output_dir, exist_ok=True)
