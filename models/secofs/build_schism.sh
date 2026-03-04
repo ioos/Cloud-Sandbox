@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -x
 
-SAVE_DIR="/save/$USER"
+export SAVE_DIR=${SAVE_DIR:-"/save/$USER"}
+
 MODULEFILE=intel_x86_64
 
 if [ ! -d $SAVE_DIR ]; then

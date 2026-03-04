@@ -7,6 +7,7 @@ import json
 import logging
 import math
 import inspect
+import getpass
 
 from pathlib import Path
 
@@ -14,15 +15,16 @@ import boto3
 from botocore.exceptions import ClientError
 
 from haikunator import Haikunator
+import prefect
 
 # from cloudflow.cluster import AWSHelper
 from cloudflow.cluster import AWSHelper
 from cloudflow.cluster.Cluster import Cluster
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-debug = False
+MAX_MINUTES = 2 * 60
 
 log = logging.getLogger('workflow')
 
@@ -158,6 +160,10 @@ class AWSCluster(Cluster):
         self.sg_ids = []
         self.subnet_id = ''
         self.placement_group = ''
+        self.username = getpass.getuser()
+        self.table_name = ''
+        # Can add this to the cluster config if so desired - Lambda sweeper function can use it or some other hard value
+        self.minutes_max = 120
         # self.hosts = ''
 
         cfDict = self.readConfig(configfile)
@@ -187,11 +193,9 @@ class AWSCluster(Cluster):
 
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
-        haikumaker = Haikunator()
-
-        # Return a random two words, example: "shiny-wave"
-        haiku = haikumaker.haikunate(token_length=0)
-        suffix=f"-{haiku}"
+        # Using Prefect 3, has built in unique name generator
+        flow_run_name = prefect.runtime.flow_run.name
+        suffix=f"-{flow_run_name}"
 
         if not any(tag["Key"] == "Name" for tag in tags):
             raise ValueError("No 'Name' tag found")
@@ -239,9 +243,6 @@ class AWSCluster(Cluster):
         except KeyError:
             print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
 
-
-        # Hacky way to force unique Name tags
-        print("running memorable_tags")
         self.tags = self.memorable_tags(cfDict['tags'])
         self.image_id = cfDict['image_id']
         self.key_name = cfDict['key_name']
@@ -249,8 +250,28 @@ class AWSCluster(Cluster):
         self.subnet_id = cfDict['subnet_id']
         self.placement_group = cfDict['placement_group']
 
+        # Enforce DynamoDB table usage
+        if 'table_name' in cfDict:
+            self.table_name = cfDict['table_name']
+
+            ddb_client = boto3.client('dynamodb', region_name=self.region)
+            try:
+                ddb_client.describe_table(TableName=self.table_name)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    log.error(f"DynamoDB table does not exists - {self.table_name}")
+                    raise
+                else:
+                    raise 
+        else:
+            log.error("ERROR !!!!!! NO DB table specified for ZOMBIE node protection !!!!!!")
+            raise ValueError("DynamoDB table_name is required but not provided")
+
+        # This is used to with EC2 policy to restrict ec2 visibility to current subnet
         self.tags.append({ "Key": "ApprovedSubnet", "Value": f"{self.subnet_id}" })
+
         print(f"self.tags: {self.tags}")
+
         return
 
     ########################################################################
@@ -346,18 +367,19 @@ class AWSCluster(Cluster):
         instances = response
         #instance_list = response['Instances']
         #self.instances = instance_list
-        print("PT DEBUG instances ------------------------------------------")
-        print("PT DEBUG instances ------------------------------------------")
-        print(instances)
+        #print(instances)
         #print(instance_list)
-        print("PT DEBUG instances ------------------------------------------")
-        print("PT DEBUG instances ------------------------------------------")
-        self.save_instance_data(instances)
+        #self.save_instance_data(instances)
         return instances
 
 
  
-    def save_instance_data(self, instances):
+    def __save_instance_data(self, instances):
+        """ Prefect 3 can't serialize and cache EC2 Instance type
+            so we save the essential EC2 Instance data here.
+            All of the other fields are standard types or serializable
+            TODO: tags, user and start_time do not need to be saved here
+        """
 
         self.instances = []
         for instance in instances:
@@ -365,14 +387,59 @@ class AWSCluster(Cluster):
                 "instance_id": instance.instance_id,
                 "instance_type": instance.instance_type,
                 "state": instance.state['Name'],
-                "host": instance.private_ip_address
+                "host": instance.private_ip_address,
+                "tags": self.tags,
+                "user": self.username,
+                "start_time": self.__start_time
             }
             print(json.dumps(instance_data))
             self.instances.append(instance_data)
-    
+
+
+    def __put_instance_records(self, instance_ids: list[str]):
+        """ Keeps track of the instances that have been started.
+            Adds an entry to DB.
+        """
+
+        ddb = boto3.resource("dynamodb", region_name=self.region)
+        table = ddb.Table(self.table_name)
+
+        now = int(time.time())
+        for tag in self.tags:
+            if tag["Key"] == "Name":
+                name_tag = tag["Value"]
+
+        mm = int(self.minutes_max)
+        if mm < 1:
+            log.warn("minutes-max must be >= 1")
+        if mm > MAX_MINUTES:
+            log.warn(f"minutes-max must be <= {MAX_MINUTES}")
+   
+        with table.batch_writer() as batch:
+            for iid in instance_ids:
+                batch.put_item(Item={
+                    "instance-id": iid,
+                    "name-tag": name_tag,
+                    "instance-type": self.nodeType,
+                    "start-time": now,
+                    "human-time": time.strftime('%Y-%m-%d %H:%M %Z'),
+                    "minutes-max": mm,
+                    "username": self.username
+                }) 
+
+
+    def __delete_instance_records(self, instance_ids: list[str]):
+        """ Removes the instance from the DB when it is terminated normally
+        """
+
+        ddb = boto3.resource("dynamodb", region_name=self.region)
+        table = ddb.Table(self.table_name)
+
+        with table.batch_writer() as batch:
+            for iid in instance_ids:
+                batch.delete_item(Key={"instance-id": iid})
+
  
- 
-    # TODO: make sure use of gp3 volume instead of gp2
     def start(self):
         """ Provision the configured cluster in the cloud.
         """
@@ -385,7 +452,6 @@ class AWSCluster(Cluster):
         try:
            instances = self.create_instances()
 
-        # TODO: refactor this loop so it is not a duplication of the above code
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 
@@ -401,7 +467,7 @@ class AWSCluster(Cluster):
                              retries += 1
                              if(retries == self.vm_max_retries):
                                  print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
-                                 raise Exception() from e
+                                 raise
                              else:
                                  # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
                                  if(retries>1):
@@ -414,26 +480,44 @@ class AWSCluster(Cluster):
                          else:
                              # Re-raise the exception if it's not a capacity issue
                              log.exception('ClientError exception in createCluster' + str(e))
-                             raise Exception() from e
+                             raise
             else:
                 log.exception('ClientError exception in createCluster' + str(e))
-                raise Exception() from e
+                raise
 
 
-        print('AWS resources have been allocated for cloudflow job. Waiting for nodes to enter running state ...')
+        log.info('AWS resources have been allocated for cloudflow job. Waiting for nodes to enter running state ...')
+
+
+        # If there hasn't been a table setup for this deployment
+        if not self.table_name:
+            pass
+        else:
+            instance_ids = [i.instance_id for i in instances]
+            self.__put_instance_records(instance_ids)
+   
+
         # Make sure the nodes are running before returning
+        try:
+            client = boto3.client('ec2', self.region)
+            waiter = client.get_waiter('instance_running')
+        except ClientError as e:
+            log.error(f"AWS Client Error: {e}")
+            raise
 
-        client = boto3.client('ec2', self.region)
-        waiter = client.get_waiter('instance_running')
-
-        for instance in instances:
-            waiter.wait(
-                InstanceIds=[instance.instance_id],
-                WaiterConfig={
-                    'Delay': 10,
-                    'MaxAttempts': 6
-                }
-            )
+        try:
+            for instance in instances:
+                waiter.wait(
+                    InstanceIds=[instance.instance_id],
+                    WaiterConfig={
+                        'Delay': 10,
+                        'MaxAttempts': 6
+                    }
+                )
+        except WaiterError as e:
+            print(f"Waiter failed: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
 
         # Wait a little more. sshd can be slow to start "Connection refused" error
         # "System is booting up. Unprivileged users are not permitted to log in yet. Please come back later.
@@ -459,6 +543,8 @@ class AWSCluster(Cluster):
             raise Exception('Nodes did not start within time limit... terminating them...')
 
         self.__start_time = time.time()
+
+        self.__save_instance_data(instances)
 
         return
 
@@ -507,9 +593,24 @@ class AWSCluster(Cluster):
         except Exception as e:
             log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
                            MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
-            raise Exception() from e
+            raise
+
+
+        # Delete the ddb entries since these have been terminated
+        if not self.table_name:
+            pass
+        else:
+            instance_ids = []
+
+            for instance_data in self.instances:
+                instance_id = instance_data["instance_id"]
+                instance_ids.append(instance_id)
+
+            self.__delete_instance_records(instance_ids)
+
 
         return responses
+
 
 
     def getHosts(self):
@@ -552,6 +653,7 @@ class AWSCluster(Cluster):
         return hosts
 
 
+    # PT: added this for serialization but not completely tested
     def dict(self):
        return {
          "platform"     : self.platform,

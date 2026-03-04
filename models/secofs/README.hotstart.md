@@ -16,5 +16,5 @@ Usage example, 720 is first day, 1440 is day 2, 2160 is day 3 etc:
 
 If there is not enough memory on the head node, you will see this error:
 Allocation error (7) 
-You need large enough machine
+You need a large enough machine to read the file
 

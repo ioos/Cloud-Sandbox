@@ -9,6 +9,7 @@ import logging
 from distributed import Client
 import prefect
 from prefect import flow
+from prefect.context import get_run_context
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
@@ -19,7 +20,7 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 provider = 'AWS'
@@ -30,8 +31,9 @@ ch = logging.StreamHandler()
 
 log.setLevel(logging.INFO)
 ch.setLevel(logging.INFO)
-# log.setLevel(logging.DEBUG)
-# ch.setLevel(logging.DEBUG)
+
+#log.setLevel(logging.DEBUG)
+#ch.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter(' %(asctime)s  %(levelname)s - %(module)s.%(funcName)s | %(message)s')
 formatter.converter = time.localtime
@@ -68,10 +70,17 @@ def simple_experiment_flow(conf, jobfile):
     expjob = tasks.job_init(cluster, jobfile)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Run the forecast
-    tasks.simple_run(cluster, expjob)
+    try:
+        tasks.simple_run(cluster, expjob)
+    except Exception as e:
+        log.exception('simple_run failed')
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
@@ -118,14 +127,21 @@ def multi_hindcast_flow(conf, jobfile, sshuser=None):
     #tasks.create_scratch('FSx',jobfile,'/ptmp')
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Mount the scratch disk
     # tasks.mount_scratch(scratch, cluster)
 
     # Create the oceanin and run the forecasts
     # This will run in a loop to complete all forecasts 
-    tasks.hindcast_run_multi(cluster, job)
+    try:
+        tasks.hindcast_run_multi(cluster, job)
+    except Exception as e:
+        log.exception('forecast_run failed')
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
@@ -141,8 +157,6 @@ def multi_hindcast_flow(conf, jobfile, sshuser=None):
     # Copy the results to S3 (optionally. currently only saves LiveOcean)
     #storage_service = tasks.storage_init(provider)
     #tasks.save_history(job, storage_service, ['*.nc'], public=True)
-
-
 
 
 
@@ -168,6 +182,14 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
     # FORECAST
     #####################################################################
 
+    # Retrieve runtime context
+    context = get_run_context()
+    
+    # Get flow run details
+    flow_run_id = context.flow_run.id
+    flow_run_name = context.flow_run.name
+    print(f"Running flow: {flow_run_name} (ID: {flow_run_id})")
+
     # Create the cluster object
     cluster = ctasks.cluster_init(fcstconf)
 
@@ -178,7 +200,11 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
     jtasks.get_forcing(fcstjob, sshuser)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+      ctasks.cluster_start(cluster)
+    except Exception as e:
+      log.exception('cluster_start failed')
+      raise
 
     # Run the forecast
     try:
@@ -209,7 +235,11 @@ def python_experiment_dask_flow(conf, jobfile):
     python_job = tasks.job_init(cluster, jobfile)
 
     # Start the machine
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Push the env, install required libs on post machine
     # TODO: install all of the 3rd party dependencies on AMI
@@ -257,10 +287,17 @@ def experiment_flow(conf, jobfile):
     experiment_job = tasks.job_init(cluster, jobfile)
 
     # Start the cluster
-    ctasks.cluster_start(cluster)
+    try:
+        ctasks.cluster_start(cluster)
+    except Exception as e:
+        log.exception('cluster_start failed')
+        raise
 
     # Run the model
-    tasks.experiment_run(cluster, experiment_job)
+    try:
+        tasks.experiment_run(cluster, experiment_job)
+    except Exception as e:
+        log.exception('experiment_run failed')
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
