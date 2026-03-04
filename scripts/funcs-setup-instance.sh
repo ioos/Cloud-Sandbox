@@ -116,6 +116,36 @@ setup_environment () {
 
 #-----------------------------------------------------------------------------#
 
+setup_prefect () {
+    # Sets up a local prefect server
+
+    # TODO: Note: there is a docker container that might be better to use
+    # TODO: Disable the prefect-server daemon before creating a new AMI
+
+    sudo pip3 install prefect==3.6.8
+
+    # Create system user for prefect daemon
+    sudo groupadd --system prefect
+    sudo useradd --system --shell /sbin/nologin --gid prefect --comment "Prefect Service Account" prefect
+    sudo mkdir -p /save/environments/prefect/.prefect
+    sudo chown prefect:prefect /save/environments/prefect/.prefect
+
+    # Create the system daemon
+    sudo cp system/prefect-server.service /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable prefect-server
+    sudo systemctl start prefect-server
+
+    #MYIPADDR=`hostname -I | awk '{print $1}'`
+    #export PREFECT_API_URL="http://${MYIPADDR}:4200/api"
+    # active = "local"
+    # [profiles.local]
+    # PREFECT_API_URL = "http://127.0.0.1:4200/api"
+
+}
+
+#-----------------------------------------------------------------------------#
+
 setup_paths () {
 
   echo "Running ${FUNCNAME[0]} ..."

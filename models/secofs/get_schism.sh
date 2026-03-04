@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MODEL_DIR="/save/$USER"
+export MODEL_DIR=${MODEL_DIR:-"/save/$USER"}
 
 if [ ! -d $MODEL_DIR ]; then
   echo "Error: $MODEL_DIR does not exist"

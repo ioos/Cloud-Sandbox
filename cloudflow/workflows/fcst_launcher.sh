@@ -1,7 +1,6 @@
 #!/bin/bash
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
-
 set -x
 set -a
 
@@ -11,12 +10,12 @@ ulimit -s unlimited
 #__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-
 if [ $# -lt 8 ] ; then
   echo "Usage: $0 YYYYMMDD HH COMOUT SAVEDIR NPROCS PPN HOSTS <cbofs|ngofs2|liveocean|secofs etc.>"
   exit 1
 fi
 
+# Defaults here
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
 export FI_PROVIDER=efa
 export I_MPI_FABRICS=ofi
@@ -29,6 +28,7 @@ export I_MPI_OFI_PROVIDER=efa
 #export I_MPI_OFI_PROVIDER=efa
 #export I_MPI_FABRICS=ofi
 #export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+#export I_MPI_DEBUG=4      # Will output task mapping
 #export FI_PROVIDER=efa
 
 # This was created to launch a job via Python
@@ -95,9 +95,6 @@ fi
 #export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
 #export MPIOPTS="-hosts $HOSTS -np $NPROCS -ppn $PPN"
 result=0
-
-#nosofs_roms="cbofs ciofs dbofs gomofs tbofs wcofs eccofs"
-#nosofs_fvcom="leofs lmhofs loofs lsofs ngofs2 sscofs sfbofs"
 
 shopt -s extglob
 nosofs_fvcom='leofs|lmhofs|loofs|lsofs|ngofs2|sscofs|sfbofs'
@@ -166,11 +163,12 @@ case $APP in
     #TODO: make this part of the job config
     module load $MODULEFILE
 
-    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws library, 1: use intel library
-    export I_MPI_OFI_PROVIDER=efa
-    export I_MPI_FABRICS=ofi
-    export FI_PROVIDER=efa
-    export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+
+    #echo "Patrick testing oversubscribed nodes"
+    #export MPIOPTS="-launcher ssh -hosts $HOSTS -np 768 -ppn 64"
+    #echo "MPIOPTS=$MPIOPTS"
+    #export OMP_NUM_THREADS=1
+    #export I_MPI_PIN_DOMAIN=omp
 
     NSCRIBES=$XTRA_ARGS
     echo "Calling: mpirun $MPIOPTS $EXEC $NSCRIBES"
@@ -183,7 +181,7 @@ case $APP in
     echo "RUN FINISHED AT $endtime"
 
     # Combine hotstart files if they exist
-    # TODO: this might need to be run as a separate script post-process job
+    # TODO: this needs to run as a separate script post-process job
     # example: what if hotstarts are written every 720 timesteps and not just at the end of the run?
     #if ls -1 outputs/hotstart_0*; then
     #    cd outputs

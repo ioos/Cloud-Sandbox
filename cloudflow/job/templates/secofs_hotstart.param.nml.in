@@ -17,7 +17,7 @@
   ibtp = 0 
 
   !OG rnday = 396. !total run time in days
-  rnday = __RNDAY__
+  rnday = __RNDAY__    ! float allowed
   dt = 120.
 
 ! Grid for WWM (USE_WWM)
@@ -32,7 +32,8 @@
 
 ! Global output controls
   nspool = 30 !output step spool
-  ihfskip = 720 !stack spool; every ihfskip steps will be put into 1_*, 2_*, etc...
+  ihfskip = __IHFSKIP__
+!  OG ihfskip = 720 !stack spool; every ihfskip steps will be put into 1_*, 2_*, etc...
   
   nbins_veg_vert = 1
 /

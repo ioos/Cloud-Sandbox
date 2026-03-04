@@ -19,6 +19,7 @@ sudo setenforce 0
 setup_paths
 setup_aliases
 setup_environment
+# setup_prefect
 
 ## install_jupyterhub # Requires some manual work
 setup_ssh_mpi

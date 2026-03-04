@@ -7,7 +7,8 @@ cd ..
 nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
 nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sscofs sfbofs"
 
-nosofs_roms="eccofs"
+#nosofs_roms="eccofs"
+nosofs_roms="cbofs"
 nosofs_fvcom=""
 
 ofslist="$nosofs_roms $nosofs_fvcom"
@@ -22,7 +23,7 @@ create_ccfg () {
 	"region"    : "us-east-2",
 	"nodeType"  : "hpc6a.48xlarge",
 	"nodeTypeNew"  : "hpc7a.96xlarge",
-	"nodeCount" : 4,
+	"nodeCount" : 2,
 	"tags"      : [
                 { "Key": "Name", "Value": "$ofs-fcst" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
@@ -35,7 +36,8 @@ create_ccfg () {
   	"sg-0083673d340d5838d"
 	],
 	"subnet_id" : "subnet-0be869ddbf3096968",
-	"placement_group" : "cloud-sandbox-08202025-us-east-2b_Terraform_Placement_Group"
+	"placement_group" : "cloud-sandbox-08202025-us-east-2b_Terraform_Placement_Group",
+        "table_name" : "IOOS-Sandbox-Compute-Nodes"
 	}
 EOL
 }
@@ -53,7 +55,7 @@ do
   echo "nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &"
   nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &
 
-  stime=5
+  stime=1
   echo "Sleeping for $stime seconds"
   sleep $stime
 
