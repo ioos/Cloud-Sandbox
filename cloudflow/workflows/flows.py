@@ -241,21 +241,29 @@ def python_experiment_dask_flow(conf, jobfile):
         log.exception('cluster_start failed')
         raise
 
-    # Push the env, install required libs on post machine
-    # TODO: install all of the 3rd party dependencies on AMI
-    ctasks.push_pyEnv(cluster)
+    try:
+        # Start a dask scheduler on the new post machine
+        # Might get a not serializable error message from prefect
+        # distributed.Client might not be serializable, Prefect 3 needs to pickle and store the data in the cache
+        cluster, dask_address = ctasks.start_dask(cluster)
 
-    # Start a dask scheduler on the new post machine
-    # Might get a not serializable error message from prefect 
-    # distributed.Client might not be serializable, Prefect 3 needs to pickle and store the data in the cache
-    daskclient: Client = ctasks.start_dask(cluster)
+        # Run the python dask experiment
+        tasks.python_dask_experiment_run(dask_address, python_job)
+    except Exception as e:
+        log.exception('Python_dask_experiment_run failed')
 
-    tasks.python_dask_experiment_run(daskclient, python_job)
-     
-    # Teriminate the dask clinet session along with the cluster nodes
-    ctasks.dask_client_close(daskclient)
+
+    # Teriminate the dask scheduler and dask ssh commands linked
+    # to the client and workers. Ensure an exception can be
+    # caught in case the start_dask workflow never sucessfully
+    # completed and we did not start up any scheduler and workers
+    try:
+        cluster = ctasks.dask_client_close(cluster)
+    except Exception as e:
+        log.exception('dask_client_close failed, likely due to nonexistent processes')
+
+    # Terminate the AWS resources allocated for dask job
     ctasks.cluster_terminate(cluster)
-
 
 
 
