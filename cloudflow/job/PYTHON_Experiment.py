@@ -100,7 +100,7 @@ class PYTHON_Experiment(Job):
         self.EXEC = cfDict.get('EXEC','python3')
 
         # Grab absolute path of your Python script you want to execute
-        self.SCRIPT = os.path.abspath(cfDict['SCRIPT']
+        self.SCRIPT = os.path.abspath(cfDict['SCRIPT'])
 
         return
 
