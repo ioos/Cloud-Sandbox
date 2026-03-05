@@ -427,15 +427,7 @@ class AWSCluster(Cluster):
                     "username": self.username
                 }
                 log.info(f"DB_table output for head node based on instance id {iid}: {db_table}")
-                batch.put_item(Item={
-                    "instance-id": iid,
-                    "name-tag": name_tag,
-                    "instance-type": self.nodeType,
-                    "start-time": now,
-                    "human-time": time.strftime('%Y-%m-%d %H:%M %Z'),
-                    "minutes-max": mm,
-                    "username": self.username
-                }) 
+                batch.put_item(Item=db_table) 
 
 
     def __delete_instance_records(self, instance_ids: list[str]):
