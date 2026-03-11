@@ -13,6 +13,15 @@ module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 
+# Force Hydra to send a SIGKILL (9) instead of a SIGTERM (15) to all ranks
+export I_MPI_JOB_ABORT_SIGNAL=9
+
+# Ensure the job terminates immediately if any process exits with a non-zero status
+export I_MPI_JOB_TIMEOUT_SIGNAL=9
+
+# Optional: Set a total timeout (in seconds) if the model hangs without crashing
+export I_MPI_JOB_TIMEOUT=3600
+
 export FC=mpiifort
 export CXX=mpiicpc
 export CC=mpiicc
