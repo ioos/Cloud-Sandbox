@@ -9,7 +9,7 @@
                 { "Key": "Name", "Value": "PYTHON" },
                 { "Key": "Project", "Value": "Basic_Model_Experiment" }
               ],
-"image_id"  : "ami-082e2e4e7ef1c6d77",
+"image_id"  : "ami-0cbf4e2a2768a602b",
 "key_name"  : "rsa_sandbox_key",
 "sg_ids"    : ["sg-05c044182398b2a27", "sg-0e5148638d9196f69", "sg-06ca6bc5d4b377dad"],
 "subnet_id" : "subnet-00075cfbfcbc8f2cf",
