@@ -66,14 +66,10 @@ awsTypes = {
 
             'hpc7a.96xlarge': 192,
 
-            'r7i.xlarge': 4,
-
-            'r7i.8xlarge': 32,
-
             'r7iz.32xlarge': 64,
 
             # The below are in vCPUs not CPU cores
-            'x2idn.24xlarge': 96, 'x2idn.32xlarge': 128 }
+            'x2idn.24xlarge': 96, 'x2idn.32xlarge': 128, 'r7i.xlarge': 2, 'r7i.8xlarge': 16 }
 
 
 class AWSCluster(Cluster):
