@@ -152,17 +152,37 @@ def get_head_node_ip():
         s.close()
     return IP
 
+
 # Check to see if dask port is already in use
 def is_port_in_use(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('0.0.0.0', port)) == 0
+    """
+    Checks if a port is actually available for binding.
 
-# Find the available dask port on the Sandbox
+    This is more robust than connect_ex because it detects
+    ports in TIME_WAIT or ports held by zombie processes.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            # We want to know if the OS is truly 
+            # done with the port from the last job.
+            s.bind(('0.0.0.0', port))
+            return False  # Bind succeeded: Port is free
+        except OSError:
+            return True   # Bind failed: Port is busy
+
+# Find the available dask port on the head node
 def find_available_port(start_port=8786, end_port=8796):
+    """
+    Iterates through the allowed head node range to find a bindable port.
+    """
     for port in range(start_port, end_port + 1):
         if not is_port_in_use(port):
+            log.info(f"Found available Dask port: {port}")
             return port
-    raise OSError("No free ports in range 8786-8796")
+
+    # If we hit the end of the loop, no ports were found
+    raise OSError(f"No free ports available in range {start_port}-{end_port}. "
+                  "Check for zombie scheduler processes.")
 
 # ssh check for ec2 instances to ensure port 22
 # connectivity with the head node for dask scheduler connection
@@ -210,11 +230,11 @@ def start_dask(cluster) -> tuple:
     # Identify the Head Node (current machine)
     head_ip = get_head_node_ip()
 
-    # Find available port to use on NOS Sandbox
+    # Find available port to use on head node
     # starting from default dask port 8786 until
-    # port 8796 so multiple users can start their
-    # own dask schedulers 
-    port = find_available_port()
+    # port 8796 (NOS Sandbox specifications)
+    # so multiple users can start their own dask schedulers 
+    port = find_available_port(8786, 8796)
 
     # Create dask scheduler address to start 
     # the dask client
