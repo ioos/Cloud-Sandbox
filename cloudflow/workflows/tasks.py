@@ -14,7 +14,6 @@ import glob
 import time
 import logging
 import traceback
-from distributed import Client
 
 from prefect import task
 
@@ -591,16 +590,20 @@ def cora_reanalysis_run(cluster: Cluster, job: Job):
 ###############################################################################
 # python dask experiment run implementation
 @task
-def python_dask_experiment_run(dask_address, job):
+def python_dask_experiment_run(client, job):
     """ Run the dask python function
 
     Parameters
     ----------
-    dask_address : dask_address
-        The dask scheduler address on the head node to run the dask client
+    client : Client
+        The dask client linked with the cluster to run on
     job : Job
         The job to run
     """
+
+    # Dask client needs your Python script main function
+    # imported here!
+    from python_example import load_and_process_xarray_example
 
     # Easier to read the user
     # defined variables withing
@@ -609,114 +612,12 @@ def python_dask_experiment_run(dask_address, job):
     APP = job.APP
     SCRIPT = job.SCRIPT
 
-    # Dask Method #1 - client.map (Data Parallelism)
-    # Use this when you have an iterable (a list of tasks, a list of files, or a list of parameters)
-    # and you want to run the same function on every item in that list simultaneously across your AWS workers.
-
-    # Dask Method #2 - client.submit (Task Parallelism)
-    # Use this when you have a single unit of work to send to the cluster. Do not save files
-    # within the function that you're using dask parallelism for. Instead, return the data
-    # to the dask client here and save the file (limitation is RAM on head node)
-
-
-    # This code logic below ensures the client session closes locally
-    # but the scheduler on the Head Node stays alive until termination
-    # workflow is implemented.
-    with Client(dask_address) as client:
-        log.info(f"Cluster resources: {client.scheduler_info(n_workers=-1)['workers'].keys()}")
-        try:
-            # Users insert an elif statement here for your dask job to run with
-            # the respective workflow convention following the task or data
-            # parallelism examples 
-
-            if(job.APP == 'dask_task_parallelism_example'):
-                # Upload script to the dask scheduler to be distributed to workers
-                client.upload_file(job.SCRIPT)
-
-                # Dask client needs your Python script main function imported here!
-                # The python script is expected to be located in the 
-                # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
-                from python_examples import dask_task_parallelism_example
-
-                log.info("Running Python dask task parallelism example")
-
-                # Dask client maps out the Python function to execute to all workers
-                # and includes the required functional arguments
-                futures = client.submit(dask_task_parallelism_example,int(job.ARG1))
-
-                # Dask client gathers the results from all workers based on what
-                # is suppose to be returned by the Python function.
-                results = client.gather(futures)
-
-                # User job argument in this case is the output directory pathway
-                # and ensure absolute path is defined so dask workers and scheduler
-                # can properly place output on the head node EFS volume
-                output_dir = os.path.abspath(job.ARG2)
-
-                # Create the directory, and do nothing if it already exists
-                os.makedirs(output_dir, exist_ok=True)
-
-                # Convert to results to dataset that was returned by the dask
-                # workers computations and save the dataframe to the EFS
-                # hardware by the dask client
-                ds_to_save = results.to_dataset(name='AORC_partial_data_gap')
-                output_path = os.path.join(output_dir, f"aorc_gap_mask_{job.ARG1}.nc")
-                ds_to_save.to_netcdf(output_path)
-                log.info(f"✅ Saved AORC masked year {job.ARG1} to {output_path}")
-
-            elif(job.APP == 'dask_data_parallelism_example'):
-                # Upload script to the dask scheduler to be distributed to workers
-                client.upload_file(job.SCRIPT)
-
-                # Dask client needs your Python script main function imported here!
-                # The python script is expected to be located in the
-                # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
-                from python_examples import dask_data_parallelism_example
-
-                # Create some dummy files for dask workers to handle as part of the
-                # example here for data parallelism
-                file_list = [f"sensor_{str(i).zfill(3)}" for i in range(0, 20 + 1)]
-
-                # User job argument in this case is the output directory pathway
-                # and ensure absolute path is defined so dask workers and scheduler
-                # can properly place output on the head node EFS volume
-                output_dir = os.path.abspath(job.ARG1)
-
-                # Create the directory, and do nothing if it already exists
-                os.makedirs(output_dir, exist_ok=True)
-
-                log.info(f"output directory is {output_dir}")
-
-                # Dask client maps out the Python function to execute to all workers
-                # and includes the required functional arguments
-                futures = client.map(dask_data_parallelism_example,file_list,output_root=output_dir)
-
-                # Dask client gathers the results from all workers based on what
-                # is suppose to be returned by the Python function.
-                results = client.gather(futures)
-
-                # Print file outputs that were saved from dask workers.
-                for r in results:
-                    print(r)
-
-        # Exception handler to kill dask job for Prefect3
-        except Exception as e:
-            log.error(f"Error during Dask execution: {e}")
-            raise
-
-        # Get the dask worker logs for users to look at the log file
-        # that was output on rank 0 to see the progress of their 
-        # Python workflow they've developed and for debugging
-        log.info("Fetching logs from AWS workers...")
-        worker_logs = client.get_worker_logs()
-
-        # Print the output of the dask workers as part of
-        # the cloudflow logging output for users
-        for worker, logs in worker_logs.items():
-            for level, msg in logs:
-                # We filter for 'INFO' and above to avoid noise
-                if level in ["INFO", "WARNING", "ERROR"]:
-                    log.info(f"[{worker}] {msg}")
+    if(job.APP == 'dask_xarray_example'):
+        client.upload_file(job.SCRIPT)
+        future = client.submit(load_and_process_xarray_example,int(job.ARG1))
+ 
+    # Wait for the jobs to complete
+    future.result()
 
 
 
@@ -792,7 +693,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('SCHISM basic model run finished successfully')
 
@@ -809,7 +710,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('DFlowFM basic model run finished successfully')
 
@@ -822,11 +723,11 @@ def experiment_run(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'ROMS basic model run failed ... result: {result.returncode}')
-                raise Exception('ROMS basic model run failed')
+                raise Exception('ROMS basic model run failed') from e
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('ROMS basic model run finished successfully')
 
@@ -844,7 +745,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('UCLA ROMS model run finished successfully')
 
@@ -861,7 +762,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('FVCOM basic model run finished successfully')
 
@@ -878,7 +779,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('PYTHON basic script execution finished successfully')
 
@@ -891,11 +792,11 @@ def experiment_run(cluster: Cluster, job: Job):
 
             if result.returncode != 0:
                 log.exception(f'PYTHON mpi script execution failed ... result: {result.returncode}')
-                raise Exception('PYTHON mpi script execution failed')
+                raise Exception('PYTHON mpi script execution failed') from e
 
         except Exception as e:
             log.exception('Exception during subprocess.run :' + str(e))
-            raise Exception('Exception during subprocess.run')
+            raise Exception('Exception during subprocess.run') from e
 
         log.info('PYTHON mpi script execution finished successfully')
 
@@ -913,7 +814,7 @@ def experiment_run(cluster: Cluster, job: Job):
 
             except Exception as e:
                 log.exception('Exception during subprocess.run :' + str(e))
-                raise Exception('Exception during subprocess.run')
+                raise Exception('Exception during subprocess.run') from e
 
             log.info(f'{JOBTYPE} basic model run finished successfully')
 

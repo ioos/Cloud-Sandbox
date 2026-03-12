@@ -2,6 +2,6 @@
   "MODEL"     : "PYTHON",
   "JOBTYPE"   : "python_experiment",
   "APP"       : "mpi",
-  "EXEC"      : "/pathway/to/python/executable",
-  "SCRIPT"    : "/pathway/to/python/mpi/script"
+  "EXEC"      : "/save/ec2-user/OWP/Jason.Ducker_Anaconda/anaconda3/envs/nwmv3_fe/bin/python",
+  "SCRIPT"    : "/save/ec2-user/OWP"
 }

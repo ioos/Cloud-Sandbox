@@ -46,9 +46,6 @@ class PYTHON_Experiment(Job):
     ARG1 : str
         The first Python argument in a given function needed to run a theoretical script
 
-    ARG2 : str
-        The second Python argument in a given function needed to run a theoretical script
-
     """
 
 
@@ -91,16 +88,15 @@ class PYTHON_Experiment(Job):
         self.jobtype = cfDict['JOBTYPE']
         self.APP = cfDict.get('APP', "basic")
         # Script Argument inputs can be inserted here below
-        # These two dummy arguments here are used for Python examples
+        # This first dummy argument is used as a Python
+        # dask example
         self.ARG1 = cfDict.get('ARG1',None)
-        self.ARG2 = cfDict.get('ARG2',None)
 
         # Optional to specify your own Python executable,
         # otherwise default to the system Python executable
         self.EXEC = cfDict.get('EXEC','python3')
 
-        # Grab absolute path of your Python script you want to execute
-        self.SCRIPT = os.path.abspath(cfDict['SCRIPT'])
+        self.SCRIPT = cfDict['SCRIPT']
 
         return
 

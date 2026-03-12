@@ -24,15 +24,6 @@ export FI_PROVIDER=efa
 export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
 
-# Force Hydra to send a SIGKILL (9) instead of a SIGTERM (15) to all ranks
-export I_MPI_JOB_ABORT_SIGNAL=9
-
-# Ensure the job terminates immediately if any process exits with a non-zero status
-export I_MPI_JOB_TIMEOUT_SIGNAL=9
-
-# Optional: Set a total timeout (in seconds) if the model hangs without crashing
-export I_MPI_JOB_TIMEOUT=3600
-
 export MODEL_DIR=$1
 export NSCRIBES=$2
 export EXEC=$3

@@ -1,8 +1,0 @@
-{
-  "MODEL"     : "PYTHON",
-  "JOBTYPE"   : "python_experiment",
-  "APP"       : "dask_task_parallelism_example",
-  "SCRIPT"    : "./workflows/python_examples.py",
-  "ARG1"      : "2001",
-  "ARG2"      : "./dask_output"
-}
