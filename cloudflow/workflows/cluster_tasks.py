@@ -152,7 +152,6 @@ def get_head_node_ip():
         s.close()
     return IP
 
-
 # Check to see if dask port is already in use
 def is_port_in_use(port):
     """
