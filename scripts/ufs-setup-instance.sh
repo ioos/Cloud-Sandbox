@@ -28,8 +28,8 @@ sudo setenforce 0
 
 # install_intel_oneapi_dnf
 # install_spack-stack_prereqs
-setup_spack-stack 
-build_spack-environment
+#setup_spack-stack 
+#build_spack-environment
 
 echo "done"; exit
 

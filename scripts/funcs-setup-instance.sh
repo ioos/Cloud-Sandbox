@@ -63,6 +63,14 @@ setup_environment () {
   sudo yum -y install bc
   sudo yum -y install htop
   sudo yum -y install libtool
+  sudo dnf -y install Lmod
+
+#[UFS-Sandbox:/etc/alternatives] ec2-user> ls -al
+#lrwxrwxrwx.   1 root root   33 Mar 24 17:34 modules.sh -> /usr/share/lmod/lmod/init/profile
+#lrwxrwxrwx.   1 root root   30 Mar 24 17:34 modules.fish -> /usr/share/lmod/lmod/init/fish
+#lrwxrwxrwx.   1 root root   31 Mar 24 17:34 modules.csh -> /usr/share/lmod/lmod/init/cshrc
+
+
   sudo yum -y install tmux
   cp system/tmux.conf ~/.tmux.conf
 
@@ -85,23 +93,26 @@ setup_environment () {
   rm awscliv2.zip
   sudo rm -Rf "./aws"
 
-  sudo yum -y install environment-modules
+#  sudo yum -y install environment-modules
+#  # Only do this once
+#  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+#  if [ $? -ne 0 ] ; then
+#    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+#    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+#    . /usr/share/Modules/init/bash
+#  fi
 
-  # Only do this once
-  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-  if [ $? -ne 0 ] ; then
-    echo . /usr/share/Modules/init/bash >> ~/.bashrc
-    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-    . /usr/share/Modules/init/bash
-  fi
+#[UFS-Sandbox:/etc/alternatives] ec2-user> echo $MODULESHOME
+#/usr/share/lmod/lmod
 
   # Only do this once
   if [ ! -d /save/environments/modulefiles ] ; then
     sudo mkdir -p /save/environments/modulefiles
     echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
-    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-    . ~/.bashrc
+# This is not needed if using Lmod, breaks lua modules
+#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+#    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+#    . ~/.bashrc
     cd /save/environments
     sudo chown $USER:$USER .
   fi
@@ -188,9 +199,6 @@ setup_paths () {
 
 install_spack-stack_prereqs () {
 
-  # Lmod-8.7.65-3.el8.x86_64.rpm
-  sudo dnf install Lmod
-
   # Miscellaneous
   sudo yum -y install binutils-devel
   sudo yum -y install git-lfs
@@ -198,10 +206,15 @@ install_spack-stack_prereqs () {
   sudo yum -y install xorg-x11-xauth
   sudo yum -y install perl-IPC-Cmd
   sudo yum -y install gettext-devel
-  sudo yum -y install xterm    # really needed? I used it a lot in college, especially for LISP
-  sudo yum -y install texlive  # really needed? bloated! 691MB
+  #sudo yum -y install xterm    # really needed? I used it a lot in college, especially for LISP
+  #sudo yum -y install texlive  # really needed? bloated! 691MB
+  sudo dnf -y install Lmod
+  if [ -e /usr/share/lmod/lmod/init/profile ]; then
+    sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
+  fi
   
   # All of these are already installed in setup_environment ()
+  # Lmod-8.7.65-3.el8.x86_64.rpm
   # sudo yum -y install m4
   # sudo yum -y install wget
   # sudo yum -y install cmake
@@ -294,8 +307,8 @@ setup_spack-stack () {
   spack config add "concretizer:targets:granularity:'generic'"
   spack config add "packages:all:target:['x86_64_v3']"
 
-  #sed -i 's/tcl/lmod/g' site/modules.yaml
-  #sed -i 's/tcl/lmod/g' common/modules.yaml
+  sed -i 's/tcl/lmod/g' site/modules.yaml
+  sed -i 's/tcl/lmod/g' common/modules.yaml
 
   # echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8" >> ~/.bashrc
 
@@ -317,6 +330,10 @@ build_spack-environment () {
   cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
   spack env activate -p .
 
+  # This is in common/packages but was not built with the spec, manually adding it
+  # "sp" is a wonderful name - it is one of NCEP's libraries - spectral transformation library, fft related
+  spack add sp@2.5.0
+
   SPACKOPTS="$SPACKOPTS --fail-fast"
 
   spack concretize --force --fresh 2>&1 | tee log.concretize
@@ -329,7 +346,8 @@ build_spack-environment () {
   spack install $SPACKOPTS 2>&1 | tee log.install
  
   # Setup modules 
-  spack module tcl refresh -y --delete-tree
+  spack module tcl refresh -y
+  #spack module lmod refresh -y --delete-tree
 
   # create setup-meta-modules
   echo "Running spack stack setup-meta-modules ..."
@@ -419,12 +437,22 @@ install_gcc_toolset_yum() {
 
   home=$PWD
 
+  # Also installs tcl environment-modules
   sudo yum -y install gcc-toolset-13-gcc-c++
   sudo yum -y install gcc-toolset-13-gcc-gfortran
   sudo yum -y install gcc-toolset-13-gdb
   sudo yum -y install gcc-toolset-13-gcc-plugin-devel
  
   # source /opt/rh/gcc-toolset-13/enable 
+
+  # Need to reset to Lua for ufs
+  echo "NOTICE: For UFS must reset alternatives for modules for Lmod lua modules"
+  echo 'Use:  sudo alternatives --config modules.sh'
+  if [ -e /usr/share/lmod/lmod/init/profile ]; then
+    sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
+  fi
+  #module --version 
+  # Modules based on Lua: Version 8.7.65
   cd $home
 }
 

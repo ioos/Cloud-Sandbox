@@ -236,12 +236,17 @@ class AWSCluster(Cluster):
         try:
             self.vm_retry_delay = cfDict['vm_retry_delay']
         except KeyError:
-            print(f'Cluster configuration variable vm_retyr_delay was not specified by user. Defaulting to value of {self.vm_retry_delay} seconds.')
-
+            print(
+                f"Cluster configuration variable vm_retyr_delay was not specified by user. "
+                "Defaulting to value of {self.vm_retry_delay} seconds."
+            )
         try:
             self.vm_max_retries = cfDict['vm_max_retries']
         except KeyError:
-            print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
+            print(
+                f'Cluster configuration variable vm_max_retries was not specified by user. '
+                'Defaulting to value of {self.vm_max_retries} number of retries.'
+            )
 
         self.tags = self.memorable_tags(cfDict['tags'])
         self.image_id = cfDict['image_id']
@@ -253,7 +258,6 @@ class AWSCluster(Cluster):
         # Enforce DynamoDB table usage
         if 'table_name' in cfDict:
             self.table_name = cfDict['table_name']
-
             ddb_client = boto3.client('dynamodb', region_name=self.region)
             try:
                 ddb_client.describe_table(TableName=self.table_name)
@@ -365,11 +369,6 @@ class AWSCluster(Cluster):
  
         # response should be an array/list of ec2 instances, see boto3 documentation for spec
         instances = response
-        #instance_list = response['Instances']
-        #self.instances = instance_list
-        #print(instances)
-        #print(instance_list)
-        #self.save_instance_data(instances)
         return instances
 
 
@@ -457,7 +456,12 @@ class AWSCluster(Cluster):
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 
-                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the delay time will be implemented over each retry interval. Cloudflow will retry {self.vm_max_retries} times over to see if we can obtain the user requested AWS resources.")
+                 print(
+                     f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait "
+                     "{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
+                     "delay time will be implemented over each retry interval. Cloudflow will retry "
+                     "{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
+                 )
                  retries = 0
 
                  while retries < self.vm_max_retries:
@@ -468,16 +472,26 @@ class AWSCluster(Cluster):
                          if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
                              retries += 1
                              if(retries == self.vm_max_retries):
-                                 print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
+                                 print(
+                                     f"Insufficient capacity. Number of retries ({self.vm_max_retries}) "
+                                     "has been reached. Cloudflow will now shutdown due to lack of AWS "
+                                     "resources requested by user."
+                                 )
                                  raise
                              else:
                                  # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
                                  if(retries>1):
                                      self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
-                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     print(
+                                         f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
+                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                     )
                                      time.sleep(self.vm_retry_delay)
                                  else:
-                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     print(
+                                         f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
+                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                     )
                                      time.sleep(self.vm_retry_delay)
                          else:
                              # Re-raise the exception if it's not a capacity issue
@@ -609,7 +623,6 @@ class AWSCluster(Cluster):
                 instance_ids.append(instance_id)
 
             #self.__delete_instance_records(instance_ids)
-
 
         return responses
 
