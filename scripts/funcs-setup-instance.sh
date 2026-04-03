@@ -212,7 +212,7 @@ install_spack-stack_prereqs () {
   if [ -e /usr/share/lmod/lmod/init/profile ]; then
     sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
   fi
-  
+
   # All of these are already installed in setup_environment ()
   # Lmod-8.7.65-3.el8.x86_64.rpm
   # sudo yum -y install m4
@@ -224,6 +224,8 @@ install_spack-stack_prereqs () {
   # sudo yum -y install patch
   # sudo yum -y install automake
   # sudo yum -y install bison
+
+  
   
 }
 
@@ -317,7 +319,6 @@ setup_spack-stack () {
 
 
 #-----------------------------------------------------------------------------#
-
 build_spack-environment () {
 
   source /save/environments/spack-stack.v2.0/setup.sh
@@ -354,15 +355,36 @@ build_spack-environment () {
   spack stack setup-meta-modules
 
 }
+#-----------------------------------------------------------------------------#
+
 
 
 #-----------------------------------------------------------------------------#
+setup_rocoto() {
+  
+  GCC_MAJOR=${GCC_VER%%.*}
+  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
+  module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
+  module load stack-intel-oneapi-compilers/2024.2.1
+  module load sqlite/3.46.0
+
+  # Needed for rocoto
+  sudo dnf -y install ruby-devel
+
+  cd /save/environments || exit 1
+  git clone -b 1.3.7 https://github.com/christopherwharrop/rocoto.git
+  cd rocoto
+  ./INSTALL
+
+}
+
+
+#-----------------------------------------------------------------------------#
 setup_environment_osx () {
   cd ~/.ssh
   cat id_rsa.pub >> authorized_keys
 }
-
 #-----------------------------------------------------------------------------#
 
 install_efa_driver() {
@@ -442,6 +464,7 @@ install_gcc_toolset_yum() {
   sudo yum -y install gcc-toolset-13-gcc-gfortran
   sudo yum -y install gcc-toolset-13-gdb
   sudo yum -y install gcc-toolset-13-gcc-plugin-devel
+  sudo dnf install gcc-toolset-13-gcc-plugin-annobin
  
   # source /opt/rh/gcc-toolset-13/enable 
 

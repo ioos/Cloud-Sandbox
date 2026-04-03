@@ -31,6 +31,8 @@ sudo setenforce 0
 #setup_spack-stack 
 #build_spack-environment
 
+setup_rocoto
+
 echo "done"; exit
 
 install_python_modules_user

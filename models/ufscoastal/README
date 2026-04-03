@@ -1,0 +1,42 @@
+aws s3 ls noaa-ufs-regtests-pds/
+
+# Need this I think
+
+# No longer exists on nodd
+
+# Looking for this!!!
+opnReqTest:INPUTDATA_ROOT=${INPUTDATA_ROOT:-$DISKNM/NEMSfv3gfs/input-data-20250507}
+grep: opnReqTests: Is a directory
+grep: parm: Is a directory
+rt.sh:  RTPWD=${RTPWD:-${DISKNM}/NEMSfv3gfs/develop-${BL_DATE}}
+rt.sh:INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20250507}
+
+/com/ufs-weather-model/RT/NEMSfv3gfs/develop-20250721/
+
+aws s3 ls noaa-ufs-coastal-pds/input-data-20240501/
+
+                           PRE develop-20251204/
+                           PRE develop-20251211/
+                           PRE develop-20251217/
+                           PRE develop-20251223/
+                           PRE develop-20260113/
+                           PRE develop-20260115/
+                           PRE develop-20260121/
+                           PRE develop-20260126/
+                           PRE develop-20260202/
+                           PRE develop-20260210/
+                           PRE develop-20260220/
+                           PRE develop-20260224/
+                           PRE develop-20260225/
+                           PRE develop-20260316/
+                           PRE develop-20260318/
+                           PRE develop-20260324/
+                           PRE input-data-20221101/
+                           PRE input-data-20240501/
+
+                           *** PRE input-data-20250507/
+
+                           PRE input-data-20251015/
+
+
+

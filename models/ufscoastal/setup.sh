@@ -55,7 +55,7 @@ source /save/environments/spack-stack.v2.0/setup.sh
 which spack
 
 # ar segfaults without the below line, ar tries to resolve built in math library with intel math library libmf and libimf
-source /opt/intel/oneapi/setvars.sh
+# source /opt/intel/oneapi/setvars.sh
 source /opt/rh/gcc-toolset-13/enable
 #spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
 
