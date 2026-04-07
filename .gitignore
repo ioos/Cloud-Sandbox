@@ -40,3 +40,4 @@ models/utils/makedepf90/
 *.out
 out.*
 terraform/deployment.info
+.venv/

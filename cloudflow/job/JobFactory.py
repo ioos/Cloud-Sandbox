@@ -23,6 +23,7 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
 
 from cloudflow.job.DFLOWFM_Experiment import DFLOWFM_Experiment
+from cloudflow.job.UFS_Experiment import UFS_Experiment
 
 __copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
@@ -99,6 +100,12 @@ class JobFactory:
         elif model == 'DFLOWFM':
             if jobtype == 'dflowfm_experiment':
                 newjob = DFLOWFM_Experiment(configfile, NPROCS)
+            else:
+                raise Exception(f'Unsupported {model} jobtype')
+
+        elif model == 'UFS':
+            if jobtype == 'ufs_experiment':
+                newjob = UFS_Experiment(configfile, NPROCS)
             else:
                 raise Exception(f'Unsupported {model} jobtype')
 

@@ -20,7 +20,7 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 provider = 'AWS'
@@ -214,6 +214,58 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
 
     # Terminate the cluster nodes
     ctasks.cluster_terminate(cluster)
+
+
+
+######################################################################
+
+@flow
+def ufs_flow(ufsconf, ufsjobfile, sshuser=None):
+        """ Provides a Prefect Flow for a ufs workflow.
+
+        Parameters
+        ----------
+        ufsconf : str
+                The JSON configuration file for the Cluster to create
+
+        ufsjobfile : str
+                The JSON configuration file for the ufs Job
+
+        """
+
+        #####################################################################
+        # UFS
+        #####################################################################
+
+        # Retrieve runtime context
+        context = get_run_context()
+
+        # Get flow run details
+        flow_run_id = context.flow_run.id
+        flow_run_name = context.flow_run.name
+        print(f"Running flow: {flow_run_name} (ID: {flow_run_id})")
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(ufsconf)
+
+        # Setup the job
+        ufsjob = tasks.job_init(cluster, ufsjobfile)
+
+        # Start the cluster
+        try:
+            ctasks.cluster_start(cluster)
+        except Exception as e:
+            log.exception('cluster_start failed')
+            raise
+
+        # Run the ufs
+        try:
+            tasks.ufs_run(cluster, ufsjob)
+        except Exception as e:
+            log.exception('ufs_run failed')
+
+        # Terminate the cluster nodes
+        ctasks.cluster_terminate(cluster)
 
 
 

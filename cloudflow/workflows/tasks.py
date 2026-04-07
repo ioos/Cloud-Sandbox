@@ -38,7 +38,7 @@ from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
 from cloudflow.utils import modelUtil as util
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 pp = pprint.PrettyPrinter()
@@ -457,6 +457,52 @@ def forecast_run(cluster: Cluster, job: Job):
     curfcst=f"{job.COMROT}/current.fcst"
     with open(curfcst, 'w') as cf:
         cf.write(f"{APP}.{CDATE}{HH}\n")
+
+    return
+
+
+
+@task
+def ufs_run(cluster: Cluster, job: Job):
+    """ Run the ufs
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+
+    PPN = cluster.PPN
+    APP = job.APP
+    TESTNAME = job.TESTNAME
+    NPROCS = job.NPROCS
+    OUTDIR = job.OUTDIR
+
+    SAVEDIR = getattr(job, "SAVEDIR", 'none')
+    PTMP = getattr(job, "PTMP", 'none')
+
+    runscript = f"{curdir}/ufs_launcher.sh"
+
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('execption retrieving list of hostnames:' + str(e))
+        raise Exception('FAILED')
+
+    try:  
+        result = subprocess.run([runscript, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+
+        if result.returncode != 0:
+            log.exception(f'UFS failed ... result: {result.returncode}')
+            raise Exception(f'UFS failed ... result: {result.returncode}')
+
+    except Exception as e:
+        log.exception('Exception during subprocess.run :' + str(e))
+        raise Exception('Exception during subprocess.run :' + str(e))
+
+    log.info('UFS finished successfully')
 
     return
 
