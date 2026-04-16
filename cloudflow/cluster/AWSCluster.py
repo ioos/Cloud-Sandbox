@@ -21,7 +21,6 @@ _REGION_LONG_NAMES = {
     "us-east-1":      "US East (N. Virginia)",
     "us-east-2":      "US East (Ohio)",
 }
-
 from haikunator import Haikunator
 import prefect
 
@@ -174,6 +173,11 @@ class AWSCluster(Cluster):
         self.minutes_max = 120
         # self.hosts = ''
 
+        # Cached on-demand rate (USD/hr per node) fetched from the Pricing API
+        # during start().  Stored here so terminate() can compute the actual
+        # cost without a second API call.  None means the rate was unavailable.
+        self._per_node_hourly_rate = None
+
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
 
@@ -271,6 +275,10 @@ class AWSCluster(Cluster):
         # min == max == the actual rate.
         per_node_hourly = min(prices_per_hour)
         per_node_daily  = per_node_hourly * 24
+
+        # Persist the per-node rate on the instance so terminate() can
+        # multiply it by the real elapsed hours to report the actual cost.
+        self._per_node_hourly_rate = per_node_hourly
 
         # Scale up to the full cluster (nodeCount nodes running in parallel).
         cluster_hourly  = per_node_hourly * self.nodeCount
@@ -568,6 +576,7 @@ class AWSCluster(Cluster):
 
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
+        # Print on-demand cost estimates before provisioning so the user can
         # see what the cluster will cost before any charges are incurred.
         self._estimate_and_print_cost()
 
@@ -714,6 +723,45 @@ class AWSCluster(Cluster):
             nametag = next((item["Value"] for item in self.tags if item["Key"] == "Name"), "No nametag")
             print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
             timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
+
+            # Compute and print the actual run cost using the on-demand rate
+            # fetched from the Pricing API at cluster start.  We use the real
+            # elapsed hours (not a daily estimate) so the figure reflects the
+            # true billable duration of this run.
+            if self._per_node_hourly_rate is not None:
+                # Actual cluster cost = rate × nodes × hours actually used.
+                # hrs is already derived from the same elapsed/mins calculation
+                # above, so this is consistent with the runtime log entry.
+                actual_cluster_cost = self._per_node_hourly_rate * nodecnt * hrs
+
+                # Emit the actual cost to the same cluster_runtime.log so every
+                # run has its timing and cost in one place without needing a
+                # separate file.
+                timelog.info(
+                    f"{nametag}: actual cost – {nodecnt}x {nodetype} × {hrs:.3f} hrs "
+                    f"@ ${self._per_node_hourly_rate:.4f}/node/hr = ${actual_cluster_cost:.4f}"
+                )
+
+                # Also print to stdout so the cost appears in the cloudflow
+                # console output immediately after the cluster is torn down.
+                print("\n===============================================================")
+                print("  ACTUAL CLUSTER COST  (on-demand, Linux, based on real runtime)")
+                print("===============================================================")
+                print(f"  Cluster name  : {nametag}")
+                print(f"  Instance type : {nodetype}")
+                print(f"  Node count    : {nodecnt}")
+                print(f"  Elapsed time  : {mins} minutes  ({hrs:.3f} hrs)")
+                print(f"  Per-node rate : ${self._per_node_hourly_rate:.4f} / hr")
+                print(f"  ACTUAL COST   : ${actual_cluster_cost:.4f}")
+                print("  NOTE: On-demand rate only; Reserved/Spot pricing will differ.")
+                print("===============================================================\n")
+            else:
+                # Rate was unavailable (Pricing API failed at start time);
+                # log a note so the absence of cost data is explicit.
+                log.warning(
+                    "Actual cost could not be calculated: on-demand rate was not "
+                    "retrieved from the Pricing API when the cluster was started."
+                )
 
         except Exception as e:
             log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
