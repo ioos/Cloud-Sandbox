@@ -16,7 +16,7 @@ __license__ = "BSD 3-Clause"
 debug = False
 
 
-class UFS_Experiment(Job):
+class UFS_RegressionTest(Job):
     """ Implementation of Job class for UFS runs. Initially this is setup to run the ufs weather app regression test, rt.sh. This is a simple test case to get the UFS workflow running in cloudflow. Future iterations will expand this to run more complex UFS applications and configurations.
 
     Attributes
@@ -27,23 +27,13 @@ class UFS_Experiment(Job):
     jobtype : str
         User defined job type, should always be ufs_experiment
 
-    APP : str
-        The model workflow application to run.
-
-    configfile : str
-        A JSON configuration file containing the required parameters for this job.
+    TESTNAME : str
+        The UFS rt testname
 
     NPROCS : int
         Total number of processors in this cluster.
 
-    EXEC : str
-        The model executable to run.
-
-    MODEL_DIR : str
-        The location of the model run directory to execute
-
-    IN_FILE : str
-        The UFS input file for a given model configuration
+    TODO: fill in py comments
     """
 
 
@@ -74,6 +64,8 @@ class UFS_Experiment(Job):
         return
 
 
+
+
     def parseConfig(self, cfDict):
         """ Parses the configuration dictionary to class attributes
 
@@ -83,13 +75,20 @@ class UFS_Experiment(Job):
           Dictionary containing this cluster parameterized settings.
         """
 
-        self.MODEL = cfDict['MODEL']
-        self.jobtype = cfDict['JOBTYPE']
-        self.APP = cfDict.get('APP', "basic")
-        self.EXEC = cfDict['EXEC']
-        self.MODEL_DIR = cfDict['MODEL_DIR']
-        self.IN_FILE = cfDict['IN_FILE']
+        self.jobtype  = cfDict['JOBTYPE']
+        # TODO: Add assert on jobtype
+        self.MODEL    = cfDict['MODEL']
+        self.APP      = cfDict['APP']
+        self.TESTNAME = cfDict['TESTNAME']
+        self.SAVEDIR  = cfDict['SAVEDIR']
+        self.PTMP     = cfDict['PTMP']
+        self.DISKNM   = cfDict['DISKNM']
+        self.SKIPCOMPILE = cfDict.get('SKIPCOMPILE', 'NO')
+
         return
+
+    def createRunTemplates(self):
+        print(f"STUB: update variables used by rt.sh for decomposition, e.g. I, J PES.")
 
 
 if __name__ == '__main__':

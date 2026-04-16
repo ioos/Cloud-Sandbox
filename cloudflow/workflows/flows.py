@@ -220,7 +220,7 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
 ######################################################################
 
 @flow
-def ufs_flow(ufsconf, ufsjobfile, sshuser=None):
+def ufs_flow(ufsconf, ufsjobfile):
         """ Provides a Prefect Flow for a ufs workflow.
 
         Parameters

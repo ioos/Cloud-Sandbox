@@ -30,13 +30,14 @@ sudo setenforce 0
 # install_spack-stack_prereqs
 #setup_spack-stack 
 #build_spack-environment
+# setup_rocoto
 
-setup_rocoto
+# install_python_modules_user
+# setup_ssh_mpi
+
+setup_prefect
 
 echo "done"; exit
-
-install_python_modules_user
-setup_ssh_mpi
 
 # install_petsc_intelmpi-spack
 

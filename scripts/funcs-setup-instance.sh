@@ -140,12 +140,16 @@ setup_prefect () {
     sudo useradd --system --shell /sbin/nologin --gid prefect --comment "Prefect Service Account" prefect
     sudo mkdir -p /save/environments/prefect/.prefect
     sudo chown prefect:prefect /save/environments/prefect/.prefect
+    sudo mkdir /home/prefect
+    sudo chown prefect:prefect /home/prefect
 
     # Create the system daemon
     sudo cp system/prefect-server.service /etc/systemd/system/
     sudo systemctl daemon-reload
     sudo systemctl enable prefect-server
     sudo systemctl start prefect-server
+
+    sudo systemctl status prefect-server
 
     #MYIPADDR=`hostname -I | awk '{print $1}'`
     #export PREFECT_API_URL="http://${MYIPADDR}:4200/api"
@@ -986,6 +990,10 @@ setup_ssh_mpi () {
 
 echo "
 
+Host localhost
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
 Host 127.0.0.1
    CheckHostIP no 
    StrictHostKeyChecking no
@@ -1059,6 +1067,10 @@ Host 172.30.*
    StrictHostKeyChecking no
 
 Host 172.31.*
+   CheckHostIP no 
+   StrictHostKeyChecking no
+
+Host ip-10-*.compute.internal
    CheckHostIP no 
    StrictHostKeyChecking no
 

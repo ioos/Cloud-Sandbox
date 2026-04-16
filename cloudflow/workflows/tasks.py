@@ -474,14 +474,15 @@ def ufs_run(cluster: Cluster, job: Job):
         The job to run
     """
 
-    PPN = cluster.PPN
     APP = job.APP
     TESTNAME = job.TESTNAME
     NPROCS = job.NPROCS
-    OUTDIR = job.OUTDIR
+    PPN = cluster.PPN
+    SAVEDIR = job.SAVEDIR
+    PTMP = job.PTMP 
 
-    SAVEDIR = getattr(job, "SAVEDIR", 'none')
-    PTMP = getattr(job, "PTMP", 'none')
+    # PT: Need to skip compile if we pre-build on Intel but run model on AMD
+    SKIPCOMPILE = getattr(job, "SKIPCOMPILE", "NO")
 
     runscript = f"{curdir}/ufs_launcher.sh"
 
@@ -492,7 +493,7 @@ def ufs_run(cluster: Cluster, job: Job):
         raise Exception('FAILED')
 
     try:  
-        result = subprocess.run([runscript, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+        result = subprocess.run([runscript, SAVEDIR, PTMP, TESTNAME, SKIPCOMPILE, HOSTS, str(NPROCS), str(PPN)], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
             log.exception(f'UFS failed ... result: {result.returncode}')

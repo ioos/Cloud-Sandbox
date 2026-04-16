@@ -19,6 +19,8 @@ sudo setenforce 0
 setup_paths
 setup_aliases
 setup_environment
+
+# Need to debug this
 # setup_prefect
 
 ## install_jupyterhub # Requires some manual work

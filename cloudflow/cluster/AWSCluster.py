@@ -56,7 +56,9 @@ awsTypes = {
             'c5n.large': 1,     'c5n.xlarge': 2, 'c5n.2xlarge': 4, 'c5n.4xlarge': 8, 'c5n.9xlarge': 18,
             'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
 
-            'c7i.48xlarge': 96,
+            'c6i.12xlarge': 24,
+
+            'c7i.12xlarge': 24, 'c7i.48xlarge': 96,
 
             'hpc6a.48xlarge': 96,
 

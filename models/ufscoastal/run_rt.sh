@@ -20,7 +20,7 @@ module use -a $CURHOME/modulefiles
 cd $SAVEDIR/ufs-weather-model/tests || exit 1
 
 # Setting for detect_machine in rt dir.
-sudo hostname ioossb.${HOST}
+#sudo hostname ioossb.${HOST}
 echo $HOST
 hostname -f
 
