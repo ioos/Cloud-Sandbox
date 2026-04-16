@@ -14,6 +14,14 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 
+# Mapping from AWS region codes to the long-form display names required by the
+# AWS Pricing API.  The Pricing API uses the human-readable region label shown
+# in the console, not the short region identifier (e.g. "us-east-2").
+_REGION_LONG_NAMES = {
+    "us-east-1":      "US East (N. Virginia)",
+    "us-east-2":      "US East (Ohio)",
+}
+
 from haikunator import Haikunator
 import prefect
 
@@ -177,6 +185,118 @@ class AWSCluster(Cluster):
 
         log.info(f"nodeCount: {self.nodeCount}  PPN: {self.PPN}")
 
+
+    def _estimate_and_print_cost(self):
+        """ Query the AWS Pricing API and print hourly / daily cost estimates
+            for the cluster configuration read from the cluster config file.
+
+            The Pricing API is a global service whose endpoint lives in
+            us-east-1 regardless of the region where instances will run.
+            Results are for Linux on-demand pricing with no pre-installed
+            software, which is the billing model used by this sandbox.
+
+            If the API call fails for any reason (e.g. no network access,
+            missing IAM permission) a warning is logged and the method returns
+            without raising so that the cluster start is not blocked.
+        """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        # Convert the short region code to the long name the Pricing API needs.
+        region_long = _REGION_LONG_NAMES.get(self.region)
+        if region_long is None:
+            log.warning(f"Cost estimate skipped: no long-name mapping for region '{self.region}'")
+            return
+
+        try:
+            # The Pricing API endpoint is always us-east-1.
+            pricing_client = boto3.client("pricing", region_name="us-east-1")
+
+            # Fetch all on-demand price list entries that match this instance
+            # type and region.  We request Linux / no-preinstalled-sw / Used
+            # capacity to match the sandbox billing model.  We do NOT filter on
+            # tenancy here because HPC instance types (hpc6a, hpc7a …) are
+            # billed under "Dedicated" tenancy while most compute types use
+            # "Shared", and filtering on the wrong value returns an empty list.
+            response = pricing_client.get_products(
+                ServiceCode="AmazonEC2",
+                Filters=[
+                    {"Type": "TERM_MATCH", "Field": "instanceType",     "Value": self.nodeType},
+                    {"Type": "TERM_MATCH", "Field": "operatingSystem",  "Value": "Linux"},
+                    {"Type": "TERM_MATCH", "Field": "preInstalledSw",   "Value": "NA"},
+                    {"Type": "TERM_MATCH", "Field": "capacitystatus",   "Value": "Used"},
+                    {"Type": "TERM_MATCH", "Field": "location",         "Value": region_long},
+                ],
+                MaxResults=100,
+            )
+
+        except Exception as e:
+            log.warning(f"Cost estimate skipped: AWS Pricing API call failed – {e}")
+            return
+
+        # Walk the returned price-list items and collect every on-demand
+        # USD/hr price found.  There may be more than one entry when the same
+        # instance type appears under multiple tenancy models (Shared vs.
+        # Dedicated).  We keep the lowest non-zero price as a conservative
+        # best-case estimate and the highest as a worst-case bound.
+        prices_per_hour = []
+
+        for price_item_str in response.get("PriceList", []):
+            try:
+                price_item = json.loads(price_item_str)
+                on_demand_terms = price_item.get("terms", {}).get("OnDemand", {})
+
+                for term in on_demand_terms.values():
+                    for dimension in term.get("priceDimensions", {}).values():
+                        usd_str = dimension.get("pricePerUnit", {}).get("USD", "0")
+                        usd = float(usd_str)
+                        # Skip free-tier / $0 placeholder entries
+                        if usd > 0:
+                            prices_per_hour.append(usd)
+
+            except (KeyError, ValueError, json.JSONDecodeError) as parse_err:
+                # Skip malformed entries rather than crashing
+                log.debug(f"Cost estimate: could not parse price item – {parse_err}")
+                continue
+
+        if not prices_per_hour:
+            log.warning(
+                f"Cost estimate skipped: no on-demand USD price found for "
+                f"{self.nodeType} in {self.region} ({region_long})."
+            )
+            return
+
+        # Use the lowest price found as the per-node on-demand rate.
+        # For HPC types (hpc6a, hpc7a) there is typically only one entry so
+        # min == max == the actual rate.
+        per_node_hourly = min(prices_per_hour)
+        per_node_daily  = per_node_hourly * 24
+
+        # Scale up to the full cluster (nodeCount nodes running in parallel).
+        cluster_hourly  = per_node_hourly * self.nodeCount
+        cluster_daily   = per_node_daily  * self.nodeCount
+
+        # Print a clearly delimited cost-estimate block so it is easy to spot
+        # in the workflow logs.
+        print("\n===============================================================")
+        print("  ESTIMATED CLUSTER COST  (on-demand, Linux, no pre-installed SW)")
+        print("===============================================================")
+        print(f"  Instance type : {self.nodeType}")
+        print(f"  Region        : {self.region}  ({region_long})")
+        print(f"  Node count    : {self.nodeCount}")
+        print(f"  Per-node rate : ${per_node_hourly:.4f} / hr")
+        print(f"  Cluster cost  : ${cluster_hourly:.4f} / hr  |  ${cluster_daily:.2f} / day")
+        print("  NOTE: Estimate is for on-demand pricing only.")
+        print("        Actual charges depend on run time and AWS billing.")
+        print("===============================================================\n")
+
+        # Also emit to the workflow log so the estimate is preserved in log files.
+        log.info(
+            f"Cost estimate – {self.nodeCount}x {self.nodeType} @ {self.region}: "
+            f"${cluster_hourly:.4f}/hr  |  ${cluster_daily:.2f}/day"
+        )
+
+    ########################################################################
 
     def getState(self):
         """ Returns the cluster state. Not currently used. """
@@ -447,6 +567,9 @@ class AWSCluster(Cluster):
         """
 
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        # see what the cluster will cost before any charges are incurred.
+        self._estimate_and_print_cost()
 
         ec2 = boto3.resource('ec2', region_name=self.region)
 
