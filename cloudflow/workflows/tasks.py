@@ -496,7 +496,10 @@ def ufs_run(cluster: Cluster, job: Job):
         result = subprocess.run([runscript, SAVEDIR, PTMP, TESTNAME, SKIPCOMPILE, HOSTS, str(NPROCS), str(PPN)], stderr=subprocess.STDOUT, universal_newlines=True)
 
         if result.returncode != 0:
+            #PT TODO: fix this so we dont get a bunch of stack-traces in the log
+            #PT maybe check return code and use log.error
             log.exception(f'UFS failed ... result: {result.returncode}')
+            # raise a different exception here so it doesnt get caught a second time below
             raise Exception(f'UFS failed ... result: {result.returncode}')
 
     except Exception as e:

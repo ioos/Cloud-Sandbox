@@ -250,19 +250,27 @@ def ufs_flow(ufsconf, ufsjobfile):
 
         # Setup the job
         ufsjob = tasks.job_init(cluster, ufsjobfile)
-
+        
         # Start the cluster
+        cluster_started = False
         try:
             ctasks.cluster_start(cluster)
+            cluster_started = True
         except Exception as e:
             log.exception('cluster_start failed')
-            raise
 
         # Run the ufs
-        try:
-            tasks.ufs_run(cluster, ufsjob)
-        except Exception as e:
-            log.exception('ufs_run failed')
+        # TODO: can also create a cluster class internal state and use that instead for flow conteol
+        # e.g. if cluster.started:  or if cluster.state == 'running': etc.
+        # If cluster_start fails, cluster object might not be well defined though and terminate might not work
+        if cluster_started:
+          try:
+              tasks.ufs_run(cluster, ufsjob)
+          except Exception as e:
+              #PT TODO: fix this so we dont get a bunch of stack-traces in the log
+              #PT maybe check return code and use log.error
+              log.exception('ufs_run failed')
+        
 
         # Terminate the cluster nodes
         ctasks.cluster_terminate(cluster)

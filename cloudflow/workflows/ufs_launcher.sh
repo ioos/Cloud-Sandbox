@@ -1,44 +1,38 @@
 #!/usr/bin/env bash
+set -eu
+set -o pipefail
 
 # https://ufs-coastal-application.readthedocs.io/en/latest/index.html
+# This script runs the ufs regression test script rt.sh
 
-# This runs the regression test script.
-
-echo "The RT does a compile job and then the forecast job"
-
-# Use this to:
-# If you are using a shared "USER" account, make sure to
-# set the below path to your own SAVE space 
-# or provide it as a command argument
-
-export CURHOME=$PWD
-export CSHOME="${PWD%/*/*}"
-
-echo "Cloud-Sandbox/ directory is: $CSHOME"
-
+# rt.sh scripts will load the modules
 #module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
-#module use -a $CURHOME/modulefiles
 
 export MACHINE_ID=ioossb
-export ACCNR=IOOS   # Not used in ioosb but needed by rt.sh
+
+# Not used in ioossb but needed by rt.sh
+export ACCNR=IOOS
 
 nprocs=$(nproc)
 
 export SAVEDIR=${1:-"/save/$USER"}
-export PTMP=${2:-${dprefix}/ptmp/$USER}
+export PTMP=${2:-"/ptmp/$USER"}
 export TESTNAME=${3:-coastal_irene_atm2roms}
 export SKIPCOMPILE=${4:-"NO"}
-export SKIPCOMPILE="YES"
+# export SKIPCOMPILE="YES"
 export HOSTS=${5:-localhost}
 export NPROCS=${6:-$nprocs}
 
 # PPN conflicts and gets changed by rt.sh system
 export CFPPN=${7:-$nprocs}
-export CFPPN=24
+if [[ $HOSTS =~ 'localhost' ]]; then
+  export CFPPN=$NPROCS
+else
+  export CFPPN=24
+fi
 
 export DISKNM=/com/ufs-weather-model/RT
-#export dprefix=/mnt/efs/fs1
-#export PTMP=${dprefix}/ptmp/$USER
+export dprefix=/mnt/efs/fs1
 export STMP=$PTMP
 
 cd $SAVEDIR/ufs-weather-model/tests || exit 1
@@ -47,25 +41,9 @@ RTCONF_FILE=rt_ioossb.conf
 mkdir -p $DISKNM
 
 # Download files - DONE
-# Irene ROMS input files supposedly here:
+# Irene ROMS input files here and also in S3
 # https://github.com/myroms/roms_test.git
 # https://github.com/myroms/roms_test/tree/main/IRENE
-
-# Needed for ptmp and stmp folders in rt.sh
-#    dprefix=${dprefix:-"/mnt/efs/fs1"}
-#    DISKNM=${DISKNM:-"/com/ufs-weather-model/RT"}
-#    STMP=${STMP:-"${dprefix}/stmp"}
-#    PTMP=${PTMP:-"${dprefix}/ptmp"}
-
-#sudo mkdir -p $dprefix/stmp
-#sudo chown $USER:$USER $dprefix/stmp
-#chmod 777 $dprefix/stmp
-#mkdir -p $dprefix/ptmp
-
-
-# /com/ufs-weather-model/RT/NEMSfv3gfs/input-data-20250507
-#     module use /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
-#     module load ufs_ioossb.intel.tcl
 
 # Also downloaded this with help from Jason
 #INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20250507}
@@ -80,15 +58,21 @@ mkdir -p $DISKNM
 # rt.sh will create a compile job_card
 # rt.sh will create a run test job_card
 # /save/ec2-user/ufs-weather-model/tests/fv3_conf
-# -rw-rw-r--.  1 ec2-user ec2-user  1712 Apr  2 21:40 fv3_cloudflow.IN_ioossb
-# -rw-rw-r--.  1 ec2-user ec2-user   540 Apr  3 20:45 compile_cloudflow.IN_ioossb
+#   fv3_cloudflow.IN_ioossb
+#   compile_cloudflow.IN_ioossb
 
-# PT: TODO: add a -x skip_compile option like on tests/opnReq script
-if [[ ${SKIPCOMPILE} = 'YES' ]]; then
+# Use -x to skip compile
+# Use -c to create to RT outputs
+# -o compile only
+# TODO: fix why results aren't being copied to REGRESSION_TESTS
+
+if [[ ${SKIPCOMPILE} == 'YES' ]]; then
   ./rt.sh -x -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 else
   ./rt.sh -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
+  # -o compile only
+  # ./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 fi
 
@@ -133,4 +117,4 @@ exit $rc
 # Note
 # 
 # -k argument is used to keep the run directory for further reference.
-# 
+

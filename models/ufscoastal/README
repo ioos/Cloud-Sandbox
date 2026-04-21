@@ -1,42 +1,44 @@
-aws s3 ls noaa-ufs-regtests-pds/
+## Setup UFS Coastal App
 
-# Need this I think
+### Prerequisites
 
-# No longer exists on nodd
+Spack-stack environment needs to be installed.
+A spack binary mirror exists for this deployment to make this easier and faster.
+See Cloud-Sandbox/scripts/ufs-setup-instance.sh
+spack-stack should work on an older currently deployed head node alongside the regular spack.
+UFS uses spack-stack.
 
-# Looking for this!!!
-opnReqTest:INPUTDATA_ROOT=${INPUTDATA_ROOT:-$DISKNM/NEMSfv3gfs/input-data-20250507}
-grep: opnReqTests: Is a directory
-grep: parm: Is a directory
-rt.sh:  RTPWD=${RTPWD:-${DISKNM}/NEMSfv3gfs/develop-${BL_DATE}}
-rt.sh:INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20250507}
+### Scripts
 
-/com/ufs-weather-model/RT/NEMSfv3gfs/develop-20250721/
+setup.sh - Clone the gitHub repository and build the ROMS App.
+Default location: /save/ec2-user/ufs-weather-model
 
-aws s3 ls noaa-ufs-coastal-pds/input-data-20240501/
+get_input_data.sh - Dowload the ROMS Irene and SCHISM Ike test case inputs
+Default location: /com/ufs-weather-model/RT/NEMSfv3gfs/input-data-20250507
 
-                           PRE develop-20251204/
-                           PRE develop-20251211/
-                           PRE develop-20251217/
-                           PRE develop-20251223/
-                           PRE develop-20260113/
-                           PRE develop-20260115/
-                           PRE develop-20260121/
-                           PRE develop-20260126/
-                           PRE develop-20260202/
-                           PRE develop-20260210/
-                           PRE develop-20260220/
-                           PRE develop-20260224/
-                           PRE develop-20260225/
-                           PRE develop-20260316/
-                           PRE develop-20260318/
-                           PRE develop-20260324/
-                           PRE input-data-20221101/
-                           PRE input-data-20240501/
+### How To Run
 
-                           *** PRE input-data-20250507/
+Currently the Irene ROMS regression test has been tested.
+Ike SCHISM tests should be easy to add at this point.
 
-                           PRE input-data-20251015/
+The run will launch a single node to build and run the preconfigured test(s).
 
+Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.rt).
+
+Set non-default directories in:  job/jobs/UFS/ufs.irene
+
+Launch the job:
+nohup workflows/workflow_main.py cluster/configs/IOOS/ufs.rt job/jobs/UFS/ufs.irene > & ufs.out &
+
+Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.
+See ufs_launcher.sh for additional options.
+
+Other links:
+https://www.epic.noaa.gov/ufs-coastal-app-development/
+https://ufs-coastal-application.readthedocs.io/en/latest/index.html
+https://github.com/oceanmodeling/ufs-weather-model
+
+Next steps:
+https://epic.noaa.gov/unified-workflow-tools/
 
 

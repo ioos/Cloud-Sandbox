@@ -16,29 +16,26 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-#setup_paths
-#setup_aliases
-#setup_environment
+setup_paths
+setup_aliases
+setup_environment
+setup_ssh_mpi
 
-#install_efa_driver
-#install_fsx_driver
+install_efa_driver
+install_fsx_driver
 
 # Compilers and libraries
-# install_gcc_toolset_yum
+install_gcc_toolset_yum
+install_intel_oneapi_dnf
 
-# install_intel_oneapi_dnf
-# install_spack-stack_prereqs
-#setup_spack-stack 
-#build_spack-environment
-# setup_rocoto
+# Spack-stack
+install_spack-stack_prereqs
+setup_spack-stack 
+build_spack-environment
 
-# install_python_modules_user
-# setup_ssh_mpi
+install_python_modules_user
 
-setup_prefect
-
-echo "done"; exit
-
+# setup_prefect
 # install_petsc_intelmpi-spack
 
 # TODO: create an output file to contain all of this state info - json

@@ -32,6 +32,8 @@ export SPACKOPTS='-v -y'
 export SPACKTARGET="arch=linux-rhel8-x86_64"
 
 export EFA_INSTALLER_VER='1.38.0'
+# PT DO: bump this to newer version, e.g. 1.48.0 
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache

@@ -29,8 +29,6 @@ setup_ssh_mpi
 install_efa_driver
 install_fsx_driver
 
-exit
-
 # Compilers and libraries
 install_python_modules_user
 install_gcc_toolset_yum
