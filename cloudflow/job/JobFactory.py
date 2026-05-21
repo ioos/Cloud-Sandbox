@@ -23,9 +23,10 @@ from cloudflow.job.Plotting import Plotting
 from cloudflow.job.WRF_Hydro_Experiment import WRF_Hydro_Experiment
 
 from cloudflow.job.DFLOWFM_Experiment import DFLOWFM_Experiment
+
 from cloudflow.job.UFS_RegressionTest import UFS_RegressionTest
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 debug = False
@@ -123,7 +124,6 @@ class JobFactory:
             else:
                 raise Exception(f'Unsupported {model} jobtype')
 
-    
         else:
             raise Exception('Unsupported MODEL class')
 

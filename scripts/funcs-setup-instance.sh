@@ -62,6 +62,7 @@ setup_environment () {
   sudo yum -y install subversion
   sudo yum -y install bc
   sudo yum -y install htop
+
   sudo yum -y install libtool
   sudo dnf -y install Lmod
 
@@ -85,6 +86,14 @@ setup_environment () {
 
   sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
   # sudo systemctl status amazon-ssm-agent
+
+  # Additional packages for spack-stack
+  #sudo yum -y install git-lfs
+  #sudo yum -y install bash-completion
+  #sudo yum -y install xorg-x11-xauth
+  #sudo yum -y install xterm
+  #sudo yum -y install texlive
+  #sudo yum -y install mysql-server
 
   cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -140,6 +149,7 @@ setup_prefect () {
     sudo useradd --system --shell /sbin/nologin --gid prefect --comment "Prefect Service Account" prefect
     sudo mkdir -p /save/environments/prefect/.prefect
     sudo chown prefect:prefect /save/environments/prefect/.prefect
+
     sudo mkdir /home/prefect
     sudo chown prefect:prefect /home/prefect
 
@@ -814,6 +824,8 @@ install_petsc_intelmpi-spack () {
 
 install_nceplibs-spack () {
 
+  echo "Running ${FUNCNAME[0]} ..."
+
     . $SPACK_DIR/share/spack/setup-env.sh
 
     COMPILER=oneapi@$ONEAPI_VER
@@ -846,12 +858,7 @@ install_nceplibs-spack () {
     # spack install $SPACKOPTS wgrib2@3.1.0%${COMPILER} $SPACKTARGET # nope
     # spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-error" $SPACKTARGET # nope
 }
-
-
 #-----------------------------------------------------------------------------#
-install_ncep_libs_spack () {
-    return
-}
 
 
 #-----------------------------------------------------------------------------#
