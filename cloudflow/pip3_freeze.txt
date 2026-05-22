@@ -84,7 +84,7 @@ pendulum==3.1.0
 pillow==11.3.0
 plotting==0.0.7
 pluggy==1.6.0
-prefect==3.6.8
+prefect==3.6.28.dev2
 prometheus_client==0.23.1
 psutil==7.0.0
 py-key-value-aio==0.3.0

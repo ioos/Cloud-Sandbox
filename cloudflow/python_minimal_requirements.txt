@@ -3,7 +3,7 @@ botocore==1.40.22
 dask==2025.7.0
 distributed==2025.7.0
 haikunator==2.1.0
-prefect==3.6.8
+prefect==3.6.28.dev2
 
 matplotlib==3.10.6
 netCDF4==1.7.2
