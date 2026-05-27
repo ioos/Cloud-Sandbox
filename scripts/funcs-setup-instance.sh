@@ -136,7 +136,7 @@ setup_environment () {
 
 #-----------------------------------------------------------------------------#
 
-setup_prefect () {
+setup_prefect-server () {
     # Sets up a local prefect server
 
     # TODO: Note: there is a docker container that might be better to use
@@ -478,12 +478,12 @@ install_gcc_toolset_yum() {
   sudo yum -y install gcc-toolset-13-gcc-gfortran
   sudo yum -y install gcc-toolset-13-gdb
   sudo yum -y install gcc-toolset-13-gcc-plugin-devel
-  sudo dnf install gcc-toolset-13-gcc-plugin-annobin
+  sudo yum -y install gcc-toolset-13-gcc-plugin-annobin
  
   # source /opt/rh/gcc-toolset-13/enable 
 
   # Need to reset to Lua for ufs
-  echo "NOTICE: For UFS must reset alternatives for modules for Lmod lua modules"
+  echo "NOTICE: For UFS you must reset alternatives for modules for Lmod lua modules"
   echo 'Use:  sudo alternatives --config modules.sh'
   if [ -e /usr/share/lmod/lmod/init/profile ]; then
     sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
@@ -500,7 +500,7 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  source /opt/rh/gcc-toolset-11/enable
+  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
