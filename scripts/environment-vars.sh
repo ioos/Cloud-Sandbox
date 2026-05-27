@@ -1,13 +1,11 @@
 # Source this file in script to use
 
-export GCC_VER=11.2.1
+export GCC_VER=13.3.1
 
 # Current used versions
-export ONEAPI_VER=2023.1.0
+export ONEAPI_VER=2024.2.1
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
-export INTEL_COMPILER_VER=2021.9.0
-
-#ONEAPI_VER=2024.1.0
+export INTEL_COMPILER_VER=2021.13.1
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
@@ -31,16 +29,15 @@ export SPACKOPTS='-v -y'
 #SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
 export SPACKTARGET="arch=linux-rhel8-x86_64"
 
-export EFA_INSTALLER_VER='1.38.0'
-# PT DO: bump this to newer version, e.g. 1.48.0 
+export EFA_INSTALLER_VER='1.48.0'
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
-export SPACK_CACHEONLY=0
-#export SPACK_CACHEONLY=1
+#export SPACK_CACHEONLY=0
+export SPACK_CACHEONLY=1
 #export SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
@@ -50,6 +47,7 @@ if [ $SPACK_CACHEONLY -eq 1 ]; then
     echo "NOTICE: Set SPACK_CACHEONLY=0 to enable building"
 fi
 
+# PT: TODO - move mirror to s3://ioos-sandbox-use2
 export SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 export SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
 export SPACK_KEY=${SPACK_DIR}/opt/spack/gpg/spack.mirror.gpgkey.pub
