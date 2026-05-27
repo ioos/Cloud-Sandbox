@@ -142,7 +142,7 @@ setup_prefect () {
     # TODO: Note: there is a docker container that might be better to use
     # TODO: Disable the prefect-server daemon before creating a new AMI
 
-    sudo pip3 install prefect==3.6.28
+    sudo pip3 install prefect==$PREFECT_VER
 
     # Create system user for prefect daemon
     sudo groupadd --system prefect
@@ -871,7 +871,7 @@ install_python_modules_user () {
   #python3 -m venv /save/$USER/csvenv
   #source /save/$USER/csvenv/bin/activate
 
-  python3 -m pip install prefect==3.6.28
+  python3 -m pip install prefect==$PREFECT_VER
   python3 -m pip install --upgrade pip
   python3 -m pip install --upgrade wheel
   python3 -m pip install --upgrade dask

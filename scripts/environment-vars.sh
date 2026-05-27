@@ -2,6 +2,8 @@
 
 export GCC_VER=13.3.1
 
+export PREFECT_VER=3.6.29
+
 # Current used versions
 export ONEAPI_VER=2024.2.1
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv

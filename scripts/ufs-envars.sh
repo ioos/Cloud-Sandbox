@@ -25,8 +25,7 @@ export SPACKOPTS='-v -y'
 #SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
 export SPACKTARGET="arch=linux-rhel8-x86_64_v3"
 
-export EFA_INSTALLER_VER='1.38.0'
-# PT DO: bump this to newer version, e.g. 1.48.0 
+export EFA_INSTALLER_VER='1.48.0'
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
@@ -44,7 +43,6 @@ if [ $SPACK_CACHEONLY -eq 1 ]; then
     echo "NOTE: Set SPACK_CACHEONLY=0 to enable building"
 fi
 
-# s3://ioos-sandbox-use2/public/spack-stack/mirror/
 export SPACK_MIRROR='s3://ioos-sandbox-use2/public/spack-stack/mirror'
 export SPACK_KEY='spack.mirror.gpgkey.pub'
 export SPACK_KEY_URL="https://ioos-sandbox-use2.s3.amazonaws.com/public/spack-stack/mirror/$SPACK_KEY"

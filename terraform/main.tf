@@ -197,7 +197,7 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 
 ################################################################
 # CLI search command for troubleshooting and verifying available images
-#aws ec2 describe-images --owners 309956199498        \
+# aws ec2 describe-images --owners 309956199498        \
 #    --filters "Name=name,Values=RHEL-8.*_HVM-*-x86_64-*-Hourly2-*"  \
 #    --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
 #    --output table

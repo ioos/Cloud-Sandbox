@@ -8,7 +8,8 @@ BRANCH=${sandbox_version}
 # RHEL8+
 RUNUSER="ec2-user"
 
-EFS_VERS='v2.3.3'
+EFS_VERS='v3.1.1'
+# EFS v3 adds s3files support - no breaking changes with v2
 # EFS v2 supports TSL encryption
 
 mkdir -p /mnt/efs/fs1
