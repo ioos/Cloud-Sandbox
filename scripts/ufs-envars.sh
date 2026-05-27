@@ -1,8 +1,10 @@
 # Source this file in script to use
 
 export GCC_VER=13.3.1
+export GCC_MAJOR=${GCC_VER%%.*}
 
 export ONEAPI_VER=2024.2.1
+export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 export INTEL_COMPILER_VER=2021.13.1
 

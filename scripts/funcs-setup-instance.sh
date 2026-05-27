@@ -286,7 +286,6 @@ setup_spack-stack () {
       echo "WARNING: Intel oneApi Compilers not found!"
   fi
 
-  GCC_MAJOR=${GCC_VER%%.*}
   source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   # Create the site environment
@@ -339,7 +338,6 @@ build_spack-environment () {
 
   source /opt/intel/oneapi/setvars.sh
 
-  GCC_MAJOR=${GCC_VER%%.*}
   source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
   
   cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
@@ -376,7 +374,6 @@ build_spack-environment () {
 #-----------------------------------------------------------------------------#
 setup_rocoto() {
   
-  GCC_MAJOR=${GCC_VER%%.*}
   source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
@@ -473,14 +470,15 @@ install_gcc_toolset_yum() {
 
   home=$PWD
 
+  #${GCC_MAJOR}
   # Also installs tcl environment-modules
-  sudo yum -y install gcc-toolset-13-gcc-c++
-  sudo yum -y install gcc-toolset-13-gcc-gfortran
-  sudo yum -y install gcc-toolset-13-gdb
-  sudo yum -y install gcc-toolset-13-gcc-plugin-devel
-  sudo yum -y install gcc-toolset-13-gcc-plugin-annobin
+  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-c++
+  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-gfortran
+  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gdb
+  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-devel
+  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-annobin
  
-  # source /opt/rh/gcc-toolset-13/enable 
+  # source /opt/rh/gcc-toolset-${GCC_MAJOR}/enable 
 
   # Need to reset to Lua for ufs
   echo "NOTICE: For UFS you must reset alternatives for modules for Lmod lua modules"
@@ -648,7 +646,6 @@ EOF
 
   mkdir /save/environments/modulefiles
 
-  ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
   sudo dnf install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
   sudo dnf install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
   sudo dnf install intel-oneapi-mkl-devel-$ONEAPI_MAJOR_MINOR

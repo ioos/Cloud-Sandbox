@@ -33,7 +33,7 @@ install_fsx_driver
 install_python_modules_user
 install_gcc_toolset_yum
 
-source /opt/rh/gcc-toolset-11/enable
+source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 install_spack
 

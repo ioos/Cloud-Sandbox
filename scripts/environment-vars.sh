@@ -1,13 +1,23 @@
 # Source this file in script to use
 
-export GCC_VER=13.3.1
-
 export PREFECT_VER=3.6.29
 
-# Current used versions
-export ONEAPI_VER=2024.2.1
+#export GCC_VER=13.3.1
+#export GCC_MAJOR=${GCC_VER%%.*}
+
+#export ONEAPI_VER=2024.2.1
+#export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
+## The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
+#export INTEL_COMPILER_VER=2021.13.1
+
+export GCC_VER=11.2.1
+export GCC_MAJOR=${GCC_VER%%.*}
+
+export ONEAPI_VER=2023.1.0
+export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
-export INTEL_COMPILER_VER=2021.13.1
+export INTEL_COMPILER_VER=2021.9.0
+
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
@@ -38,8 +48,8 @@ export EFA_INSTALLER_VER='1.48.0'
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
-export SPACK_CACHEONLY=0
-#export SPACK_CACHEONLY=1
+#export SPACK_CACHEONLY=0
+export SPACK_CACHEONLY=1
 #export SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
