@@ -296,7 +296,7 @@ resource "aws_instance" "head_node" {
   root_block_device {
     encrypted             = true
     delete_on_termination = true
-    volume_size           = 16
+    volume_size           = 28
     volume_type           = "gp3"
     tags                  = {
         Name    = "${var.name_tag} Head Node"
