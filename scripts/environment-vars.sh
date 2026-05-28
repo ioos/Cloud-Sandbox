@@ -18,7 +18,6 @@ export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 export INTEL_COMPILER_VER=2021.9.0
 
-
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
 # spack v0.22.3 and higher has that spec

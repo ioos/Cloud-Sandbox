@@ -45,7 +45,7 @@ setup_environment () {
 
   sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
   sudo dnf config-manager --set-enabled codeready-builder-for-rhel-8-rhui-rpms
-  sudo dnf install rh-amazon-rhui-client
+  sudo dnf -y install rh-amazon-rhui-client
 
   sudo yum -y install tcsh
   sudo yum -y install ksh
@@ -213,6 +213,9 @@ setup_paths () {
 
 install_spack-stack_prereqs () {
 
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
   # Miscellaneous
   sudo yum -y install binutils-devel
   sudo yum -y install git-lfs
@@ -239,8 +242,7 @@ install_spack-stack_prereqs () {
   # sudo yum -y install automake
   # sudo yum -y install bison
 
-  
-  
+  echo "Done with ${FUNCNAME[0]}" 
 }
 
 
@@ -326,6 +328,7 @@ setup_spack-stack () {
   sed -i 's/tcl/lmod/g' common/modules.yaml
 
   # echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8" >> ~/.bashrc
+  echo "spack-stack is installed ... install/build the environment next"
 
   cd $home
 }
@@ -357,7 +360,9 @@ build_spack-environment () {
 
   # The install stops when the terminal times out - use tmux
   spack install $SPACKOPTS 2>&1 | tee log.install
- 
+
+  echo "PT debugging - exiting"
+  exit  
   # Setup modules 
   spack module tcl refresh -y
   #spack module lmod refresh -y --delete-tree
@@ -412,6 +417,22 @@ install_efa_driver() {
 
   version=$EFA_INSTALLER_VER
 
+  # Need these dependencies
+  sudo dnf -y install kernel-devel
+  sudo dnf -y install kernel-modules-extra
+
+#  sudo depmod -a
+#  sudo modprobe ib_core
+#
+#  sudo depmod -a
+#  sudo modprobe ib_uverbs
+
+#Error! echo
+#Your kernel headers for kernel 4.18.0-553.126.1.el8_10.x86_64 cannot be found at
+#/lib/modules/4.18.0-553.126.1.el8_10.x86_64/build or /lib/modules/4.18.0-553.126.1.el8_10.x86_64/source.
+#You can use the --kernelsourcedir option to tell DKMS where it's located.
+
+
   # version=latest
   # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
@@ -424,12 +445,13 @@ install_efa_driver() {
   # There may be old kernels laying around without available headers, temporarily move them
   # otherwise the efa driver might fail
 
-  sudo mkdir /usr/lib/oldkernel
-  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
-  do
-    oldkrnl=`ls -1 /usr/lib/modules | head -1`
-    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
-  done
+# I think this has been fixed and we don't need this hack anymore
+#  sudo mkdir /usr/lib/oldkernel
+#  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
+#  do
+#    oldkrnl=`ls -1 /usr/lib/modules | head -1`
+#    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
+#  done
 
   # System default gcc version is needed to build the kernel driver
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
@@ -450,14 +472,38 @@ install_efa_driver() {
 
   else
     # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
+    # NOTE:
     sudo ./efa_installer.sh -y --minimal
+ 
+    # Install the AWS libfabric that ships with the EFA driver
+    cd RPMS/ROCKYLINUX8/x86_64
+    RPM=$(ls -1 libfabric-aws-[0-9]*)
+    sudo dnf install $RPM
   fi
 
-  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
-  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
-    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
-    sudo rmdir /usr/lib/oldkernel
-  fi
+# I think this has been fixed and we don't need this hack anymore
+#  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
+#  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
+#    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+#    sudo rmdir /usr/lib/oldkernel
+#  fi
+
+# cd /opt/amazon/efa/bin
+# export I_MPI_OFI_LIBRARY_INTERNAL=0 - use AWS libfabric
+# fi_info -p efa -t FI_EP_RDM
+# You should see:
+# provider: efa
+#     fabric: efa-direct
+#     domain: rdmap0s31-rdm
+#     version: 204.0
+#     type: FI_EP_RDM
+#     protocol: FI_PROTO_EFA
+# provider: efa
+#     fabric: efa
+#     domain: rdmap0s31-rdm
+#     version: 204.0
+#     type: FI_EP_RDM
+#     protocol: FI_PROTO_EFA
 
   cd $home
   echo "!!!!!!!!!    EFA INSTALLER COMPLETED    !!!!!!!!!"
@@ -646,10 +692,10 @@ EOF
 
   mkdir /save/environments/modulefiles
 
-  sudo dnf install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
-  sudo dnf install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
-  sudo dnf install intel-oneapi-mkl-devel-$ONEAPI_MAJOR_MINOR
-  # sudo dnf install intel-oneapi-mkl-2024.2
+  sudo dnf -y install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
+  sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
+  sudo dnf -y install intel-oneapi-mkl-devel-$ONEAPI_MAJOR_MINOR
+  # sudo dnf -y install intel-oneapi-mkl-2024.2
 
   echo "Installed the following at /opt/intel/oneapi:"
   dnf list installed "intel-oneapi-*"
