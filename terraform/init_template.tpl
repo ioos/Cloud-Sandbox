@@ -26,6 +26,7 @@ sudo mkdir -p /mnt/efs/fs1
 sudo yum -y -q install git 
 sudo yum -y install rpm-build
 sudo yum -y install make
+sudo yum -y install cmake
 sudo yum -y install nfs-utils
 sudo yum -y install openssl-devel
 sudo yum -y install cargo
@@ -78,8 +79,7 @@ echo "ami name : $ami_name"
 
 ## Install all of the software and drivers
 ##########################################
-# sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
-echo "IN DEVELOPLMENT: NOT RUNNING setup-instance.sh"
+sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 

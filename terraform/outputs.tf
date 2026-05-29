@@ -70,6 +70,7 @@ output "aws_placement_group" {
    An EIP is not used when an existing pre-provisioned subnet is specified, e.g. NOAA/NOS environments do not allow public IPs.
    TODO: Better logic for this, an existing subnet with public visibility might be specified, breaking this.
 */
+
 output "login_command" {
    description = "SSH Login"
    value = aws_instance.head_node.public_ip != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_ip}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"

@@ -478,7 +478,7 @@ install_efa_driver() {
     # Install the AWS libfabric that ships with the EFA driver
     cd RPMS/ROCKYLINUX8/x86_64
     RPM=$(ls -1 libfabric-aws-[0-9]*)
-    sudo dnf install $RPM
+    sudo dnf -y install $RPM
   fi
 
 # I think this has been fixed and we don't need this hack anymore

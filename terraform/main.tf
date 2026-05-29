@@ -281,7 +281,7 @@ resource "aws_instance" "head_node" {
 
   #################################
   ### Specify which AMI to use here
-  #############################################
+  ###s#############################
 
   ami = data.aws_ami.rhel_8.id
 
@@ -362,21 +362,27 @@ resource "aws_network_interface" "head_node" {
 
 # https://developer.hashicorp.com/terraform/language/v1.5.x/resources/terraform-data
 
-#│ Error: local-exec provisioner error
-#│ 
-#│   with terraform_data.send_outputs,
-#│   on main.tf line 372, in resource "terraform_data" "send_outputs":
-#│  372:   provisioner "local-exec" {
-#│ 
-#│ Error running command './scp.terraform.output.sh': exit status 1. Output: usage: ssh-keyscan [-46cDHqv] [-f file] [-O
-#│ option] [-p port] [-T timeout]
-#│                    [-t type] [host | addrlist namelist]
-#│ Copying deployment.info to head node
-#│ ++++++++++++++++++++++++++++++++++++
-#│ scp -i  -p deployment.info :~/deployment.info
-#│ scp: :~/deployment.info: No such file or directory
+resource "local_file" "deployment_info" {
+  filename = "${path.module}/deployment_info.txt"
+  content  = <<EOT
 
-# This works if ran manually after deployment, added a 30 second sleep to script
+Deployment Reference Info
+-------------------------
+Subnet ID:       ${aws_instance.head_node.subnet_id}
+AMI Name Prefix: ${var.name_tag}-${random_pet.ami_id.id}
+Key Name:        ${var.key_name}
+Instance Name:   ${var.name_tag}
+EOT
+}
+
+    
+#Security Groups: ${aws_network_interface.head_node.security_groups}
+#Security Groups: ${aws_network_interface.head_node.security_groups}
+# Security Groups: [ ${join(",\n ", aws_instance.head_node.vpc_security_group_ids)} ]
+#Security Groups: [ ${aws_security_group.base_sg.id},
+#                   ${aws_security_group.ssh_ingress.id},
+#                   ${aws_security_group.efs_sg.id}
+#                 ]
 
 # scp deployment info to head node automatically
 resource "terraform_data" "send_outputs" {
@@ -385,8 +391,22 @@ resource "terraform_data" "send_outputs" {
     timestamp() 
   ]
 
+  # Ensures EC2 exists and has outputs before this runs
+  depends_on = [
+    aws_instance.head_node,
+    local_file.deployment_info
+  ]
+
   provisioner "local-exec" {
+
     command = "./scp.terraform.output.sh"
+
+    environment = {
+      LOGIN_COMMAND = (aws_instance.head_node.public_ip != null ? 
+                        "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_ip}" : 
+                        "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}")
+      INFO_FILE = local_file.deployment_info.filename
+    }
   }
 }
 
