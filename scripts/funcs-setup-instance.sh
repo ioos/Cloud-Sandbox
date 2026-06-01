@@ -1212,7 +1212,7 @@ setup_aliases () {
       echo 'alias cds "cd /save/$USER"' >> ~/.tcshrc
       echo 'alias cdc "cd /com/$USER"' >> ~/.tcshrc
       echo 'alias cdpt "cd /ptmp/$USER"' >> ~/.tcshrc
-      echo 'set prompt="[NEW-IOOS-Sandbox:%~] %n $0> "' >> ~/.tcshrc
+      echo 'set prompt="[IOOS-Sandbox:%~] %n $0> "' >> ~/.tcshrc
   fi
 
   grep 'alias lsl=' ~/.bashrc
@@ -1222,7 +1222,7 @@ setup_aliases () {
       echo 'alias lst="ls -altr"' >> ~/.bashrc
       echo 'alias h="history"' >> ~/.bashrc
       echo 'alias cds="cd /save/$USER"' >> ~/.bashrc
-      echo 'PS1="[NEW-IOOS-Sandbox:\w] \u> "' >> ~/.bashrc
+      echo 'PS1="[IOOS-Sandbox:\w] \u> "' >> ~/.bashrc
   fi
 
   cp system/.vimrc ~/.vimrc

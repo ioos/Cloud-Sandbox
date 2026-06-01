@@ -360,29 +360,40 @@ resource "aws_network_interface" "head_node" {
   }
 }
 
-# https://developer.hashicorp.com/terraform/language/v1.5.x/resources/terraform-data
+# "key_name"  : "ioos-sandbox",
+# "image_id"  : "ami-00dd9c867a255acf3",
+# "sg_ids"    : ["sg-0d5c0b543fe45330c",
+#                "sg-0cdfc3845ababd4f4",
+#                "sg-0b765f6f659fef905"],
+# "subnet_id" : "subnet-0be869ddbf3096968",
+# "placement_group" : "ufscoastal-sandbox-us-east-2b_Terraform_Placement_Group",
+
 
 resource "local_file" "deployment_info" {
   filename = "${path.module}/deployment_info.txt"
-  content  = <<EOT
+  content = <<EOT
 
 Deployment Reference Info
 -------------------------
-Subnet ID:       ${aws_instance.head_node.subnet_id}
-AMI Name Prefix: ${var.name_tag}-${random_pet.ami_id.id}
-Key Name:        ${var.key_name}
-Instance Name:   ${var.name_tag}
+Head Node Instance Name:   ${var.name_tag}
+AMI Name Prefix:           ${var.name_tag}-${random_pet.ami_id.id}
+VPC ID:                    ${var.vpc_id != null ? data.aws_vpc.pre-provisioned[0].id : aws_vpc.cloud_vpc[0].id}
+
+JSON for cluster config
+-----------------------
+
+"key_name"        : "${var.key_name}",
+"image_id"        : "found at the end of setup.log, or provided by admin"
+"sg_ids"          : [ "${aws_security_group.base_sg.id}",
+                      "${aws_security_group.ssh_ingress.id}",
+                      "${aws_security_group.efs_sg.id}" ],
+"subnet_id"       : "${aws_instance.head_node.subnet_id}",
+"placement_group" : "${aws_placement_group.cloud_sandbox_placement_group.name}"
+
 EOT
+
 }
 
-    
-#Security Groups: ${aws_network_interface.head_node.security_groups}
-#Security Groups: ${aws_network_interface.head_node.security_groups}
-# Security Groups: [ ${join(",\n ", aws_instance.head_node.vpc_security_group_ids)} ]
-#Security Groups: [ ${aws_security_group.base_sg.id},
-#                   ${aws_security_group.ssh_ingress.id},
-#                   ${aws_security_group.efs_sg.id}
-#                 ]
 
 # scp deployment info to head node automatically
 resource "terraform_data" "send_outputs" {

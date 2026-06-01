@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
-#set -x 
+set -x 
 
-outputfile=deployment.info
+outputfile=$INFO_FILE
 
 wait_time=30
 
 echo "sleeping for $wait_time seconds to wait for output ..."
 sleep $wait_time
  
-terraform output > $outputfile
+# terraform output > $outputfile
 
 login_command=$LOGIN_COMMAND
 echo "The login command is: $LOGIN_COMMAND"
 
-key=$(echo $login_command | awk -F= '{print $2}' | awk '{print $3}')
-login=$(echo $login_command | awk -F= '{print $2}' | awk '{print $4}' | awk -F\" '{print $1}')
-remote_host=$(echo $login_command | awk -F@ '{print $2}' | awk -F\" '{print $1}'`
+key=$(echo $login_command | awk '{print $3}')
+login=$(echo $login_command | awk '{print $4}' | awk -F\" '{print $1}')
+remote_host=$(echo $login_command | awk -F@ '{print $2}' | awk -F\" '{print $1}')
+
 echo "remote_host: $remote_host"
 ssh-keyscan -H $remote_host >> ~/.ssh/known_hosts
 
