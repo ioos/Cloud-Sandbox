@@ -12,10 +12,10 @@ REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" $META/placement/availabil
 MAC=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" $META/network/interfaces/macs | head -1)
 SGIDS=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" $META/network/interfaces/macs/${MAC}/security-group-ids)
 
-#AMIID=`tail /tmp/setup.log | grep ImageId`
+AMIID=`tail /tmp/setup.log | grep ImageId`
 
-#PLACEMENT_GROUP=`aws ec2 describe-placement-groups | grep GroupId | awk -F\" '{print $4}'`
-#PLACEMENT_GROUP=`aws ec2 describe-placement-groups | grep GroupId`
+PLACEMENT_GROUP=`aws ec2 describe-placement-groups | grep GroupId | awk -F\" '{print $4}'`
+PLACEMENT_GROUPS=`aws ec2 describe-placement-groups | grep GroupName`
 
 echo "instanceid: $INSTANCEID"
 #echo "iface: $IFACE"
@@ -25,7 +25,7 @@ echo "image_id: $AMIID"
 echo "sg_ids: "
 echo "$SGIDS"
 echo "subnet_id: $SUBNET_ID"
-echo "placement_group: $PLACEMENT_GROUP"
+echo "placement_group - select: $PLACEMENT_GROUPS"
 
 #tail /tmp/setup.log | grep ImageId
 

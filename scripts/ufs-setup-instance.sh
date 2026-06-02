@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-#__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-source environment-vars.sh
+source ufs-envars.sh
 
 ##########################################################
 
@@ -19,40 +19,30 @@ sudo setenforce 0
 setup_paths
 setup_aliases
 setup_environment
-
-# Need to debug this
-# setup_prefect-server
-
-## install_jupyterhub # Requires some manual work
 setup_ssh_mpi
 
 install_efa_driver
 install_fsx_driver
 
 # Compilers and libraries
-install_python_modules_user
 install_gcc_toolset_yum
+install_intel_oneapi_dnf
 
-source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+# Spack-stack
+install_spack-stack_prereqs
+setup_spack-stack 
+build_spack-environment
 
-install_spack
+install_python_modules_user
 
-. $SPACK_DIR/share/spack/setup-env.sh
-
-install_intel_oneapi_spack
-install_intel-oneapi-mkl_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
+setup_prefect
 install_petsc_intelmpi-spack
-install_nceplibs-spack
-
-# install_ffmpeg
-
-# TODO: create an output file to contain all of this state info - json
 
 # create node image
 ###################################
 
-spack clean
+spack clean -a
+sudo yum clean all
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default

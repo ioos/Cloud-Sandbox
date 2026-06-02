@@ -3,9 +3,19 @@
 #__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-source environment-vars.sh
+source ufs-envars.sh
 
-##########################################################
+###############################################################
+# Note: before adding spack-stack, unset the current spack !!!
+#
+# Edit ~/.bashrc and remove the following line:
+# . /save/environments/spack.v0.22.5/share/spack/setup-env.sh
+#
+# Edit ~/.tcshrc and remove the following line:
+# source /save/environments/spack.v0.22.5/share/spack/setup-env.csh
+#
+# close your existing shells and open a new one
+###############################################################
 
 # source include the functions 
 . funcs-setup-instance.sh
@@ -13,46 +23,21 @@ source environment-vars.sh
 # calling sudo from cloud init adds 25 second delay for each sudo command
 sudo setenforce 0
 
-# Use caution when changing the order of the following
-
-# System stuff
-setup_paths
-setup_aliases
-setup_environment
-
-# Need to debug this
-# setup_prefect-server
-
-## install_jupyterhub # Requires some manual work
-setup_ssh_mpi
-
-install_efa_driver
-install_fsx_driver
-
 # Compilers and libraries
-install_python_modules_user
 install_gcc_toolset_yum
+install_intel_oneapi_dnf
 
-source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+# Spack-stack
+install_spack-stack_prereqs
 
-install_spack
-
-. $SPACK_DIR/share/spack/setup-env.sh
-
-install_intel_oneapi_spack
-install_intel-oneapi-mkl_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
-install_petsc_intelmpi-spack
-install_nceplibs-spack
-
-# install_ffmpeg
-
-# TODO: create an output file to contain all of this state info - json
+setup_spack-stack 
+build_spack-environment
 
 # create node image
 ###################################
 
-spack clean
+spack clean -a
+sudo yum clean all
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default

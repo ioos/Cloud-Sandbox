@@ -90,6 +90,10 @@ def main():
     elif jobtype == "plotting_diff":
         flows.diff_plot_flow(postconf, jobfile)
 
+    elif jobtype == "ufs_regressiontest":
+        #TODO: can include other UFS jobtypes later
+        flows.ufs_flow(conf, jobfile)
+
     elif re.search("experiment", jobtype):
         if re.search("dask",jobdict["APP"]):
             flows.python_experiment_dask_flow(conf, jobfile)
