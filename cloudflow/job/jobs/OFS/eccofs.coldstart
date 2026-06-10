@@ -4,9 +4,9 @@
   "APP"       : "eccofs",
   "CDATE"     : "20190101",
   "HH"        : "00",
-  "COMROT"    : "/com/patrick/nosofs",
-  "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",
-  "PTMP"      : "/ptmp/patrick",
+  "COMROT"    : "/com/ec2-user/nosofs",
+  "SAVEDIR"   : "/save/ec2-user/nosofs.v3.6.6",
+  "PTMP"      : "/ptmp/ec2-user",
   "TIME_REF"  : "20110101.0d0",
   "BUCKET"    : "",
   "BCKTFLDR"  : "",
@@ -14,6 +14,6 @@
   "24HR_NTIMES"    : "1920",
   "OUTDIR"    : "auto",
   "OCEANIN"   : "auto",
-  "OCNINTMPL" : "/save/patrick/Cloud-Sandbox/cloudflow/job/templates/eccofs.coldstart.ocean.in"
+  "OCNINTMPL" : "/save/ec2-user/Cloud-Sandbox/cloudflow/job/templates/eccofs.coldstart.ocean.in"
 }
 
