@@ -65,7 +65,7 @@ def main():
     #print(f"lenargs: {lenargs}")
     if lenargs !=  2:
         print(f"Usage: {os.path.basename(__file__)} cluster_config job_config")
-        print(f"    example: {os.path.basename(__file__)} cluster/configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
+        print(f"    example: {os.path.basename(__file__)} ../cluster.configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
         sys.exit(1)
 
     conf = os.path.abspath(sys.argv[1])
