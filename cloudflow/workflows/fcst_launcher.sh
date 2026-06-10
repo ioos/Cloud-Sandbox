@@ -15,11 +15,21 @@ if [ $# -lt 8 ] ; then
   exit 1
 fi
 
-# Defaults here
+# Note: module load might reset I_MPI options to their default values
+#       set these values AFTER loading modules
+#       older intel MPI fabric does not work on hpc8a
+
+#export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
+export I_MPI_OFI_PROVIDER_DUMP=1
+
 export FI_PROVIDER=efa
 export I_MPI_FABRICS=ofi
 export I_MPI_OFI_PROVIDER=efa
+export I_MPI_DEBUG=1
+
+export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+export FI_PROVIDER_PATH=/opt/amazon/efa/lib64/libfabric
 
 # module load libfabric-aws
 
@@ -163,6 +173,17 @@ case $APP in
     #TODO: make this part of the job config
     module load $MODULEFILE
 
+    #export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
+    export I_MPI_OFI_PROVIDER_DUMP=1
+
+    export FI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_DEBUG=1
+
+    export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+    export FI_PROVIDER_PATH=/opt/amazon/efa/lib64/libfabric
 
     #echo "Patrick testing oversubscribed nodes"
     #export MPIOPTS="-launcher ssh -hosts $HOSTS -np 768 -ppn 64"

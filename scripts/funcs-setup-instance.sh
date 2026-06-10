@@ -82,6 +82,8 @@ setup_environment () {
   sudo yum -y install python3.11-pip
   sudo yum -y install jq
 
+  sudo alternatives --set python /usr/bin/python3
+
   python3 -m pip install boto3
 
   sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
@@ -142,6 +144,10 @@ setup_prefect-server () {
     # TODO: Note: there is a docker container that might be better to use
     # TODO: Disable the prefect-server daemon before creating a new AMI
 
+    echo "Running ${FUNCNAME[0]} ..."
+
+    home=$PWD
+
     sudo pip3 install prefect==$PREFECT_VER
 
     # Create system user for prefect daemon
@@ -167,6 +173,7 @@ setup_prefect-server () {
     # [profiles.local]
     # PREFECT_API_URL = "http://127.0.0.1:4200/api"
 
+    cd $home
 }
 
 #-----------------------------------------------------------------------------#
@@ -175,7 +182,6 @@ setup_paths () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
-  set -x
   home=$PWD
 
   if [ ! -d /mnt/efs/fs1 ]; then
@@ -337,6 +343,9 @@ setup_spack-stack () {
 #-----------------------------------------------------------------------------#
 build_spack-environment () {
 
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
   source /save/environments/spack-stack.v2.0/setup.sh
 
   source /opt/intel/oneapi/setvars.sh
@@ -361,8 +370,6 @@ build_spack-environment () {
   # The install stops when the terminal times out - use tmux
   spack install $SPACKOPTS 2>&1 | tee log.install
 
-  echo "PT debugging - exiting"
-  exit  
   # Setup modules 
   spack module tcl refresh -y
   #spack module lmod refresh -y --delete-tree
@@ -370,6 +377,8 @@ build_spack-environment () {
   # create setup-meta-modules
   echo "Running spack stack setup-meta-modules ..."
   spack stack setup-meta-modules
+
+  cd $home
 
 }
 #-----------------------------------------------------------------------------#
@@ -788,6 +797,9 @@ install_esmf_spack () {
 
 #-----------------------------------------------------------------------------#
 install_fsx_driver () {
+
+    home=$PWD
+
     # Run as sudo
 
     # RedHat EL 8
@@ -833,6 +845,8 @@ install_fsx_driver () {
     sudo yum install -y kmod-lustre-client lustre-client
     sudo yum clean all
 
+    cd $home
+
 }
 
 
@@ -869,6 +883,9 @@ install_nceplibs-spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
 
+  home=$PWD
+
+
     . $SPACK_DIR/share/spack/setup-env.sh
 
     COMPILER=oneapi@$ONEAPI_VER
@@ -900,6 +917,8 @@ install_nceplibs-spack () {
     # zlib is packaged within wgrib2 - sigh
     # spack install $SPACKOPTS wgrib2@3.1.0%${COMPILER} $SPACKTARGET # nope
     # spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-error" $SPACKTARGET # nope
+
+    cd $home
 }
 #-----------------------------------------------------------------------------#
 
@@ -925,6 +944,13 @@ install_python_modules_user () {
 
   python3 -m pip install --upgrade botocore==1.40.22
   python3 -m pip install --upgrade boto3==1.40.22
+
+  # Alternative to pip3 install -r ../cloudflow/python_minimal_requirements.txt
+  python3 -m pip install --upgrade matplotlib>=3.10.6
+  python3 -m pip install --upgrade netCDF4>=1.7.2
+  python3 -m pip install --upgrade numpy>=2.3.2
+  python3 -m pip install --upgrade pillow>=12.2.0
+  python3 -m pip install --upgrade pyproj>=3.7.2
 
   # Install requirements for plotting module
   # cd ../cloudflow
@@ -1136,6 +1162,9 @@ Host ip-10-*.compute.internal
 
 create_ami_reboot () {
 
+  home=$PWD
+
+
   # Create the AMI from this instance
   instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 
@@ -1150,6 +1179,8 @@ create_ami_reboot () {
 
   imageID=`grep ImageId /tmp/ami.log`
   echo "imageID to use for compute nodes is: $imageID"
+
+  cd $home
 }
 
 #-----------------------------------------------------------------------------#

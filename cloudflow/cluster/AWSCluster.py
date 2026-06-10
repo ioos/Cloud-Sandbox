@@ -75,6 +75,8 @@ awsTypes = {
 
             'hpc7a.96xlarge': 192,
 
+            'hpc8a.96xlarge': 192,
+
             'r7iz.32xlarge': 64,
 
             # The below are in vCPUs not CPU cores

@@ -32,8 +32,15 @@ export SPACK_VER='v0.22.5'
 # NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands
 export SPACK_DIR="/save/environments/spack.${SPACK_VER}"
 
+if [[ $(nproc) -eq 1 || $(nproc) -eq 2 ]]; then
+    JOBS=1
+else
+    JOBS=$(($(nproc) - 1))
+fi
+
 #SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
-export SPACKOPTS='-v -y'
+# spack v1.0.1 later versions might not use --jobs for package installation, but will use a different option -p
+export SPACKOPTS="-v -y --jobs $JOBS"
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
