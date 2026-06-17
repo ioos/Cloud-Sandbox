@@ -382,6 +382,3 @@ def experiment_flow(conf, jobfile):
 if __name__ == '__main__':
     pass
 
-    # conf = f'./cluster/configs/debug.config'
-    # jobfile = f'./job/jobs/ngofs.03z.fcst'
-    # debug_model(conf, jobfile, 'none')

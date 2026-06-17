@@ -32,5 +32,10 @@ echo "Node image_name: $image_name"
 
 # Flush the disk cache
 sync
-python3 create_image.py $instance_id "$image_name" "$project_tag"
+
+output=$(python3 create_image.py $instance_id "$image_name" "$project_tag")
+image_id=$(echo "$output" | tail -n 1 | awk -F: '{print $2}')
+
+echo "AMI Image ID is: $image_id"
+echo $image_id > ~/image-id-$now
 
