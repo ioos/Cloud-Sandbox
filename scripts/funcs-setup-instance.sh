@@ -43,8 +43,10 @@ setup_environment () {
   # e.g. efa driver
   ##################
 
-  sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-  sudo dnf config-manager --set-enabled codeready-builder-for-rhel-8-rhui-rpms
+ # sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+  sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms
+  sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+ # sudo dnf config-manager --set-enabled codeready-builder-for-rhel-8-rhui-rpms
   sudo dnf -y install rh-amazon-rhui-client
 
   sudo yum -y install tcsh
