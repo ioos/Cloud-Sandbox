@@ -58,7 +58,7 @@ spack clean
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
 now=`date -u +\%Y\%m\%d_\%H-\%M`
-ami_name=${ami_name:="IOOS-Cloud-Sandbox-${now}"}
+ami_name="RHEL10-IOOS-Cloud-Sandbox-${now}"
 echo "ami_name: $ami_name"
 
 # TODO: pass this in via Terraform init template

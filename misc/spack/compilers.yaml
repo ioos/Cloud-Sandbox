@@ -43,8 +43,8 @@ compilers:
     paths:
       cc: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/icx
       cxx: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/icpx
-      f77: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifx
-      fc: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifx
+      f77: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifort
+      fc: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifort
     flags: {}
     operating_system: rhel10
     target: x86_64

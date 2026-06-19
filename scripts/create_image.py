@@ -68,7 +68,7 @@ def create_snapshot(instance_id: str, name_tag: str, project_tag: str):
     )
   except Exception as e:
     print(str(e))
-    traceback.print_stack()
+    traceback.print_exc()
     return None
 
   snapshot_id = response['Snapshots'][0]['SnapshotId']
@@ -120,7 +120,7 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
 
   except Exception as e:
     print("Exception: " + str(e))
-    if DEBUG: traceback.print_stack()
+    if DEBUG: traceback.print_exc()
     return None  
  
   response=''
@@ -137,7 +137,7 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     )
   except Exception as e:
     print("Exception: " + str(e))
-    if DEBUG: traceback.print_stack()
+    if DEBUG: traceback.print_exc()
     return None
 
   image_id = response['ImageId']
