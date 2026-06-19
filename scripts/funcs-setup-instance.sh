@@ -99,12 +99,15 @@ setup_environment () {
   #sudo dnf -y install texlive
   #sudo dnf -y install mysql-server
 
-  cliver="2.10.0"
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
-  /usr/bin/unzip -q awscliv2.zip
-  sudo ./aws/install
-  rm awscliv2.zip
-  sudo rm -Rf "./aws"
+
+  if ! aws --version &> /dev/null ; then
+    cliver="2.10.0"
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
+    /usr/bin/unzip -q awscliv2.zip
+    sudo ./aws/install
+    rm awscliv2.zip
+    sudo rm -Rf "./aws"
+  fi
 
 #  sudo dnf -y install environment-modules
 #  # Only do this once
