@@ -39,26 +39,15 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
-    spec: oneapi@2021.3.0
-    paths:
-      cc: /mnt/efs/fs1/save/intel/oneapi/compiler/2021.3.0/linux/bin/icx
-      cxx: /mnt/efs/fs1/save/intel/oneapi/compiler/2021.3.0/linux/bin/icpx
-      f77: /mnt/efs/fs1/save/intel/oneapi/compiler/2021.3.0/linux/bin/ifx
-      fc: /mnt/efs/fs1/save/intel/oneapi/compiler/2021.3.0/linux/bin/ifx
-    flags: {}
-    operating_system: rhel10
-    target: x86_64
-    modules: [compiler/2021.3.0 compiler-rt/2021.3.0 gcc/8.3.1]
-    environment: {}
-    extra_rpaths: []
-- compiler:
     spec: oneapi@2023.1.0
     paths:
-      cc: /path/to/2023/bin/icx
-      cxx: /path/to/2023/bin/icpx
-      f77: /path/to/2023/bin/ifx
-      fc: /path/to/2023/bin/ifx
+      cc: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/icx
+      cxx: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/icpx
+      f77: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifx
+      fc: /mnt/efs/fs1/save/intel/oneapi/compiler/2023.1.0/linux/bin/ifx
     flags: {}
     operating_system: rhel10
     target: x86_64
-    modules: []
+    modules: [compiler/2023.1.0 compiler-rt/2023.1.0 gcc/8.3.1]
+    environment: {}
+    extra_rpaths: []

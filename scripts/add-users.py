@@ -237,7 +237,7 @@ def setup_user_env(full_name, email, username, public_key):
 
     cmd = [ 'sudo', '-u', username, 'ssh-keygen', 
             '-t', 'rsa', '-N', "", 
-            '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/id_rsa" ]
+            '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/cloudflow_id_rsa" ]
     #        '-C', f"{username}-mpi-ssh-key", '-f', f"/home/{username}/.ssh/id_rsa.mpi" ]
 
     # Note: If key has a non-standard name, ssh will not automatically use it unless something
@@ -255,7 +255,7 @@ def setup_user_env(full_name, email, username, public_key):
     ###################################################
     with open(f"/home/{username}/.ssh/authorized_keys", "a") as dest:
         subprocess.run(['echo', f"{public_key}"], stdout=dest)
-        subprocess.run(['cat', f"/home/{username}/.ssh/id_rsa.pub"], stdout=dest)
+        subprocess.run(['cat', f"/home/{username}/.ssh/cloudflow_id_rsa.pub"], stdout=dest)
 
         # Problem?: add user requires sudo, add_ingress rule requires aws sso
         # Need to sudo -i and export or setenv AWS_PROFILE with a valid aws sso or iam credentials

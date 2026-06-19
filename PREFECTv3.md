@@ -39,7 +39,7 @@ Connect via SSH with a tunnel from 4200 to 4200
 ssh -L local_port:destination_address:remote_port user@remote_server_addres
 
 Example:
-`ssh -i ~/.ssh/id_rsa -L 4200:localhost:4200 username@sandbox`
+`ssh -i ~/.ssh/cloudflow_id_rsa -L 4200:localhost:4200 username@sandbox`
 
 Open a web browser and open the URL:
 `http://localhost:4200/dashboard`

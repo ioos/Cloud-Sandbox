@@ -410,7 +410,7 @@ setup_rocoto() {
 #-----------------------------------------------------------------------------#
 setup_environment_osx () {
   cd ~/.ssh
-  cat id_rsa.pub >> authorized_keys
+  cat cloudflow_id_rsa.pub >> authorized_keys
 }
 #-----------------------------------------------------------------------------#
 
@@ -1061,8 +1061,8 @@ setup_ssh_mpi () {
 
   # MPI needs key to ssh into cluster nodes
   # TODO: DOUBLE CHECK: DO NOT OVERWRITE EXISTING KEY
-  sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/id_rsa
-  sudo -u $USER cat /home/$USER/.ssh/id_rsa.pub >> /home/$USER/.ssh/authorized_keys
+  sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/cloudflow_id_rsa
+  sudo -u $USER cat /home/$USER/.ssh/cloudflow_id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 
 # Prevent SSH prompts when using a local/private address
 
