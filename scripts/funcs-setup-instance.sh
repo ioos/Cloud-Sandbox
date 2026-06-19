@@ -36,36 +36,36 @@ setup_environment () {
   # sudo vi /etc/dnf/plugins/subscription-manager.conf
 
   ##################
-  sudo yum -y update
+  sudo dnf -y update
   #                
-  # yum update might update the kernel 
+  # dnf update might update the kernel 
   # and might cause some installs to fail without a reboot first
   # e.g. efa driver
   ##################
 
- # sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+ # sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
   sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms
-  sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+  sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
  # sudo dnf config-manager --set-enabled codeready-builder-for-rhel-8-rhui-rpms
   sudo dnf -y install rh-amazon-rhui-client
 
-  sudo yum -y install tcsh
-  sudo yum -y install ksh
-  sudo yum -y install wget
-  sudo yum -y install unzip
-  sudo yum -y install time
-  sudo yum -y install glibc-devel
-  sudo yum -y install gcc-c++
-  sudo yum -y install patch
-  sudo yum -y install bzip2
-  sudo yum -y install bzip2-devel
-  sudo yum -y install automake
-  sudo yum -y install vim-enhanced
-  sudo yum -y install subversion
-  sudo yum -y install bc
-  sudo yum -y install htop
+  sudo dnf -y install tcsh
+  sudo dnf -y install ksh
+  sudo dnf -y install wget
+  sudo dnf -y install unzip
+  sudo dnf -y install time
+  sudo dnf -y install glibc-devel
+  sudo dnf -y install gcc-c++
+  sudo dnf -y install patch
+  sudo dnf -y install bzip2
+  sudo dnf -y install bzip2-devel
+  sudo dnf -y install automake
+  sudo dnf -y install vim-enhanced
+  sudo dnf -y install subversion
+  sudo dnf -y install bc
+  sudo dnf -y install htop
 
-  sudo yum -y install libtool
+  sudo dnf -y install libtool
   sudo dnf -y install Lmod
 
 #[UFS-Sandbox:/etc/alternatives] ec2-user> ls -al
@@ -74,30 +74,30 @@ setup_environment () {
 #lrwxrwxrwx.   1 root root   31 Mar 24 17:34 modules.csh -> /usr/share/lmod/lmod/init/cshrc
 
 
-  sudo yum -y install tmux
+  sudo dnf -y install tmux
   cp system/tmux.conf ~/.tmux.conf
 
-  sudo yum -y install python3.11-devel
+  sudo dnf -y install python3-devel
 
   # Is this safe? It hasn't caused any issues.
-  sudo alternatives --set python3 /usr/bin/python3.11
-  sudo yum -y install python3.11-pip
-  sudo yum -y install jq
+  # sudo alternatives --set python3 /usr/bin/python3.11
+  sudo dnf -y install python3-pip
+  sudo dnf -y install jq
 
   sudo alternatives --set python /usr/bin/python3
 
   python3 -m pip install boto3
 
-  sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+  sudo dnf -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
   # sudo systemctl status amazon-ssm-agent
 
   # Additional packages for spack-stack
-  #sudo yum -y install git-lfs
-  #sudo yum -y install bash-completion
-  #sudo yum -y install xorg-x11-xauth
-  #sudo yum -y install xterm
-  #sudo yum -y install texlive
-  #sudo yum -y install mysql-server
+  #sudo dnf -y install git-lfs
+  #sudo dnf -y install bash-completion
+  #sudo dnf -y install xorg-x11-xauth
+  #sudo dnf -y install xterm
+  #sudo dnf -y install texlive
+  #sudo dnf -y install mysql-server
 
   cliver="2.10.0"
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
@@ -106,7 +106,7 @@ setup_environment () {
   rm awscliv2.zip
   sudo rm -Rf "./aws"
 
-#  sudo yum -y install environment-modules
+#  sudo dnf -y install environment-modules
 #  # Only do this once
 #  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
 #  if [ $? -ne 0 ] ; then
@@ -133,7 +133,7 @@ setup_environment () {
   # Add unlimited stack size 
   echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
 
-  # sudo yum clean {option}
+  # sudo dnf clean {option}
   cd $home
 
 }
@@ -225,14 +225,14 @@ install_spack-stack_prereqs () {
   home=$PWD
 
   # Miscellaneous
-  sudo yum -y install binutils-devel
-  sudo yum -y install git-lfs
-  sudo yum -y install bash-completion
-  sudo yum -y install xorg-x11-xauth
-  sudo yum -y install perl-IPC-Cmd
-  sudo yum -y install gettext-devel
-  #sudo yum -y install xterm    # really needed? I used it a lot in college, especially for LISP
-  #sudo yum -y install texlive  # really needed? bloated! 691MB
+  sudo dnf -y install binutils-devel
+  sudo dnf -y install git-lfs
+  sudo dnf -y install bash-completion
+  sudo dnf -y install xorg-x11-xauth
+  sudo dnf -y install perl-IPC-Cmd
+  sudo dnf -y install gettext-devel
+  #sudo dnf -y install xterm    # really needed? I used it a lot in college, especially for LISP
+  #sudo dnf -y install texlive  # really needed? bloated! 691MB
   sudo dnf -y install Lmod
   if [ -e /usr/share/lmod/lmod/init/profile ]; then
     sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
@@ -240,15 +240,15 @@ install_spack-stack_prereqs () {
 
   # All of these are already installed in setup_environment ()
   # Lmod-8.7.65-3.el8.x86_64.rpm
-  # sudo yum -y install m4
-  # sudo yum -y install wget
-  # sudo yum -y install cmake
-  # sudo yum -y install git
-  # sudo yum -y install bzip2 bzip2-devel
-  # sudo yum -y install unzip
-  # sudo yum -y install patch
-  # sudo yum -y install automake
-  # sudo yum -y install bison
+  # sudo dnf -y install m4
+  # sudo dnf -y install wget
+  # sudo dnf -y install cmake
+  # sudo dnf -y install git
+  # sudo dnf -y install bzip2 bzip2-devel
+  # sudo dnf -y install unzip
+  # sudo dnf -y install patch
+  # sudo dnf -y install automake
+  # sudo dnf -y install bison
 
   echo "Done with ${FUNCNAME[0]}" 
 }
@@ -296,7 +296,8 @@ setup_spack-stack () {
       echo "WARNING: Intel oneApi Compilers not found!"
   fi
 
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # Disabled for RHEL 10
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   # Create the site environment
   spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel8 --compiler=oneapi
@@ -352,7 +353,8 @@ build_spack-environment () {
 
   source /opt/intel/oneapi/setvars.sh
 
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # Disabled for RHEL 10
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
   
   cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
   spack env activate -p .
@@ -390,7 +392,8 @@ build_spack-environment () {
 #-----------------------------------------------------------------------------#
 setup_rocoto() {
   
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # Disabled for RHEL 10
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
   module load stack-intel-oneapi-compilers/2024.2.1
@@ -495,7 +498,7 @@ install_efa_driver() {
 # I think this has been fixed and we don't need this hack anymore
 #  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
 #  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
-#    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+#    sudo mv /usr/lib/oldkernel/* /usr/lib/modules
 #    sudo rmdir /usr/lib/oldkernel
 #  fi
 
@@ -527,14 +530,15 @@ install_gcc_toolset_yum() {
 
   home=$PWD
 
-  #${GCC_MAJOR}
+  # Standard RHEL 10 GCC packages (replaces legacy gcc-toolset)
   # Also installs tcl environment-modules
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-c++
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-gfortran
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gdb
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-devel
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-annobin
+  sudo dnf -y install gcc-c++
+  sudo dnf -y install gcc-gfortran
+  sudo dnf -y install gdb
+  sudo dnf -y install gcc-plugin-devel
+  sudo dnf -y install gcc-plugin-annobin
  
+  # Disabled for RHEL 10
   # source /opt/rh/gcc-toolset-${GCC_MAJOR}/enable 
 
   # Need to reset to Lua for ufs
@@ -555,7 +559,8 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # Disabled for RHEL 10
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
@@ -698,8 +703,8 @@ gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.
 EOF
 
   # sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-  # sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
-  # sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+  # sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+  # sudo dnf -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
 
   mkdir /save/environments/modulefiles
 
@@ -730,7 +735,8 @@ install_intel_oneapi_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh 
 
-  source /opt/rh/gcc-toolset-11/enable
+  # Disabled for RHEL 10
+  # source /opt/rh/gcc-toolset-11/enable
 
   GCC_COMPILER=gcc@$GCC_VER
 
@@ -844,8 +850,8 @@ install_fsx_driver () {
 
     # If the command returns 4.18.0-425*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.7 release.
 
-    sudo yum install -y kmod-lustre-client lustre-client
-    sudo yum clean all
+    sudo dnf install -y kmod-lustre-client lustre-client
+    sudo dnf clean all
 
     cd $home
 
@@ -944,15 +950,15 @@ install_python_modules_user () {
   python3 -m pip install --upgrade paramiko         # needed for dask-ssh
   python3 -m pip install --upgrade haikunator       # memorable Name tags
 
-  python3 -m pip install --upgrade botocore==1.40.22
-  python3 -m pip install --upgrade boto3==1.40.22
+  python3 -m pip install --upgrade botocore==1.43.32
+  python3 -m pip install --upgrade boto3==1.43.32
 
   # Alternative to pip3 install -r ../cloudflow/python_minimal_requirements.txt
-  python3 -m pip install --upgrade matplotlib>=3.10.6
-  python3 -m pip install --upgrade netCDF4>=1.7.2
-  python3 -m pip install --upgrade numpy>=2.3.2
-  python3 -m pip install --upgrade pillow>=12.2.0
-  python3 -m pip install --upgrade pyproj>=3.7.2
+  python3 -m pip install --upgrade "matplotlib>=3.10.6"
+  python3 -m pip install --upgrade "netCDF4>=1.7.2"
+  python3 -m pip install --upgrade "numpy>=2.3.2"
+  python3 -m pip install --upgrade "pillow>=12.2.0"
+  python3 -m pip install --upgrade "pyproj>=3.7.2"
 
   # Install requirements for plotting module
   # cd ../cloudflow
@@ -1076,12 +1082,10 @@ Host 127.0.0.1
    CheckHostIP no 
    StrictHostKeyChecking no
 
-Host 10.* 
-   CheckHostIP no 
+Host 10.* CheckHostIP no 
    StrictHostKeyChecking no
 
-Host 192.168.* 
-   CheckHostIP no 
+Host 192.168.* CheckHostIP no 
    StrictHostKeyChecking no
 
 Host 172.16.*
@@ -1271,4 +1275,3 @@ setup_aliases () {
 
   cd $home
 }
-

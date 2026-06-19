@@ -33,7 +33,8 @@ install_fsx_driver
 install_python_modules_user
 install_gcc_toolset_yum
 
-source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+# Disabled for RHEL 10 as GCC is natively installed
+# source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 install_spack
 
