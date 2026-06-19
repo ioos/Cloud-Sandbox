@@ -613,27 +613,15 @@ install_spack() {
   
   spack compiler find --scope site
 
-  ###############################################
+###############################################
   # Use system installed packages when available
-  # had some gettext build issues, using the system one resolved it
   ###############################################
-  # scope 
-  # site -- changes saved in SPACK_DIR
-  # system -- changes globally in /etc/spack
-  # user -- changes in ~/.spack
 
   spack external find --scope site
+  
+  # Force Spack to find the system CMake and NEVER download/build another one
   spack external find --scope site cmake
-
-  # spack external find --not-buildable --scope site
-  # --not-buildable       packages with detected externals won't be built with Spack
-
-  # Note: to recreate modulefiles
-  # spack module tcl refresh -y
-
-  # This is spack's mirror of some libraries
-  #spack mirror add v0.22.5 https://binaries.spack.io/v0.22.5
-  #spack buildcache keys --install --trust
+  spack config add --scope site "packages:cmake:buildable:false"
 
   cd $home
 }
