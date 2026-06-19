@@ -5,8 +5,9 @@ packages:
       prefix: /usr
   cmake:
     externals:
-    - spec: cmake@2.8.12.2
+    - spec: cmake@3.31.8
       prefix: /usr
+    buildable: false
   mpi:
     externals:
     - spec: intel-oneapi-mpi@2023.1.0
@@ -20,9 +21,10 @@ packages:
       - mkl/2023.1.0
       prefix: /save/intel/oneapi
   all:
-    compiler: [intel@2023.1.0]
+    compiler: [oneapi@2023.1.0]
     providers:
       mpi: [intel-oneapi-mpi@2023.1.0]
       blas: [intel-oneapi-mkl@2023.1.0]
       lapack: [intel-oneapi-mkl@2023.1.0]
       scalapack: [intel-oneapi-mkl@2023.1.0]
+      

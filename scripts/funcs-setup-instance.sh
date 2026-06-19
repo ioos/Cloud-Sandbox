@@ -100,7 +100,7 @@ setup_environment () {
   #sudo dnf -y install mysql-server
 
 
-  if ! aws --version &> /dev/null ; then
+  if ! command -v aws &> /dev/null ; then
     cliver="2.10.0"
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
     /usr/bin/unzip -q awscliv2.zip
@@ -435,7 +435,7 @@ install_efa_driver() {
   version=$EFA_INSTALLER_VER
 
   # Need these dependencies
-  sudo dnf -y install kernel-devel
+  sudo dnf -y install kernel-devel-matched
   sudo dnf -y install kernel-modules-extra
 
 #  sudo depmod -a
