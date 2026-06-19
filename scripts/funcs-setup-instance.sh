@@ -620,6 +620,8 @@ install_spack() {
   # user -- changes in ~/.spack
 
   spack external find --scope site
+  spack external find --scope site cmake
+
   # spack external find --not-buildable --scope site
   # --not-buildable       packages with detected externals won't be built with Spack
 
@@ -775,7 +777,8 @@ install_esmf_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  COMPILER=intel@${INTEL_COMPILER_VER}
+  # COMPILER=intel@${INTEL_COMPILER_VER}
+  COMPILER=oneapi@${ONEAPI_VER}
 
   # oneapi mpi spack build option
       # external-libfabric [false]        false, true
@@ -919,7 +922,8 @@ install_nceplibs-spack () {
     # source /opt/rh/gcc-toolset-11/enable
     # wgrib2 builds fine with gcc, fails with intel
     COMPILER=gcc@$GCC_VER
-    spack install $SPACKOPTS wgrib2%${COMPILER} $SPACKTARGET
+    # spack install $SPACKOPTS wgrib2%${COMPILER} $SPACKTARGET
+    spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-implicit-function-declaration -Wno-incompatible-pointer-types" $SPACKTARGET
 
     # spack install $SPACKOPTS wgrib2%${COMPILER} ^zlib@1.2.13 $SPACKTARGET # nope
     # zlib is packaged within wgrib2 - sigh
@@ -950,8 +954,8 @@ install_python_modules_user () {
   python3 -m pip install --upgrade paramiko         # needed for dask-ssh
   python3 -m pip install --upgrade haikunator       # memorable Name tags
 
-  python3 -m pip install --upgrade botocore==1.43.32
-  python3 -m pip install --upgrade boto3==1.43.32
+  python3 -m pip install --upgrade "botocore>=1.43.33"
+  python3 -m pip install --upgrade "boto3>=1.43.33"
 
   # Alternative to pip3 install -r ../cloudflow/python_minimal_requirements.txt
   python3 -m pip install --upgrade "matplotlib>=3.10.6"
@@ -1067,7 +1071,12 @@ setup_ssh_mpi () {
 
   # MPI needs key to ssh into cluster nodes
   # TODO: DOUBLE CHECK: DO NOT OVERWRITE EXISTING KEY
-  sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/cloudflow_id_rsa
+  if [ -e /home/$USER/.ssh/cloudflow_id_rsa ]; then
+    echo "SSH key already exists at /home/$USER/.ssh/cloudflow_id_rsa, skipping ssh keygen"
+  else
+     echo "Generating SSH key for MPI cluster communication ..."
+     sudo -u $USER ssh-keygen -t rsa -N ""  -C "mpi-ssh-key" -f /home/$USER/.ssh/cloudflow_id_rsa
+  fi
   sudo -u $USER cat /home/$USER/.ssh/cloudflow_id_rsa.pub >> /home/$USER/.ssh/authorized_keys
 
 # Prevent SSH prompts when using a local/private address
