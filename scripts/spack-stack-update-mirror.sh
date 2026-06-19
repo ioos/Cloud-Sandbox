@@ -6,7 +6,7 @@ SPACK_DIR="/save/environments/spack-stack.${SPACK_STACK_VER}/spack"
 SPACK_MIRROR='s3://ioos-sandbox-use2/public/spack-stack/mirror'
 PUB_SPACK_KEY_URL='https://ioos-sandbox-use2.s3.amazonaws.com/public/spack-stack/mirror/spack.mirror.gpgkey.pub'
 PUB_SPACK_KEY="$SPACK_DIR/opt/spack/gpg/spack.mirror.gpgkey.pub"
-SPACKENV='aws-ioossb-rhel8'
+SPACKENV='aws-ioossb-rhel10'
 
 FORCE_OPT=''
 #FORCE_OPT='-f'

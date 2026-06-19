@@ -14,7 +14,7 @@ fi
 #__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
-# This has been tested on RHEL8 
+# This has been tested on RHel10 
 #-----------------------------------------------------------------------------#
 
 setup_environment () {
@@ -239,7 +239,7 @@ install_spack-stack_prereqs () {
   fi
 
   # All of these are already installed in setup_environment ()
-  # Lmod-8.7.65-3.el8.x86_64.rpm
+  # Lmod-8.7.65-3.el10.x86_64.rpm
   # sudo dnf -y install m4
   # sudo dnf -y install wget
   # sudo dnf -y install cmake
@@ -300,9 +300,9 @@ setup_spack-stack () {
   # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   # Create the site environment
-  spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel8 --compiler=oneapi
+  spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel10 --compiler=oneapi
 
-  cd envs/aws-ioossb-rhel8/
+  cd envs/aws-ioossb-rhel10/
   spack env activate -p .
 
   ################ environment/site specific ################
@@ -336,7 +336,7 @@ setup_spack-stack () {
   sed -i 's/tcl/lmod/g' site/modules.yaml
   sed -i 's/tcl/lmod/g' common/modules.yaml
 
-  # echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8" >> ~/.bashrc
+  # echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10" >> ~/.bashrc
   echo "spack-stack is installed ... install/build the environment next"
 
   cd $home
@@ -356,7 +356,7 @@ build_spack-environment () {
   # Disabled for RHEL 10
   # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
   
-  cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
+  cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10
   spack env activate -p .
 
   # This is in common/packages but was not built with the spec, manually adding it
@@ -395,7 +395,7 @@ setup_rocoto() {
   # Disabled for RHEL 10
   # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
-  module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
+  module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10/modulefiles.tcl/Core
   module load stack-intel-oneapi-compilers/2024.2.1
   module load sqlite/3.46.0
 
@@ -442,8 +442,8 @@ install_efa_driver() {
 #  sudo modprobe ib_uverbs
 
 #Error! echo
-#Your kernel headers for kernel 4.18.0-553.126.1.el8_10.x86_64 cannot be found at
-#/lib/modules/4.18.0-553.126.1.el8_10.x86_64/build or /lib/modules/4.18.0-553.126.1.el8_10.x86_64/source.
+#Your kernel headers for kernel 4.18.0-553.126.1.el10_10.x86_64 cannot be found at
+#/lib/modules/4.18.0-553.126.1.el10_10.x86_64/build or /lib/modules/4.18.0-553.126.1.el10_10.x86_64/source.
 #You can use the --kernelsourcedir option to tell DKMS where it's located.
 
 
@@ -812,7 +812,7 @@ install_fsx_driver () {
 
     # RedHat EL 8
     # Kernel - uname -r
-    # 4.18.0-425.13.1.el8_7.x86_64
+    # 4.18.0-425.13.1.el10_7.x86_64
 
     # Install rpm key
     curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc -o /tmp/fsx-rpm-public-key.asc
@@ -820,7 +820,7 @@ install_fsx_driver () {
     sudo rpm --import /tmp/fsx-rpm-public-key.asc
 
     # Add repo
-    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
+    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/10/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
 
     # Do one of the following:
     kernel=`uname -r`

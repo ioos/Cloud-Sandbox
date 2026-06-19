@@ -6,7 +6,7 @@ puts stderr "tcl modulefile for ufs"
 
 module-whatis "This module sets the environment for ufs coastal app"
 
-module use -a /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
+module use -a /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10/modulefiles.tcl/Core
 
 module load stack-intel-oneapi-compilers/2024.2.1
 module load stack-intel-oneapi-mpi/2021.13.0

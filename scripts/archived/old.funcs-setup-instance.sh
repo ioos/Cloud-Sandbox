@@ -211,9 +211,9 @@ setup_spack-stack () {
 
   # Create the site environment
 
-  spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel8 --compiler=oneapi
+  spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel10 --compiler=oneapi
 
-  cd envs/aws-ioossb-rhel8/
+  cd envs/aws-ioossb-rhel10/
   spack env activate -p .
 
   unset SPACK_DISABLE_LOCAL_CONFIG
@@ -237,7 +237,7 @@ setup_spack-stack () {
   unset SPACK_SYSTEM_CONFIG_PATH
 
 #  echo "source /save/environments/spack-stack.v2.0/setup.sh" >> ~/.bashrc
-#  echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8" >> ~/.bashrc
+#  echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10" >> ~/.bashrc
 
   spack config add "packages:mpi:require:['intel-oneapi-mpi@2021.13.0']"
   spack config add "concretizer:targets:granularity:'generic'"
@@ -281,7 +281,7 @@ build_spack-environment () {
   source /save/environments/spack-stack.v2.0/setup.sh
   source /opt/intel/oneapi/setvars.sh
 
-  cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
+  cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel10
   spack env activate -p .
 
   export SPACK_DISABLE_LOCAL_CONFIG=true
