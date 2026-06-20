@@ -613,18 +613,32 @@ install_spack() {
   
   spack compiler find --scope site
 
-###############################################
+  ###############################################
   # Use system installed packages when available
   ###############################################
 
+  # Find available system compilers and tools
+  spack compiler find --scope site
   spack external find --scope site
   
-  # Force Spack to find the system CMake and NEVER download/build another one
-  spack external find --scope site cmake
-  spack config add --scope site "packages:cmake:buildable:false"
+# Force Spack to use system tools and completely ignore the S3 mirror for them
+  cat <<EOF | sudo tee $SPACK_DIR/etc/spack/packages.yaml > /dev/null
+packages:
+  cmake:
+    externals:
+    - spec: cmake@3.31.8
+      prefix: /usr
+    buildable: false
+  gmake:
+    externals:
+    - spec: gmake@4.4.1
+      prefix: /usr
+    buildable: false
+  zlib-ng:
+    buildable: false
+EOF
 
   cd $home
-}
 
 #-----------------------------------------------------------------------------#
 # Uninstalls everything
@@ -915,7 +929,6 @@ install_nceplibs-spack () {
     COMPILER=gcc@$GCC_VER
     # spack install $SPACKOPTS wgrib2%${COMPILER} $SPACKTARGET
     spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-implicit-function-declaration -Wno-incompatible-pointer-types" $SPACKTARGET
-
     # spack install $SPACKOPTS wgrib2%${COMPILER} ^zlib@1.2.13 $SPACKTARGET # nope
     # zlib is packaged within wgrib2 - sigh
     # spack install $SPACKOPTS wgrib2@3.1.0%${COMPILER} $SPACKTARGET # nope
