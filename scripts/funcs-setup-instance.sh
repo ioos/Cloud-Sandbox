@@ -535,12 +535,19 @@ install_gcc_toolset_yum() {
  
   # source /opt/rh/gcc-toolset-${GCC_MAJOR}/enable 
 
+  sudo alternatives --config modules.sh
+
   # Need to reset to Lua for ufs
   echo "NOTICE: For UFS you must reset alternatives for modules for Lmod lua modules"
+  echo "NOTICE: Older modulefiles might not work correctly with Lua modueles"
   echo 'Use:  sudo alternatives --config modules.sh'
-  if [ -e /usr/share/lmod/lmod/init/profile ]; then
-    sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
-  fi
+
+  sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
+
+  # if [ -e /usr/share/lmod/lmod/init/profile ]; then
+  #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
+  # fi
+
   #module --version 
   # Modules based on Lua: Version 8.7.65
   cd $home
@@ -946,11 +953,11 @@ install_python_modules_user () {
   python3 -m pip install --upgrade boto3==1.40.22
 
   # Alternative to pip3 install -r ../cloudflow/python_minimal_requirements.txt
-  python3 -m pip install --upgrade matplotlib>=3.10.6
-  python3 -m pip install --upgrade netCDF4>=1.7.2
-  python3 -m pip install --upgrade numpy>=2.3.2
-  python3 -m pip install --upgrade pillow>=12.2.0
-  python3 -m pip install --upgrade pyproj>=3.7.2
+  python3 -m pip install --upgrade "matplotlib>=3.10.6"
+  python3 -m pip install --upgrade "netCDF4>=1.7.2"
+  python3 -m pip install --upgrade "numpy>=2.3.2"
+  python3 -m pip install --upgrade "pillow>=12.2.0"
+  python3 -m pip install --upgrade "pyproj>=3.7.2"
 
   # Install requirements for plotting module
   # cd ../cloudflow
