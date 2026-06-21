@@ -15,7 +15,7 @@ Steps to run SECOFS:
     get_testcase_inputs.sh - download the test case input data from S3
 
 3. Setup your cluster config file.
-   e.g. cloudflow/cluster/configs/IOOS/secofs.hpc6
+   e.g. cluster.configs/IOOS/secofs.hpc6
    Get adminstrator help to properly fill out the values for your deployment.
 
 4. Setup your job config file.

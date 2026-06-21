@@ -9,7 +9,7 @@ git clone https://github.com/ioos/Cloud-Sandbox.git
 The keywords in this job file will inform the rest of the workflow.
 Change directory into 
 ~~~bash
-Cloud-Sandbox/cloudflow/job/jobs
+Cloud-Sandbox/job.configs
 ~~~ 
 Copy the `cloud_sandbox_experiment.template` file into a new file called `your_model_name.exp`. Inside that new file, you must specify at minimum the: 
 - MODEL (model name/class) 
@@ -22,7 +22,7 @@ Copy the `cloud_sandbox_experiment.template` file into a new file called `your_m
 4. **Create an AWS cluster configuration file for your model.** 
 Change directory into 
 ~~~bash
-Cloud-Sandbox/cloudflow/cluster/config 
+Cloud-Sandbox/cluster.configs 
 ~~~
 Create a new directory based on your affiliated organization. (Ex. `mkdir USER_AFFILIATION`). Copy `template.ioos` into a new file called `your_model_name.config` to specify the AWS cloud resource configuration you would like your model to run on. Move the new file `your_model_name.config` in your user affiliation directory. In that file you can edit the following variables: 
 - nodeType (Eligible AWS node instances are listed within the `cloudflow/cluster/AWSCluster.py` Python script under variable `awsTypes` with the associated CPU core count) 

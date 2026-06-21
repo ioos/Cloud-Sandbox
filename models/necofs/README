@@ -9,7 +9,7 @@ Setup scripts, make sure to edit them to set to your directory locations.
 2. build_necofs.sh
 3. get_testcase_inputs.sh
 
-Tested example job configs cloudflow/job/jobs, make sure to edit them to set to your directory locations and other options:
+Tested example job configs job.configs, make sure to edit them to set to your directory locations and other options:
 
 necofs.exp.test  - bare bones manual setup cold start
 necofs.exp.hot   - bare bones manual setup hindcast
