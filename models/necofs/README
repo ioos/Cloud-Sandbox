@@ -4,6 +4,7 @@ Current version is in hindcasts folder.
 
 Setup scripts, make sure to edit them to set to your directory locations.
 
+0. cd hindcasts
 1. get_src.sh
 2. build_necofs.sh
 3. get_testcase_inputs.sh
