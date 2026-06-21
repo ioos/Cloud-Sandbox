@@ -3,9 +3,9 @@
 
 ''' Usage:
 
-    ./workflows/workflow_main.py fcst-job [post-job]
+    ./workflows/workflow_main.py cluster-config job-config [post-job]
 
-    Examples: ./workflows/workflow_main.py job/jobs/cbofs.00z.fcst 
+    Examples: ./workflows/workflow_main.py ../cluster.configs/NOS/nos.cora.cfg ../job.configs/cora.reanalysis
 
 '''
 

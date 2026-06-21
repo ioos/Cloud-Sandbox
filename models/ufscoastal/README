@@ -25,10 +25,10 @@ The run will launch a single node to build and run the preconfigured test(s).
 
 Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.rt).
 
-Set non-default directories in:  job/jobs/UFS/ufs.irene
+Set non-default directories in:  ../job.configs/UFS/ufs.irene
 
 Launch the job:
-nohup workflows/workflow_main.py cluster/configs/IOOS/ufs.rt job/jobs/UFS/ufs.irene > & ufs.out &
+nohup workflows/workflow_main.py cluster/configs/IOOS/ufs.rt ../job.configs/UFS/ufs.irene > & ufs.out &
 
 Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.
 See ufs_launcher.sh for additional options.

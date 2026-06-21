@@ -11,7 +11,7 @@ cyc='00'
 
 cd $HOME/Cloud-Sandbox/cloudflow
 
-fcst=job/jobs/${ofs}.${cyc}z.fcst
+fcst=../job.configs/${ofs}.${cyc}z.fcst
 
 nohup ./workflows/nosofs_qops.py $fcst > $HOME/${ofs}.log 2>&1
 

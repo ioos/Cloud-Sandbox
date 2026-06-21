@@ -40,9 +40,7 @@ python3 -m pip install --user -r requirements.txt
     .
     ├── cloudflow            Python3 cloudflow sources
     │   ├── cluster          Cluster abstract base class and implementations 
-    │   │   └── configs      cluster configuration files (JSON)
     │   ├── job              Job abstract base class and implementations
-    │   │   ├── jobs         job configuration files (JSON)
     │   │   └── templates    Ocean model input namelist templates
     │   ├── notebooks
     │   ├── plotting         plotting and mp4 routines
@@ -51,8 +49,10 @@ python3 -m pip install --user -r requirements.txt
     │   ├── utils            Various utility functions, e.g. getTiling(totalCores), ndate(), etc.
     │   └── workflows        Workflows and workflow tasks
     │       └── scripts      BASH scripts for various tasks
+    ├── cluster.configs      cluster configuration files (JSON)
+    ├── job.configs          job configuration files (JSON)
     ├── docs                 Documentation
-    ├── terraform    
+    ├── terraform            Deployment folder
     └── README.md
 
 ### Setup the machine configuration files for the forecast and/or post processing
@@ -100,8 +100,8 @@ Edit this file: `./Cloud-Sandbox/cluster.configs/post.config`
 The above machine configuration files are specified in the workflow_main.py script. Feel free to rename them to whatever you want.
 
 ```
-fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-postconf = f'{curdir}/../cluster/configs/post.config'
+fcstconf = f'{curdir}/../cluster.configs/ioos.config'
+postconf = f'{curdir}/../cluster.configs/post.config'
 ```
 
 ### Setup the job configuration files
@@ -164,7 +164,7 @@ To submit the job(s) and to optionally log to an output file and run as a backgr
 ```
 cd ./Cloud-Sandbox/cloudflow
 touch /tmp/workflowlog.txt
-./workflows/workflow_main.py job/jobs/yourjob1 [job/jobs/yourjob2] 2>&1 /tmp/workflowlog.txt &
+./workflows/workflow_main.py ../cluster.configs/your.cfg ../job.configs/yourjob1 2>&1 /tmp/workflowlog.txt &
 ```
 Note: *job2 will only run if job1 finishes without error.*
 
@@ -180,4 +180,4 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
 
-*Copyright © 2023 RPS Group, Inc. All rights reserved.*
+*Copyright © 2026 Tetra Tech, Inc. All rights reserved.*

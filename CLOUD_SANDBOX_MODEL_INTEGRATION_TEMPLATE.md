@@ -116,7 +116,7 @@ Cloud-Sandbox/cloudflow
 ~~~ 	
 Make sure you are in the `cloudflow` directory before running any models. Follow the steps below to submit the Cloud-Sandbox job submission to the background of the head node and monitor your job progress:
 ~~~bash
-./workflows/workflow_main.py ./cluster/configs/your_model_name.config ./job/jobs/your_model_name.exp &> your_model_test.out &
+./workflows/workflow_main.py ../cluster.configs/your_model_name.config ../job.configs/your_model_name.exp &> your_model_test.out &
 ~~~
 To see the progress of the Cloud-Sandbox execution of your model
 ~~~bash
