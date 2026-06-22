@@ -13,11 +13,11 @@ __license__ = "BSD 3-Clause"
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-postconf = f'{curdir}/../cluster/configs/post.config'
+postconf = f'{curdir}/.../cluster.configs/post.config'
 
 def main():
 
-    jobfile = f'{curdir}/../job/jobs/dbofs.00z.diffplots'
+    jobfile = f'{curdir}/.../job.configs/dbofs.00z.diffplots'
     flow = flows.notebook_flow(postconf, jobfile)
 
     state = flow.run()

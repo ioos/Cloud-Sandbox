@@ -144,13 +144,13 @@ Optionally change these settings to override the defaults:
 
 | Variable              | Default value                                | Description                    |
 |-----------------------|----------------------------------------------|--------------------------------|
-| preferred_region  | "us-east-2"                    | The AWS region to use |
-| name_tag     | "IOOS Cloud Sandbox Terraform" | The "Name" tag for the instance |
-| nameprefix   | "ioos_cloud_sandbox" | This is attached to the name of resources created. |
-| project_tag      | "IOOS-Cloud-Sandbox"           | The "Project" tag for the resources created |
-| availability_zone | "us-east-2a"                   | The AWS Availability zone  |
-| instance_type     | "t3.medium"                    | EC2 Instance type to use for setup |
-| use_efa           | false                           | Whether or not to use [AWS Elastic Fabric Adapter](https://aws.amazon.com/hpc/efa/) |
+| preferred_region      | "us-east-2"                    | The AWS region to use |
+| name_tag              | "IOOS Cloud Sandbox Terraform" | The "Name" tag for the instance |
+| nameprefix            | "ioos_cloud_sandbox" | This is attached to the name of resources created. |
+| project_tag           | "IOOS-Cloud-Sandbox"           | The "Project" tag for the resources created |
+| availability_zone     | "us-east-2a"                   | The AWS Availability zone  |
+| instance_type         | "t3.medium"                    | EC2 Instance type to use for setup |
+| use_efa               | false                          | Whether or not to use [AWS Elastic Fabric Adapter](https://aws.amazon.com/hpc/efa/) |
 
 Run `terrform plan` to check for errors and see what resources will be created: 
 ```
@@ -218,6 +218,42 @@ sudo -i
 tail -f /root/setup.log
 ```
 
+**Depoyment info document**
+
+Details of the current deployment will be copied to the new head node. These details can be easily copied into your cluster.configs file when setting up a run.
+```
+~/deployment_info.txt
+
+Deployment Reference Info
+-------------------------
+Head Node Instance Name:   Cloud-Sandbox-20260619
+AMI Name Prefix:           Cloud-Sandbox-20260619-valued-ibex
+VPC ID:                    vpc-0547b5af66035b910
+
+JSON for cluster config
+-----------------------
+
+"key_name"        : "ioos-sandbox",
+"image_id"        : "found at the end of setup.log, or provided by admin"
+"sg_ids"          : [ "sg-0e8403aa829a0bbde",
+                      "sg-063f1f280e9070e10",
+                      "sg-04ec20a7b423973a1" ],
+"subnet_id"       : "subnet-0be869ddbf3096968",
+"placement_group" : "docsupdate-sandbox-us-east-2b_Terraform_Placement_Group"
+```
+**Most recent snapshot/AMI**
+
+If scripts/create_image.sh is used to create an image, the image id will be saved in the home folder. This can be used in the cluster.configs when setting up a run.
+
+Example:
+```
+cat ~/image-id-20260619_16-48
+ami-0ae0b8006aff6a196
+```
+
+**Easy login from terraform folder**
+
+After deployment, `./login` can be used to login to the newly created headnode.
 
 ### Amazon Machine Image (AMI) for the compute nodes
 This is done automatically.
@@ -231,7 +267,7 @@ Example: `instance_type = "t3.micro"`
 
 Run terraform apply:
 ```
-terraform apply -var-file="mysettings.tfvars"
+terraform apply -refresh-only --var-file=mysettings.tfvars
 ```
 *If terraform says the instance needs to be destroyed first, type "no" when prompted to keep the existing instance. There are other ways to change the instance type.*
 
@@ -247,4 +283,4 @@ terraform destroy -var-file="mysettings.tfvars"
 
 In case you've already deployed cloud resources but your local Cloud Sandbox terraform directory/files are destroyed or or lost, or if you work on multiple copies, you can restore the Terraform state from the remote S3 bucket by simply running `terraform init -backend-config=config.s3.tfbackend` again. If you were using a custom workspace, switch to that workspace with `terraform workspace select`. Once you run `terraform plan` you should see that no new resources need to be created.
 
-*© Copyright 2025 RPS Group. All rights reserved.*
+*© Copyright 2026 Tetra Tech, Inc. All rights reserved.*

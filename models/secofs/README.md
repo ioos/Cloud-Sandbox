@@ -15,11 +15,11 @@ Steps to run SECOFS:
     get_testcase_inputs.sh - download the test case input data from S3
 
 3. Setup your cluster config file.
-   e.g. cloudflow/cluster/configs/IOOS/secofs.hpc6
+   e.g. cluster.configs/IOOS/secofs.hpc6
    Get adminstrator help to properly fill out the values for your deployment.
 
 4. Setup your job config file.
-   e.g. cloudflow/jobs/jobs/OFS/secofs.coldstart or secofs.hotstart
+   e.g. job.configs/OFS/secofs.coldstart or secofs.hotstart
    These will use the the model configuration template in: cloudflow/job/templates
        secofs_coldstart.param.nml.in        - run day 1 from a cold start
        secofs_hotstart.param.nml.in         - start run from coldstart provided day 2 to N
@@ -28,7 +28,7 @@ Steps to run SECOFS:
 5. Run the job(s)
    e.g.
    cd cloudflow
-   ./workflows/workflow_main.sh cluster/configs/IOOS/secofs.hpc6 jobs/jobs/OFS/secofs.coldstart >& secofs.cold.out &
+   ./workflows/workflow_main.sh ../cluster.configs/IOOS/secofs.hpc6 ../job.configs/OFS/secofs.coldstart >& secofs.cold.out &
 
 Model will run in the following output folder:
 /com/_your_folder_/secofs/20171201/outputs
