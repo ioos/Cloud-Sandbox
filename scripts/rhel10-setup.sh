@@ -16,20 +16,22 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-setup_paths
-setup_aliases
-setup_environment
+#setup_paths
+#setup_aliases
+#setup_environment
 
-exit 0
 
 # Need to debug this
 # setup_prefect-server
 
 ## install_jupyterhub # Requires some manual work
-setup_ssh_mpi
+# setup_ssh_mpi
 
-install_efa_driver
+# install_efa_driver
+
 install_fsx_driver
+
+exit 0
 
 # Compilers and libraries
 # install_python_modules_user

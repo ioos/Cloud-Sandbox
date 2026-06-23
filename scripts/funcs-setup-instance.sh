@@ -209,7 +209,6 @@ setup_paths () {
   cd $home
 }
 
-
 #-----------------------------------------------------------------------------#
 
 install_spack-stack_prereqs () {
@@ -334,8 +333,8 @@ setup_spack-stack () {
   cd $home
 }
 
-
 #-----------------------------------------------------------------------------#
+
 build_spack-environment () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -376,11 +375,9 @@ build_spack-environment () {
   cd $home
 
 }
-#-----------------------------------------------------------------------------#
-
-
 
 #-----------------------------------------------------------------------------#
+
 setup_rocoto() {
   
   source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
@@ -399,12 +396,13 @@ setup_rocoto() {
 
 }
 
-
 #-----------------------------------------------------------------------------#
+
 setup_environment_osx () {
   cd ~/.ssh
   cat id_rsa.pub >> authorized_keys
 }
+
 #-----------------------------------------------------------------------------#
 
 install_efa_driver() {
@@ -413,9 +411,9 @@ install_efa_driver() {
   echo "!!!!!!!!!               INSTALLING EFA DRIVER                !!!!!!!!!"
   echo "!!!!!!!!!     DO NOT KILL OR PRESS CTL-C UNTIL COMPLETED     !!!!!!!!!"
 
-# This must be installed before the rest
+  # This must be installed before the rest
 
-# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
 
   home=$PWD
 
@@ -425,20 +423,6 @@ install_efa_driver() {
   sudo dnf -y install kernel-devel
   sudo dnf -y install kernel-modules-extra
 
-#  sudo depmod -a
-#  sudo modprobe ib_core
-#
-#  sudo depmod -a
-#  sudo modprobe ib_uverbs
-
-#Error! echo
-#Your kernel headers for kernel 4.18.0-553.126.1.el8_10.x86_64 cannot be found at
-#/lib/modules/4.18.0-553.126.1.el8_10.x86_64/build or /lib/modules/4.18.0-553.126.1.el8_10.x86_64/source.
-#You can use the --kernelsourcedir option to tell DKMS where it's located.
-
-
-  # version=latest
-  # version=1.14.1  # Last one with CentOS 8 support
   tarfile=aws-efa-installer-${version}.tar.gz
 
   wrkdir=~/efadriver
@@ -448,14 +432,13 @@ install_efa_driver() {
 
   # There may be old kernels laying around without available headers, temporarily move them
   # otherwise the efa driver might fail
-
-# I think this has been fixed and we don't need this hack anymore
-#  sudo mkdir /usr/lib/oldkernel
-#  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
-#  do
-#    oldkrnl=`ls -1 /usr/lib/modules | head -1`
-#    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
-#  done
+  # I think this has been fixed and we don't need this hack anymore
+  #  sudo mkdir /usr/lib/oldkernel
+  #  while [ `ls -1 /usr/lib/modules | wc -l` -gt 1 ]
+  #  do
+  #    oldkrnl=`ls -1 /usr/lib/modules | head -1`
+  #    sudo mv /usr/lib/modules/$oldkrnl /usr/lib/oldkernel
+  #  done
 
   # System default gcc version is needed to build the kernel driver
   curl -s -O https://s3-us-west-2.amazonaws.com/aws-efa-installer/$tarfile
@@ -464,7 +447,6 @@ install_efa_driver() {
 
   cd aws-efa-installer
 
-  # hpc7a did not work with intel MPI and the AWS libfabric
   EFA_MINAMAL="YES"
 
   if [[ $EFA_MINIMAL == "NO" ]]; then
@@ -475,45 +457,48 @@ install_efa_driver() {
     sudo cp $home/system/profile.d.zippy_efa.sh /etc/profile.d/zippy_efa.sh
 
   else
-    # Install without AWS libfabric and OpenMPI, we will use Intel libfabric and MPI
-    # NOTE:
+    # Install without AWS libfabric and OpenMPI
     sudo ./efa_installer.sh -y --minimal
  
     # Install the AWS libfabric that ships with the EFA driver
-    cd RPMS/ROCKYLINUX8/x86_64
+    cd RPMS/RHEL10/x86_64
     RPM=$(ls -1 libfabric-aws-[0-9]*)
     sudo dnf -y install $RPM
   fi
 
-# I think this has been fixed and we don't need this hack anymore
-#  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
-#  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
-#    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
-#    sudo rmdir /usr/lib/oldkernel
-#  fi
+  # I think this has been fixed and we don't need this hack anymore
+  #  # Put old kernels back in original location in case new kernel fails to boot, can revert if needed
+  #  if [ $(ls /usr/lib/oldkernel/ | wc -l) -ne 0 ]; then
+  #    sudo mv /usr/lib/oldkernel/*  /usr/lib/modules
+  #    sudo rmdir /usr/lib/oldkernel
+  #  fi
 
-# cd /opt/amazon/efa/bin
-# export I_MPI_OFI_LIBRARY_INTERNAL=0 - use AWS libfabric
-# fi_info -p efa -t FI_EP_RDM
-# You should see:
-# provider: efa
-#     fabric: efa-direct
-#     domain: rdmap0s31-rdm
-#     version: 204.0
-#     type: FI_EP_RDM
-#     protocol: FI_PROTO_EFA
-# provider: efa
-#     fabric: efa
-#     domain: rdmap0s31-rdm
-#     version: 204.0
-#     type: FI_EP_RDM
-#     protocol: FI_PROTO_EFA
+  # To test if EFA driver is working, 
+  # run the following on a compute node that has an EFA network adapter(s).
+  # ------------------------------------------------------------------------
+  # cd /opt/amazon/efa/bin
+  # export I_MPI_OFI_LIBRARY_INTERNAL=0 - use AWS libfabric
+  # fi_info -p efa -t FI_EP_RDM
+  # You should see:
+  # provider: efa
+  #     fabric: efa-direct
+  #     domain: rdmap0s31-rdm
+  #     version: 204.0
+  #     type: FI_EP_RDM
+  #     protocol: FI_PROTO_EFA
+  # provider: efa
+  #     fabric: efa
+  #     domain: rdmap0s31-rdm
+  #     version: 204.0
+  #     type: FI_EP_RDM
+  #     protocol: FI_PROTO_EFA
 
   cd $home
   echo "!!!!!!!!!    EFA INSTALLER COMPLETED    !!!!!!!!!"
 }
 
 #-----------------------------------------------------------------------------#
+
 install_gcc_toolset_dnf() {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -629,6 +614,7 @@ install_spack() {
 }
 
 #-----------------------------------------------------------------------------#
+
 # Uninstalls everything
 remove_spack() {
   set +x
@@ -680,6 +666,7 @@ remove_spack() {
 }
 
 #-----------------------------------------------------------------------------#
+
 install_intel_oneapi_dnf () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -687,17 +674,17 @@ install_intel_oneapi_dnf () {
   home=$PWD
 
 ## Install intel oneapi with dnf
-sudo tee /etc/dnf.repos.d/oneAPI.repo << EOF
+sudo tee /etc/yum.repos.d/oneAPI.repo << EOF
 [oneAPI]
 name=Intel® oneAPI repository
-baseurl=https://dnf.repos.intel.com/oneapi
+baseurl=https://yum.repos.intel.com/oneapi
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1
-gpgkey=https://dnf.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 EOF
 
-  # sudo rpm --import https://dnf.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+  # sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
   # sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
   # sudo dnf -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
 
@@ -722,6 +709,7 @@ EOF
 }
 
 #-----------------------------------------------------------------------------#
+
 install_intel_oneapi_spack () {
 
   echo "Running ${FUNCNAME[0]} ..."
@@ -755,7 +743,6 @@ install_intel-oneapi-mkl_spack () {
 
   cd $home
 }
-
 
 #-----------------------------------------------------------------------------#
 
@@ -794,11 +781,45 @@ install_esmf_spack () {
   cd $home
 }
 
+#-----------------------------------------------------------------------------#
 
+install_fsx_driver () {
 
+    set -x
+
+    home=$PWD
+  
+    # Install rpm key
+    curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc -o /tmp/fsx-rpm-public-key.asc
+  
+    # sudo rpm --import /tmp/fsx-rpm-public-key.asc
+  
+    # Add repo
+    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/10/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
+  
+    kernel=`uname -r` 
+    echo "Current kernel version is: ${kernel}"
+  
+    if [[ $kernel =~ "6.12.0-211" ]]; then
+        echo "RHEL 10.2"
+        # no change needed
+    elif [[ $kernel =~ "6.12.0-124" ]]; then
+        echo "RHEL 10.1"
+        sudo sed -i 's#10#10.1#' /etc/yum.repos.d/aws-fsx.repo
+    else
+       echo "not sure if any changes to /etc/yum.repos.d/aws-fsx.repo are needed for $kernel"
+    fi
+
+    sudo dnf clean all
+    sudo dnf install -y kmod-lustre-client lustre-client
+    sudo dnf clean all
+
+    cd $home
+}
 
 #-----------------------------------------------------------------------------#
-install_fsx_driver () {
+
+install_fsx_driver-rhel8 () {
 
     home=$PWD
 
@@ -814,12 +835,11 @@ install_fsx_driver () {
     sudo rpm --import /tmp/fsx-rpm-public-key.asc
 
     # Add repo
-    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/dnf.repos.d/aws-fsx.repo
+    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
 
     # Do one of the following:
     kernel=`uname -r`
     echo "Current kernel version is: ${kernel}"
-
 
     # If the command returns 4.18.0-553*, you don't need to modify the repository configuration. Continue to the To install the Lustre client procedure.
 
@@ -829,15 +849,15 @@ install_fsx_driver () {
 	# no change needed
     elif [[ $kernel =~ "4.18.0-513" ]]; then
         echo "RHEL 8.9"
-        sudo sed -i 's#/8/#/8.9/#' /etc/dnf.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.9/#' /etc/yum.repos.d/aws-fsx.repo
     elif [[ $kernel =~ "4.18.0-477" ]]; then
         echo "RHEL 8.8"
-        sudo sed -i 's#/8/#/8.8/#' /etc/dnf.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.8/#' /etc/yum.repos.d/aws-fsx.repo
     elif [[ $kernel =~ "4.18.0-425" ]]; then
         echo "RHEL 8.7"
-        sudo sed -i 's#/8/#/8.7/#' /etc/dnf.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.7/#' /etc/yum.repos.d/aws-fsx.repo
     else
-       echo "not sure if any changes to /etc/dnf.repos.d/aws-fsx.repo are needed for $kernel"
+       echo "not sure if any changes to /etc/yum.repos.d/aws-fsx.repo are needed for $kernel"
     fi 
 
     # If the command returns 4.18.0-477*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.8 release.
@@ -848,12 +868,10 @@ install_fsx_driver () {
     sudo dnf clean all
 
     cd $home
-
 }
 
-
-
 #-----------------------------------------------------------------------------#
+
 install_petsc_intelmpi-spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh
@@ -922,10 +940,9 @@ install_nceplibs-spack () {
 
     cd $home
 }
-#-----------------------------------------------------------------------------#
-
 
 #-----------------------------------------------------------------------------#
+
 install_python_modules_user () {
 
   echo "Running ${FUNCNAME[0]} ..."
