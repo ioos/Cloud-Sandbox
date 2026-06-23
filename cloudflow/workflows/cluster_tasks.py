@@ -259,16 +259,23 @@ def start_dask(cluster) -> tuple:
     dask_bin = os.path.join(bin_dir, "dask")
     remote_worker_bin = os.path.join(bin_dir, "dask-worker")
 
+    # Dynamically extract the environment base prefix
+    env_base = sys.prefix
+    env_lib = os.path.join(env_base, "lib")
+
+    # Dynamically construct the specific site-packages path matching the exact Python version
+    py_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+    env_packages = os.path.join(env_lib, py_version, "site-packages")
+    
     # Start Dask Scheduler locally on the Head Node
     # using specified dask port available for user
     sched_proc = subprocess.Popen(
-        [dask_bin, "scheduler", "--host", head_ip, "--port", str(port),"--dashboard-address", "0"],
+        [current_python, "-s", "-m", "distributed.cli.dask_scheduler","--host", head_ip,"--port", str(port),"--dashboard-address", "0"],
         stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
 
     # Assign dask scheduler process to cluster object
     # to eventually close once job is finished
     cluster.daskscheduler = sched_proc
-
 
     # Verify Scheduler is actually running
     # and listening for connections
@@ -289,16 +296,29 @@ def start_dask(cluster) -> tuple:
     # list within the cluster object
     if worker_hosts:
         for host in worker_hosts:
+           # Chain the environment overrides to inject into the non-interactive SSH session
+            env_prefix = (
+                f"export LD_LIBRARY_PATH={env_lib}:$LD_LIBRARY_PATH && "
+                f"export PYTHONPATH={env_packages} && "
+                f"export PATH={bin_dir}:$PATH"
+            )
+
+            # Call the standalone binary directly instead of using python -m
+            worker_command = (
+                f"{remote_worker_bin} {head_ip}:{port} "
+                f"--nworkers {cluster.PPN} "
+                f"--nthreads 1 "
+                f"--death-timeout 120 "
+                f"--name worker-{host}"
+            )
+
+            # 3. Combine them into a single string for SSH execution
             ssh_cmd = [
                 "ssh", "-o", "StrictHostKeyChecking=no",
                 f"ec2-user@{host}",
-                f"{remote_worker_bin} {head_ip}:{port} " # Phone home between dask worker and scheduler
-                f"--nworkers {cluster.PPN} " # Assign number of dask workers based on EC2 instance cores
-                f"--nthreads 1 " # Assign single threading for each dask worker
-                f"--death-timeout 120 " # Timeout span if ssh protocol fails to complete in allocated time
-                f"--name worker-{host}" # Naming of ssh process
+                f"{env_prefix} && {worker_command}"
             ]
-
+            
             wp = subprocess.Popen(ssh_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             cluster.worker_procs.append(wp)
 
