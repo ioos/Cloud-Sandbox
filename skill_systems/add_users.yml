@@ -1,0 +1,80 @@
+---
+- name: Create users from CSV file
+  hosts: all
+  become: yes
+  vars:
+      users_file: "users.csv" # Path to your CSV file
+      groups_file: "groups.csv" # Path to your CSV file
+      environment_url: "https://raw.githubusercontent.com/NOAA-CO-OPS/Next-Gen-NOS-OFS-Skill-Assessment/refs/heads/main/environment.yml"
+
+  tasks:
+  - name: Read CSV file
+    community.general.read_csv:
+        path: "{{ groups_file }}"
+        fieldnames: group_name,group_id
+        delimiter: ','
+        skipinitialspace: yes
+    register: groups_data
+    delegate_to: localhost
+    become: no
+
+  - name: Read CSV file
+    community.general.read_csv:
+      path: "{{ users_file }}"
+      fieldnames: username,user_id,email,group,ssh_key
+      delimiter: ','
+      skipinitialspace: yes  
+    register: users_data
+    delegate_to: localhost
+    become: no
+  
+  - name: Create groups if they don't exist
+    ansible.builtin.group:
+        name: "{{ item.group_name }}"
+        gid: "{{ item.group_id }}"
+        state: present
+    loop: "{{ groups_data.list }}"
+
+  - name: Create users
+    ansible.builtin.user:
+        name: "{{ item.username }}"
+        uid: "{{ item.user_id }}"
+        groups: "{{ item.group }}"
+        comment: "{{ item.email }}"
+        state: present
+    loop: "{{ users_data.list }}"
+
+  - name: Add SSH key for each user
+    ansible.builtin.authorized_key:
+        user: "{{ item.username }}"
+        key: "{{ item.ssh_key }}"
+        state: present
+    loop: "{{ users_data.list }}"
+
+  - name: Download Miniconda installer
+    ansible.builtin.get_url:
+      url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+      dest: /tmp/Miniconda3-latest-Linux-x86_64.sh
+      mode: '0755'
+  
+  - name: Execute Miniconda installer
+    ansible.builtin.command:
+      cmd: bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3
+      creates: /opt/miniconda3
+    become: yes
+  - name: Add Miniconda to PATH
+    ansible.builtin.copy:
+      dest: /etc/profile.d/miniconda.sh
+      content: |
+        # Add mniniconda
+        'export PATH="/opt/miniconda3/bin:$PATH"'
+    become: yes
+  
+  - name: Create conda environment
+    loop: "{{ users_data.list }}"
+    ansible.builtin.command:
+        cmd: "/opt/miniconda3/bin/conda env create -q -y -f  {{ environment_url}}"
+        chdir: "/home/{{ item.username }}"
+        creates: "/home/{{ item.username }}/.conda/envs/ofs_dps"
+    become: yes
+    become_user: "{{ item.username }}"
