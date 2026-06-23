@@ -1,13 +1,22 @@
 # Source this file in script to use
 
-export GCC_VER=11.2.1
+export PREFECT_VER=3.6.29
 
-# Current used versions
+#export GCC_VER=13.3.1
+#export GCC_MAJOR=${GCC_VER%%.*}
+
+#export ONEAPI_VER=2024.2.1
+#export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
+## The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
+#export INTEL_COMPILER_VER=2021.13.1
+
+export GCC_VER=11.2.1
+export GCC_MAJOR=${GCC_VER%%.*}
+
 export ONEAPI_VER=2023.1.0
+export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 export INTEL_COMPILER_VER=2021.9.0
-
-#ONEAPI_VER=2024.1.0
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
@@ -23,22 +32,30 @@ export SPACK_VER='v0.22.5'
 # NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands
 export SPACK_DIR="/save/environments/spack.${SPACK_VER}"
 
+if [[ $(nproc) -eq 1 || $(nproc) -eq 2 ]]; then
+    JOBS=1
+else
+    JOBS=$(($(nproc) - 1))
+fi
+
 #SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
-export SPACKOPTS='-v -y'
+# spack v1.0.1 later versions might not use --jobs for package installation, but will use a different option -p
+export SPACKOPTS="-v -y --jobs $JOBS"
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
 #SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
 export SPACKTARGET="arch=linux-rhel8-x86_64"
 
-export EFA_INSTALLER_VER='1.38.0'
+export EFA_INSTALLER_VER='1.48.0'
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html
 
 #  1 = Don't build any packages. Only install packages from binary mirrors
 #  0 = Will build if not found in mirror/cache
 # -1 = Don't check pre-built binary cache
 
-export SPACK_CACHEONLY=0
-#export SPACK_CACHEONLY=1
+#export SPACK_CACHEONLY=0
+export SPACK_CACHEONLY=1
 #export SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
@@ -48,6 +65,7 @@ if [ $SPACK_CACHEONLY -eq 1 ]; then
     echo "NOTICE: Set SPACK_CACHEONLY=0 to enable building"
 fi
 
+# PT: TODO - move mirror to s3://ioos-sandbox-use2
 export SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
 export SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
 export SPACK_KEY=${SPACK_DIR}/opt/spack/gpg/spack.mirror.gpgkey.pub

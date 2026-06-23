@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+#set -x
 
 export SAVE_DIR=${SAVE_DIR:-"/save/$USER"}
 
@@ -8,6 +8,13 @@ MODULEFILE=intel_x86_64
 if [ ! -d $SAVE_DIR ]; then
   echo "Error: $SAVE_DIR does not exist"
   exit 1
+fi
+
+
+if [[ $(nproc) -eq 1 || $(nproc) -eq 2 ]]; then
+    JOBS=1
+else
+    JOBS=$(($(nproc) - 1))
 fi
 
 SCRIPTS=$PWD
@@ -40,7 +47,7 @@ fi
 cmake -DCMAKE_C_FLAGS="-diag-disable=10441" -DCMAKE_CXX_FLAGS="-diag-disable=10441" \
        -C ../cmake/SCHISM.local.build -C ../cmake/SCHISM.aws.ioos ../src/
 
-make -j1
+make -j$JOBS
 
 if [ ! -d ../bin ]; then
     mkdir ../bin

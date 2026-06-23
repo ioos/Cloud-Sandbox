@@ -14,6 +14,13 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 
+# Mapping from AWS region codes to the long-form display names required by the
+# AWS Pricing API.  The Pricing API uses the human-readable region label shown
+# in the console, not the short region identifier (e.g. "us-east-2").
+_REGION_LONG_NAMES = {
+    "us-east-1":      "US East (N. Virginia)",
+    "us-east-2":      "US East (Ohio)",
+}
 from haikunator import Haikunator
 import prefect
 
@@ -56,7 +63,9 @@ awsTypes = {
             'c5n.large': 1,     'c5n.xlarge': 2, 'c5n.2xlarge': 4, 'c5n.4xlarge': 8, 'c5n.9xlarge': 18,
             'c5n.18xlarge': 36, 'c5n.24xlarge': 48, 'c5n.metal': 36,
 
-            'c7i.48xlarge': 96,
+            'c6i.12xlarge': 24,
+
+            'c7i.12xlarge': 24, 'c7i.48xlarge': 96,
 
             'hpc6a.48xlarge': 96,
 
@@ -65,6 +74,8 @@ awsTypes = {
             'hpc7a.48xlarge': 96,
 
             'hpc7a.96xlarge': 192,
+
+            'hpc8a.96xlarge': 192,
 
             'r7iz.32xlarge': 64,
 
@@ -166,6 +177,11 @@ class AWSCluster(Cluster):
         self.minutes_max = 120
         # self.hosts = ''
 
+        # Cached on-demand rate (USD/hr per node) fetched from the Pricing API
+        # during start().  Stored here so terminate() can compute the actual
+        # cost without a second API call.  None means the rate was unavailable.
+        self._per_node_hourly_rate = None
+
         cfDict = self.readConfig(configfile)
         self.parseConfig(cfDict)
 
@@ -177,6 +193,122 @@ class AWSCluster(Cluster):
 
         log.info(f"nodeCount: {self.nodeCount}  PPN: {self.PPN}")
 
+
+    def _estimate_and_print_cost(self):
+        """ Query the AWS Pricing API and print hourly / daily cost estimates
+            for the cluster configuration read from the cluster config file.
+
+            The Pricing API is a global service whose endpoint lives in
+            us-east-1 regardless of the region where instances will run.
+            Results are for Linux on-demand pricing with no pre-installed
+            software, which is the billing model used by this sandbox.
+
+            If the API call fails for any reason (e.g. no network access,
+            missing IAM permission) a warning is logged and the method returns
+            without raising so that the cluster start is not blocked.
+        """
+
+        log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
+
+        # Convert the short region code to the long name the Pricing API needs.
+        region_long = _REGION_LONG_NAMES.get(self.region)
+        if region_long is None:
+            log.warning(f"Cost estimate skipped: no long-name mapping for region '{self.region}'")
+            return
+
+        try:
+            # The Pricing API endpoint is always us-east-1.
+            pricing_client = boto3.client("pricing", region_name="us-east-1")
+
+            # Fetch all on-demand price list entries that match this instance
+            # type and region.  We request Linux / no-preinstalled-sw / Used
+            # capacity to match the sandbox billing model.  We do NOT filter on
+            # tenancy here because HPC instance types (hpc6a, hpc7a …) are
+            # billed under "Dedicated" tenancy while most compute types use
+            # "Shared", and filtering on the wrong value returns an empty list.
+            response = pricing_client.get_products(
+                ServiceCode="AmazonEC2",
+                Filters=[
+                    {"Type": "TERM_MATCH", "Field": "instanceType",     "Value": self.nodeType},
+                    {"Type": "TERM_MATCH", "Field": "operatingSystem",  "Value": "Linux"},
+                    {"Type": "TERM_MATCH", "Field": "preInstalledSw",   "Value": "NA"},
+                    {"Type": "TERM_MATCH", "Field": "capacitystatus",   "Value": "Used"},
+                    {"Type": "TERM_MATCH", "Field": "location",         "Value": region_long},
+                ],
+                MaxResults=100,
+            )
+
+        except Exception as e:
+            log.warning(f"Cost estimate skipped: AWS Pricing API call failed – {e}")
+            return
+
+        # Walk the returned price-list items and collect every on-demand
+        # USD/hr price found.  There may be more than one entry when the same
+        # instance type appears under multiple tenancy models (Shared vs.
+        # Dedicated).  We keep the lowest non-zero price as a conservative
+        # best-case estimate and the highest as a worst-case bound.
+        prices_per_hour = []
+
+        for price_item_str in response.get("PriceList", []):
+            try:
+                price_item = json.loads(price_item_str)
+                on_demand_terms = price_item.get("terms", {}).get("OnDemand", {})
+
+                for term in on_demand_terms.values():
+                    for dimension in term.get("priceDimensions", {}).values():
+                        usd_str = dimension.get("pricePerUnit", {}).get("USD", "0")
+                        usd = float(usd_str)
+                        # Skip free-tier / $0 placeholder entries
+                        if usd > 0:
+                            prices_per_hour.append(usd)
+
+            except (KeyError, ValueError, json.JSONDecodeError) as parse_err:
+                # Skip malformed entries rather than crashing
+                log.debug(f"Cost estimate: could not parse price item – {parse_err}")
+                continue
+
+        if not prices_per_hour:
+            log.warning(
+                f"Cost estimate skipped: no on-demand USD price found for "
+                f"{self.nodeType} in {self.region} ({region_long})."
+            )
+            return
+
+        # Use the lowest price found as the per-node on-demand rate.
+        # For HPC types (hpc6a, hpc7a) there is typically only one entry so
+        # min == max == the actual rate.
+        per_node_hourly = min(prices_per_hour)
+        per_node_daily  = per_node_hourly * 24
+
+        # Persist the per-node rate on the instance so terminate() can
+        # multiply it by the real elapsed hours to report the actual cost.
+        self._per_node_hourly_rate = per_node_hourly
+
+        # Scale up to the full cluster (nodeCount nodes running in parallel).
+        cluster_hourly  = per_node_hourly * self.nodeCount
+        cluster_daily   = per_node_daily  * self.nodeCount
+
+        # Print a clearly delimited cost-estimate block so it is easy to spot
+        # in the workflow logs.
+        print("\n===============================================================")
+        print("  ESTIMATED CLUSTER COST  (on-demand, Linux, no pre-installed SW)")
+        print("===============================================================")
+        print(f"  Instance type : {self.nodeType}")
+        print(f"  Region        : {self.region}  ({region_long})")
+        print(f"  Node count    : {self.nodeCount}")
+        print(f"  Per-node rate : ${per_node_hourly:.4f} / hr")
+        print(f"  Cluster cost  : ${cluster_hourly:.4f} / hr  |  ${cluster_daily:.2f} / day")
+        print("  NOTE: Estimate is for on-demand pricing only.")
+        print("        Actual charges depend on run time and AWS billing.")
+        print("===============================================================\n")
+
+        # Also emit to the workflow log so the estimate is preserved in log files.
+        log.info(
+            f"Cost estimate – {self.nodeCount}x {self.nodeType} @ {self.region}: "
+            f"${cluster_hourly:.4f}/hr  |  ${cluster_daily:.2f}/day"
+        )
+
+    ########################################################################
 
     def getState(self):
         """ Returns the cluster state. Not currently used. """
@@ -236,12 +368,18 @@ class AWSCluster(Cluster):
         try:
             self.vm_retry_delay = cfDict['vm_retry_delay']
         except KeyError:
-            print(f'Cluster configuration variable vm_retyr_delay was not specified by user. Defaulting to value of {self.vm_retry_delay} seconds.')
 
+            print(
+                f"Cluster configuration variable vm_retyr_delay was not specified by user. "
+                "Defaulting to value of {self.vm_retry_delay} seconds."
+            )
         try:
             self.vm_max_retries = cfDict['vm_max_retries']
         except KeyError:
-            print(f'Cluster configuration variable vm_max_retries was not specified by user. Defaulting to value of {self.vm_max_retries} number of retries.')
+            print(
+                f'Cluster configuration variable vm_max_retries was not specified by user. '
+                'Defaulting to value of {self.vm_max_retries} number of retries.'
+            )
 
         self.tags = self.memorable_tags(cfDict['tags'])
         self.image_id = cfDict['image_id']
@@ -253,7 +391,6 @@ class AWSCluster(Cluster):
         # Enforce DynamoDB table usage
         if 'table_name' in cfDict:
             self.table_name = cfDict['table_name']
-
             ddb_client = boto3.client('dynamodb', region_name=self.region)
             try:
                 ddb_client.describe_table(TableName=self.table_name)
@@ -365,11 +502,7 @@ class AWSCluster(Cluster):
  
         # response should be an array/list of ec2 instances, see boto3 documentation for spec
         instances = response
-        #instance_list = response['Instances']
-        #self.instances = instance_list
-        #print(instances)
-        #print(instance_list)
-        #self.save_instance_data(instances)
+
         return instances
 
 
@@ -448,6 +581,10 @@ class AWSCluster(Cluster):
 
         log.debug(f"In: {self.__class__.__name__} : {inspect.currentframe().f_code.co_name}")
 
+        # Print on-demand cost estimates before provisioning so the user can
+        # see what the cluster will cost before any charges are incurred.
+        self._estimate_and_print_cost()
+
         ec2 = boto3.resource('ec2', region_name=self.region)
 
         instances = []
@@ -457,7 +594,12 @@ class AWSCluster(Cluster):
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
 
-                 print(f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait {self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the delay time will be implemented over each retry interval. Cloudflow will retry {self.vm_max_retries} times over to see if we can obtain the user requested AWS resources.")
+                 print(
+                     f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait "
+                     "{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
+                     "delay time will be implemented over each retry interval. Cloudflow will retry "
+                     "{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
+                 )
                  retries = 0
 
                  while retries < self.vm_max_retries:
@@ -468,16 +610,26 @@ class AWSCluster(Cluster):
                          if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
                              retries += 1
                              if(retries == self.vm_max_retries):
-                                 print(f"Insufficient capacity. Number of retries ({self.vm_max_retries}) has been reached. Cloudflow will now shutdown due to lack of AWS resources requested by user.")
+                                 print(
+                                     f"Insufficient capacity. Number of retries ({self.vm_max_retries}) "
+                                     "has been reached. Cloudflow will now shutdown due to lack of AWS "
+                                     "resources requested by user."
+                                 )
                                  raise
                              else:
                                  # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
                                  if(retries>1):
                                      self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
-                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     print(
+                                         f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
+                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                     )
                                      time.sleep(self.vm_retry_delay)
                                  else:
-                                     print(f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... (Attempt {retries}/{self.vm_max_retries})")
+                                     print(
+                                         f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
+                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                     )
                                      time.sleep(self.vm_retry_delay)
                          else:
                              # Re-raise the exception if it's not a capacity issue
@@ -592,6 +744,45 @@ class AWSCluster(Cluster):
             print(f"timelog: {nametag}: {mins} minutes - {nodecnt} x {nodetype}")
             timelog.info(f"{nametag}: {mins} minutes - {nodecnt} x {nodetype}")
 
+            # Compute and print the actual run cost using the on-demand rate
+            # fetched from the Pricing API at cluster start.  We use the real
+            # elapsed hours (not a daily estimate) so the figure reflects the
+            # true billable duration of this run.
+            if self._per_node_hourly_rate is not None:
+                # Actual cluster cost = rate × nodes × hours actually used.
+                # hrs is already derived from the same elapsed/mins calculation
+                # above, so this is consistent with the runtime log entry.
+                actual_cluster_cost = self._per_node_hourly_rate * nodecnt * hrs
+
+                # Emit the actual cost to the same cluster_runtime.log so every
+                # run has its timing and cost in one place without needing a
+                # separate file.
+                timelog.info(
+                    f"{nametag}: actual cost – {nodecnt}x {nodetype} × {hrs:.3f} hrs "
+                    f"@ ${self._per_node_hourly_rate:.4f}/node/hr = ${actual_cluster_cost:.4f}"
+                )
+
+                # Also print to stdout so the cost appears in the cloudflow
+                # console output immediately after the cluster is torn down.
+                print("\n===============================================================")
+                print("  ACTUAL CLUSTER COST  (on-demand, Linux, based on real runtime)")
+                print("===============================================================")
+                print(f"  Cluster name  : {nametag}")
+                print(f"  Instance type : {nodetype}")
+                print(f"  Node count    : {nodecnt}")
+                print(f"  Elapsed time  : {mins} minutes  ({hrs:.3f} hrs)")
+                print(f"  Per-node rate : ${self._per_node_hourly_rate:.4f} / hr")
+                print(f"  ACTUAL COST   : ${actual_cluster_cost:.4f}")
+                print("  NOTE: On-demand rate only; Reserved/Spot pricing will differ.")
+                print("===============================================================\n")
+            else:
+                # Rate was unavailable (Pricing API failed at start time);
+                # log a note so the absence of cost data is explicit.
+                log.warning(
+                    "Actual cost could not be calculated: on-demand rate was not "
+                    "retrieved from the Pricing API when the cluster was started."
+                )
+
         except Exception as e:
             log.exception('ERROR!!!!!!  Exception while trying to terminate compute nodes!!!!\n \
                            MANUALLY VERIFY INSTANCES ARE TERMINATED !!!!!!!!!!!!!!!!!!!!!!!!' + str(e))
@@ -609,7 +800,6 @@ class AWSCluster(Cluster):
                 instance_ids.append(instance_id)
 
             #self.__delete_instance_records(instance_ids)
-
 
         return responses
 

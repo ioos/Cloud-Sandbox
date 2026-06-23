@@ -25,7 +25,7 @@ log = logging.getLogger('workflow')
 
 
 def create_delete():
-    config="/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/nosofs.config"
+    config="/home/centos/Cloud-Sandbox/cluster.configs/nosofs.config"
     fsx = FSxScratchDisk(config)
     fsx.create('/ptmp')
     print("FSx disk was created and mounted locally")
@@ -69,7 +69,7 @@ def test_locks2():
    
 
 def test_utils():
-    config='/home/centos/Cloud-Sandbox/cloudflow/cluster/configs/ioos.config'
+    config='/home/centos/Cloud-Sandbox/cluster.configs/ioos.config'
     scratch = FSxScratchDisk(config)
     result = scratch._pathexists()
     print(f'pathexists: {result}')

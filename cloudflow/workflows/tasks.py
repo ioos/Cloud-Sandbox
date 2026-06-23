@@ -38,7 +38,7 @@ from cloudflow.services.NFSScratchDisk import NFSScratchDisk
 
 from cloudflow.utils import modelUtil as util
 
-__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 pp = pprint.PrettyPrinter()
@@ -457,6 +457,56 @@ def forecast_run(cluster: Cluster, job: Job):
     curfcst=f"{job.COMROT}/current.fcst"
     with open(curfcst, 'w') as cf:
         cf.write(f"{APP}.{CDATE}{HH}\n")
+
+    return
+
+
+
+@task
+def ufs_run(cluster: Cluster, job: Job):
+    """ Run the ufs
+
+    Parameters
+    ----------
+    cluster : Cluster
+        The cluster to run on
+    job : Job
+        The job to run
+    """
+
+    APP = job.APP
+    TESTNAME = job.TESTNAME
+    NPROCS = job.NPROCS
+    PPN = cluster.PPN
+    SAVEDIR = job.SAVEDIR
+    PTMP = job.PTMP 
+
+    # PT: Need to skip compile if we pre-build on Intel but run model on AMD
+    SKIPCOMPILE = getattr(job, "SKIPCOMPILE", "NO")
+
+    runscript = f"{curdir}/ufs_launcher.sh"
+
+    try:
+        HOSTS = cluster.getHostsCSV()
+    except Exception as e:
+        log.exception('execption retrieving list of hostnames:' + str(e))
+        raise Exception('FAILED')
+
+    try:  
+        result = subprocess.run([runscript, SAVEDIR, PTMP, TESTNAME, SKIPCOMPILE, HOSTS, str(NPROCS), str(PPN)], stderr=subprocess.STDOUT, universal_newlines=True)
+
+        if result.returncode != 0:
+            #PT TODO: fix this so we dont get a bunch of stack-traces in the log
+            #PT maybe check return code and use log.error
+            log.exception(f'UFS failed ... result: {result.returncode}')
+            # raise a different exception here so it doesnt get caught a second time below
+            raise Exception(f'UFS failed ... result: {result.returncode}')
+
+    except Exception as e:
+        log.exception('Exception during subprocess.run :' + str(e))
+        raise Exception('Exception during subprocess.run :' + str(e))
+
+    log.info('UFS finished successfully')
 
     return
 

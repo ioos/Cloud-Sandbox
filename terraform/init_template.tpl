@@ -8,26 +8,30 @@ BRANCH=${sandbox_version}
 # RHEL8+
 RUNUSER="ec2-user"
 
-EFS_VERS='v2.3.3'
+EFS_VERS='v3.1.1'
+# EFS v3 adds s3files support - no breaking changes with v2
 # EFS v2 supports TSL encryption
 
-mkdir -p /mnt/efs/fs1
-sudo yum -y -q install git 
+sudo mkdir -p /mnt/efs/fs1
 
 
 ## Install EFS utilities
 ########################
-# https://github.com/aws/efs-utils/blob/v2.3.3/README.md
+# https://github.com/aws/efs-utils/
 # sudo yum -y install amazon-efs-utils
 # Some Linux distributiones: Unable to find a match: amazon-efs-utils
 
 # Alternate method, build from source
 # Install prerequisites
+sudo yum -y -q install git 
 sudo yum -y install rpm-build
 sudo yum -y install make
+sudo yum -y install cmake
 sudo yum -y install nfs-utils
 sudo yum -y install openssl-devel
 sudo yum -y install cargo
+sudo yum -y install golang
+sudo yum -y install perl
 sudo yum -y install rust
 sudo yum -y install stunnel
 
@@ -71,7 +75,6 @@ cd scripts
 # ami_name is defined in main.tf user_data
 export ami_name=${ami_name}
 echo "ami name : $ami_name"
-
 
 
 ## Install all of the software and drivers

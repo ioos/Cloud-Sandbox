@@ -20,7 +20,7 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 provider = 'AWS'
@@ -217,6 +217,70 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
 
 
 
+######################################################################
+@flow
+def python_experiment_dask_flow(conf, jobfile):
+    """
+    """
+
+@flow
+def ufs_flow(ufsconf, ufsjobfile):
+        """ Provides a Prefect Flow for a ufs workflow.
+
+        Parameters
+        ----------
+        ufsconf : str
+                The JSON configuration file for the Cluster to create
+
+        ufsjobfile : str
+                The JSON configuration file for the ufs Job
+
+        """
+
+        #####################################################################
+        # UFS
+        #####################################################################
+
+        # Retrieve runtime context
+        context = get_run_context()
+
+        # Get flow run details
+        flow_run_id = context.flow_run.id
+        flow_run_name = context.flow_run.name
+        print(f"Running flow: {flow_run_name} (ID: {flow_run_id})")
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(ufsconf)
+
+        # Setup the job
+        ufsjob = tasks.job_init(cluster, ufsjobfile)
+        
+        # Start the cluster
+        cluster_started = False
+        try:
+            ctasks.cluster_start(cluster)
+            cluster_started = True
+        except Exception as e:
+            log.exception('cluster_start failed')
+
+        # Run the ufs
+        # TODO: can also create a cluster class internal state and use that instead for flow conteol
+        # e.g. if cluster.started:  or if cluster.state == 'running': etc.
+        # If cluster_start fails, cluster object might not be well defined though and terminate might not work
+        if cluster_started:
+          try:
+              tasks.ufs_run(cluster, ufsjob)
+          except Exception as e:
+              #PT TODO: fix this so we dont get a bunch of stack-traces in the log
+              #PT maybe check return code and use log.error
+              log.exception('ufs_run failed')
+        
+
+        # Terminate the cluster nodes
+        ctasks.cluster_terminate(cluster)
+
+
+
 
 ######################################################################
 @flow
@@ -318,6 +382,3 @@ def experiment_flow(conf, jobfile):
 if __name__ == '__main__':
     pass
 
-    # conf = f'./cluster/configs/debug.config'
-    # jobfile = f'./job/jobs/ngofs.03z.fcst'
-    # debug_model(conf, jobfile, 'none')

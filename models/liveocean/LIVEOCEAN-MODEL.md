@@ -12,6 +12,6 @@ cd LiveOcean
 
 ```
 cd ../Cloud-Sandbox/cloudflow
-./workflows/workflow_main.py job/jobs/liveocean.fcst >& /tmp/liveocean.log &
+./workflows/workflow_main.py ../cluster.configs/ioos.cfg ../job.configs/liveocean.fcst >& /tmp/liveocean.log &
 ```
 

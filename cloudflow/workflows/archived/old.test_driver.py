@@ -17,7 +17,7 @@ conf = f'{curdir}/../cluster/configs/ioos.config'
 
 def main():
 
-    jobfile = f'{curdir}/../job/jobs/liveocean.00z.fcst'
+    jobfile = f'{curdir}/.../job.configs/liveocean.00z.fcst'
     flow = flows.test_flow(conf, jobfile)
 
     state = flow.run()

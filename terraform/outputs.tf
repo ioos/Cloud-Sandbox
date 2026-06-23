@@ -65,11 +65,17 @@ output "aws_placement_group" {
   value       = aws_placement_group.cloud_sandbox_placement_group.id
 }
 
+output "sandbox_version" {
+    description = "Cloud-Sandbox branch/tag to use"
+    value       = var.sandbox_version
+}
+
 /* This is just a little helper output: See the "./login" script. 
    If an elastic ip (EIP) is specified, use the public_dns name, otherwise use the private_dns name
    An EIP is not used when an existing pre-provisioned subnet is specified, e.g. NOAA/NOS environments do not allow public IPs.
    TODO: Better logic for this, an existing subnet with public visibility might be specified, breaking this.
 */
+
 output "login_command" {
    description = "SSH Login"
    value = aws_instance.head_node.public_ip != null ? "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_ip}" : "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}"

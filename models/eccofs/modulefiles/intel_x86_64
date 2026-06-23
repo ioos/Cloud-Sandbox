@@ -28,7 +28,9 @@ setenv NO_AVX512 1
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi 
 module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
-# module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
+
+# Load mpi module after netcdf - netcdf was built with same mpi version but with intel classic compilers
+module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
 module load metis/5.1.0-intel-2021.9.0-fdsd6ir
 module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
 

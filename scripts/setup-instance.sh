@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
 source environment-vars.sh
@@ -19,7 +19,9 @@ sudo setenforce 0
 setup_paths
 setup_aliases
 setup_environment
-# setup_prefect
+
+# Need to debug this
+# setup_prefect-server
 
 ## install_jupyterhub # Requires some manual work
 setup_ssh_mpi
@@ -31,7 +33,7 @@ install_fsx_driver
 install_python_modules_user
 install_gcc_toolset_yum
 
-source /opt/rh/gcc-toolset-11/enable
+source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 install_spack
 

@@ -40,9 +40,7 @@ python3 -m pip install --user -r requirements.txt
     .
     ├── cloudflow            Python3 cloudflow sources
     │   ├── cluster          Cluster abstract base class and implementations 
-    │   │   └── configs      cluster configuration files (JSON)
     │   ├── job              Job abstract base class and implementations
-    │   │   ├── jobs         job configuration files (JSON)
     │   │   └── templates    Ocean model input namelist templates
     │   ├── notebooks
     │   ├── plotting         plotting and mp4 routines
@@ -51,15 +49,17 @@ python3 -m pip install --user -r requirements.txt
     │   ├── utils            Various utility functions, e.g. getTiling(totalCores), ndate(), etc.
     │   └── workflows        Workflows and workflow tasks
     │       └── scripts      BASH scripts for various tasks
+    ├── cluster.configs      cluster configuration files (JSON)
+    ├── job.configs          job configuration files (JSON)
     ├── docs                 Documentation
-    ├── terraform    
+    ├── terraform            Deployment folder
     └── README.md
 
 ### Setup the machine configuration files for the forecast and/or post processing
 
 Update the configuration files to match your particular cloud configuration. These correspond to the machine configuration used for the forecast and post processing flows.
 
-Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/ioos.config`
+Edit the following file: `./Cloud-Sandbox/cluster.configs/ioos.config`
 
 | Key | Description |
 | --- | ----- |
@@ -95,13 +95,13 @@ Edit the following file: `./Cloud-Sandbox/cloudflow/cluster/configs/ioos.config`
 ```
 Copy the same values over for the post-processing. The nodeType and nodeCount may be different, but the other values should be the same.
 
-Edit this file: `./Cloud-Sandbox/cloudflow/cluster/configs/post.config`
+Edit this file: `./Cloud-Sandbox/cluster.configs/post.config`
 
 The above machine configuration files are specified in the workflow_main.py script. Feel free to rename them to whatever you want.
 
 ```
-fcstconf = f'{curdir}/../cluster/configs/ioos.config'
-postconf = f'{curdir}/../cluster/configs/post.config'
+fcstconf = f'{curdir}/../cluster.configs/ioos.config'
+postconf = f'{curdir}/../cluster.configs/post.config'
 ```
 
 ### Setup the job configuration files
@@ -110,9 +110,9 @@ These files contain parameters for running the models. These are provided as com
 
 Example:
 
-`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.fcst` (forecast)
+`./Cloud-Sandbox/job.configs/cbofs.00z.fcst` (forecast)
 
-`./Cloud-Sandbox/cloudflow/job/jobs/cbofs.00z.plots` (plots)
+`./Cloud-Sandbox/job.configs/cbofs.00z.plots` (plots)
 
 The variables are described below:
 
@@ -164,7 +164,7 @@ To submit the job(s) and to optionally log to an output file and run as a backgr
 ```
 cd ./Cloud-Sandbox/cloudflow
 touch /tmp/workflowlog.txt
-./workflows/workflow_main.py job/jobs/yourjob1 [job/jobs/yourjob2] 2>&1 /tmp/workflowlog.txt &
+./workflows/workflow_main.py ../cluster.configs/your.cfg ../job.configs/yourjob1 2>&1 /tmp/workflowlog.txt &
 ```
 Note: *job2 will only run if job1 finishes without error.*
 
@@ -180,4 +180,4 @@ The default output directory for NOSOFS is `/ptmp` while the forecast job is run
 - To add additional Cluster functionality or define new Cluster implementations, see the classes in the `./cluster folder`.
 - See the `./plotting folder` for plotting jobs.
 
-*Copyright © 2023 RPS Group, Inc. All rights reserved.*
+*Copyright © 2026 Tetra Tech, Inc. All rights reserved.*

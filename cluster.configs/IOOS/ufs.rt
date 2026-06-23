@@ -1,0 +1,21 @@
+{
+"platform"  : "AWS",
+"region"    : "us-east-2",
+"nodeTypeAMD"  : "hpc6a.48xlarge",
+"nodeTypeC5n"     : "c5n.9xlarge",
+"nodeType"     : "c6i.12xlarge",
+"nodeCount" : 1,
+"tags"      : [ 
+                { "Key": "Name", "Value": "UFS Regression Test" },
+                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
+              ],
+"key_name"  : "ioos-sandbox",
+"image_id"  : "ami-00dd9c867a255acf3",
+"sg_ids"    : ["sg-0d5c0b543fe45330c",
+               "sg-0cdfc3845ababd4f4",
+               "sg-0b765f6f659fef905"],
+"subnet_id" : "subnet-0be869ddbf3096968",
+"placement_group" : "ufscoastal-sandbox-us-east-2b_Terraform_Placement_Group",
+"table_name" : "IOOS-Sandbox-Compute-Nodes"
+}
+
