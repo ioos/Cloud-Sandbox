@@ -27,103 +27,98 @@ setup_environment () {
   home=$PWD
 
   # Some OS releases do not install the docs (man pages) for packages, remove that setting here
-  sudo sed -i 's/tsflags=nodocs/# &/' /etc/yum.conf
+  sudo sed -i 's/tsflags=nodocs/# &/' /etc/dnf.conf
 
   # Get rid of subscription manager messages
   sudo subscription-manager config --rhsm.manage_repos=0
-  sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
+  sudo sed -i 's/enabled[ ]*=[ ]*1/enabled=0/g' /etc/dnf/pluginconf.d/subscription-manager.conf
 
   # sudo vi /etc/dnf/plugins/subscription-manager.conf
 
   ##################
-  sudo yum -y update
+  sudo dnf -y update
   #                
-  # yum update might update the kernel 
+  # dnf update might update the kernel 
   # and might cause some installs to fail without a reboot first
   # e.g. efa driver
   ##################
 
-  sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-  sudo dnf config-manager --set-enabled codeready-builder-for-rhel-8-rhui-rpms
+  sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+  sudo dnf config-manager --set-enabled codeready-builder-for-rhel-10-rhui-rpms
   sudo dnf -y install rh-amazon-rhui-client
 
-  sudo yum -y install tcsh
-  sudo yum -y install ksh
-  sudo yum -y install wget
-  sudo yum -y install unzip
-  sudo yum -y install time
-  sudo yum -y install glibc-devel
-  sudo yum -y install gcc-c++
-  sudo yum -y install patch
-  sudo yum -y install bzip2
-  sudo yum -y install bzip2-devel
-  sudo yum -y install automake
-  sudo yum -y install vim-enhanced
-  sudo yum -y install subversion
-  sudo yum -y install bc
-  sudo yum -y install htop
+  sudo dnf -y install tcsh
+  sudo dnf -y install ksh
+  sudo dnf -y install wget
+  sudo dnf -y install unzip
+  sudo dnf -y install time
+  sudo dnf -y install glibc-devel
+  sudo dnf -y install gcc-c++
+  sudo dnf -y install patch
+  sudo dnf -y install bzip2
+  sudo dnf -y install bzip2-devel
+  sudo dnf -y install automake
+  sudo dnf -y install vim-enhanced
+  sudo dnf -y install subversion
+  sudo dnf -y install bc
+  sudo dnf -y install htop
 
-  sudo yum -y install libtool
+  sudo dnf -y install libtool
   sudo dnf -y install Lmod
 
-#[UFS-Sandbox:/etc/alternatives] ec2-user> ls -al
-#lrwxrwxrwx.   1 root root   33 Mar 24 17:34 modules.sh -> /usr/share/lmod/lmod/init/profile
-#lrwxrwxrwx.   1 root root   30 Mar 24 17:34 modules.fish -> /usr/share/lmod/lmod/init/fish
-#lrwxrwxrwx.   1 root root   31 Mar 24 17:34 modules.csh -> /usr/share/lmod/lmod/init/cshrc
-
-
-  sudo yum -y install tmux
+  sudo dnf -y install tmux
   cp system/tmux.conf ~/.tmux.conf
 
-  sudo yum -y install python3.11-devel
+  # RHEL 10 ships with python 3.12
+  # 3.13 through 3.14 available
 
-  # Is this safe? It hasn't caused any issues.
-  sudo alternatives --set python3 /usr/bin/python3.11
-  sudo yum -y install python3.11-pip
-  sudo yum -y install jq
+  sudo dnf -y install python3-devel
+  sudo dnf -y install python3-pip
+  sudo dnf -y install jq
 
   sudo alternatives --set python /usr/bin/python3
 
   python3 -m pip install boto3
 
-  sudo yum -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+  sudo dnf -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
   # sudo systemctl status amazon-ssm-agent
 
   # Additional packages for spack-stack
-  #sudo yum -y install git-lfs
-  #sudo yum -y install bash-completion
-  #sudo yum -y install xorg-x11-xauth
-  #sudo yum -y install xterm
-  #sudo yum -y install texlive
-  #sudo yum -y install mysql-server
+  #sudo dnf -y install git-lfs
+  #sudo dnf -y install bash-completion
+  #sudo dnf -y install xorg-x11-xauth
+  #sudo dnf -y install xterm
+  #sudo dnf -y install texlive
+  #sudo dnf -y install mysql-server
 
-  cliver="2.10.0"
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
-  /usr/bin/unzip -q awscliv2.zip
-  sudo ./aws/install
-  rm awscliv2.zip
-  sudo rm -Rf "./aws"
+  if ! command -v aws &> /dev/null ; then
+    cliver="2.10.0"
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
+    /usr/bin/unzip -q awscliv2.zip
+    sudo ./aws/install
+    rm awscliv2.zip
+    sudo rm -Rf "./aws"
+  fi
 
-#  sudo yum -y install environment-modules
-#  # Only do this once
-#  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-#  if [ $? -ne 0 ] ; then
-#    echo . /usr/share/Modules/init/bash >> ~/.bashrc
-#    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-#    . /usr/share/Modules/init/bash
-#  fi
-
-#[UFS-Sandbox:/etc/alternatives] ec2-user> echo $MODULESHOME
-#/usr/share/lmod/lmod
+  #  sudo dnf -y install environment-modules
+  #  # Only do this once
+  #  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+  #  if [ $? -ne 0 ] ; then
+  #    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+  #    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+  #    . /usr/share/Modules/init/bash
+  #  fi
 
   # Only do this once
   if [ ! -d /save/environments/modulefiles ] ; then
     sudo mkdir -p /save/environments/modulefiles
     echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
-# This is not needed if using Lmod, breaks lua modules
-#    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-#    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-#    . ~/.bashrc
+
+    # This is not needed if using Lmod, breaks lua modules
+    #    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
+    #    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
+    #    . ~/.bashrc
+
     cd /save/environments
     sudo chown $USER:$USER .
   fi
@@ -131,7 +126,7 @@ setup_environment () {
   # Add unlimited stack size 
   echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
 
-  # sudo yum clean {option}
+  # sudo dnf clean {option}
   cd $home
 
 }
@@ -223,14 +218,14 @@ install_spack-stack_prereqs () {
   home=$PWD
 
   # Miscellaneous
-  sudo yum -y install binutils-devel
-  sudo yum -y install git-lfs
-  sudo yum -y install bash-completion
-  sudo yum -y install xorg-x11-xauth
-  sudo yum -y install perl-IPC-Cmd
-  sudo yum -y install gettext-devel
-  #sudo yum -y install xterm    # really needed? I used it a lot in college, especially for LISP
-  #sudo yum -y install texlive  # really needed? bloated! 691MB
+  sudo dnf -y install binutils-devel
+  sudo dnf -y install git-lfs
+  sudo dnf -y install bash-completion
+  sudo dnf -y install xorg-x11-xauth
+  sudo dnf -y install perl-IPC-Cmd
+  sudo dnf -y install gettext-devel
+  #sudo dnf -y install xterm    # really needed? I used it a lot in college, especially for LISP
+  #sudo dnf -y install texlive  # really needed? bloated! 691MB
   sudo dnf -y install Lmod
   if [ -e /usr/share/lmod/lmod/init/profile ]; then
     sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
@@ -238,15 +233,15 @@ install_spack-stack_prereqs () {
 
   # All of these are already installed in setup_environment ()
   # Lmod-8.7.65-3.el8.x86_64.rpm
-  # sudo yum -y install m4
-  # sudo yum -y install wget
-  # sudo yum -y install cmake
-  # sudo yum -y install git
-  # sudo yum -y install bzip2 bzip2-devel
-  # sudo yum -y install unzip
-  # sudo yum -y install patch
-  # sudo yum -y install automake
-  # sudo yum -y install bison
+  # sudo dnf -y install m4
+  # sudo dnf -y install wget
+  # sudo dnf -y install cmake
+  # sudo dnf -y install git
+  # sudo dnf -y install bzip2 bzip2-devel
+  # sudo dnf -y install unzip
+  # sudo dnf -y install patch
+  # sudo dnf -y install automake
+  # sudo dnf -y install bison
 
   echo "Done with ${FUNCNAME[0]}" 
 }
@@ -519,7 +514,7 @@ install_efa_driver() {
 }
 
 #-----------------------------------------------------------------------------#
-install_gcc_toolset_yum() {
+install_gcc_toolset_dnf() {
 
   echo "Running ${FUNCNAME[0]} ..."
 
@@ -527,11 +522,11 @@ install_gcc_toolset_yum() {
 
   #${GCC_MAJOR}
   # Also installs tcl environment-modules
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-c++
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-gfortran
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gdb
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-devel
-  sudo yum -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-annobin
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-c++
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-gfortran
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gdb
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-devel
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-annobin
  
   # source /opt/rh/gcc-toolset-${GCC_MAJOR}/enable 
 
@@ -692,19 +687,19 @@ install_intel_oneapi_dnf () {
   home=$PWD
 
 ## Install intel oneapi with dnf
-sudo tee /etc/yum.repos.d/oneAPI.repo << EOF
+sudo tee /etc/dnf.repos.d/oneAPI.repo << EOF
 [oneAPI]
 name=Intel® oneAPI repository
-baseurl=https://yum.repos.intel.com/oneapi
+baseurl=https://dnf.repos.intel.com/oneapi
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1
-gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+gpgkey=https://dnf.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 EOF
 
-  # sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-  # sudo yum -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
-  # sudo yum -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
+  # sudo rpm --import https://dnf.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+  # sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
+  # sudo dnf -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
 
   mkdir /save/environments/modulefiles
 
@@ -819,7 +814,7 @@ install_fsx_driver () {
     sudo rpm --import /tmp/fsx-rpm-public-key.asc
 
     # Add repo
-    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
+    sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/fsx-lustre-client.repo -o /etc/dnf.repos.d/aws-fsx.repo
 
     # Do one of the following:
     kernel=`uname -r`
@@ -834,23 +829,23 @@ install_fsx_driver () {
 	# no change needed
     elif [[ $kernel =~ "4.18.0-513" ]]; then
         echo "RHEL 8.9"
-        sudo sed -i 's#/8/#/8.9/#' /etc/yum.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.9/#' /etc/dnf.repos.d/aws-fsx.repo
     elif [[ $kernel =~ "4.18.0-477" ]]; then
         echo "RHEL 8.8"
-        sudo sed -i 's#/8/#/8.8/#' /etc/yum.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.8/#' /etc/dnf.repos.d/aws-fsx.repo
     elif [[ $kernel =~ "4.18.0-425" ]]; then
         echo "RHEL 8.7"
-        sudo sed -i 's#/8/#/8.7/#' /etc/yum.repos.d/aws-fsx.repo
+        sudo sed -i 's#/8/#/8.7/#' /etc/dnf.repos.d/aws-fsx.repo
     else
-       echo "not sure if any changes to /etc/yum.repos.d/aws-fsx.repo are needed for $kernel"
+       echo "not sure if any changes to /etc/dnf.repos.d/aws-fsx.repo are needed for $kernel"
     fi 
 
     # If the command returns 4.18.0-477*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.8 release.
 
     # If the command returns 4.18.0-425*, you must edit the repository configuration so that it points to the Lustre client for the CentOS, Rocky Linux, and RHEL 8.7 release.
 
-    sudo yum install -y kmod-lustre-client lustre-client
-    sudo yum clean all
+    sudo dnf install -y kmod-lustre-client lustre-client
+    sudo dnf clean all
 
     cd $home
 
