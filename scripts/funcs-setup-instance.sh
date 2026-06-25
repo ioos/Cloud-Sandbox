@@ -493,7 +493,7 @@ install_efa_driver() {
     sudo ./efa_installer.sh -y --minimal
  
     # Install the AWS libfabric that ships with the EFA driver
-    cd RPMS/ROCKYLINUX8/x86_64
+    cd RPMS/RHEL10/x86_64
     RPM=$(ls -1 libfabric-aws-[0-9]*)
     sudo dnf -y install $RPM
   fi
