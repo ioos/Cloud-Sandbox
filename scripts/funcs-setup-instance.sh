@@ -726,6 +726,8 @@ install_intel_oneapi_spack () {
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
+  echo "... ${FUNCNAME[0]} done.
+
   cd $home
 }
 

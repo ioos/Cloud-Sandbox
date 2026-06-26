@@ -11,8 +11,11 @@ export GCC_VER=14.3.1
 export GCC_MAJOR=${GCC_VER%%.*}
 
 export ONEAPI_VER=2023.1.0
+#export ONEAPI_VER=2024.1.0 # newest one available with spack 0.22.5
+# 2024.2.0 is the last one with ifort
 export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 # The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
+# ifort 2021.13.0
 export INTEL_COMPILER_VER=2021.9.0
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+

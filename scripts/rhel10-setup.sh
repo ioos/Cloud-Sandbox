@@ -38,8 +38,7 @@ sudo setenforce 0
 # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 # remove_spack
-install_spack
-exit 0
+# install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
