@@ -570,25 +570,22 @@ install_spack() {
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
-  #echo "DEBUGGING unexpected errors trusting $SPACK_KEY"
-  #echo $SPACK_KEY_URL
-  #echo $SPACK_KEY
-  spack gpg list
-  echo "curl -o $SPACK_KEY $SPACK_KEY_URL"
-  curl -o $SPACK_KEY $SPACK_KEY_URL
-  if [ ! -e $SPACK_KEY ]; then
-    echo "ERROR: $SPACK_KEY not downloaded"
-  fi
-  spack gpg trust $SPACK_KEY
-  spack gpg list
+#  spack gpg list
+#  echo "curl -o $SPACK_KEY $SPACK_KEY_URL"
+#  curl -o $SPACK_KEY $SPACK_KEY_URL
+#  if [ ! -e $SPACK_KEY ]; then
+#    echo "ERROR: $SPACK_KEY not downloaded"
+#  fi
+#  spack gpg trust $SPACK_KEY
+#  spack gpg list
 
   spack config add "config:install_tree:padded_length:73"
   spack config add "modules:default:enable:[tcl]"
 
   # Using an s3-mirror for previously built packages
-  echo "Using SPACK s3-mirror $SPACK_MIRROR"
-  spack mirror add s3-mirror $SPACK_MIRROR >& /dev/null
-  spack buildcache keys --install --trust
+#  echo "Using SPACK s3-mirror $SPACK_MIRROR"
+#  spack mirror add s3-mirror $SPACK_MIRROR >& /dev/null
+#  spack buildcache keys --install --trust
   
   spack compiler find --scope site
 
@@ -609,7 +606,7 @@ install_spack() {
   # spack module tcl refresh -y
 
   # This is spack's mirror of some libraries
-  spack mirror add v0.22.5 https://binaries.spack.io/v0.22.5
+  spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
   spack buildcache keys --install --trust
 
   echo "${FUNCNAME[0]} finished"
@@ -661,7 +658,7 @@ remove_spack() {
   else
     cd $SPACK_DIR || exit 1
     rm -Rf *
-    rm -Rf .[a-Z]*
+    rm -Rf .[a-zA-Z]*
     cd ..
     sudo rmdir $SPACK_DIR
     cd $home

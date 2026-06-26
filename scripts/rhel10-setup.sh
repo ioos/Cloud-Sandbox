@@ -37,10 +37,9 @@ sudo setenforce 0
 # NOT RHEL 10 install_gcc_toolset_yum
 # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
-remove_spack
+# remove_spack
+install_spack
 exit 0
-# install_spack
-
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
