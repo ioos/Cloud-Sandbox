@@ -722,8 +722,6 @@ install_intel_oneapi_spack () {
 
   . $SPACK_DIR/share/spack/setup-env.sh 
 
-  source /opt/rh/gcc-toolset-11/enable
-
   GCC_COMPILER=gcc@$GCC_VER
 
   spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET

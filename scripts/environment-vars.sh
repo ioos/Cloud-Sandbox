@@ -2,15 +2,12 @@
 
 export PREFECT_VER=3.6.29
 
-#export GCC_VER=13.3.1
-#export GCC_MAJOR=${GCC_VER%%.*}
-
 #export ONEAPI_VER=2024.2.1
 #export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 ## The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 #export INTEL_COMPILER_VER=2021.13.1
 
-export GCC_VER=11.2.1
+export GCC_VER=14.3.1
 export GCC_MAJOR=${GCC_VER%%.*}
 
 export ONEAPI_VER=2023.1.0
@@ -45,7 +42,8 @@ export SPACKOPTS="-v -y --jobs $JOBS"
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
 #SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
-export SPACKTARGET="arch=linux-rhel8-x86_64"
+
+export SPACKTARGET="arch=linux-rhel10-x86_64"
 
 export EFA_INSTALLER_VER='1.48.0'
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html
