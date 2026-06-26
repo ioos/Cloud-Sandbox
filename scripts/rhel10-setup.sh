@@ -18,7 +18,7 @@ sudo setenforce 0
 # System stuff
 #setup_paths
 #setup_aliases
-#setup_environment
+setup_environment
 
 
 # Need to debug this
@@ -28,18 +28,18 @@ sudo setenforce 0
 # setup_ssh_mpi
 
 # install_efa_driver
+# install_fsx_driver
 
-install_fsx_driver
-
-exit 0
 
 # Compilers and libraries
-# install_python_modules_user
+install_python_modules_user
 # install_gcc_toolset_yum
 
-source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+# source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 install_spack
+
+exit 0
 
 . $SPACK_DIR/share/spack/setup-env.sh
 

@@ -55,8 +55,8 @@ export EFA_INSTALLER_VER='1.48.0'
 # -1 = Don't check pre-built binary cache
 
 #export SPACK_CACHEONLY=0
-export SPACK_CACHEONLY=1
-#export SPACK_CACHEONLY=-1
+#export SPACK_CACHEONLY=1
+export SPACK_CACHEONLY=-1
 
 if [ $SPACK_CACHEONLY -eq 1 ]; then
     echo "NOTICE: SPACK_CACHEONLY is set to 1 in environment-vars.sh"

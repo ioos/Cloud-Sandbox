@@ -36,11 +36,13 @@ setup_environment () {
   # sudo vi /etc/dnf/plugins/subscription-manager.conf
 
   ##################
+  ##################
   sudo dnf -y update
-  #                
+  
   # dnf update might update the kernel 
   # and might cause some installs to fail without a reboot first
   # e.g. efa driver
+  ##################
   ##################
 
   sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
@@ -223,8 +225,8 @@ install_spack-stack_prereqs () {
   sudo dnf -y install xorg-x11-xauth
   sudo dnf -y install perl-IPC-Cmd
   sudo dnf -y install gettext-devel
-  #sudo dnf -y install xterm    # really needed? I used it a lot in college, especially for LISP
-  #sudo dnf -y install texlive  # really needed? bloated! 691MB
+  #sudo dnf -y install xterm    # optional
+  #sudo dnf -y install texlive  # optional
   sudo dnf -y install Lmod
   if [ -e /usr/share/lmod/lmod/init/profile ]; then
     sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
@@ -540,7 +542,7 @@ install_spack() {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
@@ -599,16 +601,18 @@ install_spack() {
   # system -- changes globally in /etc/spack
   # user -- changes in ~/.spack
 
-  spack external find --scope site
-  # spack external find --not-buildable --scope site
   # --not-buildable       packages with detected externals won't be built with Spack
+  # spack external find --scope site
+  spack external find --not-buildable --scope site
 
   # Note: to recreate modulefiles
   # spack module tcl refresh -y
 
   # This is spack's mirror of some libraries
-  #spack mirror add v0.22.5 https://binaries.spack.io/v0.22.5
-  #spack buildcache keys --install --trust
+  spack mirror add v0.22.5 https://binaries.spack.io/v0.22.5
+  spack buildcache keys --install --trust
+
+  echo "${FUNCNAME[0]} finished"
 
   cd $home
 }
@@ -785,21 +789,25 @@ install_esmf_spack () {
 
 install_fsx_driver () {
 
-    set -x
-
     home=$PWD
   
-    # Install rpm key
-    curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc -o /tmp/fsx-rpm-public-key.asc
-  
+    # Install rpm key - RHEL 10 does not accept this key w/o a workaround
+    # 2 options:
+    #   a. temporarily tell RHEL 10 to support legacy GPG keys
+    #   b. turn off gpgcheck=1 in /etc/yum.repos.d/aws-fsx.repo
+
+    # sudo curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc -o /tmp/fsx-rpm-public-key.asc
     # sudo rpm --import /tmp/fsx-rpm-public-key.asc
   
     # Add repo
     sudo curl https://fsx-lustre-client-repo.s3.amazonaws.com/el/10/fsx-lustre-client.repo -o /etc/yum.repos.d/aws-fsx.repo
+
+    # Turn off gpgcheck
+    sudo sed -i 's#gpgcheck=1#gpgcheck=0#' /etc/yum.repos.d/aws-fsx.repo
   
     kernel=`uname -r` 
     echo "Current kernel version is: ${kernel}"
-  
+ 
     if [[ $kernel =~ "6.12.0-211" ]]; then
         echo "RHEL 10.2"
         # no change needed
@@ -959,10 +967,10 @@ install_python_modules_user () {
   python3 -m pip install --upgrade distributed
   python3 -m pip install --upgrade setuptools_rust  # needed for paramiko
   python3 -m pip install --upgrade paramiko         # needed for dask-ssh
-  python3 -m pip install --upgrade haikunator       # memorable Name tags
 
-  python3 -m pip install --upgrade botocore==1.40.22
-  python3 -m pip install --upgrade boto3==1.40.22
+  echo "TODO: update these library versions maybe"
+  python3 -m pip install --upgrade "botocore>=1.40.22"
+  python3 -m pip install --upgrade "boto3>=1.40.22"
 
   # Alternative to pip3 install -r ../cloudflow/python_minimal_requirements.txt
   python3 -m pip install --upgrade "matplotlib>=3.10.6"
