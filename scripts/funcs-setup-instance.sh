@@ -65,6 +65,10 @@ setup_environment () {
   sudo dnf -y install bc
   sudo dnf -y install htop
 
+  # ESMF/netcdf dependencies # had to manually add to packages.yaml externals
+  sudo dnf -y install zlib-ng-devel
+  sudo dnf -y install snappy-devel
+
   sudo dnf -y install libtool
   sudo dnf -y install Lmod
 
@@ -110,6 +114,16 @@ setup_environment () {
   #    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
   #    . /usr/share/Modules/init/bash
   #  fi
+
+
+# Might need to use older tcl modules instead of Lua
+  # if [ -e /usr/share/lmod/lmod/init/profile ]; then
+  #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
+  # fi
+  
+  #module --version 
+  # Modules based on Lua: Version 8.7.65
+#   sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
 
   # Only do this once
   if [ ! -d /save/environments/modulefiles ] ; then
@@ -726,7 +740,7 @@ install_intel_oneapi_spack () {
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
-  echo "... ${FUNCNAME[0]} done.
+  echo "... ${FUNCNAME[0]} done"
 
   cd $home
 }
@@ -764,7 +778,7 @@ install_esmf_spack () {
       # Enable external libfabric dependency
 
   #spack install $SPACKOPTS esmf@${ESMF_VER} %${COMPILER} $SPACKTARGET
-  spack install $SPACKOPTS esmf@${ESMF_VER} +pnetcdf %${COMPILER} $SPACKTARGET
+  spack install $SPACKOPTS esmf@${ESMF_VER} +pnetcdf ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   # Can tell mpiifort to use ifx:
   # export FC=ifx
@@ -777,7 +791,7 @@ install_esmf_spack () {
   # Install fails with the following
   # COMPILER=oneapi@${ONEAPI_VER}
   # v8.5 and v8.6 build errors with oneapi compilers, use intel classic, maybe try a newer version of oneapi compilers
-  #spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
+  # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
 }

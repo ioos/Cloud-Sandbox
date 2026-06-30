@@ -1,0 +1,48 @@
+compilers:
+- compiler:
+    spec: gcc@=14.3.1
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: null
+      fc: null
+    flags: {}
+    operating_system: rhel10
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+
+- compiler:
+    spec: intel@=2021.9.0
+    paths:
+      cc: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/intel64/icc
+      cxx: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/intel64/icpc
+      f77: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/intel64/ifort
+      fc: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/intel64/ifort
+    flags:
+      cflags: "-D_Float32=float -D_Float64=double -D_Float32x=double -D_Float64x=long\ double"
+      cxxflags: "-D_Float32=float -D_Float64=double -D_Float32x=double -D_Float64x=long\ double"
+    operating_system: rhel10
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+
+- compiler:
+    spec: oneapi@=2023.1.0
+    paths:
+      cc: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/icx
+      cxx: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/icpx
+      f77: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/ifx
+      fc: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel10-x86_64/gcc-14.3.1/intel-oneapi-compilers-2023.1.0-44shdobo2rxpk5pt3uiavhlm7a73pcnk/compiler/latest/linux/bin/ifx
+    flags:
+      cflags: "-D_Float32=float -D_Float64=double -D_Float32x=double -D_Float64x=long\ double"
+      cxxflags: "-D_Float32=float -D_Float64=double -D_Float32x=double -D_Float64x=long\ double"
+    operating_system: rhel10
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+
+

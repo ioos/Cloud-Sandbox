@@ -34,21 +34,22 @@ sudo setenforce 0
 # Compilers and libraries
 # install_python_modules_user
 
-# NOT RHEL 10 install_gcc_toolset_yum
-# source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
-
 # remove_spack
 # install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
 # Start with existing working versions
-install_intel_oneapi_spack
+# install_intel_oneapi_spack
+
+# install_intel-oneapi-mkl_spack
+
+# To catch any dnf installed dependencies while debugging
+# spack external find --not-buildable --scope site
+
+# install_esmf_spack              # also installs netcdf, hdf5, intel-mpi
 exit 0
 
-
-install_intel-oneapi-mkl_spack
-install_esmf_spack              # also installs netcdf, hdf5, intel-mpi
 install_petsc_intelmpi-spack
 install_nceplibs-spack
 

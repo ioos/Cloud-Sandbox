@@ -1,0 +1,131 @@
+packages:
+  binutils:
+    externals:
+    - spec: binutils@2.41.63
+      prefix: /usr
+    buildable: false
+  bison:
+    externals:
+    - spec: bison@3.8.2
+      prefix: /usr
+    buildable: false
+  autoconf:
+    externals:
+    - spec: autoconf@2.71
+      prefix: /usr
+    buildable: false
+  gawk:
+    externals:
+    - spec: gawk@5.3.0
+      prefix: /usr
+    buildable: false
+  findutils:
+    externals:
+    - spec: findutils@4.10.0
+      prefix: /usr
+    buildable: false
+  tar:
+    externals:
+    - spec: tar@1.35
+      prefix: /usr
+    buildable: false
+  subversion:
+    externals:
+    - spec: subversion@1.14.5
+      prefix: /usr
+    buildable: false
+  pkgconf:
+    externals:
+    - spec: pkgconf@2.1.0
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.5.5
+      prefix: /usr
+    buildable: false
+  automake:
+    externals:
+    - spec: automake@1.16.5
+      prefix: /usr
+    buildable: false
+  flex:
+    externals:
+    - spec: flex@2.6.4+lex
+      prefix: /usr
+    buildable: false
+  openssh:
+    externals:
+    - spec: openssh@9.9p1
+      prefix: /usr
+    buildable: false
+  libtool:
+    externals:
+    - spec: libtool@2.4.7
+      prefix: /usr
+    buildable: false
+  sed:
+    externals:
+    - spec: sed@4.9
+      prefix: /usr
+    buildable: false
+  gettext:
+    externals:
+    - spec: gettext@0.22.5
+      prefix: /usr
+    buildable: false
+  cmake:
+    externals:
+    - spec: cmake@3.31.8
+      prefix: /usr
+    buildable: false
+  groff:
+    externals:
+    - spec: groff@1.23.0
+      prefix: /usr
+    buildable: false
+  gmake:
+    externals:
+    - spec: gmake@4.4.1
+      prefix: /usr
+    buildable: false
+  git:
+    externals:
+    - spec: git@2.52.0~tcltk
+      prefix: /usr
+    buildable: false
+  diffutils:
+    externals:
+    - spec: diffutils@3.10
+      prefix: /usr
+    buildable: false
+  coreutils:
+    externals:
+    - spec: coreutils@9.5
+      prefix: /usr
+    buildable: false
+  perl:
+    externals:
+    - spec: perl@5.40.2~cpanm~opcode~open+shared+threads
+      prefix: /usr
+    buildable: false
+  curl:
+    externals:
+    - spec: curl@8.12.1+gssapi+ldap+nghttp2
+      prefix: /usr
+    buildable: false
+  m4:
+    externals:
+    - spec: m4@1.4.19
+      prefix: /usr
+    buildable: false
+  snappy:
+    externals:
+    - spec: snappy@1.1.10
+      prefix: /usr
+    buildable: false
+  zlib:
+    externals:
+    - spec: zlib@2.2.3
+      prefix: /usr
+    buildable: false

@@ -1,22 +1,26 @@
 # Source this file in script to use
 
 export PREFECT_VER=3.6.29
+export GCC_VER=14.3.1
+export GCC_MAJOR=${GCC_VER%%.*}
+export SPACK_VER='v0.22.5'
+export ONEAPI_VER=2023.1.0
+export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
+export INTEL_COMPILER_VER=2021.9.0      # This version corresponds with ONEAPI_VER above
+
+# intel oneapi version with RHEL 10 support 2025.x
 
 #export ONEAPI_VER=2024.2.1
 #export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 ## The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 #export INTEL_COMPILER_VER=2021.13.1
 
-export GCC_VER=14.3.1
-export GCC_MAJOR=${GCC_VER%%.*}
-
-export ONEAPI_VER=2023.1.0
 #export ONEAPI_VER=2024.1.0 # newest one available with spack 0.22.5
-# 2024.2.0 is the last one with ifort
-export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
-# The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
 # ifort 2021.13.0
-export INTEL_COMPILER_VER=2021.9.0
+# 2024.2.0 is the last one with ifort
+# export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
+# The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
+# export INTEL_COMPILER_VER=2021.9.0
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
@@ -24,23 +28,23 @@ export INTEL_COMPILER_VER=2021.9.0
 # problems with spack v23
 
 export INTEL_MPI_VER=2021.12.1
-
-export ESMF_VER=8.5.0
-
-export SPACK_VER='v0.22.5'
+export ESMF_VER=8.6.0
 
 # NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands
 export SPACK_DIR="/save/environments/spack.${SPACK_VER}"
 
 if [[ $(nproc) -eq 1 || $(nproc) -eq 2 ]]; then
-    JOBS=1
+    export JOBS=1
 else
-    JOBS=$(($(nproc) - 1))
+    export JOBS=$(($(nproc) - 1))
 fi
+
+#echo "PT DEBUG using single compile job"
+#export JOBS=1
 
 #SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
 # spack v1.0.1 later versions might not use --jobs for package installation, but will use a different option -p
-export SPACKOPTS="-v -y --jobs $JOBS"
+export SPACKOPTS="-v -y --jobs $JOBS --fail-fast"
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
