@@ -83,6 +83,7 @@ setup_environment () {
   sudo dnf -y install jq
 
   sudo alternatives --set python /usr/bin/python3
+  # cannot access /var/lib/alternatives/python: No such file or directory
 
   python3 -m pip install boto3
 
@@ -90,6 +91,7 @@ setup_environment () {
   # sudo systemctl status amazon-ssm-agent
 
   # Additional packages for spack-stack
+  # TODO: Move to spack-stack setup
   #sudo dnf -y install git-lfs
   #sudo dnf -y install bash-completion
   #sudo dnf -y install xorg-x11-xauth
@@ -97,8 +99,15 @@ setup_environment () {
   #sudo dnf -y install texlive
   #sudo dnf -y install mysql-server
 
+  # AWS CLI Installer
+  # 2.35.13 as of June 30, 2026
+  # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  # unzip awscliv2.zip
+  # sudo ./aws/install
+  # sudo ./aws/install --update
+
   if ! command -v aws &> /dev/null ; then
-    cliver="2.10.0"
+    cliver="2.35.13"
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${cliver}.zip" -o "awscliv2.zip"
     /usr/bin/unzip -q awscliv2.zip
     sudo ./aws/install
@@ -106,24 +115,27 @@ setup_environment () {
     sudo rm -Rf "./aws"
   fi
 
-  #  sudo dnf -y install environment-modules
-  #  # Only do this once
-  #  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
-  #  if [ $? -ne 0 ] ; then
-  #    echo . /usr/share/Modules/init/bash >> ~/.bashrc
-  #    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-  #    . /usr/share/Modules/init/bash
-  #  fi
+  sudo dnf -y install environment-modules
 
+  # Only do this once
+  grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
+  if [ $? -ne 0 ] ; then
+    echo . /usr/share/Modules/init/bash >> ~/.bashrc
+    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+    . /usr/share/Modules/init/bash
+  fi
 
-# Might need to use older tcl modules instead of Lua
+  sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
+
+  # module --version 
+
+  # Can use Lua modules, newer but not 100% backwards compatible despite claims otherwise
   # if [ -e /usr/share/lmod/lmod/init/profile ]; then
   #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
   # fi
-  
-  #module --version 
-  # Modules based on Lua: Version 8.7.65
-#   sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
+
+  # Might need to use older tcl modules instead of Lua
+  # sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
 
   # Only do this once
   if [ ! -d /save/environments/modulefiles ] ; then
@@ -145,6 +157,7 @@ setup_environment () {
   # sudo dnf clean {option}
   cd $home
 
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -185,6 +198,7 @@ setup_prefect-server () {
     # PREFECT_API_URL = "http://127.0.0.1:4200/api"
 
     cd $home
+    echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -223,6 +237,7 @@ setup_paths () {
 
   set +x
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -347,6 +362,7 @@ setup_spack-stack () {
   echo "spack-stack is installed ... install/build the environment next"
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -389,7 +405,7 @@ build_spack-environment () {
   spack stack setup-meta-modules
 
   cd $home
-
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -511,6 +527,7 @@ install_efa_driver() {
 
   cd $home
   echo "!!!!!!!!!    EFA INSTALLER COMPLETED    !!!!!!!!!"
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -547,6 +564,7 @@ install_gcc_toolset_dnf() {
   #module --version 
   # Modules based on Lua: Version 8.7.65
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -555,8 +573,6 @@ install_spack() {
 
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
-
-  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
   echo "Installing SPACK in $SPACK_DIR ..."
 
@@ -623,9 +639,8 @@ install_spack() {
   spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
   spack buildcache keys --install --trust
 
-  echo "${FUNCNAME[0]} finished"
-
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -678,6 +693,7 @@ remove_spack() {
     cd $home
   fi
 
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -708,6 +724,12 @@ EOF
   sudo dnf -y install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-mkl-devel-$ONEAPI_MAJOR_MINOR
+  sudo dnf -y install intel-oneapi-mkl-classic-devel-$ONEAPI_MAJOR_MINOR
+  sudo dnf -y install intel-oneapi-mpi-devel-$INTEL_MPI_VER
+
+  # intel-oneapi-mkl-classic-2024.2.x86_64
+  # intel-oneapi-mkl-classic-devel-2024.2.x86_64
+  # intel-oneapi-mkl-devel-2024.2.x86_64
   # sudo dnf -y install intel-oneapi-mkl-2024.2
 
   echo "Installed the following at /opt/intel/oneapi:"
@@ -721,6 +743,7 @@ EOF
   echo "module use -a /save/environments/modulefiles" >> ~/.bashrc
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -743,6 +766,7 @@ install_intel_oneapi_spack () {
   echo "... ${FUNCNAME[0]} done"
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 
@@ -757,6 +781,7 @@ install_intel-oneapi-mkl_spack () {
   spack install $SPACKOPTS intel-oneapi-mkl@${ONEAPI_VER}%oneapi@${ONEAPI_VER} $SPACKTARGET
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -794,6 +819,7 @@ install_esmf_spack () {
   # spack install $SPACKOPTS esmf@${ESMF_VER} ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -834,6 +860,7 @@ install_fsx_driver () {
     sudo dnf clean all
 
     cd $home
+    echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -887,6 +914,7 @@ install_fsx_driver-rhel8 () {
     sudo dnf clean all
 
     cd $home
+    echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -913,6 +941,7 @@ install_petsc_intelmpi-spack () {
 
   spack install $SPACKOPTS petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER} $SPACKTARGET 
 
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -958,6 +987,7 @@ install_nceplibs-spack () {
     # spack install $SPACKOPTS wgrib2%${COMPILER} cflags="-Wno-error" $SPACKTARGET # nope
 
     cd $home
+    echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -999,6 +1029,8 @@ install_python_modules_user () {
 
   # deactivate
   cd $home 
+
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -1017,6 +1049,7 @@ install_plotting_modules () {
   python3 -m pip install --user dist/plotting-*.tar.gz
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -1191,6 +1224,7 @@ Host ip-10-*.compute.internal
 " | sudo tee -a /etc/ssh/ssh_config
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 
@@ -1219,6 +1253,7 @@ create_ami_reboot () {
   echo "imageID to use for compute nodes is: $imageID"
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -1260,6 +1295,7 @@ create_snapshot () {
   echo $snapshotId | awk -F\" '{print $2}'
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 
 #####################################################################
@@ -1306,5 +1342,6 @@ setup_aliases () {
   #git config user.email "75450912+Michael-Lalime@users.noreply.github.com"
 
   cd $home
+  echo "${FUNCNAME[0]} finished"
 }
 

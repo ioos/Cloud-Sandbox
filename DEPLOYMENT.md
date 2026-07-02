@@ -218,6 +218,13 @@ sudo -i
 tail -f /root/setup.log
 ```
 
+On RHEL 10, additional output can be found in the following file. This is the output from 
+the system initialization and anything from the terraform/init_template.tpl file.
+
+```
+/var/log/cloud-init-output.log 
+```
+
 **Depoyment info document**
 
 Details of the current deployment will be copied to the new head node. These details can be easily copied into your cluster.configs file when setting up a run.

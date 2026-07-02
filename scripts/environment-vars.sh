@@ -3,31 +3,25 @@
 export PREFECT_VER=3.6.29
 export GCC_VER=14.3.1
 export GCC_MAJOR=${GCC_VER%%.*}
-export SPACK_VER='v0.22.5'
-export ONEAPI_VER=2023.1.0
+
+export SPACK_VER='v1.2.0'
+
+export ONEAPI_VER=2024.2.2
 export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
-export INTEL_COMPILER_VER=2021.9.0      # This version corresponds with ONEAPI_VER above
+
+# The below versions correspond with ONEAPI_VER above
+export INTEL_COMPILER_VER=2021.13
+export INTEL_MPI_VER=2021.13
 
 # intel oneapi version with RHEL 10 support 2025.x
 
-#export ONEAPI_VER=2024.2.1
-#export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
-## The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
-#export INTEL_COMPILER_VER=2021.13.1
-
-#export ONEAPI_VER=2024.1.0 # newest one available with spack 0.22.5
-# ifort 2021.13.0
-# 2024.2.0 is the last one with ifort
-# export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
-# The ONEAPI_VER above ^^^^ installs the INTEL_COMPILER_VERSION below vvvv
-# export INTEL_COMPILER_VER=2021.9.0
+# 2024.2 is the last one with ifort
 
 # Upgrading INTEL_MPI for 2 EFA adaptors support, version 2021.12.0+
 # MPI v 2021.12.0+ supports multiple EFA adaptors
 # spack v0.22.3 and higher has that spec
 # problems with spack v23
 
-export INTEL_MPI_VER=2021.12.1
 export ESMF_VER=8.6.0
 
 # NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands

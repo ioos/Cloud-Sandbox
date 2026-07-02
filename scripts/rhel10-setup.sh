@@ -25,24 +25,37 @@ sudo setenforce 0
 # setup_prefect-server
 
 ## install_jupyterhub # Requires some manual work
-# setup_ssh_mpi
+#setup_ssh_mpi
 
-# install_efa_driver
-# install_fsx_driver
-
+#install_efa_driver
+#install_fsx_driver
 
 # Compilers and libraries
-# install_python_modules_user
+#install_python_modules_user
 
 # remove_spack
 # install_spack
+echo "Done"
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
-# Start with existing working versions
-# install_intel_oneapi_spack
 
-# install_intel-oneapi-mkl_spack
+# Install compilers, mkl, and mpi
+# install_intel_oneapi_dnf
+
+module load intel/compiler/2024.2.1
+module load intel/compiler-intel-llvm/2024.2.1
+module load intel/ifort/2024.2.1
+module load intel/mpi/2021.13 
+module load intel/mkl/2024.2
+
+module list
+
+exit
+
+spack compiler find --scope site
+
+## Add spack compiler find or install intel before spack
 
 # To catch any dnf installed dependencies while debugging
 # spack external find --not-buildable --scope site
