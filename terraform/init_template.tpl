@@ -64,7 +64,8 @@ echo "ami name : $ami_name"
 
 ## Install all of the software and drivers
 ##########################################
-# sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
+
+sudo -E -u $RUNUSER ./setup-instance.sh >> ~/setup.log 2>&1
 
 # TODO: Check for errors returned from any step above
 
