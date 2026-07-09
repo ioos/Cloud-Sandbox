@@ -21,7 +21,6 @@ _REGION_LONG_NAMES = {
     "us-east-1":      "US East (N. Virginia)",
     "us-east-2":      "US East (Ohio)",
 }
-from haikunator import Haikunator
 import prefect
 
 # from cloudflow.cluster import AWSHelper

@@ -1,6 +1,6 @@
 # Source this file in script to use
 
-export PREFECT_VER=3.6.29
+export PREFECT_VER=3.7.7
 export GCC_VER=14.3.1
 export GCC_MAJOR=${GCC_VER%%.*}
 

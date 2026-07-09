@@ -16,39 +16,33 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-#setup_paths
-#setup_aliases
-#setup_environment
+setup_paths
+setup_aliases
+setup_environment
 
 # Need to debug this
 # setup_prefect-server
 
-## install_jupyterhub # Requires some manual work
-#setup_ssh_mpi
+# install_jupyterhub # Requires some manual work
+setup_ssh_mpi
 
-#install_efa_driver
-#install_fsx_driver
+install_efa_driver
+install_fsx_driver
 
 # Compilers and libraries
-#install_python_modules_user
+install_python_modules_user
 
-# install_spack
+install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
 # Install compilers, mkl, and mpi
 
-# install_intel_oneapi_dnf
+install_intel_oneapi_dnf
 
 create_spack-environment
 
-# build_spack-environment
-
-exit
-
-install_nceplibs-spack
-
-# install_ffmpeg
+build_spack-environment
 
 # TODO: create an output file to contain all of this state info - json
 

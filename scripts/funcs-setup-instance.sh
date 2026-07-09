@@ -693,6 +693,8 @@ create_spack-environment() {
   spack env activate -p /save/environments/rhel10-x86_64_v3
 
   spack config add 'modules:default:enable:[tcl]'
+
+  # If keeping spack modulefiles in environment folder, make sure to add this to modulespath 
   # spack config add 'modules:default:roots:tcl:/save/environments/rhel10-x86_64_v3/modules/'
 
   spack config add 'concretizer:targets:granularity:generic'
@@ -711,15 +713,13 @@ build_spack-environment () {
 
   spack env activate -p /save/environments/rhel10-x86_64_v3
 
-  #COMPILER=intel@${INTEL_COMPILER_VER}
-
   COMPILER=intel-oneapi-compilers@${ONEAPI_VER}
 
   # Add packages
 
   spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
 
-#  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
+  #  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
 
   spack add "petsc+mpi %${COMPILER}"
 
