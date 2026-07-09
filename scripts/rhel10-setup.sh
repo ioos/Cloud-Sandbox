@@ -36,7 +36,7 @@ install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
-# Install compilers, mkl, and mpi
+# Install compilers, mkl, and mpi, etc.
 
 install_intel_oneapi_dnf
 

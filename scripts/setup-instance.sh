@@ -23,7 +23,7 @@ setup_environment
 # Need to debug this
 # setup_prefect-server
 
-## install_jupyterhub # Requires some manual work
+# install_jupyterhub # Requires some manual work
 setup_ssh_mpi
 
 install_efa_driver
@@ -31,21 +31,18 @@ install_fsx_driver
 
 # Compilers and libraries
 install_python_modules_user
-install_gcc_toolset_yum
-
-source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
 
 install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
-install_intel_oneapi_spack
-install_intel-oneapi-mkl_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
-install_petsc_intelmpi-spack
-install_nceplibs-spack
+# Install compilers, mkl, and mpi, etc.
 
-# install_ffmpeg
+install_intel_oneapi_dnf
+
+create_spack-environment
+
+build_spack-environment
 
 # TODO: create an output file to contain all of this state info - json
 
