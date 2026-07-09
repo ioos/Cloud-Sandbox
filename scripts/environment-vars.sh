@@ -6,11 +6,11 @@ export GCC_MAJOR=${GCC_VER%%.*}
 
 export SPACK_VER='v1.2.0'
 
-export ONEAPI_VER=2024.2.2
+export ONEAPI_VER=2024.2.1
 export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 
 # The below versions correspond with ONEAPI_VER above
-export INTEL_COMPILER_VER=2021.13
+export INTEL_COMPILER_VER=2021.13.2
 export INTEL_MPI_VER=2021.13
 
 # intel oneapi version with RHEL 10 support 2025.x
@@ -22,7 +22,7 @@ export INTEL_MPI_VER=2021.13
 # spack v0.22.3 and higher has that spec
 # problems with spack v23
 
-export ESMF_VER=8.6.0
+export ESMF_VER=8.9.1
 
 # NOTE: Changing SPACK_DIR will still modify files in /etc/spack if using --scope system in spack commands
 export SPACK_DIR="/save/environments/spack.${SPACK_VER}"
@@ -36,15 +36,21 @@ fi
 #echo "PT DEBUG using single compile job"
 #export JOBS=1
 
-#SPACKOPTS='-v -y --dirty'   # don't rememeber why I needed --dirty, everything built fine without it, maybe esmf needs it?
-# spack v1.0.1 later versions might not use --jobs for package installation, but will use a different option -p
 export SPACKOPTS="-v -y --jobs $JOBS --fail-fast"
 
 #SPACKTARGET='target=skylake_avx512'         # default on skylake intel instances t3.xxxx
 #SPACKTARGET='target=haswell'                # works on AMD also - has no avx512 extensions
-#SPACKTARGET='target=x86_64'                 # works on AMD and Intel x86_64
 
-export SPACKTARGET="arch=linux-rhel10-x86_64"
+# Generic
+export target=x86_64_v3    # supports 3rd Gen AMD EPYC - hpc6a - Build First
+# export target=x86_64_v4    # supports 4th and 5th Gen AMD EPYC AVX-512, hpc7a, hpc8a - Build and Benchmark later
+
+# Best for AMD
+# target=zen3         # hpc6a
+# target=zen4         # hpc7a AVX-512
+# target=zen5         # hpc8a AVX-512
+
+export SPACKTARGET="arch=linux-rhel10-$target"
 
 export EFA_INSTALLER_VER='1.48.0'
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-changelog.html

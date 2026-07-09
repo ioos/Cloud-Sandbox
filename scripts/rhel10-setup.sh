@@ -20,7 +20,6 @@ sudo setenforce 0
 #setup_aliases
 #setup_environment
 
-
 # Need to debug this
 # setup_prefect-server
 
@@ -33,37 +32,20 @@ sudo setenforce 0
 # Compilers and libraries
 #install_python_modules_user
 
-# remove_spack
 # install_spack
-echo "Done"
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
-
 # Install compilers, mkl, and mpi
+
 # install_intel_oneapi_dnf
 
-module load intel/compiler/2024.2.1
-module load intel/compiler-intel-llvm/2024.2.1
-module load intel/ifort/2024.2.1
-module load intel/mpi/2021.13 
-module load intel/mkl/2024.2
+create_spack-environment
 
-module list
+# build_spack-environment
 
 exit
 
-spack compiler find --scope site
-
-## Add spack compiler find or install intel before spack
-
-# To catch any dnf installed dependencies while debugging
-# spack external find --not-buildable --scope site
-
-# install_esmf_spack              # also installs netcdf, hdf5, intel-mpi
-exit 0
-
-install_petsc_intelmpi-spack
 install_nceplibs-spack
 
 # install_ffmpeg

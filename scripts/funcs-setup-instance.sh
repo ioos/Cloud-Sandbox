@@ -581,11 +581,13 @@ install_spack() {
     return
   fi
 
-  sudo mkdir -p $SPACK_DIR
-  sudo chown $USER:$USER $SPACK_DIR
-  git clone -q https://github.com/spack/spack.git $SPACK_DIR
-  cd $SPACK_DIR
-  git checkout -q $SPACK_VER
+  if [ ! -d $SPACK_DIR ]; then
+    sudo mkdir -p $SPACK_DIR
+    sudo chown $USER:$USER $SPACK_DIR
+    git clone -q https://github.com/spack/spack.git $SPACK_DIR
+    cd $SPACK_DIR
+    git checkout -q $SPACK_VER
+  fi
 
   # Don't add this if it is already there
   grep "\. $SPACK_DIR/share/spack/setup-env.sh" ~/.bashrc >& /dev/null
@@ -595,8 +597,8 @@ install_spack() {
   fi
 
   # Location for overriding default configurations
-  sudo mkdir /etc/spack
-  sudo chown $USER:$USER /etc/spack
+  #sudo mkdir /etc/spack
+  #sudo chown $USER:$USER /etc/spack
  
   . $SPACK_DIR/share/spack/setup-env.sh
 
@@ -619,29 +621,149 @@ install_spack() {
   
   spack compiler find --scope site
 
-  ###############################################
-  # Use system installed packages when available
-  # had some gettext build issues, using the system one resolved it
-  ###############################################
   # scope 
   # site -- changes saved in SPACK_DIR
   # system -- changes globally in /etc/spack
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
-  # spack external find --scope site
-  spack external find --not-buildable --scope site
+  # spack external find --not-buildable --scope site
+  spack external find --scope site
 
   # Note: to recreate modulefiles
   # spack module tcl refresh -y
 
   # This is spack's mirror of some libraries
-  spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
+  # spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
+  spack mirror add --scope site spack-public https://cache.spack.io
   spack buildcache keys --install --trust
 
   cd $home
   echo "${FUNCNAME[0]} finished"
 }
+
+#-----------------------------------------------------------------------------#
+
+add_spack_site_external() {
+    local pkg="$1"
+    local spec="$2"
+    local prefix="$3"
+    local file="${SPACK_DIR}/etc/spack/site/packages.yaml"
+
+    mkdir -p "$(dirname "$file")"
+
+    if [ ! -f "$file" ]; then
+        printf '%s\n' 'packages:' > "$file"
+    fi
+
+    # Don't add it twice
+    if grep -q "^  ${pkg}:" "$file"; then
+        return
+    fi
+
+    cat >> "$file" <<EOF
+  ${pkg}:
+    externals:
+    - spec: ${spec}
+      prefix: ${prefix}
+    buildable: false
+
+EOF
+}
+
+#-----------------------------------------------------------------------------#
+
+create_spack-environment() {
+
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
+  echo "Setting up spack environment ... "
+
+  if [ ! -d /save ] ; then
+    echo "/save does not exst. Setup the paths first."
+    return
+  fi
+
+  cd $SPACK_DIR
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  spack env create /save/environments/rhel10-x86_64_v3
+  spack env activate -p /save/environments/rhel10-x86_64_v3
+
+  spack config add 'modules:default:enable:[tcl]'
+  # spack config add 'modules:default:roots:tcl:/save/environments/rhel10-x86_64_v3/modules/'
+
+  spack config add 'concretizer:targets:granularity:generic'
+  spack config add 'packages:all:require:[target=x86_64_v3]'
+
+  cd $home
+  echo "${FUNCNAME[0]} finished"
+}
+
+#-----------------------------------------------------------------------------#
+
+build_spack-environment () {
+
+  echo "Running ${FUNCNAME[0]} ..."
+  home=$PWD
+
+  spack env activate -p /save/environments/rhel10-x86_64_v3
+
+  #COMPILER=intel@${INTEL_COMPILER_VER}
+
+  COMPILER=intel-oneapi-compilers@${ONEAPI_VER}
+
+  # Add packages
+
+  spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
+
+#  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
+
+  spack add "petsc+mpi %${COMPILER}"
+
+#  # NCEPLIBS
+  package_list='
+'
+
+#    prod-util
+#    bacio
+#    bufr
+#    g2
+#    nemsio
+#    sigio
+#    w3emc
+#    w3nco
+#    grib-util
+#  '
+#
+  for package in $package_list
+  do
+    echo "Package: $package"
+    spack add ${package}%${COMPILER}
+  done
+
+#
+#  COMPILER=gcc@$GCC_VER
+#  spack add wgrib2%${COMPILER}
+
+  spack concretize --force --fresh 2>&1 | tee log.concretize
+
+  # The install stops when the terminal times out - use tmux
+  #spack install $SPACKOPTS 2>&1 | tee log.install
+
+  spack install $SPACKOPTS
+
+  # Create modulefiles
+  spack module tcl refresh --delete-tree -y
+
+# HERE
+  cd $home
+  echo "${FUNCNAME[0]} finished"
+
+}
+
 
 #-----------------------------------------------------------------------------#
 
@@ -715,16 +837,16 @@ repo_gpgcheck=1
 gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 EOF
 
-  # sudo rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-  # sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.1.0.x86_64
-  # sudo dnf -y install intel-oneapi-compiler-fortran-2023.1.0.x86_64
-
   mkdir /save/environments/modulefiles
+
+  # Below might be needed
+  # sudo dnf -y install clang19 llvm19-toolset
 
   sudo dnf -y install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-mkl-devel-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-mkl-classic-devel-$ONEAPI_MAJOR_MINOR
+  sudo dnf -y install intel-oneapi-openmp-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-mpi-devel-$INTEL_MPI_VER
 
   # intel-oneapi-mkl-classic-2024.2.x86_64
@@ -738,9 +860,37 @@ EOF
   cd /opt/intel/oneapi/
   sudo ./modulefiles-setup.sh --force --ignore-latest --output-dir=/save/environments/modulefiles/intel
 
-  # Might need to add this back into .bashrc
-  module use -a /save/environments/modulefiles
-  echo "module use -a /save/environments/modulefiles" >> ~/.bashrc
+  module load intel/compiler/2024.2.1
+  module load intel/compiler-intel-llvm/2024.2.1
+  module load intel/ifort/2024.2.1
+  module load intel/mpi/2021.13
+  module load intel/mkl/2024.2
+
+  ## spack compiler find or install intel before spack
+  spack compiler find --scope site
+
+  spack external find --not-buildable --scope site
+
+  # Manually add mpi and mkl externals so spack doesn't build new ones
+
+  add_spack_site_external \
+    intel-oneapi-mkl \
+    intel-oneapi-mkl@2024.2 \
+    /opt/intel/oneapi
+
+  add_spack_site_external \
+    intel-oneapi-mpi \
+    intel-oneapi-mpi@2021.13 \
+    /opt/intel/oneapi
+
+  spack config --scope site add 'packages:all:providers:blas:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:lapack:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:scalapack:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:mpi:[intel-oneapi-mpi]'
+
+  # spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
+  spack mirror add spack-public https://cache.spack.io
+  spack buildcache keys --install --trust
 
   cd $home
   echo "${FUNCNAME[0]} finished"
@@ -759,7 +909,6 @@ install_intel_oneapi_spack () {
   GCC_COMPILER=gcc@$GCC_VER
 
   spack install $SPACKOPTS intel-oneapi-compilers@${ONEAPI_VER} $SPACKTARGET
-
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin/intel64
   spack compiler add --scope site `spack location -i intel-oneapi-compilers \%${GCC_COMPILER}`/compiler/latest/linux/bin
 
