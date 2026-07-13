@@ -31,7 +31,7 @@ install_intel_oneapi_dnf
 install_spack-stack_prereqs
 
 setup_spack-stack 
-build_spack-environment
+build_spack-stack-environment
 
 # create node image
 ###################################

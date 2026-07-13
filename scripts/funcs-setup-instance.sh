@@ -168,7 +168,6 @@ setup_environment () {
 
 configure_optimizations () {
 
-  set -x
   echo "In ${FUNCNAME[0]}"
 
   # original (virtual-guest) 32 minutes
@@ -426,7 +425,7 @@ setup_spack-stack () {
 
 #-----------------------------------------------------------------------------#
 
-build_spack-environment () {
+build_spack-stack-environment () {
 
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
@@ -817,7 +816,6 @@ build_spack-environment () {
   # Create modulefiles
   spack module tcl refresh --delete-tree -y
 
-# HERE
   cd $home
   echo "${FUNCNAME[0]} finished"
 
