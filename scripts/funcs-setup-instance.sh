@@ -64,6 +64,9 @@ setup_environment () {
   sudo dnf -y install subversion
   sudo dnf -y install bc
   sudo dnf -y install htop
+  sudo dnf -y install cmake
+
+  sudo dnf -y install libcurl-devel
 
   # ESMF/netcdf dependencies # had to manually add to packages.yaml externals
   sudo dnf -y install zlib-ng-devel
@@ -115,43 +118,44 @@ setup_environment () {
     sudo rm -Rf "./aws"
   fi
 
+
+  ## Set up environment modules
+  #############################
+
+  # Only do this once 
+  if [ ! -d /save/environments/modulefiles ] ; then
+    sudo mkdir -p /save/environments/modulefiles
+    echo "/save/environments/modulefiles" | sudo tee -a /etc/environment-modules/modulespath
+
+    cd /save/environments
+    sudo chown $USER:$USER .
+  fi
+
   sudo dnf -y install environment-modules
+
+  sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
 
   # Only do this once
   grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
   if [ $? -ne 0 ] ; then
     echo . /usr/share/Modules/init/bash >> ~/.bashrc
     echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
-    . /usr/share/Modules/init/bash
   fi
 
-  sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
+  . /usr/share/Modules/init/bash
 
   # module --version 
+  echo $MODULESHOME
+  echo $MODULEPATH
 
-  # Can use Lua modules, newer but not 100% backwards compatible despite claims otherwise
+
+  # Can use Lua modules, newer but not 100% compatible wit tcl modules
   # if [ -e /usr/share/lmod/lmod/init/profile ]; then
   #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
   # fi
 
-  # Might need to use older tcl modules instead of Lua
-  # sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
 
-  # Only do this once
-  if [ ! -d /save/environments/modulefiles ] ; then
-    sudo mkdir -p /save/environments/modulefiles
-    echo "/save/environments/modulefiles" | sudo tee -a ${MODULESHOME}/init/.modulespath
-
-    # This is not needed if using Lmod, breaks lua modules
-    #    echo ". /usr/share/Modules/init/bash" | sudo tee -a /etc/profile.d/custom.sh
-    #    echo "source /usr/share/Modules/init/csh" | sudo tee -a /etc/profile.d/custom.csh
-    #    . ~/.bashrc
-
-    cd /save/environments
-    sudo chown $USER:$USER .
-  fi
-
-  # Add unlimited stack size 
+  ## Add unlimited stack size 
   echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
 
   # sudo dnf clean {option}
@@ -682,8 +686,8 @@ install_spack() {
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
-  # spack external find --not-buildable --scope site
-  spack external find --scope site
+  # spack external find --scope site
+  spack external find --not-buildable --scope site
 
   # Note: to recreate modulefiles
   # spack module tcl refresh -y
@@ -892,10 +896,8 @@ repo_gpgcheck=1
 gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 EOF
 
-  mkdir /save/environments/modulefiles
-
   # Below might be needed
-  # sudo dnf -y install clang19 llvm19-toolset
+  sudo dnf -y install clang19 llvm19-toolset
 
   sudo dnf -y install intel-oneapi-compiler-fortran-$ONEAPI_MAJOR_MINOR
   sudo dnf -y install intel-oneapi-compiler-dpcpp-cpp-$ONEAPI_MAJOR_MINOR
@@ -912,8 +914,16 @@ EOF
   echo "Installed the following at /opt/intel/oneapi:"
   dnf list installed "intel-oneapi-*"
 
+  . /usr/share/Modules/init/bash
+
   cd /opt/intel/oneapi/
   sudo ./modulefiles-setup.sh --force --ignore-latest --output-dir=/save/environments/modulefiles/intel
+
+  # MODULEPATH might not be loaded right
+  echo $MODULESHOME
+  echo $MODULEPATH
+
+  module use -a /save/environments/modulefiles
 
   module load intel/compiler/2024.2.1
   module load intel/compiler-intel-llvm/2024.2.1
