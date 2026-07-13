@@ -162,17 +162,65 @@ setup_environment () {
 
 #-----------------------------------------------------------------------------#
 
+configure_optimizations () {
+
+  set -x
+  echo "In ${FUNCNAME[0]}"
+
+  # original (virtual-guest) 32 minutes
+  # sudo tuned-adm profile throughput-performance  # 33 minutes
+  # sudo tuned-adm profile hpc-compute  # 35 minutes
+
+  sudo tuned-adm profile network-latency  # 32 minutes
+
+  # tuned-adm profile_info
+
+  # - accelerator-performance     - Throughput performance based tuning with disabled higher latency STOP states
+  # - aws                         - Optimize for aws ec2 instances
+  # - balanced                    - General non-specialized tuned profile
+  # - hpc-compute                 - Optimize for HPC compute workloads
+  # - network-latency             - Optimize for deterministic performance at the cost of increased power consumption, focused on low latency network performance
+  # - network-throughput          - Optimize for streaming network throughput, generally only necessary on older CPUs or 40G+ networks
+  # - throughput-performance      - Broadly applicable tuning that provides excellent performance across a variety of common server workloads
+  # - virtual-guest               - Optimize for running inside a virtual guest
+
+  # if your application is network-bound, use network-latency
+  # network-latency is better for jobs requiring heavy node-to-node communication over the Elastic Fabric Adapter (EFA).
+
+# Creating a custom tuned profile to make some extra changes/optimizations
+  sudo mkdir -p /etc/tuned/profiles/hpc-performance
+  sudo tee /etc/tuned/profiles/hpc-performance/tuned.conf << EOF
+[main]
+summary=Custom optimization for AWS EC2 Hpc types
+include=network-latency
+
+[cpu]
+force_latency = cstate.id:0
+governor = performance
+
+[vm]
+transparent_hugepages = never
+
+[sysctl]
+kernel.numa_balancing = 0
+EOF
+
+  sudo tuned-adm profile hpc-performance
+
+  echo "${FUNCNAME[0]} finished"
+}
+
+
+#-----------------------------------------------------------------------------#
+
 setup_prefect-server () {
     # Sets up a local prefect server
 
     # TODO: Note: there is a docker container that might be better to use
-    # TODO: Disable the prefect-server daemon before creating a new AMI
 
     echo "Running ${FUNCNAME[0]} ..."
 
     home=$PWD
-
-    sudo pip3 install prefect==$PREFECT_VER
 
     # Create system user for prefect daemon
     sudo groupadd --system prefect
@@ -180,8 +228,15 @@ setup_prefect-server () {
     sudo mkdir -p /save/environments/prefect/.prefect
     sudo chown prefect:prefect /save/environments/prefect/.prefect
 
-    sudo mkdir /home/prefect
-    sudo chown prefect:prefect /home/prefect
+    sudo mkdir -p /opt/prefect
+    sudo chown -R prefect:prefect /opt/prefect
+
+    # Create a venv for prefect server instead of installing prefect as root
+    sudo -u prefect python3 -m venv /opt/prefect/venv
+    sudo -u prefect /opt/prefect/venv/bin/pip install --upgrade pip
+    sudo -u prefect /opt/prefect/venv/bin/pip install prefect==$PREFECT_VER
+
+    # sudo pip3 install prefect==$PREFECT_VER
 
     # Create the system daemon
     sudo cp system/prefect-server.service /etc/systemd/system/
@@ -1427,7 +1482,6 @@ create_snapshot () {
   aws_region=`curl http://169.254.169.254/latest/meta-data/placement/region`
   instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 
-  # TODO: remove hardcoded values
   name_tag="$message snapshot of $instance_id"
   echo "create_snapshot: name_tag is: $name_tag"
 

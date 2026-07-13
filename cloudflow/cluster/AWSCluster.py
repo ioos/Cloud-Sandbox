@@ -424,6 +424,9 @@ class AWSCluster(Cluster):
         return self.PPN
 
 
+    ########################################################################
+
+
     def create_instances(self):
         """ Provision the configured cluster in the cloud.
 
@@ -505,7 +508,9 @@ class AWSCluster(Cluster):
         return instances
 
 
- 
+    ########################################################################
+
+
     def __save_instance_data(self, instances):
         """ Prefect 3 can't serialize and cache EC2 Instance type
             so we save the essential EC2 Instance data here.

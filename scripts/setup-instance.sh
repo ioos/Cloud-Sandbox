@@ -20,8 +20,8 @@ setup_paths
 setup_aliases
 setup_environment
 
-# Need to debug this
-# setup_prefect-server
+# Setup Prefect as a system daemon
+setup_prefect-server
 
 # install_jupyterhub # Requires some manual work
 setup_ssh_mpi
@@ -44,12 +44,13 @@ create_spack-environment
 
 build_spack-environment
 
-# TODO: create an output file to contain all of this state info - json
+configure_optimizations
 
 # create node image
 ###################################
 
-spack clean
+spack clean --all
+sudo dnf clean all
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
@@ -63,6 +64,16 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
+## disable prefect server daemon
+sudo systemctl stop prefect-server
+sudo systemctl disable prefect-server
+
 ./create_image.sh $ami_name $project_tag
+
+## re-enable prefect server daemon
+sudo systemctl enable prefect-server
+sudo systemctl start prefect-server
+
+sudo setenforce 1
 
 echo "Setup completed!"

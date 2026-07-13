@@ -5,11 +5,11 @@
 "nodeCount" : 8,
 "tags"      : [ 
                 { "Key": "Name", "Value": "seccofs-hotstart" },
-                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
+                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox-COMT" }
               ],
 
 "key_name"        : "ioos-sandbox",
-"image_id"        : "ami-0f51a6b708224abfb",
+"image_id"        : "ami-01c7852a707469667",
 "sg_ids"          : [ "sg-05cc98305ade69e79",
                       "sg-0e61daf5532b0d2e7",
                       "sg-01c9c2d5f3b42619f" ],
