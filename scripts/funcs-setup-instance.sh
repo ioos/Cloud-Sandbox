@@ -819,6 +819,7 @@ build_spack-environment () {
   # Create modulefiles
   spack module tcl refresh --delete-tree -y
 
+  spack env deactivate
   cd $home
   echo "${FUNCNAME[0]} finished"
 
