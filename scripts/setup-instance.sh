@@ -40,9 +40,9 @@ install_spack
 
 install_intel_oneapi_dnf
 
-create_spack-environment
+#create_spack-environment
 
-build_spack-environment
+#build_spack-environment
 
 configure_optimizations
 
