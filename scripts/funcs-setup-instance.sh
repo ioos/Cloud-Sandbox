@@ -685,8 +685,11 @@ install_spack() {
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
-  # spack external find --scope site
-  spack external find --not-buildable --scope site
+  # spack external find --not-buildable --scope site
+  # spack external find --not-buildable --scope site
+
+  spack external find --scope site
+  spack external find --not-buildable --scope site cmake
 
   # Note: to recreate modulefiles
   # spack module tcl refresh -y
@@ -932,10 +935,8 @@ EOF
   ## spack compiler find or install intel before spack
   spack compiler find --scope site
 
-  spack external find --not-buildable --scope site
 
   # Manually add mpi and mkl externals so spack doesn't build new ones
-
   add_spack_site_external \
     intel-oneapi-mkl \
     intel-oneapi-mkl@2024.2 \
@@ -946,6 +947,7 @@ EOF
     intel-oneapi-mpi@2021.13 \
     /opt/intel/oneapi
 
+  spack config --scope site add 'packages:all:providers:mkl:[intel-oneapi-mkl]'
   spack config --scope site add 'packages:all:providers:blas:[intel-oneapi-mkl]'
   spack config --scope site add 'packages:all:providers:lapack:[intel-oneapi-mkl]'
   spack config --scope site add 'packages:all:providers:scalapack:[intel-oneapi-mkl]'
