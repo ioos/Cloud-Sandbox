@@ -27,7 +27,8 @@ Cloud-Sandbox/cluster.configs
 Create a new directory based on your affiliated organization. (Ex. `mkdir USER_AFFILIATION`). Copy `template.ioos` into a new file called `your_model_name.config` to specify the AWS cloud resource configuration you would like your model to run on. Move the new file `your_model_name.config` in your user affiliation directory. In that file you can edit the following variables: 
 - nodeType (Eligible AWS node instances are listed within the `cloudflow/cluster/AWSCluster.py` Python script under variable `awsTypes` with the associated CPU core count) 
 - nodeCount (Number of nodes you want to utilize of the given AWS node instance. A word of caution as the Cloud-Sandbox AWS account does have caps on the number of nodes you can allocate for a given instance)
-- tags (The Values for “Name” and “Project” should reflect your model name and affiliation). 
+- tags (The Values for “Name” and “Project” should reflect your model name and affiliation).
+- image_id (The specific head node image that your user group is currently on. Defaults currently point to the NOS Sandbox image, if unsure what this specification should be then contact the Sandbox help desk: sandbox.helpdesk@noaa.gov).
 
 5. **Build the workflow for your model - `workflow_main.py`**
 Change directory into 
@@ -36,10 +37,7 @@ Cloud-Sandbox/cloudflow/workflows
 ~~~ 
 
 Edit the `workflow_main.py` script. 
-- In the function `main()` under the for loop `for jobfile in joblist:`
-   - add an `elif jobtype == ` block with your JOBTYPE that you specified in the job file from Step #3. 
-      - You can copy the block for `ucla-roms` for most models and replace the jobtype. Otherwise, choose or create a function in `Cloud-Sandbox/cloudflow/workflows/flows.py`
-   - If you need to execute a specific Python environment pathway, then you will also need to replace the `-S python3 -u` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/python`.
+   - If you need to execute a specific Python environment pathway compatible with the cloudflow code base, then you will need to replace the `-S python3 -u` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/cloudflow_environment/python`. Cloudflow environment Python installation instructions are already available within the `Cloud-Sandbox/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md` file for Sandbox users. 
 
 6. **Build the workflow for your model - `your_model_name.py`** 
 We will create a file to read in the keywords from your job file by creating a new script and class for your model.
@@ -82,13 +80,13 @@ Edit `tasks.py`
   - Copy and modify the code logic like in the `schism`, `dflowfm`, or `ucla-roms` code blocks for each model class, then add the jobtype of your specific model class.
   
 
-9. **Build the workflow for your model - `basic_launcher.py`**	
+9. **Build the workflow for your model - `experiment_launcher.sh`**	
 This controls the launch of your model inside the Cloud-Sandbox.
 Change directory into 
 ~~~bash
 Cloud-Sandbox/cloudflow/workflows
 ~~~ 	
-Modify `basic_launcher.sh` 
+Modify `experiment_launcher.sh` 
 - If you completed Step #8 due to model information required from the job file to kick start the executable, 
   - make an `if` shell script block to ingest the special input argument(s) 
     - You can simply follow along with the code blocks for `schism`, `dflowfm`, or `ucla-roms` for the `export` statements. 
@@ -116,7 +114,7 @@ Cloud-Sandbox/cloudflow
 ~~~ 	
 Make sure you are in the `cloudflow` directory before running any models. Follow the steps below to submit the Cloud-Sandbox job submission to the background of the head node and monitor your job progress:
 ~~~bash
-./workflows/workflow_main.py ../cluster.configs/your_model_name.config ../job.configs/your_model_name.exp &> your_model_test.out &
+./workflows/workflow_main.py ../cluster.configs/your_model_name.config ../job.configs/your_model_name.exp > your_model_test.out &
 ~~~
 To see the progress of the Cloud-Sandbox execution of your model
 ~~~bash
