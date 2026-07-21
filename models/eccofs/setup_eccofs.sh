@@ -46,13 +46,16 @@ if [ ! -d $MODEL_DIR/fix ]; then
 fi
 
 cd $MODEL_DIR/fix
-$CURHOME/get_eccofs_fixfiles_s3.sh
+if [ ! -d eccofs ]; then
+  $CURHOME/get_eccofs_fixfiles_s3.sh
+fi
 
 # Build it
 echo "Building eccofs ... "
 cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
 cd $MODEL_DIR/sorc
-./build-eccofs-only.sh
+# ./build-eccofs-only.sh
+
 
 # Get test-case data
 echo "Retrieving the forcing data from S3 ..."

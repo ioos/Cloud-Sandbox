@@ -20,7 +20,13 @@ def main():
     #vdir = '/'.join(vdir)
     #localpath = '/'.join(vdir.split('/')[0:-1])
     #print(localpath)
-    test_get_baseline_lo()
+    #test_get_baseline_lo()
+
+    tiling=utils.getTiling(192)
+    NtileI = tiling['NtileI']
+    NtileJ = tiling['NtileJ']
+
+    print(f"{NtileI} {NtileJ}")
 
 
 if __name__ == '__main__':

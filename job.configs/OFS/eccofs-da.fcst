@@ -1,0 +1,18 @@
+{
+  "MODEL"     : "ROMS",
+  "JOBTYPE"   : "romsforecast",
+  "APP"       : "eccofs-da",
+  "CDATE"     : "20190101",
+  "HH"        : "00",
+  "COMROT"    : "/com/ec2-user/eccofs-da",
+  "SAVEDIR"   : "/save/ec2-user/roms_eccofs/RBL4DVAR_mixres",
+  "PTMP"      : "/ptmp/ec2-user",
+  "TIME_REF"  : "20110101.0d0",
+  "BUCKET"    : "",
+  "BCKTFLDR"  : "",
+  "NTIMES"    : "",
+  "OUTDIR"    : "",
+  "OCEANIN"   : "",
+  "OCNINTMPL" : ""
+}
+

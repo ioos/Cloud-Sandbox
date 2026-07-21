@@ -600,9 +600,9 @@ class AWSCluster(Cluster):
 
                  print(
                      f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait "
-                     "{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
-                     "delay time will be implemented over each retry interval. Cloudflow will retry "
-                     "{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
+                     f"{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
+                     f"delay time will be implemented over each retry interval. Cloudflow will retry "
+                     f"{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
                  )
                  retries = 0
 
@@ -626,13 +626,13 @@ class AWSCluster(Cluster):
                                      self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
                                      print(
                                          f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
-                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                         f"(Attempt {retries}/{self.vm_max_retries})"
                                      )
                                      time.sleep(self.vm_retry_delay)
                                  else:
                                      print(
                                          f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
-                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                         f"(Attempt {retries}/{self.vm_max_retries})"
                                      )
                                      time.sleep(self.vm_retry_delay)
                          else:

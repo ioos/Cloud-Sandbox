@@ -118,6 +118,13 @@ class ROMSForecast(Job):
         if self.APP == 'wrfroms':
             self.__make_couplerin()
             self.__make_wrfin()
+
+        if self.APP == 'eccofs-da':
+            tiling = util.getTiling(self.NPROCS, ratio=1.0)
+            self.NtileI = tiling['NtileI']
+            self.NtileJ = tiling['NtileJ']
+            print(f"PT DEBUG: NtileI: {self.NtileI}, NtileJ: {self.NtileJ}")
+
         return
 
 
@@ -148,6 +155,11 @@ class ROMSForecast(Job):
         self.OUTDIR = cfDict['OUTDIR']
         self.OCEANIN = cfDict['OCEANIN']
         self.OCNINTMPL = cfDict['OCNINTMPL']
+
+        # Temporary hack for eccofs-da development
+        # nPETsX and nPETsY needed in its submit script
+        self.NtileI = 1
+        self.NtileJ = 1
 
         if self.CDATE == "today":
             today = datetime.date.today().strftime("%Y%m%d")

@@ -300,7 +300,7 @@ def getTiling(totalCores, ratio=1.0):
         else:
             ceil -= 1
 
-    print("NtileI : ", NtileI, " NtileJ ", NtileJ)
+    print("NtileI : ", NtileI, " NtileJ : ", NtileJ)
 
     if debug:
         print(f"DEBUG: totalCores: {totalCores} I*J: {NtileI * NtileJ} ratio: {ratio} I/J: {NtileI / NtileJ}")

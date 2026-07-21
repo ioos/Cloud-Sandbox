@@ -1,13 +1,14 @@
 #!/bin/bash
 # Script used to launch forecasts.
 # BASH is used in order to bridge between the Python interface and NCO's BASH based run scripts
-set -x
-set -a
+# set -x
+
+set -ae
 
 ulimit -c unlimited
 ulimit -s unlimited
 
-#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
 if [ $# -lt 8 ] ; then
@@ -19,7 +20,6 @@ fi
 #       set these values AFTER loading modules
 #       older intel MPI fabric does not work on hpc8a
 
-#export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
 
 export FI_PROVIDER=efa
@@ -32,18 +32,14 @@ export FI_PROVIDER_PATH=/opt/amazon/efa/lib64/libfabric
 
 # module load libfabric-aws
 
-# LiveOcean
-#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-#export I_MPI_OFI_PROVIDER=efa
-#export I_MPI_FABRICS=ofi
 #export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 #export I_MPI_DEBUG=4      # Will output task mapping
-#export FI_PROVIDER=efa
 
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
 
+set -x
 export CDATE=$1
 export HH=$2
 export COMOUT=$3     # job.OUTDIR
@@ -55,6 +51,7 @@ export HOSTS=$8
 export APP=$9
 export EXEC=${10}
 export XTRA_ARGS=${11}   # extra args needed for schism/secofs, and eccofs
+set +x
 
 #OpenMPI
 #mpirun --version
@@ -151,7 +148,77 @@ case $APP in
     ;;
 
 
+  ##############################################################################
+
+  eccofs-da)
+
+    #export CDATE=$1
+    #export HH=$2
+    #export COMOUT=$3     # job.OUTDIR
+    #export SAVEDIR=$4
+    #export PTMP=$5
+    #export NPROCS=$6
+    #export PPN=$7
+    #export HOSTS=$8
+    #export APP=$9
+    #EXEC=${10}
+    #XTRA=${11}
+
+    set -x
+    echo "PT DEBUG"
+    export NtileI=${12}
+    export NtileJ=${13}
+    echo "PT DEBUG"
+    set +x
+
+    #export MPIOPTS=${MPIOPTS:-"-np $NPP -ppn $PPN "}
+
+    export OFS=$APP
+    export HOMEnos=$SAVEDIR
+    export JOBDIR=$HOMEnos
+
+    cd "$JOBDIR" || exit 1
+
+    # A lot of hardcoded stuff in this script, will need to re-work things to generalize it
+    # Create a job/template with it and sed/replace in job.init with nPETsX and nPETxY (NTILEI NTILEJ) etc.
+    # A bit of a drift from operational versions, can work it out later
+    export JOBSCRIPT=$JOBDIR/submit_mixres_rbl4dvar.sh
+
+    module use -a $JOBDIR/modulefiles
+    MODULEFILE=intel_x86_64
+    module load $MODULEFILE
+
+    export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
+
+    export FI_PROVIDER=efa
+    export I_MPI_FABRICS=ofi
+    export I_MPI_OFI_PROVIDER=efa
+    export I_MPI_DEBUG=1
+
+    #export NPROCS=64
+    #export PPN=64
+
+    #export NPROCS=384
+    #export PPN=192
+
+    export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"  
+
+    export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+    export FI_PROVIDER_PATH=/opt/amazon/efa/lib64/libfabric 
+
+    #$JOBSCRIPT $JOBARGS
+
+    $JOBSCRIPT
+    result=$?
+    echo "PT DEBUG: I am here $PWD"
+    ;;
+
+
+
+  ##############################################################################
+
   secofs)
+
     # TODO: use an envvar or something to indicate /ptmp use, think about the many different ways to do this
 
     mkdir -p $COMOUT
@@ -172,7 +239,6 @@ case $APP in
     #TODO: make this part of the job config
     module load $MODULEFILE
 
-    #export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
     export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
 
     export FI_PROVIDER=efa

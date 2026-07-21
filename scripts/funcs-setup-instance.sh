@@ -66,6 +66,9 @@ setup_environment () {
   sudo dnf -y install htop
   sudo dnf -y install cmake
 
+  sudo dnf -y install git-lfs
+  sudo dnf -y install perl-Switch
+
   sudo dnf -y install libcurl-devel
 
   # ESMF/netcdf dependencies # had to manually add to packages.yaml externals
@@ -685,8 +688,6 @@ install_spack() {
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
-  # spack external find --not-buildable --scope site
-  # spack external find --not-buildable --scope site
 
   spack external find --scope site
   spack external find --not-buildable --scope site cmake
@@ -784,6 +785,8 @@ build_spack-environment () {
 
   spack add "petsc+mpi %${COMPILER}"
 
+  spack add "parallelio+pnetcdf+mpi+ncint %${COMPILER}"
+
 #  # NCEPLIBS
   package_list='
 '
@@ -798,7 +801,7 @@ build_spack-environment () {
 #    w3nco
 #    grib-util
 #  '
-#
+
   for package in $package_list
   do
     echo "Package: $package"

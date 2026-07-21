@@ -18,6 +18,9 @@ if [ ! -d $INPUTDIR ]; then
     if [ $result -ne 0 ]; then
         echo "Unable to create $INPUTDIR, might need sudo permissions"
     fi
+else
+    echo "$INPUTDIR already exists, not downloading data"
+    exit 0
 fi
 
 cd $INPUTDIR || exit 1

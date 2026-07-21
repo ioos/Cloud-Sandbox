@@ -409,6 +409,7 @@ def forecast_run(cluster: Cluster, job: Job):
     NPROCS = job.NPROCS
     OUTDIR = job.OUTDIR
 
+
     SAVEDIR = getattr(job, "SAVEDIR", 'none')
     PTMP = getattr(job, "PTMP", 'none')
 
@@ -428,8 +429,16 @@ def forecast_run(cluster: Cluster, job: Job):
         if APP == "adnoc":
             time.sleep(60)
             result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC], stderr=subprocess.STDOUT, universal_newlines=True)
+
+        elif APP == "eccofs-da":
+
+            print(f"PT DEBUG: str(job.NtileI): {str(job.NtileI)}, str(job.NtileJ): {str(job.NtileJ)}")
+
+            result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, "not-used", str(job.NtileI), str(job.NtileJ)], stderr=subprocess.STDOUT, universal_newlines=True) 
+
         else:
             result = subprocess.run([runscript, CDATE, HH, OUTDIR, SAVEDIR, PTMP, str(NPROCS), str(PPN), HOSTS, APP, job.EXEC, NSCRIBES], stderr=subprocess.STDOUT, universal_newlines=True)
+
 
 # Fix double logging and generic exception,
         # text=True,
