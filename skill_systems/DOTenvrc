@@ -1,0 +1,8 @@
+export PKR_VAR_aws_profile=noaa
+# export PKR_VAR_aws_region=us-east-2
+export PKR_VAR_instance_type=r5.4xlarge
+export PKR_VAR_vpc=vpc-0c78d0d63b7a100df
+export PKR_VAR_subnet=subnet-01e56d2f9c1c95cc8
+export PKR_VAR_ami_name=Skills-Instance
+export PKR_VAR_volume_size=200
+export PKR_VAR_ssh_interface=private_ip
