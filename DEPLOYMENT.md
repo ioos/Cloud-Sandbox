@@ -183,14 +183,25 @@ If this happens, change the "nameprefix" variable to something unique and re-run
 
 ### Install all of the required software and libraries
 This is done automatically in `init_template.tpl`  
+
+`init_template.tpl` is run automatically when a new head-node is deployed.
+It calls `scripts/setup-instance.sh` which sets up the environment and
+all required software needed to build and run the models.
+
 Some of the things it installs:  
 - GNU Fortran, C++, and C compilers
 - IntelOne API Fortran, C++, and C compilers
 - IntelOne API MPI libraries
 - NetCDF, HDF5, and other libraries needed by the models.
 
-It takes around 45 minutes for the entire setup to complete,
-and about another 10 minutes for the machine image/snapshot creation.  
+It takes around an hour for the entire setup to complete if using s3 spack mirror/build-cache 
+for pre-built binaries. Otherwise it will take several hours to build all of the software 
+depending on the type/size of the instance specified for the head-node.
+
+At the end of the setup, a machine image/snapshot will be created that will be used when creating
+the compute nodes in the worklow execution. A record of each machine image creation is kept in 
+the home folder.
+
 Wait a few minutes before logging in, it takes a minute or two for the instance to boot up.
 
 Details about the created instance and how to login will be output when completed.
@@ -216,6 +227,13 @@ Example:
 ssh -i my-sandbox.pem ec2-user@ec2-3-219-217-151.compute-1.amazonaws
 sudo -i
 tail -f /root/setup.log
+```
+
+On RHEL 10, additional output can be found in the following file. This is the output from 
+the system initialization and anything from the terraform/init_template.tpl file.
+
+```
+/var/log/cloud-init-output.log 
 ```
 
 **Depoyment info document**

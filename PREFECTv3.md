@@ -7,25 +7,24 @@ finishing correctly if an Exception is encountered.
 Recommended usage is to launch the prefect server as a background task and 
 configure your account point to the local server.
 
-We are working on setting up a daemon process to automatically launch when the 
-system is booted. Alternatively, Prefect has some recommendations to run the 
-server in a Docker container. This will be setup automatically in future
-deployments.
+### Prefect now runs as a system process
 
-### Start the prefect server
+This is setup in the head-node deployment scripts.
 
-`prefect server start --background`
+To see the status:
 
-By default, the server will run on the localhost 127.0.0.1 port:4200
+`sudo systemctl status prefect-server`
+
+By default, the server runs on the localhost 127.0.0.1 port:4200
 
 ### Configure your profile to use the running server
 `prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"`
 
-### Additional settings to persist results
+### Additional settings to persist results are already set in the systemd service
 `prefect config set PREFECT_RESULTS_PERSIST_BY_DEFAULT="true"`
 `prefect config set PREFECT_TASKS_DEFAULT_PERSIST_RESULT="true"`
 
-### These settings will be added to ~/.prefect/profile.toml
+### These settings might need to be added to user's ~/.prefect/profiles.toml or run the prefect config set steps above
 ```
 export PREFECT_API_URL="http://localhost:4200/api"
 export PREFECT_RESULTS_PERSIST_BY_DEFAULT = "true"
