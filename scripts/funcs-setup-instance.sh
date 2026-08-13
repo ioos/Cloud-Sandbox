@@ -688,6 +688,11 @@ install_spack() {
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
+  # spack external find --not-buildable --scope site
+  # spack external find --not-buildable --scope site
+
+  spack external find --scope site
+  spack external find --not-buildable --scope site cmake
 
   spack external find --scope site
   spack external find --not-buildable --scope site cmake
@@ -779,11 +784,11 @@ build_spack-environment () {
 
   # Add packages
 
-  # spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
+  spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
 
   #PT OLD  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
 
-  #spack add "petsc+mpi %${COMPILER}"
+  spack add "petsc+mpi %${COMPILER}"
 
   #spack add "parallelio+pnetcdf+mpi+ncint %${COMPILER}"
 
@@ -810,7 +815,6 @@ build_spack-environment () {
     spack add ${package}%${COMPILER}
   done
 
-#
 #  COMPILER=gcc@$GCC_VER
 #  spack add wgrib2%${COMPILER}
 
