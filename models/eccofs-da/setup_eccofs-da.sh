@@ -28,7 +28,12 @@ export MODEL_DIR=$SAVEDIR/roms_eccofs
 export EXP_DIR=$MODEL_DIR/RBL4DVAR_mixres
 
 export ROMS_REPO="https://github.com/asascience-open/roms.git"
-# From Haibo: 3eaf9c5
+# From Haibo: 3eaf9c5 (maybe they used this for USEC)
+# From Julia: bf66be4
+# Testing 32c79b7
+# Author: Hernan G. Arango <arango@marine.rutgers.edu>
+# Date:   Sat Apr 25 16:40:18 2026 -0400
+#    Forcing the closing of the INI and ITL files in 4D-Var (#76)
 
 # sandbox-eccofs - from working eccofs
 # 148a4614 (HEAD -> sandbox-eccofs, origin/sandbox-eccofs) added JOBS to compile
@@ -85,7 +90,7 @@ cp -pf $CURHOME/modulefiles/$MODULEFILE $EXP_DIR/modulefiles
 
 #echo "PT testing: skipping build."
 echo "Building eccofs ... "
-# ./build_eccofs-da.sh
+./build_eccofs-da.sh
 
 echo "Done."
 

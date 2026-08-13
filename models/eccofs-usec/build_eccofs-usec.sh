@@ -16,7 +16,7 @@ export CSHOME="${PWD%/*/*}"
 echo "Cloud-Sandbox/ directory is: $CSHOME"
 
 export MODULEFILE=${MODULEFILE:=intel_x86_64}
-export MODEL_DIR=${MODEL_DIR:-$SAVEDIR/roms_eccofs}
+export MODEL_DIR=${MODEL_DIR:-$SAVEDIR/eccofs-usec}
 export EXP_DIR=${EXP_DIR:-$MODEL_DIR/RBL4DVAR_mixres}
 export ROMS_ROOT_DIR=${ROMS_ROOT_DIR:-$MODEL_DIR}
 

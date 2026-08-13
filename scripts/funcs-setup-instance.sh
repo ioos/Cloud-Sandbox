@@ -779,13 +779,15 @@ build_spack-environment () {
 
   # Add packages
 
-  spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
+  # spack add "esmf@${ESMF_VER}+pnetcdf+mpi ^intel-oneapi-mpi@${INTEL_MPI_VER} ^zlib-ng+compat %${COMPILER}"
 
-  #  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
+  #PT OLD  spack add "petsc%${COMPILER} cflags='-O3 -march=core-avx2' fflags='-O3 -march=core-avx2' cxxflags='-O3 -march=core-avx2' ^intel-oneapi-mpi@${INTEL_MPI_VER} %${COMPILER}"
 
-  spack add "petsc+mpi %${COMPILER}"
+  #spack add "petsc+mpi %${COMPILER}"
 
-  spack add "parallelio+pnetcdf+mpi+ncint %${COMPILER}"
+  #spack add "parallelio+pnetcdf+mpi+ncint %${COMPILER}"
+
+  spack add parallelio+pnetcdf+ncint+fortran ^netcdf-c+mpi+parallel-netcdf ^parallel-netcdf
 
 #  # NCEPLIBS
   package_list='

@@ -309,14 +309,10 @@ fi
 
 # Hardcoded for now
 
-set -x
-
 echo "PT DEBUG: NtileI: $NtileI, NtileJ: $NtileJ"
 
         nPETsX=${NtileI}                       # number PETs in the X-direction
         nPETsY=${NtileJ}                       # number PETs in the Y-direction
-set +x
-        
 
 ################################################################################
 
@@ -403,16 +399,19 @@ set +x
 
 #PT     MyINP_LIB=2                       # reading library: [1] standard [2] PIO
 #PT     MyOUT_LIB=2                       # writing library: [1] standard [2] PIO
-#PT# MyPIO_METHOD=2                       # [2] serial read and write of NetCDF3 (64-bit offset)
 #PT  MyPIO_METHOD=3                       # [3] parallel read and serial write of NetCDF4, delayed sync
 #PT MyPIO_IOTASKS=4                       # number of I/O processes (use more than 1 on large grids)
 #PT  MyPIO_STRIDE=8                       # stride in MPI-rank between I/O tasks (see documentation)
+#PT    MyPIO_BASE=0                       # offset for the first I/O task
+#PT   MyPIO_REARR=1                       # rearranger method: [1] box [2] subset
+#PT MyPIO_REARRCOM=0                       # rearranger communications: [0] p2p [1] coll
+#PT MyPIO_REARRDIR=0                       # rearranger direction: [0] I2C/C2I, ... [3]
 
      MyINP_LIB=1                       # reading library: [1] standard [2] PIO
      MyOUT_LIB=1                       # writing library: [1] standard [2] PIO
-#  MyPIO_METHOD=2                       # [2] serial read and write of NetCDF3 (64-bit offset)
-  MyPIO_METHOD=3                       # [3] parallel read and serial write of NetCDF4, delayed sync
- MyPIO_IOTASKS=3                       # number of I/O processes (use more than 1 on large grids)
+#  MyPIO_METHOD=3                       # [3] parallel read and serial write of NetCDF4, delayed sync
+  MyPIO_METHOD=2                       # [3] parallel read and serial write of NetCDF4, delayed sync
+ MyPIO_IOTASKS=4                       # number of I/O processes (use more than 1 on large grids)
   MyPIO_STRIDE=8                       # stride in MPI-rank between I/O tasks (see documentation)
     MyPIO_BASE=1                       # offset for the first I/O task
    MyPIO_REARR=1                       # rearranger method: [1] box [2] subset

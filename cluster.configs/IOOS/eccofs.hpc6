@@ -4,7 +4,7 @@
 "nodeType"  : "hpc6a.48xlarge",
 "vm_retry_delay": 60,
 "vm_max_retries": 5,
-"nodeCount" : 4,
+"nodeCount" : 1,
 "tags"      : [ 
                 { "Key": "Name", "Value": "eccofs" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }

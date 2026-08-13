@@ -1,39 +1,51 @@
-==> Installing "clingo-bootstrap@=spack~apps~docs+ipo+optimized+python+static_libstdcpp build_system=cmake build_type=Release commit=2a025667090d71b2c9dce60fe924feb6bde8f667 generator=make patches:=bebb819,ec99431 platform=linux os=centos7 target=x86_64" from a buildcache
-==> Concretized 2 specs:
- -   tecxkjp  esmf@8.9.1~debug~external-lapack+external-parallelio+mpi+netcdf+openmp+pnetcdf~python+shared~xerces build_system=makefile esmf_comm=auto esmf_os=auto esmf_pio=auto patches:=f63d405 snapshot=none platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
- -   lhx7tcu      ^compiler-wrapper@1.1.0 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+==> Concretized 8 specs:
+[+]  i2grbk4  bacio@2.6.0~ipo+pic~shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
+[e]  bqvofmf      ^cmake@3.31.8~doc+ncurses+ownlibs~qtgui build_system=generic build_type=Release platform=linux os=rhel10 target=x86_64_v3
+[+]  lhx7tcu      ^compiler-wrapper@1.1.0 build_system=generic platform=linux os=rhel10 target=x86_64_v3
 [e]  5g7znvp      ^glibc@2.39 build_system=autotools platform=linux os=rhel10 target=x86_64_v3
 [e]  k7aa4o3      ^gmake@4.4.1~guile build_system=generic platform=linux os=rhel10 target=x86_64_v3
 [e]  r2buaru      ^intel-oneapi-compilers@2024.2.1~amd+envmods~fix_rt_linkage~nvidia build_system=generic platform=linux os=rhel10 target=x86_64_v3
-[e]  hesoai3      ^intel-oneapi-mpi@2021.13~classic-names+envmods~external-libfabric~generic-names~ilp64 build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   ham3zbf      ^intel-oneapi-runtime@2024.2.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   2nb7tfu          ^gcc-runtime@14.3.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  ham3zbf      ^intel-oneapi-runtime@2024.2.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  2nb7tfu          ^gcc-runtime@14.3.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
 [e]  4vk6z57              ^gcc@14.3.1+binutils+bootstrap~graphite+libsanitizer~mold~nvptx~piclibs~profiled~strip build_system=autotools build_type=RelWithDebInfo languages:='c,c++' platform=linux os=rhel10 target=x86_64_v3
- -   4k7v6jf      ^netcdf-c@4.10.0+blosc~byterange~dap~fsync~hdf4~jna~logging+mpi~nczarr_zip+optimize~parallel-netcdf+pic+shared+szip+zstd build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
- -   ir74cwm          ^bzip2@1.0.8~debug~pic+shared build_system=generic platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
- -   n2aguze          ^c-blosc@1.21.6+avx2~ipo build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   xbrcqd4              ^lz4@1.10.0+pic build_system=makefile libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   ei5tn6u              ^snappy@1.2.1~ipo+pic+shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   svrl2fd          ^hdf5@1.14.6~cxx~fortran+hl~ipo~java~map+mpi+shared~subfiling~szip~threadsafe+tools api=default build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+ -   v3e7j6z  esmf@8.9.1~debug~external-lapack+external-parallelio+mpi+netcdf+openmp+pnetcdf~python+shared~xerces build_system=makefile esmf_comm=auto esmf_os=auto esmf_pio=auto patches:=f63d405 snapshot=none platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
+[e]  hesoai3      ^intel-oneapi-mpi@2021.13~classic-names+envmods~external-libfabric~generic-names~ilp64 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  4k7v6jf      ^netcdf-c@4.10.0+blosc~byterange~dap~fsync~hdf4~jna~logging+mpi~nczarr_zip+optimize~parallel-netcdf+pic+shared+szip+zstd build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  ir74cwm          ^bzip2@1.0.8~debug~pic+shared build_system=generic platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  n2aguze          ^c-blosc@1.21.6+avx2~ipo build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  xbrcqd4              ^lz4@1.10.0+pic build_system=makefile libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  ei5tn6u              ^snappy@1.2.1~ipo+pic+shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  svrl2fd          ^hdf5@1.14.6~cxx~fortran+hl~ipo~java~map+mpi+shared~subfiling~szip~threadsafe+tools api=default build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
 [e]  2rlalb7              ^pkgconf@2.1.0 build_system=autotools platform=linux os=rhel10 target=x86_64_v3
- -   lkcxvzb          ^libaec@1.1.4~ipo+shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   n5q3dpy          ^zlib-ng@2.3.3+compat+new_strategies+opt+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   46ncdei          ^zstd@1.5.7~programs build_system=makefile libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   qf6u5b4      ^netcdf-fortran@4.6.2~doc+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
- -   xtd76dv      ^parallel-netcdf@1.14.1~burstbuffer+cxx~examples+fortran+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
+[+]  lkcxvzb          ^libaec@1.1.4~ipo+shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  46ncdei          ^zstd@1.5.7~programs build_system=makefile libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  qf6u5b4      ^netcdf-fortran@4.6.2~doc+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
+[+]  xtd76dv      ^parallel-netcdf@1.14.1~burstbuffer+cxx~examples+fortran+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
 [e]  ow2xr5j          ^m4@1.4.19+sigsegv build_system=autotools platform=linux os=rhel10 target=x86_64_v3
 [e]  6jqqzfa          ^perl@5.40.2~cpanm~opcode~open+shared+threads build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   2donasz      ^parallelio@2.6.8+fortran~ipo~logging+mpi~ncint~pnetcdf+shared~timing build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
-[e]  bqvofmf          ^cmake@3.31.8~doc+ncurses+ownlibs~qtgui build_system=generic build_type=Release platform=linux os=rhel10 target=x86_64_v3
- -   2abms3j      ^py-pyyaml@6.0.3+libyaml build_system=python_pip platform=linux os=rhel10 target=x86_64_v3
- -   iveyewa          ^libyaml@0.2.5 build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
- -   h6dotqm          ^py-cython@3.2.4 build_system=python_pip platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
- -   v4gquon          ^py-pip@26.1.2 build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   4waeyo7          ^py-setuptools@82.0.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   mbscbp2          ^py-wheel@0.45.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   7oewumj          ^python-venv@1.0 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  2abms3j      ^py-pyyaml@6.0.3+libyaml build_system=python_pip platform=linux os=rhel10 target=x86_64_v3
+[+]  iveyewa          ^libyaml@0.2.5 build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  h6dotqm          ^py-cython@3.2.4 build_system=python_pip platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  v4gquon          ^py-pip@26.1.2 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  4waeyo7          ^py-setuptools@82.0.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  mbscbp2          ^py-wheel@0.45.1 build_system=generic platform=linux os=rhel10 target=x86_64_v3
+[+]  7oewumj          ^python-venv@1.0 build_system=generic platform=linux os=rhel10 target=x86_64_v3
 [e]  jqglm2a      ^python@3.12.13+bz2+crypt+ctypes+dbm~debug+libxml2+lzma~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~static~tests~tkinter+uuid+zlib build_system=generic platform=linux os=rhel10 target=x86_64_v3
- -   av6rhno  petsc@3.25.2~X~batch~cgns~complex~cuda~debug+double+examples~exodusii~fftw+fortran+fortran-bindings~giflib~hdf5~hpddm~hwloc~hypre~int64~jpeg~knl~kokkos~libpng~libyaml~memkind~metis~mkl-pardiso~ml~mmg~moab~mpfr+mpi~mumps~openmp~p4est~parmmg~ptscotch~random123~rocm~saws~scalapack+shared~strumpack~suite-sparse~superlu-dist~sycl~tetgen~valgrind~zoltan build_system=generic clanguage=C memalign=none platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
+[+]  kcb7f34  g2@4.0.0+aec~g2c_compare~ipo~openmp+pic~shared~use_g2c_api~utils+w3emc build_system=cmake build_type=Release generator=make precision:=4,d platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
+[+]  odetpdt      ^g2c@2.3.0+aec+build_v2_api~ipo+jasper~openjpeg+pic+png~pthreads+utils build_system=cmake build_type=Release generator=make libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  st5sx24          ^libxml2@2.15.3+pic~python+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  h3bgdar              ^libiconv@1.18 build_system=autotools libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  o2cwghp              ^xz@5.8.3~pic build_system=autotools libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  j7qsafo      ^jasper@4.2.8~ipo+jpeg~opengl+shared build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  k74vjtc          ^libjpeg-turbo@3.1.3~ipo~jpeg8~partial_decoder+pic build_system=cmake build_type=Release generator=make libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  iknvg4w              ^nasm@2.16.03 build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c=oneapi@2024.2.1
+[+]  ursksia  libpng@1.6.58~ipo~pic build_system=cmake build_type=Release generator=make libs:=shared,static platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+[+]  n5q3dpy      ^zlib-ng@2.3.3+compat+new_strategies+opt+pic+shared build_system=autotools platform=linux os=rhel10 target=x86_64_v3 %c,cxx=oneapi@2024.2.1
+ -   lbxfs47  parallelio@2.6.8+fortran~ipo~logging+mpi+ncint+pnetcdf+shared~timing build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
+[+]  av6rhno  petsc@3.25.2~X~batch~cgns~complex~cuda~debug+double+examples~exodusii~fftw+fortran+fortran-bindings~giflib~hdf5~hpddm~hwloc~hypre~int64~jpeg~knl~kokkos~libpng~libyaml~memkind~metis~mkl-pardiso~ml~mmg~moab~mpfr+mpi~mumps~openmp~p4est~parmmg~ptscotch~random123~rocm~saws~scalapack+shared~strumpack~suite-sparse~superlu-dist~sycl~tetgen~valgrind~zoltan build_system=generic clanguage=C memalign=none platform=linux os=rhel10 target=x86_64_v3 %c,cxx,fortran=oneapi@2024.2.1
 [e]  f3nupty      ^diffutils@3.10 build_system=autotools platform=linux os=rhel10 target=x86_64_v3
 [e]  x4ffbkg      ^intel-oneapi-mkl@2024.2~cluster+envmods~gfortran~ilp64+shared build_system=generic mpi_family=none threads=none platform=linux os=rhel10 target=x86_64_v3
+[+]  n322rch  prod-util@2.1.2~ipo build_system=cmake build_type=Release generator=make platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
+[+]  alfdwhm  w3emc@2.13.0~bufr~build_deprecated~ipo+pic~shared build_system=cmake build_type=Release generator=make precision:=4,d platform=linux os=rhel10 target=x86_64_v3 %c,fortran=oneapi@2024.2.1
 
+==> Updating view at /save/environments/rhel10-x86_64_v3/.spack-env/view
