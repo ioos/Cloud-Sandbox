@@ -37,7 +37,7 @@ Cloud-Sandbox/cloudflow/workflows
 ~~~ 
 
 Edit the `workflow_main.py` script. 
-   - If you need to execute a specific Python environment pathway compatible with the cloudflow code base, then you will need to replace the `-S python3 -u` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/cloudflow_environment/python`. Cloudflow environment Python installation instructions are already available within the `Cloud-Sandbox/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md` file for Sandbox users. 
+   - If you need to execute a specific Python environment pathway compatible with the cloudflow code base, then you will need to replace the `-S python3 -u` syntax in the very first line with the Python environment pathway. For example, the first line will end up looking like `#/usr/bin/env /pathway/to/cloudflow_environment/python`. Cloudflow environment Python installation instructions are already available within the `Cloud-Sandbox/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md` file for Sandbox users. This is necessary assuming your head node does not already have a precompiled Python envirionment with the required dependencies to execute cloudflow.
 
 6. **Build the workflow for your model - `your_model_name.py`** 
 We will create a file to read in the keywords from your job file by creating a new script and class for your model.
@@ -54,7 +54,6 @@ Within that directory, you will want to copy the file called `Model_Experiment_T
 
 7. **Build the workflow for your model - `JobFactory.py`**	
 Edit `JobFactory.py` file and at the very top of the script, you will now add a new import statement to reflect the new “your_model_Experiment” Python class you’ve constructed from the `your_model_name_Experiment.py` file you created in Step #6 
-- e.g., 
 ~~~python
 from cloudflow.job.your_model_name_Experiment import your_model_name_Experiment
 ~~~

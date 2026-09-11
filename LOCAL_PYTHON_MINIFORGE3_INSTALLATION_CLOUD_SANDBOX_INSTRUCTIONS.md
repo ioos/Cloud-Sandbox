@@ -33,7 +33,7 @@ in later steps.  If, for some reason, you do log out or your shell gets killed, 
 ```bash
 # ~1-2 seconds
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-# ~6 minutes
+# ~4-6 minutes
 time bash Miniforge3-$(uname)-$(uname -m).sh -b -p ${WORKINGDIR}/miniforge3
 export MAMBA=$WORKINGDIR/miniforge3/bin/mamba
 echo "Your default python3 executable is: ${WORKINGDIR}/miniforge3/bin/python3"
@@ -49,7 +49,7 @@ cd ..
 git clone https://github.com/ioos/Cloud-Sandbox.git
 cd Cloud-Sandbox/cloudflow
 # ~13 minutes
-time $MAMBA env create -f cloudflow_minforge3_installation.yml -y
+time $MAMBA env create -f cloudflow_miniforge3_installation.yml -y
 echo "Your cloudflow python3 executable is: ${WORKINGDIR}/miniforge3/envs/cloudflow/bin/python3"
 ```
 

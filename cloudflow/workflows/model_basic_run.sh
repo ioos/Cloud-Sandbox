@@ -27,16 +27,6 @@ module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 # Export required variables
 # for your model executable
 # if required
-export FC=mpiifort
-export CXX=mpiicpc
-export CC=mpiicc
-
-# Define the AWS MPI options to utilize
-# the efa fabric for hpc7as
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-export FI_PROVIDER=efa
-export I_MPI_FABRICS=ofi
-export I_MPI_OFI_PROVIDER=efa
 
 # Force Hydra to send a SIGKILL (9) instead of a SIGTERM (15) to all ranks
 export I_MPI_JOB_ABORT_SIGNAL=9
@@ -44,8 +34,15 @@ export I_MPI_JOB_ABORT_SIGNAL=9
 # Ensure the job terminates immediately if any process exits with a non-zero status
 export I_MPI_JOB_TIMEOUT_SIGNAL=9
 
-# Optional: Set a total timeout (in seconds) if the model hangs without crashing
-export I_MPI_JOB_TIMEOUT=3600
+# System Paths: Point dynamic linker and Libfabric to AWS EFA libraries
+export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+export FI_PROVIDER_PATH="/opt/amazon/efa/lib64/libfabric"
+
+# Fabric Control: Force Intel MPI to use AWS system Libfabric over EFA
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+export FI_PROVIDER="efa"
+export I_MPI_FABRICS="ofi"
+export I_MPI_OFI_PROVIDER="efa"
 
 # This is where you define your 
 # shell script required inputs

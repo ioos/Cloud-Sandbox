@@ -43,9 +43,18 @@ Example:
 Open a web browser and open the URL:
 `http://localhost:4200/dashboard`
 
+
+
+### Stop the prefect server if necessary
+
+`prefect server stop`
+
+Stopping the prefect server may be required for debugging issues with running cloudflow on new head nodes.
+
+
 There are also useful Prefect CLI tools:
-prefect --help
-prefect flow-runs ls
+- prefect --help
+- prefect flow-runs ls
 
 ## To cancel a currently running flow:
 Use prefect flow-run cancel flowrun-id. The id can be obtained from "prefect 

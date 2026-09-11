@@ -15,5 +15,6 @@ dependencies:
   - pillow>=12.2.0
   - pyproj==3.7.2
   - pip:
+    - "fastapi>=0.111.0,<0.116.0"
     - prefect==3.6.29
     - haikunator

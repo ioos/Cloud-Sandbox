@@ -6,6 +6,7 @@ set -e       # exit immediately on error
 set -x       # verbose with command expansion
 set -u       # forces exit on undefined variables
 
+# Load the available modules on the head node
 module purge
 module use -a /mnt/efs/fs1/save/environments/spack.v0.22.5/share/spack/modules/linux-rhel8-x86_64
 
@@ -21,17 +22,15 @@ export I_MPI_JOB_ABORT_SIGNAL=9
 # Ensure the job terminates immediately if any process exits with a non-zero status
 export I_MPI_JOB_TIMEOUT_SIGNAL=9
 
-# Optional: Set a total timeout (in seconds) if the model hangs without crashing
-export I_MPI_JOB_TIMEOUT=3600
+# System Paths: Point dynamic linker and Libfabric to AWS EFA libraries
+export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+export FI_PROVIDER_PATH="/opt/amazon/efa/lib64/libfabric"
 
-export FC=mpiifort
-export CXX=mpiicpc
-export CC=mpiicc
-
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-export FI_PROVIDER=efa
-export I_MPI_FABRICS=ofi
-export I_MPI_OFI_PROVIDER=efa
+# Fabric Control: Force Intel MPI to use AWS system Libfabric over EFA
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+export FI_PROVIDER="efa"
+export I_MPI_FABRICS="ofi"
+export I_MPI_OFI_PROVIDER="efa"
 
 export MODEL_DIR=$1
 export DFLOW_LIB=$2

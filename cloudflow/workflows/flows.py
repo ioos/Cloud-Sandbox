@@ -219,11 +219,6 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
 
 ######################################################################
 @flow
-def python_experiment_dask_flow(conf, jobfile):
-    """
-    """
-
-@flow
 def ufs_flow(ufsconf, ufsjobfile):
         """ Provides a Prefect Flow for a ufs workflow.
 
@@ -358,6 +353,13 @@ def experiment_flow(conf, jobfile):
     # Setup the job
     experiment_job = tasks.job_init(cluster, jobfile)
 
+    # Catch Python experiments attempting to use more than
+    # one node as it violates the rules of cloudflow for the
+    # given model implementation on the cloud
+    if experiment_job.MODEL=='PYTHON' and experiment_job.APP != 'mpi' and cluster.nodeCount > 1:
+        log.exception('Standard Python jobs cannot allocate more than a single EC2 instance for execution. Please revise cluster configuration file accordingly.')
+        raise ValueError('Standard Python jobs cannot allocate more than a single EC2 instance for execution. Please revise cluster configuration file accordingly.')
+        
     # Start the cluster
     try:
         ctasks.cluster_start(cluster)

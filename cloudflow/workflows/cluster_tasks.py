@@ -315,7 +315,7 @@ def start_dask(cluster) -> tuple:
             # 3. Combine them into a single string for SSH execution
             ssh_cmd = [
                 "ssh", "-o", "StrictHostKeyChecking=no",
-                f"ec2-user@{host}",
+                f"{host}",
                 f"{env_prefix} && {worker_command}"
             ]
             
