@@ -33,6 +33,15 @@ export I_MPI_JOB_TIMEOUT_SIGNAL=9
 # Optional: Set a total timeout (in seconds) if the model hangs without crashing
 export I_MPI_JOB_TIMEOUT=3600
 
+# System Paths: Point dynamic linker and Libfabric to AWS EFA libraries
+export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+export FI_PROVIDER_PATH="/opt/amazon/efa/lib64/libfabric"
+
+# Fabric Control: Force Intel MPI to use AWS system Libfabric over EFA
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+export FI_PROVIDER="efa"
+export I_MPI_FABRICS="ofi"
+export I_MPI_OFI_PROVIDER="efa"
 
 echo "--- " 
 echo "--- Checking PYTHON MPI script for syntax errors and then running PYTHON MPI script -----------------"

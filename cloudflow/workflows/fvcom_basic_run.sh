@@ -6,6 +6,7 @@ set -e       # exit immediately on error
 set -x       # verbose with command expansion
 set -u       # forces exit on undefined variables
 
+# Load the available modules on the head node
 module purge
 module use -a /mnt/efs/fs1/save/environments/spack.v0.22.5/share/spack/modules/linux-rhel8-x86_64
 
@@ -15,18 +16,6 @@ module load hdf5/1.14.3-intel-2021.9.0-jjst2zs
 module load netcdf-c/4.9.2-intel-2021.9.0-vkckbzk
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 
-export FC=mpiifort
-export CXX=mpiicpc
-export CC=mpiicc
-
-export LD_LIBRARY_PATH=/mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/lib:$LD_LIBRARY_PATH
-
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-export FI_PROVIDER=efa
-export I_MPI_FABRICS=ofi
-export I_MPI_OFI_PROVIDER=efa
-
 # Force Hydra to send a SIGKILL (9) instead of a SIGTERM (15) to all ranks
 export I_MPI_JOB_ABORT_SIGNAL=9
 
@@ -35,6 +24,16 @@ export I_MPI_JOB_TIMEOUT_SIGNAL=9
 
 # Optional: Set a total timeout (in seconds) if the model hangs without crashing
 export I_MPI_JOB_TIMEOUT=3600
+
+# System Paths: Point dynamic linker and Libfabric to AWS EFA libraries
+export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
+export FI_PROVIDER_PATH="/opt/amazon/efa/lib64/libfabric"
+
+# Fabric Control: Force Intel MPI to use AWS system Libfabric over EFA
+export I_MPI_OFI_LIBRARY_INTERNAL=0
+export FI_PROVIDER="efa"
+export I_MPI_FABRICS="ofi"
+export I_MPI_OFI_PROVIDER="efa"
 
 export MODEL_DIR=$1
 export CASE_FILE=$2
