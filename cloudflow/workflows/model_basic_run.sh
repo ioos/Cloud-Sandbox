@@ -34,9 +34,6 @@ export I_MPI_JOB_ABORT_SIGNAL=9
 # Ensure the job terminates immediately if any process exits with a non-zero status
 export I_MPI_JOB_TIMEOUT_SIGNAL=9
 
-# Optional: Set a total timeout (in seconds) if the model hangs without crashing
-export I_MPI_JOB_TIMEOUT=3600
-
 # System Paths: Point dynamic linker and Libfabric to AWS EFA libraries
 export LD_LIBRARY_PATH="/opt/amazon/efa/lib64:$LD_LIBRARY_PATH"
 export FI_PROVIDER_PATH="/opt/amazon/efa/lib64/libfabric"
