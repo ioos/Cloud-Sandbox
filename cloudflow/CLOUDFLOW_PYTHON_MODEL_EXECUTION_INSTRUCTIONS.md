@@ -131,7 +131,7 @@ Edit `../cluster.configs/Experiments/python.ioos` (**Note:** `nodeCount` must st
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 ---
 #### Step 4: Submit and Monitor Job
@@ -353,7 +353,7 @@ Edit `../cluster.configs/Experiments/python.ioos` (Set `nodeCount` to desired sc
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 ---
 
@@ -632,7 +632,7 @@ Edit `../cluster.configs/Experiments/python.ioos`:
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 ---
 
@@ -881,7 +881,7 @@ Edit `../cluster.configs/Experiments/python.ioos`:
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 ---
 
