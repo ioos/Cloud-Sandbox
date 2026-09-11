@@ -137,7 +137,7 @@ vi ../cluster.configs/Experiments/schism.ioos
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 ---
 
