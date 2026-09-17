@@ -6,11 +6,17 @@ After=network.target
 User=prefect
 Group=prefect
 WorkingDirectory=/home/prefect
-# Use a shell to evaluate the private IP address dynamically
+
+# Can use shell to evaluate the private IP address dynamically if localhost can't be used
 # ExecStart=/bin/sh -c 'HOST_IP=$(hostname -I | awk "{print \$1}"); /usr/local/bin/prefect server start --host $HOST_IP'
-ExecStart=/usr/local/bin/prefect server start --host 127.0.0.1
-Restart=always
+
+ExecStart=/opt/prefect/venv/bin/prefect server start --host 127.0.0.1
+
 Environment=PREFECT_HOME=/save/environments/prefect/.prefect
+Environment="PREFECT_RESULTS_PERSIST_BY_DEFAULT=true"
+Environment="PREFECT_TASKS_DEFAULT_PERSIST_RESULT=true"
+
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

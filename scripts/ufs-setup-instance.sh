@@ -31,7 +31,7 @@ install_intel_oneapi_dnf
 # Spack-stack
 install_spack-stack_prereqs
 setup_spack-stack 
-build_spack-environment
+build_spack-stack-environment
 
 install_python_modules_user
 

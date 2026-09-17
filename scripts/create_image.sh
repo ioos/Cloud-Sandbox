@@ -30,6 +30,9 @@ echo "project_tag: $project_tag"
 image_name="${ami_name}-Node"
 echo "Node image_name: $image_name"
 
+# python3 complained there was no boto3 package installed
+python3 -m pip install boto3
+
 # Flush the disk cache
 sync
 

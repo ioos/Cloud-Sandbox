@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#set -x
+set -x
 
 export SAVE_DIR=${SAVE_DIR:-"/save/$USER"}
 

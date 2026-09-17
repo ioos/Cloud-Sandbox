@@ -21,7 +21,6 @@ _REGION_LONG_NAMES = {
     "us-east-1":      "US East (N. Virginia)",
     "us-east-2":      "US East (Ohio)",
 }
-from haikunator import Haikunator
 import prefect
 
 # from cloudflow.cluster import AWSHelper
@@ -425,6 +424,9 @@ class AWSCluster(Cluster):
         return self.PPN
 
 
+    ########################################################################
+
+
     def create_instances(self):
         """ Provision the configured cluster in the cloud.
 
@@ -506,7 +508,9 @@ class AWSCluster(Cluster):
         return instances
 
 
- 
+    ########################################################################
+
+
     def __save_instance_data(self, instances):
         """ Prefect 3 can't serialize and cache EC2 Instance type
             so we save the essential EC2 Instance data here.

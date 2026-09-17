@@ -20,23 +20,31 @@ module-whatis "This module sets the environment variables for \
 #setenv COMP_CPP cpp
 #setenv COMP_MPCC "mpicc -fc=icc"
 
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
-module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
-module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
-module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
+#module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
+#module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
+#module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
+#module load intel-oneapi-mpi/2021.12.1-oneapi-2023.1.0-p5npcbi
+
+module load intel/compiler/2024.2.1
+module load intel/ifort/2024.2.1
+module load intel/tbb/2021.13
+module load intel/mkl/2024.2
+module load intel/mpi/2021.13
+
+module load netcdf-fortran/4.6.2-intel-oneapi-compilers-2024.2.1-qf6u5b4
 
 # module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
 
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
 # Loding nceplibs modules
-module load bacio
-module load bufr
-module load g2
-module load w3emc
-module load w3nco
-module load prod-util
-module load wgrib2
+#module load bacio
+#module load bufr
+#module load g2
+#module load w3emc
+#module load w3nco
+#module load prod-util
+#module load wgrib2
 
 # Loding nceplibs modules
 #module load produtil/1.0.18

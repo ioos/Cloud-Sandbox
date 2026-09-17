@@ -21,7 +21,6 @@ fi
 
 #export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
 export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
-export I_MPI_OFI_PROVIDER_DUMP=1
 
 export FI_PROVIDER=efa
 export I_MPI_FABRICS=ofi
@@ -175,7 +174,6 @@ case $APP in
 
     #export I_MPI_OFI_LIBRARY_INTERNAL=1   # 0: use aws efa fabric 1: use intel efa fabric
     export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
-    export I_MPI_OFI_PROVIDER_DUMP=1
 
     export FI_PROVIDER=efa
     export I_MPI_FABRICS=ofi

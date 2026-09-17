@@ -190,19 +190,8 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 
 ###################################
 # RHEL 8
-# 2023-10-06: ami-057094267c651958e
-# AMI name: RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2
 # Owner account ID 309956199498 Red Hat
 ##################################
-
-################################################################
-# CLI search command for troubleshooting and verifying available images
-# aws ec2 describe-images --owners 309956199498        \
-#    --filters "Name=name,Values=RHEL-8.*_HVM-*-x86_64-*-Hourly2-*"  \
-#    --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
-#    --output table
-# example:
-# |  RHEL-8.10.0_HVM-20251214-x86_64-1988-Hourly2-GP3 |  ami-07885cd3cf11ed0b6 |  2025-12-15T01:40:39.000Z 
 
 data "aws_ami" "rhel_8" {
   owners = ["309956199498"]
@@ -230,28 +219,36 @@ data "aws_ami" "rhel_8" {
 }
 
 
+  
 ###################################
-# Centos Stream 9 - untested
-# ami-0c2abda83f1b9e09d
-# AMI name: CentOS Stream 9 x86_64 
-# Owner account ID 125523088429
+# RHEL 10
+# Owner account ID 309956199498 Red Hat
 ##################################
-
-data "aws_ami" "centos_stream_9" {
-  owners = ["125523088429"]   # CentOS Official CPE
+  
+################################################################
+# CLI search command for troubleshooting and verifying available images
+# aws ec2 describe-images --owners 309956199498        \
+#   --filters "Name=name,Values=RHEL-10.*_HVM-*-x86_64-*-Hourly2-*"  \
+#   --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
+#   --output table
+# example: 
+#  RHEL-10.2.0_HVM-20260618-x86_64-0-Hourly2-GP3 |  ami-0806afd7f0392af4d |  2026-06-18T18:54:19.000Z  
+                
+data "aws_ami" "rhel_10" {
+  owners = ["309956199498"]
   most_recent = true
-
+  
   filter {
-    name = "description"
-    values = ["CentOS Stream 9 *"]
+    name = "name"
+    values = ["RHEL-10.*_HVM-*-x86_64-*-Hourly2-*"]
   }
 
   filter {
     name   = "architecture"
     values = ["x86_64"]
   }
-
-  filter {
+  
+  filter {  
     name   = "root-device-type"
     values = ["ebs"]
   }
@@ -261,7 +258,6 @@ data "aws_ami" "centos_stream_9" {
     values = ["hvm"]
   }
 }
-
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
@@ -283,7 +279,7 @@ resource "aws_instance" "head_node" {
   ### Specify which AMI to use here
   ###s#############################
 
-  ami = data.aws_ami.rhel_8.id
+  ami = data.aws_ami.rhel_10.id
 
   metadata_options {
      http_endpoint = "enabled"
@@ -359,14 +355,6 @@ resource "aws_network_interface" "head_node" {
       Project = var.project_tag
   }
 }
-
-# "key_name"  : "ioos-sandbox",
-# "image_id"  : "ami-00dd9c867a255acf3",
-# "sg_ids"    : ["sg-0d5c0b543fe45330c",
-#                "sg-0cdfc3845ababd4f4",
-#                "sg-0b765f6f659fef905"],
-# "subnet_id" : "subnet-0be869ddbf3096968",
-# "placement_group" : "ufscoastal-sandbox-us-east-2b_Terraform_Placement_Group",
 
 
 resource "local_file" "deployment_info" {
