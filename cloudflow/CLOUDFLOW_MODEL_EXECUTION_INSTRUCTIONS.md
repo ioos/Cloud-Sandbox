@@ -13,6 +13,11 @@ From your local machine:
 aws s3 cp /pathway/to/your/model/setup s3://ioos-transfers/your_model_setup --recursive
 ```
 
+> **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
+> * **[AWS CLI Official Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)**
+>   * [Linux Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-linux)
+>   * [macOS Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-macos)
+>   * [Windows Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)
 ---
 
 ## 2. Head Node Setup & Environment Configuration
@@ -139,6 +144,30 @@ vi ../cluster.configs/Experiments/schism.ioos
 
 > **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
+
+### Ensure Model Launcher Script Matches Module Environment
+Load the specific Spack HPC modules used during model compilation to ensure all required shared libraries (e.g., MPI, NetCDF-Fortran) are available at runtime.
+
+```bash
+vi workflows/schism_basic_run.sh
+```
+
+```bash
+#!/bin/bash
+
+set -e       # exit immediately on error
+set -x       # print executed commands to stdout
+set -u       # exit on attempt to use an undeclared variable
+
+# Load the required HPC runtime modules on compute nodes
+module purge
+
+module load intel-oneapi-compilers/2024.2.1-none-none-r2buaru
+module load intel-oneapi-mpi/2021.13-none-none-hesoai3
+module load netcdf-fortran/4.6.2-intel-oneapi-compilers-2024.2.1-qf6u5b4
+```
+
+> **Note:** Pre-configured runner scripts for supported numerical models (e.g., `adcirc_basic_run.sh`, `fvcom_basic_run.sh`, `roms_basic_run.sh`, `dflowfm_basic_run.sh`) are available in the `workflows/` directory following the same structure shown in the SCHISM example above.
 ---
 
 ## 5. Prefect Workflow Server & Execution

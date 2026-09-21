@@ -14,6 +14,12 @@ From your local machine:
 aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recursive
 ```
 
+> **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
+> * **[AWS CLI Official Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)**
+>   * [Linux Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-linux)
+>   * [macOS Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-macos)
+>   * [Windows Installation Steps](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)
+
 ### Workspace Preparation
 On the Cloud-Sandbox head node:
 ```bash
