@@ -43,7 +43,7 @@ git clone https://github.com/ioos/Cloud-Sandbox.git
 
 ## 3. Module Environment & Model Compilation
 
-Load the necessary compiler and library modules available on the head node via Spack to compile your model (SCHISM shown as an example).
+Load the necessary compiler and library modules available on the head node via Spack to compile your model (SCHISM shown as an example). These modules are directly linked to the image id of your head node. If there are specific modules required for your model suite that is not available on your head node, then please submit an email request to the Sandbox help desk (sandbox.helpdesk@noaa.gov) to obtain a new head node image id with the updated spack module installations tailored to your model suite.  Your specific model executable will be compiled on the EFS volume (`/save`) where this will live for as long as you keep it there. 
 
 ```bash
 # View available environment modules
@@ -142,7 +142,7 @@ vi ../cluster.configs/Experiments/schism.ioos
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node you're on. To ensure the image id and security groups linked to your head node image id are correct, please reach out to the Sandbox help desk (sandbox.helpdesk@noaa.gov) if you believe these specs are incorrect. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 
 ### Ensure Model Launcher Script Matches Module Environment
@@ -201,6 +201,15 @@ nohup ./workflows/workflow_main.py ../cluster.configs/Experiments/schism.ioos ..
 # Stream live output
 tail -f cloudflow_test.out
 ```
+
+> **What's Happening Under the Hood During Execution?**
+>
+> When Cloudflow provisions your AWS EC2 compute instances, it dynamically binds two core infrastructure components directly to the running nodes:
+>
+> 1. **Amazon Machine Image (AMI / Image ID):** The instantiated compute nodes pull the exact AMI snapshot containing the pre-configured Spack HPC compilers, MPI frameworks, and shared runtime libraries used during model compilation.
+> 2. **Elastic File System (EFS Volume):** The compute nodes mount the shared `/save` EFS filesystem, where your model input files, configuration parameters, and compiled model executable physically reside.
+>
+> By linking the specified AMI with the mounted EFS volume across the allocated host instance IPs, Cloudflow mirrors your head node's precise runtime environment on the worker nodes, enabling seamlessly synchronized model execution.
 
 ---
 
