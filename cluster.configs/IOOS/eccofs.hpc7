@@ -6,8 +6,8 @@
 "vm_retry_delay": 60,
 "vm_max_retries": 5,
 "tags"      : [ 
-                { "Key": "Name", "Value": "eccofs" },
-                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
+     { "Key": "Name", "Value": "eccofs-nl-hotstart" },
+     { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
 
 "key_name"        : "ioos-sandbox",

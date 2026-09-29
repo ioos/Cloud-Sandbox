@@ -14,8 +14,6 @@ export CURHOME=$PWD
 export CSHOME="${PWD%/*/*}"
 echo "Cloud-Sandbox/ directory is: $CSHOME"
 
-export REPO="https://github.com/asascience-open/NOSOFS-Code-Package.git"
-export BRANCH="v3.6.6.dev"
 export MODEL_VERSION='nosofs.v3.6.6'
 export MODULEFILE=intel_x86_64
 
@@ -29,6 +27,7 @@ if [ ! -d $MODEL_DIR ]; then
 fi
 
 # Build it
+cp $CURHOME/Linux-ifort-intel.mk $MODEL_DIR/sorc/ROMS.eccofs/Compilers/Linux-ifort-intel.mk
 cp $CURHOME/modulefiles/$MODULEFILE $MODEL_DIR/modulefiles/intel_x86_64
 
 # This will also build some binaries used by the nosofs framework needed to run
