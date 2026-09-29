@@ -1,0 +1,7 @@
+{
+  "MODEL"     : "PYTHON",
+  "JOBTYPE"   : "python_experiment",
+  "APP"       : "mpi",
+  "EXEC"      : "/pathway/to/python/executable",
+  "SCRIPT"    : "/pathway/to/python/mpi/script"
+}

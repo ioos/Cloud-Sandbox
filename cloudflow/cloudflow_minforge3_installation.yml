@@ -1,0 +1,19 @@
+name: cloudflow
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - setuptools
+  - wheel
+  - boto3==1.40.22
+  - botocore==1.40.22
+  - dask>=2026.1.0
+  - distributed
+  - matplotlib==3.10.6
+  - netCDF4==1.7.2
+  - numpy==2.3.2
+  - pillow>=12.2.0
+  - pyproj==3.7.2
+  - pip:
+    - prefect==3.6.29
+    - haikunator

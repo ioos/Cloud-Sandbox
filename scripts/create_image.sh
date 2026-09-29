@@ -30,7 +30,15 @@ echo "project_tag: $project_tag"
 image_name="${ami_name}-Node"
 echo "Node image_name: $image_name"
 
+# python3 complained there was no boto3 package installed
+python3 -m pip install boto3
+
 # Flush the disk cache
 sync
-python3 create_image.py $instance_id "$image_name" "$project_tag"
+
+output=$(python3 create_image.py $instance_id "$image_name" "$project_tag")
+image_id=$(echo "$output" | tail -n 1 | awk -F: '{print $2}')
+
+echo "AMI Image ID is: $image_id"
+echo $image_id > ~/image-id-$now
 

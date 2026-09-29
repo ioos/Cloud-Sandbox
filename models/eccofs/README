@@ -35,11 +35,11 @@ This uses the same workflow and scripts used for the nosofs forecasts.
 Modify and use the following job config files for each step.
 
 1. Run the 1 day coldstart for 20190101
-  jobs/ config: eccofs.coldstart
+  job.configs : eccofs.coldstart
   template: templates/eccofs.coldstart.ocean.in
 
 2. Run the forecast for 20190102
-  jobs/ config: eccofs.fcst
+  jobs.configs : eccofs.fcst
       Set NTIMES= how ever many days you want to run
   template: templates/eccofs.ocean.in
   The workflow will copy the coldstart restart file automatically
@@ -47,7 +47,7 @@ Modify and use the following job config files for each step.
   restart file if it exists in the expected /com folder.
 
 3. Continuing runs:
-  See jobs/ config: eccofs.fcst.continue
+  See job.configs : eccofs.fcst.continue
   CDATE and ININAME need to be manually configured based on your previous run date 
   and forecast length.
   Use restart_date.sh script to help setup the job if not sure how long the previous one ran.

@@ -3,9 +3,9 @@
 
 ''' Usage:
 
-    ./workflows/workflow_main.py fcst-job [post-job]
+    ./workflows/workflow_main.py cluster-config job-config [post-job]
 
-    Examples: ./workflows/workflow_main.py job/jobs/cbofs.00z.fcst 
+    Examples: ./workflows/workflow_main.py ../cluster.configs/NOS/nos.cora.cfg ../job.configs/cora.reanalysis
 
 '''
 
@@ -65,7 +65,7 @@ def main():
     #print(f"lenargs: {lenargs}")
     if lenargs !=  2:
         print(f"Usage: {os.path.basename(__file__)} cluster_config job_config")
-        print(f"    example: {os.path.basename(__file__)} cluster/configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
+        print(f"    example: {os.path.basename(__file__)} ../cluster.configs/NOS/nos.cora.cfg myjobs/cora.reanalysis")
         sys.exit(1)
 
     conf = os.path.abspath(sys.argv[1])
@@ -89,6 +89,10 @@ def main():
 
     elif jobtype == "plotting_diff":
         flows.diff_plot_flow(postconf, jobfile)
+
+    elif jobtype == "ufs_regressiontest":
+        #TODO: can include other UFS jobtypes later
+        flows.ufs_flow(conf, jobfile)
 
     elif re.search("experiment", jobtype):
         if re.search("dask",jobdict["APP"]):

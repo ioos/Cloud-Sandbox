@@ -16,13 +16,13 @@ cyc=$2
 
 cd $HOME/Cloud-Sandbox/cloudflow
 
-fcst=job/jobs/${ofs}.${cyc}z.fcst
-plots=job/jobs/${ofs}.${cyc}z.diffplots
+fcst=../job.configs/${ofs}.${cyc}z.fcst
+plots=../job.configs/${ofs}.${cyc}z.diffplots
 
 nohup ./workflows/nosofs_qops.py $fcst $plots > $HOME/${ofs}.log 2>&1
 
 
-#nohup ./workflows/nosofs_qops.py job/jobs/dbofs.00z.fcst < /dev/null > $HOME/dbofs.log &
+#nohup ./workflows/nosofs_qops.py ../job.configs/dbofs.00z.fcst < /dev/null > $HOME/dbofs.log &
 
 
 

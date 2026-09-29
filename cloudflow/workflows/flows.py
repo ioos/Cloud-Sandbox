@@ -20,7 +20,7 @@ from cloudflow.workflows import tasks
 from cloudflow.workflows import cluster_tasks as ctasks
 from cloudflow.workflows import job_tasks as jtasks
 
-__copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
+__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
 provider = 'AWS'
@@ -217,6 +217,70 @@ def fcst_flow(fcstconf, fcstjobfile, sshuser=None):
 
 
 
+######################################################################
+@flow
+def python_experiment_dask_flow(conf, jobfile):
+    """
+    """
+
+@flow
+def ufs_flow(ufsconf, ufsjobfile):
+        """ Provides a Prefect Flow for a ufs workflow.
+
+        Parameters
+        ----------
+        ufsconf : str
+                The JSON configuration file for the Cluster to create
+
+        ufsjobfile : str
+                The JSON configuration file for the ufs Job
+
+        """
+
+        #####################################################################
+        # UFS
+        #####################################################################
+
+        # Retrieve runtime context
+        context = get_run_context()
+
+        # Get flow run details
+        flow_run_id = context.flow_run.id
+        flow_run_name = context.flow_run.name
+        print(f"Running flow: {flow_run_name} (ID: {flow_run_id})")
+
+        # Create the cluster object
+        cluster = ctasks.cluster_init(ufsconf)
+
+        # Setup the job
+        ufsjob = tasks.job_init(cluster, ufsjobfile)
+        
+        # Start the cluster
+        cluster_started = False
+        try:
+            ctasks.cluster_start(cluster)
+            cluster_started = True
+        except Exception as e:
+            log.exception('cluster_start failed')
+
+        # Run the ufs
+        # TODO: can also create a cluster class internal state and use that instead for flow conteol
+        # e.g. if cluster.started:  or if cluster.state == 'running': etc.
+        # If cluster_start fails, cluster object might not be well defined though and terminate might not work
+        if cluster_started:
+          try:
+              tasks.ufs_run(cluster, ufsjob)
+          except Exception as e:
+              #PT TODO: fix this so we dont get a bunch of stack-traces in the log
+              #PT maybe check return code and use log.error
+              log.exception('ufs_run failed')
+        
+
+        # Terminate the cluster nodes
+        ctasks.cluster_terminate(cluster)
+
+
+
 
 ######################################################################
 @flow
@@ -241,21 +305,29 @@ def python_experiment_dask_flow(conf, jobfile):
         log.exception('cluster_start failed')
         raise
 
-    # Push the env, install required libs on post machine
-    # TODO: install all of the 3rd party dependencies on AMI
-    ctasks.push_pyEnv(cluster)
+    try:
+        # Start a dask scheduler on the new post machine
+        # Might get a not serializable error message from prefect
+        # distributed.Client might not be serializable, Prefect 3 needs to pickle and store the data in the cache
+        cluster, dask_address = ctasks.start_dask(cluster)
 
-    # Start a dask scheduler on the new post machine
-    # Might get a not serializable error message from prefect 
-    # distributed.Client might not be serializable, Prefect 3 needs to pickle and store the data in the cache
-    daskclient: Client = ctasks.start_dask(cluster)
+        # Run the python dask experiment
+        tasks.python_dask_experiment_run(dask_address, python_job)
+    except Exception as e:
+        log.exception('Python_dask_experiment_run failed')
 
-    tasks.python_dask_experiment_run(daskclient, python_job)
-     
-    # Teriminate the dask clinet session along with the cluster nodes
-    ctasks.dask_client_close(daskclient)
+
+    # Teriminate the dask scheduler and dask ssh commands linked
+    # to the client and workers. Ensure an exception can be
+    # caught in case the start_dask workflow never sucessfully
+    # completed and we did not start up any scheduler and workers
+    try:
+        cluster = ctasks.dask_client_close(cluster)
+    except Exception as e:
+        log.exception('dask_client_close failed, likely due to nonexistent processes')
+
+    # Terminate the AWS resources allocated for dask job
     ctasks.cluster_terminate(cluster)
-
 
 
 
@@ -310,6 +382,3 @@ def experiment_flow(conf, jobfile):
 if __name__ == '__main__':
     pass
 
-    # conf = f'./cluster/configs/debug.config'
-    # jobfile = f'./job/jobs/ngofs.03z.fcst'
-    # debug_model(conf, jobfile, 'none')

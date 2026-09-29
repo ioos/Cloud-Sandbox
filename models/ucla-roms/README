@@ -17,7 +17,7 @@ you specified HOMEroms in 1.
     i. This compiles the ROMS code for this example inside of the 
        ucla-roms/Examples/Rivers_real folder
   b. change directories to Cloud-Sandbox/cloudflow/
-  c. edit job/jobs/ucla-roms.exp  
+  c. edit ../job.configs/ucla-roms.exp  
     i.   edit the EXEC, MODEL_DIR, and IN_FILE paths
     ii.  EXEC      = roms executable that was generated in a.
     iii. MODEL_DIR = directory of roms executable
@@ -27,7 +27,7 @@ you specified HOMEroms in 1.
 	 with EXEC and IN_FILE paths having roms and rivers.in
          appended at the end, respectively
   d. while inside Cloud-Sandbox/cloudflow/ execute:
-     workflows/workflow_main.py cluster/configs/NOS/ucla-roms.config job/jobs/ucla-roms.exp &> ucla-roms-rivers.log &
+     workflows/workflow_main.py ../cluster.configs/NOS/ucla-roms.config ../job.configs/ucla-roms.exp &> ucla-roms-rivers.log &
      i.   how this command works is detailed in step 3 below
      ii.  ucla-roms-rivers.log: 
 	  details of job submission to the cloud and the model output log 
@@ -48,11 +48,11 @@ The general workflow will be:
    Cloud-Sandbox/cloudflow/ 
    i.  Make sure this is the current working directory before proceeding.
    ii. From here, the command to execute a model run is:
-       workflows/workflow_main.py cluster/configs/NOS/ucla-roms.config job/jobs/ucla-roms.exp &> ucla-roms.log &
+       workflows/workflow_main.py ../cluster.configs/NOS/ucla-roms.config ../job.configs/ucla-roms.exp &> ucla-roms.log &
 3. Let's break this command down and understand what you need to edit
    i.   workflows/workflow_main.py 
         Sandbox launcher script. No changes are to be made here.
-   ii.  job/jobs/ucla-roms.exp
+   ii.  ../job.configs/ucla-roms.exp
 	Job file that is specific to each model run
         Leave JOBTYPE and OFS as "ucla-roms"
         RUNCORES:  Number of cores needed to run the experiment
@@ -60,7 +60,7 @@ The general workflow will be:
         EXEC:      Path to your roms executable compiled in 1.
         MODEL_DIR: This is the same path as EXEC without the executable
         IN_FILE:   Path to your roms .in input file 
-   iii. cluster/configs/NOS/ucla-roms.config
+   iii. ../cluster.configs/NOS/ucla-roms.config
 	Configuration file for Cloud running
         The main changes will be to "nodeType" and "nodeCount"
 	nodeType:  Type of AWS instances (nodes) chosen. 

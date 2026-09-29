@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     aws = {
@@ -189,20 +190,8 @@ resource "aws_efs_mount_target" "mount_target_main_efs" {
 
 ###################################
 # RHEL 8
-# 2023-10-06: ami-057094267c651958e
-# AMI name: RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2
 # Owner account ID 309956199498 Red Hat
 ##################################
-
-################################################################
-# CLI search command for troubleshooting, specificity
-#aws ec2 describe-images --owners 309956199498        \
-#    --filters "Name=name,Values=RHEL-8.*_HVM-*-x86_64-*-Hourly2-*"  \
-#    --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
-#    --output table
-# example:
-# |  RHEL-8.9.0_HVM-20240327-x86_64-4-Hourly2-GP3  |  ami-03b59d2a779dad4d3 |  2024-03-28T07:27:26.000Z  |
-# success: ami                                  = "ami-03b59d2a779dad4d3"
 
 data "aws_ami" "rhel_8" {
   owners = ["309956199498"]
@@ -210,7 +199,6 @@ data "aws_ami" "rhel_8" {
 
   filter {
     name = "name"
-    #values = ["RHEL-8.7.0_HVM-20230330-x86_64-56-Hourly2-GP2"]
     values = ["RHEL-8.10*_HVM-*-x86_64-*-Hourly2-*"]
   }
 
@@ -231,28 +219,36 @@ data "aws_ami" "rhel_8" {
 }
 
 
+  
 ###################################
-# Centos Stream 9 - untested
-# ami-0c2abda83f1b9e09d
-# AMI name: CentOS Stream 9 x86_64 
-# Owner account ID 125523088429
+# RHEL 10
+# Owner account ID 309956199498 Red Hat
 ##################################
-
-data "aws_ami" "centos_stream_9" {
-  owners = ["125523088429"]   # CentOS Official CPE
+  
+################################################################
+# CLI search command for troubleshooting and verifying available images
+# aws ec2 describe-images --owners 309956199498        \
+#   --filters "Name=name,Values=RHEL-10.*_HVM-*-x86_64-*-Hourly2-*"  \
+#   --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
+#   --output table
+# example: 
+#  RHEL-10.2.0_HVM-20260618-x86_64-0-Hourly2-GP3 |  ami-0806afd7f0392af4d |  2026-06-18T18:54:19.000Z  
+                
+data "aws_ami" "rhel_10" {
+  owners = ["309956199498"]
   most_recent = true
-
+  
   filter {
-    name = "description"
-    values = ["CentOS Stream 9 *"]
+    name = "name"
+    values = ["RHEL-10.*_HVM-*-x86_64-*-Hourly2-*"]
   }
 
   filter {
     name   = "architecture"
     values = ["x86_64"]
   }
-
-  filter {
+  
+  filter {  
     name   = "root-device-type"
     values = ["ebs"]
   }
@@ -262,7 +258,6 @@ data "aws_ami" "centos_stream_9" {
     values = ["hvm"]
   }
 }
-
 
 # Work around to get a public IP assigned when using EFA
 resource "aws_eip" "head_node" {
@@ -282,9 +277,9 @@ resource "aws_instance" "head_node" {
 
   #################################
   ### Specify which AMI to use here
-  #############################################
+  ###s#############################
 
-  ami = data.aws_ami.rhel_8.id
+  ami = data.aws_ami.rhel_10.id
 
   metadata_options {
      http_endpoint = "enabled"
@@ -297,7 +292,7 @@ resource "aws_instance" "head_node" {
   root_block_device {
     encrypted             = true
     delete_on_termination = true
-    volume_size           = 16
+    volume_size           = 28
     volume_type           = "gp3"
     tags                  = {
         Name    = "${var.name_tag} Head Node"
@@ -361,7 +356,32 @@ resource "aws_network_interface" "head_node" {
   }
 }
 
-# https://developer.hashicorp.com/terraform/language/v1.5.x/resources/terraform-data
+
+resource "local_file" "deployment_info" {
+  filename = "${path.module}/deployment_info.txt"
+  content = <<EOT
+
+Deployment Reference Info
+-------------------------
+Head Node Instance Name:   ${var.name_tag}
+AMI Name Prefix:           ${var.name_tag}-${random_pet.ami_id.id}
+VPC ID:                    ${var.vpc_id != null ? data.aws_vpc.pre-provisioned[0].id : aws_vpc.cloud_vpc[0].id}
+
+JSON for cluster config
+-----------------------
+
+"key_name"        : "${var.key_name}",
+"image_id"        : "found at the end of setup.log, or provided by admin"
+"sg_ids"          : [ "${aws_security_group.base_sg.id}",
+                      "${aws_security_group.ssh_ingress.id}",
+                      "${aws_security_group.efs_sg.id}" ],
+"subnet_id"       : "${aws_instance.head_node.subnet_id}",
+"placement_group" : "${aws_placement_group.cloud_sandbox_placement_group.name}"
+
+EOT
+
+}
+
 
 # scp deployment info to head node automatically
 resource "terraform_data" "send_outputs" {
@@ -369,10 +389,23 @@ resource "terraform_data" "send_outputs" {
   triggers_replace = [
     timestamp() 
   ]
-  # aws_instance.head_node.id
+
+  # Ensures EC2 exists and has outputs before this runs
+  depends_on = [
+    aws_instance.head_node,
+    local_file.deployment_info
+  ]
 
   provisioner "local-exec" {
+
     command = "./scp.terraform.output.sh"
+
+    environment = {
+      LOGIN_COMMAND = (aws_instance.head_node.public_ip != null ? 
+                        "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.public_ip}" : 
+                        "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.head_node.private_dns}")
+      INFO_FILE = local_file.deployment_info.filename
+    }
   }
 }
 

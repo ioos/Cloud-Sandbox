@@ -116,12 +116,13 @@ variable "subnet_quartile" {
 }
 
 # TODO: limit this
-# TODO: Add dynamoDB
 variable "managed_policies" {
   description = "The attached IAM policies granting machine permissions"
   default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
              "arn:aws:iam::aws:policy/AmazonS3FullAccess",
              "arn:aws:iam::aws:policy/AmazonFSxFullAccess",
+             "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2",
+             "arn:aws:iam::aws:policy/AWSPriceListServiceFullAccess",
              "arn:aws:iam::aws:policy/AmazonSSMManagedEC2InstanceDefaultPolicy"
             ]
 }

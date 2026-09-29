@@ -1,0 +1,19 @@
+{
+"platform"  : "AWS",
+"region"    : "us-east-2",
+"nodeType"  : "hpc8a.96xlarge",
+"nodeCount" : 2,
+"tags"      : [ 
+                { "Key": "Name", "Value": "eccofs" },
+                { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
+              ],
+"key_name"        : "ioos-sandbox",
+"image_id"        : "ami-0ae0b8006aff6a196",
+"sg_ids"          : [ "sg-0e8403aa829a0bbde",
+                      "sg-063f1f280e9070e10",
+                      "sg-04ec20a7b423973a1" ],
+"subnet_id"       : "subnet-0be869ddbf3096968",
+"placement_group" : "docsupdate-sandbox-us-east-2b_Terraform_Placement_Group",
+"table_name" : "IOOS-Sandbox-Compute-Nodes"
+}
+

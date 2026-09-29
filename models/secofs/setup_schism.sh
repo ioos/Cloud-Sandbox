@@ -21,4 +21,6 @@ cd $CURHOME
 ./get_testcase_inputs.sh
 cd $CURHOME
 
+echo "SECOFS setup has completed"
+
 

@@ -1,0 +1,10 @@
+{
+  "APP"         : "UFS",
+  "MODEL"       : "UFS",
+  "JOBTYPE"     : "ufs_regressiontest",
+  "TESTNAME"    : "coastal_irene_atm2roms",
+  "SKIPCOMPILE" : "NO",
+  "SAVEDIR"     : "/save/ec2-user",
+  "PTMP"        : "/ptmp",
+  "DISKNM"      : "/com/ufs-weather-model/RT"
+}

@@ -44,6 +44,7 @@ echo "Retrieving the fixed field files ..."
 if [ ! -d $MODEL_DIR/fix ]; then
   mkdir $MODEL_DIR/fix
 fi
+
 cd $MODEL_DIR/fix
 $CURHOME/get_eccofs_fixfiles_s3.sh
 

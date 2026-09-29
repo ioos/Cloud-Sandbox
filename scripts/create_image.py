@@ -148,6 +148,7 @@ def create_image_from_snapshot(snapshot_id: str, image_name: str):
     Tags=[ { 'Key': 'Name',
              'Value': image_name } ])
 
+  print(f"AMI Image ID: {image_id}")
   return image_id
 
 #####################################################################

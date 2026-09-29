@@ -1,0 +1,44 @@
+## Setup UFS Coastal App
+
+### Prerequisites
+
+Spack-stack environment needs to be installed.
+A spack binary mirror exists for this deployment to make this easier and faster.
+See Cloud-Sandbox/scripts/ufs-setup-instance.sh
+spack-stack should work on an older currently deployed head node alongside the regular spack.
+UFS uses spack-stack.
+
+### Scripts
+
+setup.sh - Clone the gitHub repository and build the ROMS App.
+Default location: /save/ec2-user/ufs-weather-model
+
+get_input_data.sh - Dowload the ROMS Irene and SCHISM Ike test case inputs
+Default location: /com/ufs-weather-model/RT/NEMSfv3gfs/input-data-20250507
+
+### How To Run
+
+Currently the Irene ROMS regression test has been tested.
+Ike SCHISM tests should be easy to add at this point.
+
+The run will launch a single node to build and run the preconfigured test(s).
+
+Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.rt).
+
+Set non-default directories in:  ../job.configs/UFS/ufs.irene
+
+Launch the job:
+nohup workflows/workflow_main.py cluster/configs/IOOS/ufs.rt ../job.configs/UFS/ufs.irene > & ufs.out &
+
+Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.
+See ufs_launcher.sh for additional options.
+
+Other links:
+https://www.epic.noaa.gov/ufs-coastal-app-development/
+https://ufs-coastal-application.readthedocs.io/en/latest/index.html
+https://github.com/oceanmodeling/ufs-weather-model
+
+Next steps:
+https://epic.noaa.gov/unified-workflow-tools/
+
+

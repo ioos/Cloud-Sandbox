@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#__copyright__ = "Copyright © 2023 RPS Group, Inc. All rights reserved."
+#__copyright__ = "Copyright © 2026 Tetra Tech, Inc. All rights reserved."
 #__license__ = "BSD 3-Clause"
 
 source environment-vars.sh
@@ -19,9 +19,11 @@ sudo setenforce 0
 setup_paths
 setup_aliases
 setup_environment
-# setup_prefect
 
-## install_jupyterhub # Requires some manual work
+# Setup Prefect as a system daemon
+setup_prefect-server
+
+# install_jupyterhub # Requires some manual work
 setup_ssh_mpi
 
 install_efa_driver
@@ -29,28 +31,26 @@ install_fsx_driver
 
 # Compilers and libraries
 install_python_modules_user
-install_gcc_toolset_yum
-
-source /opt/rh/gcc-toolset-11/enable
 
 install_spack
 
 . $SPACK_DIR/share/spack/setup-env.sh
 
-install_intel_oneapi_spack
-install_intel-oneapi-mkl_spack
-install_esmf_spack   # also installs netcdf, hdf5, intel-mpi
-install_petsc_intelmpi-spack
-install_nceplibs-spack
+# Install compilers, mkl, and mpi, etc.
 
-# install_ffmpeg
+install_intel_oneapi_dnf
 
-# TODO: create an output file to contain all of this state info - json
+create_spack-environment
+
+build_spack-environment
+
+configure_optimizations
 
 # create node image
 ###################################
 
-spack clean
+spack clean --all
+sudo dnf clean all
 
 # ami_name is provided by Terraform if called via the init_template
 # otherwise it will use the default
@@ -64,6 +64,16 @@ project_tag=${project_tag:="IOOS-Cloud-Sandbox"}
 # create node image
 ###################################
 
+## disable prefect server daemon
+sudo systemctl stop prefect-server
+sudo systemctl disable prefect-server
+
 ./create_image.sh $ami_name $project_tag
+
+## re-enable prefect server daemon
+sudo systemctl enable prefect-server
+sudo systemctl start prefect-server
+
+sudo setenforce 1
 
 echo "Setup completed!"
