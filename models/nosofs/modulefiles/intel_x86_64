@@ -31,16 +31,29 @@ setenv COMP_MPCC mpicc
 # AVX512 not available on hpc6a instances
 setenv NO_AVX512 1
 
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi 
-module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
-module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
-# module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-module load metis/5.1.0-intel-2021.9.0-fdsd6ir
-module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
+module load intel/compiler/2024.2.1 
+module load intel/mkl/2024.2
+module load intel/mpi/2021.13
+module load netcdf-fortran/4.6.2-intel-oneapi-compilers-2024.2.1-qf6u5b4 
+
+#module load metis/5.1.0-intel-2021.9.0-fdsd6ir
+module load libpng/1.6.58-intel-oneapi-compilers-2024.2.1-ursksia   
 
 # Need to test build with these, I don't think they are being used yet
-module load parallel-netcdf/1.12.3-intel-2021.9.0-o334gxk  
-module load parallelio/2.6.2-intel-2021.9.0-mznk65v  
+#module load parallel-netcdf/1.12.3-intel-2021.9.0-o334gxk
+#module load parallelio/2.6.2-intel-2021.9.0-mznk65v
+
+
+#module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi 
+#module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
+#module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
+## module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
+#module load metis/5.1.0-intel-2021.9.0-fdsd6ir
+#module load libpng/1.6.39-oneapi-2023.1.0-n3gzlbg
+#
+## Need to test build with these, I don't think they are being used yet
+#module load parallel-netcdf/1.12.3-intel-2021.9.0-o334gxk  
+#module load parallelio/2.6.2-intel-2021.9.0-mznk65v  
 ###########################################################
 
 set METIS [exec spack location -i metis]
