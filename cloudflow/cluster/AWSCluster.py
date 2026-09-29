@@ -24,7 +24,7 @@ from cloudflow.cluster.Cluster import Cluster
 __copyright__ = "Copyright © 2025 Tetra Tech, Inc. All rights reserved."
 __license__ = "BSD 3-Clause"
 
-MAX_MINUTES = 2 * 60
+MAX_MINUTES = 3 * 60
 
 log = logging.getLogger('workflow')
 
@@ -152,7 +152,7 @@ class AWSCluster(Cluster):
         self.nodeCount = 0
         self.NPROCS = 0
         self.PPN = 0
-        self.vm_retry_delay = 300
+        self.vm_retry_delay = 60
         self.vm_max_retries = 5
         self.tags = []
         self.image_id = ''
@@ -163,7 +163,7 @@ class AWSCluster(Cluster):
         self.username = getpass.getuser()
         self.table_name = ''
         # Can add this to the cluster config if so desired - Lambda sweeper function can use it or some other hard value
-        self.minutes_max = 120
+        self.minutes_max = 360
         # self.hosts = ''
 
         cfDict = self.readConfig(configfile)

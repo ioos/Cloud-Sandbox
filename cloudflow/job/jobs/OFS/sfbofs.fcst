@@ -4,7 +4,7 @@
   "APP"       : "sfbofs",
   "CDATE"     : "today",
   "HH"        : "03",
-  "NHOURS"    : "24",
+  "NHOURS"    : "48",
   "OP_NHOURS" : "48",
   "COMROT"    : "/com/patrick/nosofs",
   "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",

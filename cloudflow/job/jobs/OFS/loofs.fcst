@@ -4,7 +4,7 @@
   "APP"       : "loofs",
   "CDATE"     : "today",
   "HH"        : "00",
-  "NHOURS"    : "24",
+  "NHOURS"    : "120",
   "OP_NHOURS" : "120",
   "COMROT"    : "/com/patrick/nosofs",
   "SAVEDIR"   : "/save/patrick/nosofs.v3.6.6",

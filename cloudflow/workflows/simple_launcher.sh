@@ -16,12 +16,6 @@ if [ $# -lt 8 ] ; then
   exit 1
 fi
 
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-export FI_PROVIDER=efa
-export I_MPI_FABRICS=shm:ofi  # default
-export I_MPI_OFI_PROVIDER=efa
-export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
@@ -38,6 +32,12 @@ export EXEC=$8
 
 # TODO: INPUTFILE isn't used, FVCOM expects casename, and the exec expects a nml file that matches the casename
 #       or in this case we can use APP
+
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
+export FI_PROVIDER=efa
+export I_MPI_FABRICS=shm:ofi  # default
+export I_MPI_OFI_PROVIDER=efa
+export I_MPI_DEBUG=1      # Will output the details of the fabric being used
 
 # TODO: put the following back in
 # mpirun --version | grep Intel

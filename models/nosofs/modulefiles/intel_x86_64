@@ -15,12 +15,18 @@ module-whatis "This module sets the environment variables for \
 setenv COMP_F ifort
 setenv COMP_F_MPI90 mpif90
 setenv COMP_F_MPI mpif90
+
+setenv I_MPI_F90 ifort
+setenv I_MPI_FC ifort
+
 # FC       = $(COMP_F_MPI) -fc=ifort
 setenv COMP_ICC icc
 setenv COMP_CC  icc
 setenv COMP_CPP cpp
 # setenv COMP_MPCC "mpicc -fc=icc"
 setenv COMP_MPCC mpicc
+
+# setenv FC ifort
 
 # AVX512 not available on hpc6a instances
 setenv NO_AVX512 1

@@ -5,13 +5,17 @@ echo $PWD
 cd ..
 
 nosofs_roms=" cbofs ciofs  dbofs gomofs tbofs  wcofs"
-nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sscofs sfbofs"
+nosofs_fvcom="leofs lmhofs loofs lsofs  ngofs2 sfbofs sscofs"
 
-#nosofs_roms="eccofs"
-nosofs_roms="cbofs"
-nosofs_fvcom=""
+# loofs failed
 
-ofslist="$nosofs_roms $nosofs_fvcom"
+small_models="cbofs dbofs gomofs leofs sfbofs tbofs wcofs"  # < 60 minutes
+medium_models="lmhofs lsofs sscofs"          # about 60-75 minutes
+large_models="ciofs ngofs2"          # over 100 miutes (ngofs2 180)
+
+
+#ofslist="$nosofs_roms $nosofs_fvcom"
+ofslist="$large_models $medium_models"
 
 create_ccfg () {
   ofs=$1
@@ -23,7 +27,7 @@ create_ccfg () {
 	"region"    : "us-east-2",
 	"nodeType"  : "hpc6a.48xlarge",
 	"nodeTypeNew"  : "hpc7a.96xlarge",
-	"nodeCount" : 2,
+	"nodeCount" : 4,
 	"tags"      : [
                 { "Key": "Name", "Value": "$ofs-fcst" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
@@ -55,7 +59,7 @@ do
   echo "nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &"
   nohup workflows/workflow_main.py $ccfg $job >& out.$ofs &
 
-  stime=1
+  stime=3600
   echo "Sleeping for $stime seconds"
   sleep $stime
 

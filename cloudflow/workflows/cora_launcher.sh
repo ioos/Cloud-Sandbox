@@ -29,6 +29,14 @@ export CONFIG=$6
 export GRID=$7
 export APP=$8
 
+#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
+export I_MPI_DEBUG=0
+
+#export I_MPI_JOB_ABORT_SIGNAL=9
+#export I_MPI_JOB_TIMEOUT_SIGNAL=9
+#export I_MPI_JOB_TIMEOUT=3600
+
 #OpenMPI
 #mpirun --version
 
@@ -53,9 +61,6 @@ if [ $openmpi -eq 1 ]; then
   export MPIOPTS="-host $HOSTS -np $NPROCS -npernode $PPN -oversubscribe"
 elif [ $impi -eq 1 ]; then
   export MPIOPTS="-launcher ssh -hosts $HOSTS -np $NPROCS -ppn $PPN"
-  #export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-  export I_MPI_OFI_LIBRARY_INTERNAL=0   # Using AWS EFA Fabric on AWS
-  export I_MPI_DEBUG=0
 else
   echo "ERROR: Unsupported mpirun version ..."
   exit 1

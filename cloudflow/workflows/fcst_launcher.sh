@@ -15,22 +15,6 @@ if [ $# -lt 8 ] ; then
   exit 1
 fi
 
-# Defaults here
-export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
-export FI_PROVIDER=efa
-export I_MPI_FABRICS=ofi
-export I_MPI_OFI_PROVIDER=efa
-
-# module load libfabric-aws
-
-# LiveOcean
-#export I_MPI_OFI_LIBRARY_INTERNAL=1  # Use intel's fabric library
-#export I_MPI_OFI_PROVIDER=efa
-#export I_MPI_FABRICS=ofi
-#export I_MPI_DEBUG=1      # Will output the details of the fabric being used
-#export I_MPI_DEBUG=4      # Will output task mapping
-#export FI_PROVIDER=efa
-
 # This was created to launch a job via Python
 # The Python scripts create the cluster on-demand
 # and submits this job with the list of hosts available.
@@ -46,6 +30,21 @@ export HOSTS=$8
 export APP=$9
 export EXEC=${10}
 export XTRA_ARGS=${11}   # extra args needed for schism/secofs, and eccofs
+
+
+# Defaults here
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
+export FI_PROVIDER=efa
+export I_MPI_FABRICS=ofi
+export I_MPI_OFI_PROVIDER=efa
+
+# export I_MPI_JOB_ABORT_SIGNAL=9
+# I_MPI_JOB_TIMEOUT sets the max time an mpijob can run, after X seconds it will stop
+# export I_MPI_JOB_TIMEOUT_SIGNAL=9
+# export I_MPI_JOB_TIMEOUT=1500
+
+#export I_MPI_DEBUG=1      # Will output the details of the fabric being used
+#export I_MPI_DEBUG=4      # Will output task mapping
 
 #OpenMPI
 #mpirun --version

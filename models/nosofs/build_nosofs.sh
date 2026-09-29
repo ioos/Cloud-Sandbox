@@ -28,6 +28,9 @@ fi
 cp $CURHOME/modulefiles/intel_x86_64 $MODEL_DIR/modulefiles/intel_x86_64
 cd $MODEL_DIR/sorc
 
+#source /opt/rh/gcc-toolset-11/enable
+#which gfortran
+
 echo "Building everything ... "
 echo "The build scripts can be modified to only build specific models."
 ./build.sh
