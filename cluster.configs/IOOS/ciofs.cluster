@@ -7,9 +7,9 @@
         "nodeType6"  : "hpc6a.48xlarge",
         "nodeCount" : 2,
         "vm_retry_delay": 60,
-        "vm_max_retries": 8,
+        "vm_max_retries": 10,
         "tags"      : [
-                { "Key": "Name", "Value": "cbofs-fcst" },
+                { "Key": "Name", "Value": "ciofs-fcst" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
               ],
         "key_name"  : "ioos-sandbox",

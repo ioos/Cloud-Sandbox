@@ -26,19 +26,6 @@ wcofs_free
 
 # Optionally only download some
 #fixdirs='shared cbofs leofs'
-fixdirs='
-ciofs
-dbofs
-gomofs
-lmhofs
-loofs
-lsofs
-ngofs2
-sfbofs
-sscofs
-tbofs
-wcofs
-'
 
 bucket=ioos-sandbox-use2
 version="v3.6.11"

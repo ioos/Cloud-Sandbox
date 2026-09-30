@@ -199,7 +199,7 @@ class AWSCluster(Cluster):
 
             The Pricing API is a global service whose endpoint lives in
             us-east-1 regardless of the region where instances will run.
-            Results are for Linux on-demand pricing with no pre-installed
+            Results are for RHEL on-demand pricing with no pre-installed
             software, which is the billing model used by this sandbox.
 
             If the API call fails for any reason (e.g. no network access,
@@ -220,7 +220,7 @@ class AWSCluster(Cluster):
             pricing_client = boto3.client("pricing", region_name="us-east-1")
 
             # Fetch all on-demand price list entries that match this instance
-            # type and region.  We request Linux / no-preinstalled-sw / Used
+            # type and region.  We request RHEL / no-preinstalled-sw / Used
             # capacity to match the sandbox billing model.  We do NOT filter on
             # tenancy here because HPC instance types (hpc6a, hpc7a …) are
             # billed under "Dedicated" tenancy while most compute types use
@@ -229,7 +229,7 @@ class AWSCluster(Cluster):
                 ServiceCode="AmazonEC2",
                 Filters=[
                     {"Type": "TERM_MATCH", "Field": "instanceType",     "Value": self.nodeType},
-                    {"Type": "TERM_MATCH", "Field": "operatingSystem",  "Value": "Linux"},
+                    {"Type": "TERM_MATCH", "Field": "operatingSystem",  "Value": "RHEL"},
                     {"Type": "TERM_MATCH", "Field": "preInstalledSw",   "Value": "NA"},
                     {"Type": "TERM_MATCH", "Field": "capacitystatus",   "Value": "Used"},
                     {"Type": "TERM_MATCH", "Field": "location",         "Value": region_long},
@@ -290,7 +290,7 @@ class AWSCluster(Cluster):
         # Print a clearly delimited cost-estimate block so it is easy to spot
         # in the workflow logs.
         print("\n===============================================================")
-        print("  ESTIMATED CLUSTER COST  (on-demand, Linux, no pre-installed SW)")
+        print("  ESTIMATED CLUSTER COST  (on-demand, RHEL, no pre-installed SW)")
         print("===============================================================")
         print(f"  Instance type : {self.nodeType}")
         print(f"  Region        : {self.region}  ({region_long})")
@@ -600,9 +600,9 @@ class AWSCluster(Cluster):
 
                  print(
                      f"AWS Insufficent Instance Capacity has been detected, Will attempt to wait "
-                     "{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
-                     "delay time will be implemented over each retry interval. Cloudflow will retry "
-                     "{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
+                     f"{self.vm_retry_delay} seconds at the start. A 10% exponential backoff on the "
+                     f"delay time will be implemented over each retry interval. Cloudflow will retry "
+                     f"{self.vm_max_retries} times over to see if we can obtain the user requested AWS resources."
                  )
                  retries = 0
 
@@ -623,16 +623,16 @@ class AWSCluster(Cluster):
                              else:
                                  # Implement an 10% exponential backoff of the time delay starting from the user specified endpoint
                                  if(retries>1):
-                                     self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * self.vm_max_retries))
+                                     self.vm_retry_delay = int(self.vm_retry_delay * math.exp(0.10 * retries))
                                      print(
                                          f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
-                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                         f"(Attempt {retries}/{self.vm_max_retries})"
                                      )
                                      time.sleep(self.vm_retry_delay)
                                  else:
                                      print(
                                          f"Insufficient capacity. Retrying in {self.vm_retry_delay} seconds... "
-                                         "(Attempt {retries}/{self.vm_max_retries})"
+                                         f"(Attempt {retries}/{self.vm_max_retries})"
                                      )
                                      time.sleep(self.vm_retry_delay)
                          else:
@@ -769,7 +769,7 @@ class AWSCluster(Cluster):
                 # Also print to stdout so the cost appears in the cloudflow
                 # console output immediately after the cluster is torn down.
                 print("\n===============================================================")
-                print("  ACTUAL CLUSTER COST  (on-demand, Linux, based on real runtime)")
+                print("  ACTUAL CLUSTER COST  (on-demand, RHEL, based on real runtime)")
                 print("===============================================================")
                 print(f"  Cluster name  : {nametag}")
                 print(f"  Instance type : {nodetype}")
