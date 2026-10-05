@@ -93,15 +93,6 @@ setup_environment () {
   sudo dnf -y install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
   # sudo systemctl status amazon-ssm-agent
 
-  # Additional packages for spack-stack
-  # TODO: Move to spack-stack setup
-  #sudo dnf -y install git-lfs
-  #sudo dnf -y install bash-completion
-  #sudo dnf -y install xorg-x11-xauth
-  #sudo dnf -y install xterm
-  #sudo dnf -y install texlive
-  #sudo dnf -y install mysql-server
-
   # AWS CLI Installer
   # 2.35.13 as of June 30, 2026
   # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -131,6 +122,24 @@ setup_environment () {
     sudo chown $USER:$USER .
   fi
 
+  ## Add unlimited stack size 
+  echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
+
+  # sudo dnf clean {option}
+  cd $home
+
+  echo "${FUNCNAME[0]} finished"
+}
+
+
+#-----------------------------------------------------------------------------#
+setup_modulefiles_tcl () {
+
+  echo "In ${FUNCNAME[0]}"
+
+  ## Set up environment modules
+  #############################
+
   sudo dnf -y install environment-modules
 
   sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
@@ -139,29 +148,37 @@ setup_environment () {
   grep "/usr/share/Modules/init/bash" ~/.bashrc >& /dev/null
   if [ $? -ne 0 ] ; then
     echo . /usr/share/Modules/init/bash >> ~/.bashrc
-    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc 
+    echo source /usr/share/Modules/init/tcsh >> ~/.tcshrc
   fi
 
   . /usr/share/Modules/init/bash
 
-  # module --version 
+  # Interactive
+  # sudo alternatives --config modules.sh
+
+  # module --version
   echo $MODULESHOME
   echo $MODULEPATH
 
+}
+
+
+#-----------------------------------------------------------------------------#
+
+setup_modulefiles_lua () {
+
+  echo "In ${FUNCNAME[0]}"
 
   # Can use Lua modules, newer but not 100% compatible wit tcl modules
-  # if [ -e /usr/share/lmod/lmod/init/profile ]; then
-  #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
-  # fi
+  if [ -e /usr/share/lmod/lmod/init/profile ]; then
+    sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
+  fi
 
+  module --version
 
-  ## Add unlimited stack size 
-  echo "ulimit -s unlimited" | sudo tee -a /etc/profile.d/custom.sh
+  echo $MODULESHOME
+  echo $MODULEPATH
 
-  # sudo dnf clean {option}
-  cd $home
-
-  echo "${FUNCNAME[0]} finished"
 }
 
 #-----------------------------------------------------------------------------#
@@ -312,15 +329,16 @@ install_spack-stack_prereqs () {
   sudo dnf -y install xorg-x11-xauth
   sudo dnf -y install perl-IPC-Cmd
   sudo dnf -y install gettext-devel
+  sudo dnf -y install Lmod
+  sudo dnf -y install zlib-ng-compat-static     # needed by hdf5 build
+  sudo dnf -y install perl-FindBin perl-IPC-Cmd # needed by openSSL build
+  sudo dnf -y install proj                      # needed by some python environments
+
   #sudo dnf -y install xterm    # optional
   #sudo dnf -y install texlive  # optional
-  sudo dnf -y install Lmod
-  if [ -e /usr/share/lmod/lmod/init/profile ]; then
-    sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
-  fi
+  #sudo dnf -y install mysql-server
 
   # All of these are already installed in setup_environment ()
-  # Lmod-8.7.65-3.el8.x86_64.rpm
   # sudo dnf -y install m4
   # sudo dnf -y install wget
   # sudo dnf -y install cmake
@@ -344,19 +362,22 @@ setup_spack-stack () {
 
   cd /save/environments
 
-  SS_BRANCH='aws-ioossb'
   if [ ! -d $SPACKSTACK_DIR ]; then
-      #git clone -b release/$SPACKSTACK_VER --recurse-submodules  \
-
-      git clone -b $SS_BRANCH --recurse-submodules  \
+      git clone -b $SPACKSTACK_VER --recurse-submodules  \
           https://github.com/asascience-open/spack-stack.git $SPACKSTACK_DIR
+
+      #git clone -b $SS_BRANCH --recurse-submodules  \
+      #    https://github.com/asascience-open/spack-stack.git $SPACKSTACK_DIR
 
   fi
   cd $SPACKSTACK_DIR
   source setup.sh
-  #echo "source /save/environments/spack-stack.v2.0/setup.sh" >> ~/.bashrc
+
+  echo "source $SPACKSTACK_DIR/setup.sh" >> ~/.bashrc
 
   spack config add "config:install_tree:padded_length:90"
+  spack config add "config:build_jobs:8"
+
 
   spack gpg init
   wget -o /dev/null -nv -O $SPACK_KEY $SPACK_KEY_URL
@@ -371,24 +392,27 @@ setup_spack-stack () {
   spack buildcache keys --install --trust
   spack buildcache update-index s3-spack-stack
 
-  # Install Intel Compiler outside of spack-stack environment
-  source /opt/intel/oneapi/setvars.sh
-  if [ $? -ne 0 ]; then
-      echo "WARNING: Intel oneApi Compilers not found!"
-  fi
-
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+#  gcc-toolset-15-enable
 
   # Create the site environment
-  spack stack create env --site linux.default --template unified-dev --name aws-ioossb-rhel8 --compiler=oneapi
+  # WARNING: /mnt/efs/fs1/save/environments/spack-stack.v2.1.0/configs/sites/tier2/linux.default/packages_oneapi.yaml not found, please check if this is correct
 
-  cd envs/aws-ioossb-rhel8/
+  spack stack create env --site aws-rhel10 --template ioos-ufscoastal --name aws-ioossb-rhel10 --compiler=oneapi
+
+  cd envs/aws-ioossb-rhel10/
   spack env activate -p .
 
   ################ environment/site specific ################
 
   unset SPACK_DISABLE_LOCAL_CONFIG
   export SPACK_SYSTEM_CONFIG_PATH="$PWD/site"
+
+  spack config add "config:install_tree:padded_length:90"
+  spack config add "config:build_jobs:8"
+
+  # Why is it excluding openssl and openssh? becuase of some spack package conflicts with crypt
+
+  echo "Finding externals ..."
 
   spack external find --scope system    \
       --exclude bison --exclude meson   \
@@ -401,27 +425,48 @@ setup_spack-stack () {
   # Note - only needed for generating documentation
   spack external find --scope system texlive
 
+  spack external find --scope system mpi
+  spack external find --scope system intel-oneapi-mpi
+
+
   # Add compilers to the top of site/packages.yaml.
   spack compiler find --scope system
+
+  # proj 9.2.0 does not build on this environment
+
+  spack config --scope system add 'packages:proj:externals:[{"spec":"proj@9.6.0","prefix":"/usr"}]'
+  # spack config --scope system add 'packages:proj:buildable:false'
+
+#  proj:
+#    externals: 
+#    - spec: proj@9.6.0
+#      prefix: /usr
+#    buildable: false
+
+  spack config --scope system add "packages:mpi:require:['intel-oneapi-mpi@2021.16']"
 
   ################ ################
 
   export SPACK_DISABLE_LOCAL_CONFIG=true
   unset SPACK_SYSTEM_CONFIG_PATH
 
-  spack config add "packages:mpi:require:['intel-oneapi-mpi@2021.13.0']"
+  # not sure if it required here or in site:
+  # spack config add "packages:mpi:require:['intel-oneapi-mpi@2021.13.1']"
+
   spack config add "concretizer:targets:granularity:'generic'"
   spack config add "packages:all:target:['x86_64_v3']"
 
   sed -i 's/tcl/lmod/g' site/modules.yaml
   sed -i 's/tcl/lmod/g' common/modules.yaml
 
-  # echo "spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8" >> ~/.bashrc
+  # echo "spack env activate -p $SPACKSTACK_DIR/envs/aws-ioossb-rhel10" >> ~/.bashrc
   echo "spack-stack is installed ... install/build the environment next"
 
   cd $home
   echo "${FUNCNAME[0]} finished"
 }
+
+
 
 #-----------------------------------------------------------------------------#
 
@@ -430,13 +475,12 @@ build_spack-stack-environment () {
   echo "Running ${FUNCNAME[0]} ..."
   home=$PWD
 
-  source /save/environments/spack-stack.v2.0/setup.sh
+  source $SPACKSTACK_DIR/setup.sh
 
-  source /opt/intel/oneapi/setvars.sh
-
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+#  source /opt/intel/oneapi/setvars.sh
+#  gcc-toolset-15-enable
   
-  cd /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
+  cd $SPACKSTACK_DIR/envs/aws-ioossb-rhel10
   spack env activate -p .
 
   # This is in common/packages but was not built with the spec, manually adding it
@@ -445,22 +489,38 @@ build_spack-stack-environment () {
 
   SPACKOPTS="$SPACKOPTS --fail-fast"
 
+  # Skipping - compile exited due to tty fail - use tmux
+  # echo "PT: Skipping concretize - compile exited due to tty fail - use tmux"
   spack concretize --force --fresh 2>&1 | tee log.concretize
 
   #${SPACK_STACK_DIR}/util/show_duplicate_packages.py
   #spack stack check-preferred-compiler
   #spack stack: error: argument SUBCOMMAND: invalid choice: 'check-preferred-compiler' choose from:
 
-  # The install stops when the terminal times out - use tmux
+  # If the install stops when the terminal times out - use tmux
   spack install $SPACKOPTS 2>&1 | tee log.install
 
+#  echo "PT: Debug --- where is mpiicx -----"
+#  source /opt/intel/oneapi/setvars.sh
+  which mpiicx
+
   # Setup modules 
-  spack module tcl refresh -y
-  #spack module lmod refresh -y --delete-tree
+  # spack module tcl refresh -y
+
+  # Trying Lmod again
+  spack module lmod refresh -y --delete-tree
 
   # create setup-meta-modules
   echo "Running spack stack setup-meta-modules ..."
   spack stack setup-meta-modules
+
+#  # Only do this once
+#  grep "$SPACKSTACK_DIR/envs/aws-ioossb-rhel10/modules" ~/.bashrc >& /dev/null
+#  if [ $? -ne 0 ] ; then
+#    echo "module use -a $SPACKSTACK_DIR/envs/aws-ioossb-rhel10/modules" >> ~/.bashrc
+#  fi
+
+  # module use -a $SPACKSTACK_DIR/envs/aws-ioossb-rhel10/modules
 
   cd $home
   echo "${FUNCNAME[0]} finished"
@@ -468,9 +528,27 @@ build_spack-stack-environment () {
 
 #-----------------------------------------------------------------------------#
 
+gcc-toolset-15-enable() {
+
+  # Why bother parameterizing the gcc version number? 
+  # RedHat will probably change/break it with the next version
+
+  # RHEL 10 removed scl-utils and the "enable" script. Users have to use scl which
+  # creates a nested shell to use gcc-toolset. Or manually set the paths as below:
+
+  export PATH="/opt/rh/gcc-toolset-15/root/usr/bin:$PATH"
+  export LD_LIBRARY_PATH="/opt/rh/gcc-toolset-15/root/usr/lib64:/opt/rh/gcc-toolset-15/root/usr/lib:$LD_LIBRARY_PATH"
+  export MANPATH="/opt/rh/gcc-toolset-15/root/usr/share/man:$MANPATH"
+  export INFOPATH="/opt/rh/gcc-toolset-15/root/usr/share/info:$INFOPATH"
+  echo "GCC Toolset 15 enabled in current shell."
+}
+
+#-----------------------------------------------------------------------------#
+
 setup_rocoto() {
   
-  source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  # source /opt/rh/gcc-toolset-$GCC_MAJOR/enable
+  gcc-toolset-15-enable
 
   module use /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8/modulefiles.tcl/Core
   module load stack-intel-oneapi-compilers/2024.2.1
@@ -596,8 +674,8 @@ install_gcc_toolset_dnf() {
 
   home=$PWD
 
-  #${GCC_MAJOR}
   # Also installs tcl environment-modules
+  sudo dnf -y install gcc-toolset-${GCC_MAJOR}
   sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-c++
   sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-gfortran
   sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gdb
@@ -605,22 +683,8 @@ install_gcc_toolset_dnf() {
   sudo dnf -y install gcc-toolset-${GCC_MAJOR}-gcc-plugin-annobin
  
   # source /opt/rh/gcc-toolset-${GCC_MAJOR}/enable 
+  gcc-toolset-15-enable
 
-  sudo alternatives --config modules.sh
-
-  # Need to reset to Lua for ufs
-  echo "NOTICE: For UFS you must reset alternatives for modules for Lmod lua modules"
-  echo "NOTICE: Older modulefiles might not work correctly with Lua modueles"
-  echo 'Use:  sudo alternatives --config modules.sh'
-
-  sudo alternatives --set modules.sh /usr/share/Modules/init/profile.sh
-
-  # if [ -e /usr/share/lmod/lmod/init/profile ]; then
-  #  sudo alternatives --set modules.sh /usr/share/lmod/lmod/init/profile
-  # fi
-
-  #module --version 
-  # Modules based on Lua: Version 8.7.65
   cd $home
   echo "${FUNCNAME[0]} finished"
 }
@@ -676,8 +740,35 @@ install_spack() {
 #  echo "Using SPACK s3-mirror $SPACK_MIRROR"
 #  spack mirror add s3-mirror $SPACK_MIRROR >& /dev/null
 #  spack buildcache keys --install --trust
+
+
+  # Find intel oneapi stuff
+  module use -a /save/environments/modulefiles
+
+  module load intel/compiler/2024.2.1
+  module load intel/compiler-intel-llvm/2024.2.1
+  module load intel/ifort/2024.2.1
+  module load intel/mpi/2021.13
+  module load intel/mkl/2024.2
   
   spack compiler find --scope site
+
+  # Manually add mpi and mkl externals so spack doesn't build new ones
+  add_spack_site_external \
+    intel-oneapi-mkl \
+    intel-oneapi-mkl@2024.2 \
+    /opt/intel/oneapi
+
+  add_spack_site_external \
+    intel-oneapi-mpi \
+    intel-oneapi-mpi@2021.13 \
+    /opt/intel/oneapi
+
+  spack config --scope site add 'packages:all:providers:mkl:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:blas:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:lapack:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:scalapack:[intel-oneapi-mkl]'
+  spack config --scope site add 'packages:all:providers:mpi:[intel-oneapi-mpi]'
 
   # scope 
   # site -- changes saved in SPACK_DIR
@@ -685,7 +776,6 @@ install_spack() {
   # user -- changes in ~/.spack
 
   # --not-buildable       packages with detected externals won't be built with Spack
-  # spack external find --not-buildable --scope site
   # spack external find --not-buildable --scope site
 
   spack external find --scope site
@@ -696,7 +786,8 @@ install_spack() {
 
   # This is spack's mirror of some libraries
   # spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
-  spack mirror add --scope site spack-public https://cache.spack.io
+  spack mirror add spack-public https://cache.spack.io
+  #spack mirror add --scope site spack-public https://cache.spack.io
   spack buildcache keys --install --trust
 
   cd $home
@@ -925,38 +1016,13 @@ EOF
   echo $MODULESHOME
   echo $MODULEPATH
 
-  module use -a /save/environments/modulefiles
+#  module use -a /save/environments/modulefiles
 
-  module load intel/compiler/2024.2.1
-  module load intel/compiler-intel-llvm/2024.2.1
-  module load intel/ifort/2024.2.1
-  module load intel/mpi/2021.13
-  module load intel/mkl/2024.2
-
-  ## spack compiler find or install intel before spack
-  spack compiler find --scope site
-
-
-  # Manually add mpi and mkl externals so spack doesn't build new ones
-  add_spack_site_external \
-    intel-oneapi-mkl \
-    intel-oneapi-mkl@2024.2 \
-    /opt/intel/oneapi
-
-  add_spack_site_external \
-    intel-oneapi-mpi \
-    intel-oneapi-mpi@2021.13 \
-    /opt/intel/oneapi
-
-  spack config --scope site add 'packages:all:providers:mkl:[intel-oneapi-mkl]'
-  spack config --scope site add 'packages:all:providers:blas:[intel-oneapi-mkl]'
-  spack config --scope site add 'packages:all:providers:lapack:[intel-oneapi-mkl]'
-  spack config --scope site add 'packages:all:providers:scalapack:[intel-oneapi-mkl]'
-  spack config --scope site add 'packages:all:providers:mpi:[intel-oneapi-mpi]'
-
-  # spack mirror add $SPACK_VER https://binaries.spack.io/$SPACK_VER
-  spack mirror add spack-public https://cache.spack.io
-  spack buildcache keys --install --trust
+#  module load intel/compiler/2024.2.1
+#  module load intel/compiler-intel-llvm/2024.2.1
+#  module load intel/ifort/2024.2.1
+#  module load intel/mpi/2021.16
+#  module load intel/mkl/2024.2
 
   cd $home
   echo "${FUNCNAME[0]} finished"

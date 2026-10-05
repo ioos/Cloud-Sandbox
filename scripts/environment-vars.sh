@@ -1,17 +1,26 @@
 # Source this file in script to use
 
 export PREFECT_VER=3.7.8
-export GCC_VER=14.3.1
+export GCC_VER=15.2.1
 export GCC_MAJOR=${GCC_VER%%.*}
 
 export SPACK_VER='v1.2.0'
+export USE_SPACK_STACK="YES"
+
+export SPACKSTACK_VER=2.1.0
+export SPACKSTACK_DIR="/save/environments/spack-stack.v${SPACKSTACK_VER}"
+# export SS_BRANCH='aws-ioossb'
 
 export ONEAPI_VER=2024.2.1
 export ONEAPI_MAJOR_MINOR=${ONEAPI_VER%.*}
 
 # The below versions correspond with ONEAPI_VER above
 export INTEL_COMPILER_VER=2021.13.2
-export INTEL_MPI_VER=2021.13
+export INTEL_MPI_VER=2021.16.1    # Currently 2021.13.1
+
+
+# UFS was using this!
+# export INTEL_MPI_VER=2021.16.0
 
 # intel oneapi version with RHEL 10 support 2025.x
 
@@ -71,9 +80,10 @@ if [ $SPACK_CACHEONLY -eq 1 ]; then
 fi
 
 # PT: TODO - move mirror to s3://ioos-sandbox-use2
-export SPACK_MIRROR='s3://ioos-cloud-sandbox/public/spack/mirror'
-export SPACK_KEY_URL='https://ioos-cloud-sandbox.s3.amazonaws.com/public/spack/mirror/spack.mirror.gpgkey.pub'
-export SPACK_KEY=${SPACK_DIR}/opt/spack/gpg/spack.mirror.gpgkey.pub
+
+export SPACK_MIRROR='s3://ioos-sandbox-use2/public/spack-stack/mirror'
+export SPACK_KEY='spack.mirror.gpgkey.pub'
+export SPACK_KEY_URL="https://ioos-sandbox-use2.s3.amazonaws.com/public/spack-stack/mirror/$SPACK_KEY"
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
