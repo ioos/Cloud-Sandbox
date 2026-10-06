@@ -268,20 +268,20 @@ MPI Python environments must be compiled against Spack HPC modules available on 
 set -e
 
 echo "=== Loading Spack HPC Modules ==="
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
-module load esmf/8.5.0-intel-2021.9.0-5sphkv4
+module load intel-oneapi-compilers/2024.2.1-none-none-r2buaru
+module load esmf/8.9.1-intel-oneapi-compilers-2024.2.1-xxuz5xf
 
-export MPICC=$(which mpiicc)
-export MPICXX=$(which mpiicpc)
+export MPICC=$(which mpiicx)
+export MPICXX=$(which mpiicpx)
 export NETCDF4_DIR=$(nc-config --prefix)
 export HDF5_DIR=$(dirname $(dirname $(which h5dump)))
 export LDFLAGS="-L$(nc-config --libdir) -Wl,-rpath,$(nc-config --libdir)"
 export CFLAGS="-I$(nc-config --includedir)"
 
 echo "=== Building Environment ==="
-./miniforge3/bin/mamba env create -f ocs_mesh_cloud_sandbox.yml -y
+./miniforge3/bin/mamba create -n python_mpi_test python pip setuptools cython numpy certifi -y
 
-ENV_NAME=$(grep -E '^name:' ocs_mesh_cloud_sandbox.yml | awk '{print $2}')
+ENV_NAME=python_mpi_test
 ENV_PATH="./miniforge3/envs/$ENV_NAME"
 ENV_PIP="$ENV_PATH/bin/pip"
 ENV_LIB="$ENV_PATH/lib"
@@ -304,7 +304,7 @@ export CFLAGS="-I$(nc-config --includedir) -DPyMPI_HAVE_MPI_Session=0"
 ../$ENV_PIP install . --no-binary netcdf4 --no-build-isolation --no-deps --no-cache-dir
 cd .. && rm -rf netcdf4-python
 
-$ENV_BIN/python -c "import mpi4py, netCDF4; print('MPI environment ready!')"
+mpirun -n 1 $ENV_BIN/python -c "import mpi4py, netCDF4; print('MPI environment ready')"
 ```
 
 #### Step 2: Configure Job & Cluster Specifications
