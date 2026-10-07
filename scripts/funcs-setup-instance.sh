@@ -486,6 +486,7 @@ build_spack-stack-environment () {
   # This is in common/packages but was not built with the spec, manually adding it
   # "sp" is a wonderful name - it is one of NCEP's libraries - spectral transformation library, fft related
   spack add sp@2.5.0
+  spack add parmetis@4.0.3
 
   SPACKOPTS="$SPACKOPTS --fail-fast"
 

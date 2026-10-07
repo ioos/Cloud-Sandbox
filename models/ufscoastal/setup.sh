@@ -38,15 +38,19 @@ fi
 cd ufs-weather-model
 
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua modulefiles/
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua modulefiles/
 
 
 module purge
 #module load ufs_ioossb.intel.tcl
 module load lua/ufs_ioossb.intel
+#module load lua/ufs_ioossb.intelllvm
 module list
 
-#APP CSTLR = Coastal ROMS - Tested - Passes
-# export CMAKE_FLAGS="-DAPP=CSTLR -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMAKE_RANLIB=xild"
+# https://ufs-coastal-application.readthedocs.io/en/latest/BuildingAndRunning.html#setting-the-cmake-flags-environment-variable
+
+#APP CSTLR = Coastal ROMS - ifort only 
+export CMAKE_FLAGS="-DAPP=CSTLR -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMAKE_RANLIB=xild"
 
 # Not yet tested
 #APP CSTLF = Cstl FVCOM
@@ -55,13 +59,10 @@ module list
 #APP CSTLA = Cstl ADCIRC
 # export CMAKE_FLAGS="-DAPP=CSTLA -DADCIRC_CONFIG=PADCIRC -DCOUPLED=ON"
 
-#APP CSTLS = Cstl SCHISM
-# export CMAKE_FLAGS="-DAPP=CSTLS -DUSE_ATMOS=ON -DNO_PARMETIS=OFF -DOLDIO=ON"
-
-APP=CSTLR
-# https://ufs-coastal-application.readthedocs.io/en/latest/BuildingAndRunning.html#setting-the-cmake-flags-environment-variable
-export CMAKE_FLAGS="-DAPP=$APP -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMAKE_RANLIB=xild"
-
+# SCHISM 
+#APP CSTLS = Cstl SCHISM -  builds ifort and ifx
+#export CMAKE_FLAGS="-DAPP=CSTLS -DUSE_ATMOS=ON -DNO_PARMETIS=OFF -DOLDIO=OFF"
+#cp -p $CURHOME/FindMETIS.cmake $SAVEDIR/ufs-weather-model/SCHISM-interface/SCHISM/cmake/modules
 
 # cmake -DCMAKE_AR="xiar" -DCMAKE_RANLIB="xild" ..
 #DCMAKE_AR
