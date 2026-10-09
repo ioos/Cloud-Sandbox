@@ -12,6 +12,7 @@ import socket
 import traceback
 import subprocess
 import pprint
+import dask
 from distributed import Client
 from prefect import task
 from prefect.cache_policies import NO_CACHE
@@ -370,9 +371,9 @@ def start_dask(cluster) -> tuple:
                 # client call to wait for all dask workers until allocated timeout span
                 client.wait_for_workers(n_workers=expected_total, timeout=timeout)
 
-            # Log to user the number of dask workers registered to the client
-            actual_workers = len(client.scheduler_info(n_workers=-1)['workers'])
-            log.info(f"SUCCESS: {actual_workers}/{expected_total} workers registered.")
+                # Log to user the number of dask workers registered to the client
+                actual_workers = len(client.scheduler_info(n_workers=-1)['workers'])
+                log.info(f"SUCCESS: {actual_workers}/{expected_total} workers registered.")
 
         return cluster, address
 
