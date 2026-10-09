@@ -14,6 +14,7 @@ import glob
 import time
 import logging
 import traceback
+import dask
 from distributed import Client
 
 from prefect import task
