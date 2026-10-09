@@ -215,6 +215,9 @@ runscript: /mnt/efs/fs1/save/jason.ducker/Cloud-Sandbox/cloudflow/workflows/expe
 Current directory is /save/jason.ducker/Cloud-Sandbox/cloudflow
 ```
 
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -492,6 +495,9 @@ Rank 0 received token back from Rank 15. Value matches: True
 Python script execution has succesfully completed on the cloud!
 ```
 
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -785,6 +791,9 @@ d. **Dask Data Parallelism Execution:** Directly submits computational tasks or 
 19:03:28.935 | INFO    | workflow - [tcp://10.26.37.191:33045] 2026-08-28 19:03:17,097 - distributed.worker - INFO - Starting Worker plugin shuffle
  2026-08-28 19:03:28,936  INFO - tasks.python_dask_experiment_run | [tcp://10.26.37.191:33045] 2026-08-28 19:03:17,055 - distributed.worker - INFO - -------------------------------------------------
 ```
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python Dask executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 e. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -1024,6 +1033,10 @@ d. **Dask Task Parallelism Execution:** Directly submits computational tasks or 
 20:57:19.075 | INFO    | workflow - [tcp://10.26.37.127:38739] 2026-08-28 20:07:02,970 - distributed.worker - INFO - Starting Worker plugin shuffle
  2026-08-28 20:57:19,075  INFO - tasks.python_dask_experiment_run | [tcp://10.26.37.127:38739] 2026-08-28 20:07:02,937 - distributed.worker - INFO - -------------------------------------------------
 ```
+
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 e. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
