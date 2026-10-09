@@ -669,104 +669,135 @@ def python_dask_experiment_run(dask_address, job):
     # to the dask client here and save the file (limitation is RAM on head node)
 
 
-    # This code logic below ensures the client session closes locally
-    # but the scheduler on the Head Node stays alive until termination
-    # workflow is implemented.
-    with Client(dask_address) as client:
-        log.info(f"Cluster resources: {client.scheduler_info(n_workers=-1)['workers'].keys()}")
-        try:
-            # Users insert an elif statement here for your dask job to run with
-            # the respective workflow convention following the task or data
-            # parallelism examples 
+    # Import KilledWorker from distributed.scheduler to catch worker death exceptions thrown during gather operations
+    from distributed.scheduler import KilledWorker
+    # Import asyncio.TimeoutError under an alias to avoid collisions with built-in or standard library TimeoutError
+    from asyncio import TimeoutError as AsyncTimeoutError
 
-            if(job.APP == 'dask_task_parallelism_example'):
-                # Upload script to the dask scheduler to be distributed to workers
-                client.upload_file(job.SCRIPT)
+    # Define Dask configuration parameters to enforce fast-fail network resilience
+    client_config = {
+        # Directs the client to expect a 60-second worker heartbeat TTL policy on the scheduler
+        "distributed.scheduler.worker-ttl": "60s",
+        # Sets maximum time (60s) allowed to establish initial TCP connection to the scheduler/workers
+        "distributed.comm.timeouts.connect": "60s",
+        # Sets maximum time (60s) for active TCP socket read/write operations before raising a timeout
+        "distributed.comm.timeouts.tcp": "60s"
+    }
 
-                # Dask client needs your Python script main function imported here!
-                # The python script is expected to be located in the 
-                # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
-                from python_examples import dask_task_parallelism_example
+    # Apply client-side timeout and worker resilience configurations during Client instantiation and execution
+    with dask.config.set(client_config):
+        
+        # This code logic below ensures the client session closes locally
+        # but the scheduler on the Head Node stays alive until termination
+        # workflow is implemented.
+        with Client(dask_address) as client:
+            log.info(f"Cluster resources: {client.scheduler_info(n_workers=-1)['workers'].keys()}")
+            try:
+                # Users insert an elif statement here for your dask job to run with
+                # the respective workflow convention following the task or data
+                # parallelism examples 
 
-                log.info("Running Python dask task parallelism example")
+                if(job.APP == 'dask_task_parallelism_example'):
+                    # Upload script to the dask scheduler to be distributed to workers
+                    client.upload_file(job.SCRIPT)
 
-                # Dask client maps out the Python function to execute to all workers
-                # and includes the required functional arguments
-                futures = client.submit(dask_task_parallelism_example,int(job.ARG1))
+                    # Dask client needs your Python script main function imported here!
+                    # The python script is expected to be located in the 
+                    # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
+                    from python_examples import dask_task_parallelism_example
 
-                # Dask client gathers the results from all workers based on what
-                # is suppose to be returned by the Python function.
-                results = client.gather(futures)
+                    log.info("Running Python dask task parallelism example")
 
-                # User job argument in this case is the output directory pathway
-                # and ensure absolute path is defined so dask workers and scheduler
-                # can properly place output on the head node EFS volume
-                output_dir = os.path.abspath(job.ARG2)
+                    # Dask client maps out the Python function to execute to all workers
+                    # and includes the required functional arguments
+                    futures = client.submit(dask_task_parallelism_example,int(job.ARG1))
 
-                # Create the directory, and do nothing if it already exists
-                os.makedirs(output_dir, exist_ok=True)
+                    # Dask client gathers the results from all workers based on what
+                    # is suppose to be returned by the Python function.
+                    results = client.gather(futures)
 
-                # Convert to results to dataset that was returned by the dask
-                # workers computations and save the dataframe to the EFS
-                # hardware by the dask client
-                ds_to_save = results.to_dataset(name='AORC_partial_data_gap')
-                output_path = os.path.join(output_dir, f"aorc_gap_mask_{job.ARG1}.nc")
-                ds_to_save.to_netcdf(output_path)
-                log.info(f"✅ Saved AORC masked year {job.ARG1} to {output_path}")
+                    # User job argument in this case is the output directory pathway
+                    # and ensure absolute path is defined so dask workers and scheduler
+                    # can properly place output on the head node EFS volume
+                    output_dir = os.path.abspath(job.ARG2)
 
-            elif(job.APP == 'dask_data_parallelism_example'):
-                # Upload script to the dask scheduler to be distributed to workers
-                client.upload_file(job.SCRIPT)
+                    # Create the directory, and do nothing if it already exists
+                    os.makedirs(output_dir, exist_ok=True)
 
-                # Dask client needs your Python script main function imported here!
-                # The python script is expected to be located in the
-                # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
-                from python_examples import dask_data_parallelism_example
+                    # Convert to results to dataset that was returned by the dask
+                    # workers computations and save the dataframe to the EFS
+                    # hardware by the dask client
+                    ds_to_save = results.to_dataset(name='AORC_partial_data_gap')
+                    output_path = os.path.join(output_dir, f"aorc_gap_mask_{job.ARG1}.nc")
+                    ds_to_save.to_netcdf(output_path)
+                    log.info(f"✅ Saved AORC masked year {job.ARG1} to {output_path}")
 
-                # Create some dummy files for dask workers to handle as part of the
-                # example here for data parallelism
-                file_list = [f"sensor_{str(i).zfill(3)}" for i in range(0, 20 + 1)]
+                elif(job.APP == 'dask_data_parallelism_example'):
+                    # Upload script to the dask scheduler to be distributed to workers
+                    client.upload_file(job.SCRIPT)
 
-                # User job argument in this case is the output directory pathway
-                # and ensure absolute path is defined so dask workers and scheduler
-                # can properly place output on the head node EFS volume
-                output_dir = os.path.abspath(job.ARG1)
+                    # Dask client needs your Python script main function imported here!
+                    # The python script is expected to be located in the
+                    # Cloud-Sandbox/cloudflow/workflows directory for this logic to work
+                    from python_examples import dask_data_parallelism_example
 
-                # Create the directory, and do nothing if it already exists
-                os.makedirs(output_dir, exist_ok=True)
+                    # Create some dummy files for dask workers to handle as part of the
+                    # example here for data parallelism
+                    file_list = [f"sensor_{str(i).zfill(3)}" for i in range(0, 20 + 1)]
 
-                log.info(f"output directory is {output_dir}")
+                    # User job argument in this case is the output directory pathway
+                    # and ensure absolute path is defined so dask workers and scheduler
+                    # can properly place output on the head node EFS volume
+                    output_dir = os.path.abspath(job.ARG1)
 
-                # Dask client maps out the Python function to execute to all workers
-                # and includes the required functional arguments
-                futures = client.map(dask_data_parallelism_example,file_list,output_root=output_dir)
+                    # Create the directory, and do nothing if it already exists
+                    os.makedirs(output_dir, exist_ok=True)
 
-                # Dask client gathers the results from all workers based on what
-                # is suppose to be returned by the Python function.
-                results = client.gather(futures)
+                    log.info(f"output directory is {output_dir}")
 
-                # Print file outputs that were saved from dask workers.
-                for r in results:
-                    print(r)
+                    # Dask client maps out the Python function to execute to all workers
+                    # and includes the required functional arguments
+                    futures = client.map(dask_data_parallelism_example,file_list,output_root=output_dir)
 
-        # Exception handler to kill dask job for Prefect3
-        except Exception as e:
-            log.error(f"Error during Dask execution: {e}")
-            raise
+                    # Dask client gathers the results from all workers based on what
+                    # is suppose to be returned by the Python function.
+                    results = client.gather(futures)
 
-        # Get the dask worker logs for users to look at the log file
-        # that was output on rank 0 to see the progress of their 
-        # Python workflow they've developed and for debugging
-        log.info("Fetching logs from AWS workers...")
-        worker_logs = client.get_worker_logs()
+                    # Print file outputs that were saved from dask workers.
+                    for r in results:
+                        print(r)
 
-        # Print the output of the dask workers as part of
-        # the cloudflow logging output for users
-        for worker, logs in worker_logs.items():
-            for level, msg in logs:
-                # We filter for 'INFO' and above to avoid noise
-                if level in ["INFO", "WARNING", "ERROR"]:
-                    log.info(f"[{worker}] {msg}")
+            # Catch instances where a Dask worker dies, is terminated, or encounters an unrecoverable hardware failure mid-task
+            except KilledWorker as e:
+                log.critical(f"Dask execution failed: Worker executing task was killed or lost: {e}")
+                # Re-raise as a standard RuntimeError to signal job failure upstream (e.g., to Prefect)
+                raise RuntimeError(f"Worker killed during execution: {e}") from e
+
+            # Catch network timeouts, TCP disconnects, lost scheduler connections, or cluster drops
+            except (RuntimeError, TimeoutError, OSError) as e:
+                log.critical(f"Dask cluster communication or execution failed: {e}")
+                # Re-raise as a standard RuntimeError to trigger workflow fast-fail cleanup
+                raise RuntimeError(f"Dask cluster failure detected: {e}") from e
+
+            # General fallback exception handler for all other unhandled task runtime errors
+            except Exception as e:
+                log.error(f"Dask task execution encountered an unexpected error: {e}")
+                # Re-raise preserving the original traceback
+                raise
+
+            # Get the dask worker logs for users to look at the log file
+            # that was output on rank 0 to see the progress of their 
+            # Python workflow they've developed and for debugging
+            log.info("Fetching logs from AWS workers...")
+            worker_logs = client.get_worker_logs()
+
+            # Print the output of the dask workers as part of
+            # the cloudflow logging output for users
+            for worker, logs in worker_logs.items():
+                for level, msg in logs:
+                    # We filter for 'INFO' and above to avoid noise
+                    if level in ["INFO", "WARNING", "ERROR"]:
+                        log.info(f"[{worker}] {msg}")
 
 
 
