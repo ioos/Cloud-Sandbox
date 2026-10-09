@@ -266,6 +266,11 @@ SCHISM model working directory is /save/jason.ducker/hawaii
 ---
 + mpiexec -launcher ssh -hosts 10.26.36.96 -np 140 -ppn 70 /save/jason.ducker/schism/build/bin/pschism_BLD_STANDALONE_SH_MEM_COMM_TVD-VL 4
 ```
+
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
+
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instances upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 
 ```bash
