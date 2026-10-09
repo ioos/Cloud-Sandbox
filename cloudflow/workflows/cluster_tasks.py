@@ -266,6 +266,18 @@ def start_dask(cluster) -> tuple:
     # Dynamically construct the specific site-packages path matching the exact Python version
     py_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
     env_packages = os.path.join(env_lib, py_version, "site-packages")
+
+    # Inherit current environment variables for the scheduler subprocess
+    sched_env = os.environ.copy()
+
+    # Enforce a 60-second Time-To-Live (TTL) on workers at the scheduler level.
+    # If a worker stops sending heartbeats for 30s, the scheduler aggressively
+    # marks it as dead to prevent tasks from hanging indefinitely.
+    sched_env["DASK_DISTRIBUTED__SCHEDULER__WORKER_TTL"] = "60s"
+
+    # Set TCP connection/read/write timeout to 60 seconds for all scheduler communications.
+    # Forces fast failure detection during network drops or host-level connectivity stalls.
+    sched_env["DASK_DISTRIBUTED__COMM__TIMEOUTS__TCP"] = "60s"
     
     # Start Dask Scheduler locally on the Head Node
     # using specified dask port available for user
@@ -300,7 +312,10 @@ def start_dask(cluster) -> tuple:
             env_prefix = (
                 f"export LD_LIBRARY_PATH={env_lib}:$LD_LIBRARY_PATH && "
                 f"export PYTHONPATH={env_packages} && "
-                f"export PATH={bin_dir}:$PATH"
+                f"export PATH={bin_dir}:$PATH && "
+                f"export DASK_DISTRIBUTED__SCHEDULER__WORKER_TTL=60s && "
+                f"export DASK_DISTRIBUTED__COMM__TIMEOUTS__CONNECT=60s && "
+                f"export DASK_DISTRIBUTED__COMM__TIMEOUTS__TCP=60s"
             )
 
             # Call the standalone binary directly instead of using python -m
@@ -333,13 +348,27 @@ def start_dask(cluster) -> tuple:
     start_time = time.time()
     expected_total = len(worker_hosts) * cluster.PPN
 
-    try:
-        # Open dask client to verify that it can listen to all dask
-        # workers allocated for job, if not then throw exception and
-        # terminate for user to further debug
-        with Client(address, timeout="60s") as client:
-            # client call to wait for all dask workers until allocated timeout span
-            client.wait_for_workers(n_workers=expected_total, timeout=timeout)
+    try:     
+        # Define Dask configuration parameters to enforce fast-fail network resilience
+        client_config = {
+            # Directs the client to expect a 60-second worker heart-beat TTL policy on the scheduler
+            "distributed.scheduler.worker-ttl": "30s",
+            # Sets maximum time (60s) allowed to establish initial TCP connection to the scheduler/workers
+            "distributed.comm.timeouts.connect": "60s",
+            # Sets maximum time (60s) for active TCP socket read/write operations before raising a timeout
+            "distributed.comm.timeouts.tcp": "60s"
+        }
+
+        # Apply client-side timeout configurations during Dask Client instantiation and task operations
+        # Context manager ensures configuration applies cleanly to tasks created within this scope
+        with dask.config.set(client_config):
+            
+            # Open dask client to verify that it can listen to all dask
+            # workers allocated for job, if not then throw exception and
+            # terminate for user to further debug
+            with Client(address, timeout="60s") as client:
+                # client call to wait for all dask workers until allocated timeout span
+                client.wait_for_workers(n_workers=expected_total, timeout=timeout)
 
             # Log to user the number of dask workers registered to the client
             actual_workers = len(client.scheduler_info(n_workers=-1)['workers'])
