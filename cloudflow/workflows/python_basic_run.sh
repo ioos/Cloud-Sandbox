@@ -37,18 +37,37 @@ export CLOUDFLOW_DIR=$(pwd)
 
 
 echo "--- " 
-echo "--- SSH into AWS worker node, checking PYTHON script for syntax errors, and then and running PYTHON script-----------------"
+echo "--- SSH into AWS worker node, checking PYTHON script for syntax errors, and running PYTHON script ---"
 echo "---"
 
-ssh $HOSTS "cd $CLOUDFLOW_DIR && env && pwd && $EXEC -m py_compile $SCRIPT && $EXEC -u $SCRIPT"
+# Enable SSH options for strict exit propagation & connection timeouts:
+# -o ConnectTimeout=10      : Drops connection if host is unreachable
+# -o ServerAliveInterval=15 : Sends keepalives every 15s so stale EC2 connections drop
+# -o ServerAliveCountMax=3  : Kills SSH if 3 keepalives fail (45s total)
 
+ssh ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 $HOSTS bash -s << EOF
+  set -e  # Immediately exit remote shell if any command returns non-zero code
+  
+  cd "$CLOUDFLOW_DIR"
+  
+  echo "[REMOTE] Environment check:"
+  pwd
+  
+  echo "[REMOTE] Compiling Python script for syntax check..."
+  $EXEC -m py_compile "$SCRIPT"
+  
+  echo "[REMOTE] Running Python script..."
+  exec $EXEC -u "$SCRIPT"
+EOF
 
-if [ $? -ne 0 ]; then
-  echo "ERROR returned from Python executable"
+# Capture the exact exit code from SSH
+PYTHON_EXIT_CODE=$?
+
+if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+  echo "ERROR: Remote Python script failed with exit code $PYTHON_EXIT_CODE" >&2
+  exit $PYTHON_EXIT_CODE
 else
-  echo "Python script execution has succesfully completed on the cloud!"
+  echo "Python script execution has successfully completed on the cloud!"
   duration=$SECONDS
   echo "Python script execution took $((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
 fi
-
-

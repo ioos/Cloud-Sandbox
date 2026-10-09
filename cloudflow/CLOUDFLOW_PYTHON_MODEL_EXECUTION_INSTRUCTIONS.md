@@ -11,7 +11,7 @@ Stage your Python scripts to S3 and set up your workspace on the shared EFS volu
 ### Stage Python Scripts to S3
 From your local machine:
 ```bash
-aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recursive
+aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recursive --no-sign-request
 ```
 
 > **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
@@ -27,7 +27,7 @@ cd /save
 mkdir -p jason.ducker && cd jason.ducker
 
 # Pull staged scripts from S3
-aws s3 cp s3://ioos-transfers/script.py ./script.py --recursive
+aws s3 cp s3://ioos-transfers/script.py ./script.py --recursive --no-sign-request
 
 # Clone the repository
 git clone [https://github.com/ioos/Cloud-Sandbox.git](https://github.com/ioos/Cloud-Sandbox.git)
@@ -215,6 +215,9 @@ runscript: /mnt/efs/fs1/save/jason.ducker/Cloud-Sandbox/cloudflow/workflows/expe
 Current directory is /save/jason.ducker/Cloud-Sandbox/cloudflow
 ```
 
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -268,20 +271,20 @@ MPI Python environments must be compiled against Spack HPC modules available on 
 set -e
 
 echo "=== Loading Spack HPC Modules ==="
-module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi
-module load esmf/8.5.0-intel-2021.9.0-5sphkv4
+module load intel-oneapi-compilers/2024.2.1-none-none-r2buaru
+module load esmf/8.9.1-intel-oneapi-compilers-2024.2.1-xxuz5xf
 
-export MPICC=$(which mpiicc)
-export MPICXX=$(which mpiicpc)
+export MPICC=$(which mpiicx)
+export MPICXX=$(which mpiicpx)
 export NETCDF4_DIR=$(nc-config --prefix)
 export HDF5_DIR=$(dirname $(dirname $(which h5dump)))
 export LDFLAGS="-L$(nc-config --libdir) -Wl,-rpath,$(nc-config --libdir)"
 export CFLAGS="-I$(nc-config --includedir)"
 
 echo "=== Building Environment ==="
-./miniforge3/bin/mamba env create -f ocs_mesh_cloud_sandbox.yml -y
+./miniforge3/bin/mamba create -n python_mpi_test python pip setuptools cython numpy certifi -y
 
-ENV_NAME=$(grep -E '^name:' ocs_mesh_cloud_sandbox.yml | awk '{print $2}')
+ENV_NAME=python_mpi_test
 ENV_PATH="./miniforge3/envs/$ENV_NAME"
 ENV_PIP="$ENV_PATH/bin/pip"
 ENV_LIB="$ENV_PATH/lib"
@@ -304,7 +307,7 @@ export CFLAGS="-I$(nc-config --includedir) -DPyMPI_HAVE_MPI_Session=0"
 ../$ENV_PIP install . --no-binary netcdf4 --no-build-isolation --no-deps --no-cache-dir
 cd .. && rm -rf netcdf4-python
 
-$ENV_BIN/python -c "import mpi4py, netCDF4; print('MPI environment ready!')"
+mpirun -n 1 $ENV_BIN/python -c "import mpi4py, netCDF4; print('MPI environment ready')"
 ```
 
 #### Step 2: Configure Job & Cluster Specifications
@@ -492,6 +495,9 @@ Rank 0 received token back from Rank 15. Value matches: True
 Python script execution has succesfully completed on the cloud!
 ```
 
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -785,6 +791,9 @@ d. **Dask Data Parallelism Execution:** Directly submits computational tasks or 
 19:03:28.935 | INFO    | workflow - [tcp://10.26.37.191:33045] 2026-08-28 19:03:17,097 - distributed.worker - INFO - Starting Worker plugin shuffle
  2026-08-28 19:03:28,936  INFO - tasks.python_dask_experiment_run | [tcp://10.26.37.191:33045] 2026-08-28 19:03:17,055 - distributed.worker - INFO - -------------------------------------------------
 ```
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running Python Dask executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 e. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash
@@ -1024,6 +1033,10 @@ d. **Dask Task Parallelism Execution:** Directly submits computational tasks or 
 20:57:19.075 | INFO    | workflow - [tcp://10.26.37.127:38739] 2026-08-28 20:07:02,970 - distributed.worker - INFO - Starting Worker plugin shuffle
  2026-08-28 20:57:19,075  INFO - tasks.python_dask_experiment_run | [tcp://10.26.37.127:38739] 2026-08-28 20:07:02,937 - distributed.worker - INFO - -------------------------------------------------
 ```
+
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
 
 e. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instance upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 ```bash

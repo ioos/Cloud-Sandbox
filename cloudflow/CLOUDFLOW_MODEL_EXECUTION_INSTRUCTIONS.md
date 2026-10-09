@@ -10,7 +10,7 @@ Before starting work on a Cloud-Sandbox head node, upload your local model setup
 
 From your local machine:
 ```bash
-aws s3 cp /pathway/to/your/model/setup s3://ioos-transfers/your_model_setup --recursive
+aws s3 cp /pathway/to/your/model/setup s3://ioos-transfers/your_model_setup --recursive --no-sign-request
 ```
 
 > **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
@@ -31,7 +31,7 @@ mkdir -p jason.ducker
 cd jason.ducker
 
 # Pull your model setup down from S3
-aws s3 cp s3://ioos-transfers/your_model_setup ./your_model_setup --recursive
+aws s3 cp s3://ioos-transfers/your_model_setup ./your_model_setup --recursive --no-sign-request
 
 # Clone the Cloud-Sandbox repository
 git clone https://github.com/ioos/Cloud-Sandbox.git
@@ -43,7 +43,7 @@ git clone https://github.com/ioos/Cloud-Sandbox.git
 
 ## 3. Module Environment & Model Compilation
 
-Load the necessary compiler and library modules available on the head node via Spack to compile your model (SCHISM shown as an example).
+Load the necessary compiler and library modules available on the head node via Spack to compile your model (SCHISM shown as an example). These modules are directly linked to the image id of your head node. If there are specific modules required for your model suite that is not available on your head node, then please submit an email request to the Sandbox help desk (sandbox.helpdesk@noaa.gov) to obtain a new head node image id with the updated spack module installations tailored to your model suite.  Your specific model executable will be compiled on the EFS volume (`/save`) where this will live for as long as you keep it there. 
 
 ```bash
 # View available environment modules
@@ -142,7 +142,7 @@ vi ../cluster.configs/Experiments/schism.ioos
 
 ---
 
-> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node your'e on. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
+> **Important:** Ensure `image_id` matches the exact AMI associated with your running head node so compute nodes mount identical environments. If you're still having issues launching the job, you may need to include an extra security group id for the EFS volume mounted on the head node you're on. To ensure the image id and security groups linked to your head node image id are correct, please reach out to the Sandbox help desk (sandbox.helpdesk@noaa.gov) if you believe these specs are incorrect. Besides that, you only need to worry about changing `nodeType`, `nodeCount`, and `tags` if desired. 
 
 
 ### Ensure Model Launcher Script Matches Module Environment
@@ -202,6 +202,15 @@ nohup ./workflows/workflow_main.py ../cluster.configs/Experiments/schism.ioos ..
 tail -f cloudflow_test.out
 ```
 
+> **What's Happening Under the Hood During Execution?**
+>
+> When Cloudflow provisions your AWS EC2 compute instances, it dynamically binds two core infrastructure components directly to the running nodes:
+>
+> 1. **Amazon Machine Image (AMI / Image ID):** The instantiated compute nodes pull the exact AMI snapshot containing the pre-configured Spack HPC compilers, MPI frameworks, and shared runtime libraries used during model compilation.
+> 2. **Elastic File System (EFS Volume):** The compute nodes mount the shared `/save` EFS filesystem, where your model input files, configuration parameters, and compiled model executable physically reside.
+>
+> By linking the specified AMI with the mounted EFS volume across the allocated host instance IPs, Cloudflow mirrors your head node's precise runtime environment on the worker nodes, enabling seamlessly synchronized model execution.
+
 ---
 
 ## 6. Execution Lifecycle Overview
@@ -257,6 +266,11 @@ SCHISM model working directory is /save/jason.ducker/hawaii
 ---
 + mpiexec -launcher ssh -hosts 10.26.36.96 -np 140 -ppn 70 /save/jason.ducker/schism/build/bin/pschism_BLD_STANDALONE_SH_MEM_COMM_TVD-VL 4
 ```
+
+> [!CAUTION]
+> **Risk of Zombie Instances & Stalled Jobs**  
+> Long-running MPI executions can occasionally hang or lose host communication on AWS EC2 instances. Before running or troubleshooting active jobs, review the [Zombie Job Checklist](https://github.com/jduckerOWP/Cloud-Sandbox_OWP/blob/main/cloudflow/ZOMBIE_JOB_CHECKLIST.md) for optional MPI heartbeat flags, health checks, and fast-kill procedures.
+
 4. **Deprovisioning & Reporting:** Automatically terminates instantiated compute instances upon run completion or failure, releasing resources and reporting actual compute wall-time and final estimated AWS cost.
 
 ```bash
