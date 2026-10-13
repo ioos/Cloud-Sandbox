@@ -10,7 +10,7 @@ Before starting work on a Cloud-Sandbox head node, upload your local model setup
 
 From your local machine:
 ```bash
-aws s3 cp /pathway/to/your/model/setup s3://ioos-transfers/your_model_setup --recursive --no-sign-request
+aws s3 cp /pathway/to/your/model/setup s3://ioos-transfers/your_model_setup --recursive --no-sign-request --region us-east-2
 ```
 
 > **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
@@ -27,11 +27,11 @@ Log into your assigned head node and prepare your user workspace on the shared E
 ### Create Workspace and Pull Staged Model Setup
 ```bash
 cd /save
-mkdir -p jason.ducker
-cd jason.ducker
+mkdir -p $USER
+cd $USER
 
 # Pull your model setup down from S3
-aws s3 cp s3://ioos-transfers/your_model_setup ./your_model_setup --recursive --no-sign-request
+aws s3 cp s3://ioos-transfers/your_model_setup ./your_model_setup --recursive --no-sign-request --region us-east-2
 
 # Clone the Cloud-Sandbox repository
 git clone https://github.com/ioos/Cloud-Sandbox.git
