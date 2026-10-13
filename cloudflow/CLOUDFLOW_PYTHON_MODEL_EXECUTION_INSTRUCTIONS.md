@@ -11,7 +11,7 @@ Stage your Python scripts to S3 and set up your workspace on the shared EFS volu
 ### Stage Python Scripts to S3
 From your local machine:
 ```bash
-aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recursive --no-sign-request
+aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recursive --no-sign-request --region us-east-2
 ```
 
 > **Note:** The `aws` command requires the AWS Command Line Interface (AWS CLI) installed on your local machine. If you do not have it installed, follow the official AWS installation guides for your operating system:
@@ -24,10 +24,10 @@ aws s3 cp /pathway/to/your/Python/script.py s3://ioos-transfers/script.py --recu
 On the Cloud-Sandbox head node:
 ```bash
 cd /save
-mkdir -p jason.ducker && cd jason.ducker
+mkdir -p $USER && cd $USER
 
 # Pull staged scripts from S3
-aws s3 cp s3://ioos-transfers/script.py ./script.py --recursive --no-sign-request
+aws s3 cp s3://ioos-transfers/script.py ./script.py --recursive --no-sign-request --region us-east-2
 
 # Clone the repository
 git clone [https://github.com/ioos/Cloud-Sandbox.git](https://github.com/ioos/Cloud-Sandbox.git)
