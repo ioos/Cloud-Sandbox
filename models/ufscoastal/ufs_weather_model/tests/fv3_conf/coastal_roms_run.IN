@@ -1,0 +1,25 @@
+if [ ! -d "INPUT" ]; then
+  mkdir INPUT
+fi
+if [ ! -d "RESTART" ]; then
+  mkdir RESTART
+fi
+
+ROMS_CASE_DIR=@[INPUTDATA_ROOT]/ROMS/$HURR
+
+if [[ $HURR == IRENE ]]; then
+   $ROMS_CASE_DIR/Coupling/$CPL_CONF/job_setup.sh -pets 3x4 -d $ROMS_CASE_DIR -t $ROMS_CASE_DIR/Coupling/$CPL_CONF
+   cp $ROMS_CASE_DIR/Data/ESMF/era5_IRENE_ESMFmesh.nc INPUT/.
+   cp $ROMS_CASE_DIR/Data/ESMF/irene_roms_grid_rho_ESMFmesh.nc INPUT/.
+   cp $ROMS_CASE_DIR/Data/FRC/era5_IRENE.nc INPUT/.
+   cp $ROMS_CASE_DIR/Coupling/$CPL_CONF/roms_cmeps_era5.yaml .
+   cp $ROMS_CASE_DIR/Data/OBS/irene_obs_20110827.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_grid.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_ini_20110827_06.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_bry.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_clm.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_nudgcoef.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_rivers.nc .
+   cp $ROMS_CASE_DIR/Data/ROMS/irene_roms_tides.nc .
+   cp @[INPUTDATA_ROOT]/ROMS/External/varinfo.yaml .
+fi

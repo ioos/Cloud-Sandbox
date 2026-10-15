@@ -23,13 +23,15 @@ export SKIPCOMPILE=${4:-"NO"}
 export HOSTS=${5:-localhost}
 export NPROCS=${6:-$nprocs}
 
+
 # PPN conflicts and gets changed by rt.sh system
 export CFPPN=${7:-$nprocs}
 if [[ $HOSTS =~ 'localhost' ]]; then
   export CFPPN=$NPROCS
-else
-  export CFPPN=24
 fi
+
+export NPROCS=24
+export CFPPN=$NPROCS
 
 export DISKNM=/com/ufs-weather-model/RT
 export dprefix=/mnt/efs/fs1
@@ -47,6 +49,8 @@ mkdir -p $DISKNM
 
 # Also downloaded this with help from Jason
 #INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20250507}
+
+# Don't have this
 #INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT}/WW3_input_data_20250225
 #INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
 
@@ -66,13 +70,15 @@ mkdir -p $DISKNM
 # -o compile only
 # TODO: fix why results aren't being copied to REGRESSION_TESTS
 
+# RT_COMPILER intel or intellvm (schism supports ifx and ifort) (roms can only do ifort)
+
 if [[ ${SKIPCOMPILE} == 'YES' ]]; then
   ./rt.sh -x -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 else
   ./rt.sh -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   # -o compile only
-  # ./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
+  #./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 fi
 

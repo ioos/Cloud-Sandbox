@@ -40,6 +40,8 @@ cd ufs-weather-model
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua modulefiles/
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua modulefiles/
 
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua tests/modules.fv3_atm2roms_intel
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2roms_intel.lua
 
 module purge
 #module load ufs_ioossb.intel.tcl
