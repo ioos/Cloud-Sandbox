@@ -44,6 +44,10 @@ export FI_PROVIDER="efa"
 export I_MPI_FABRICS="ofi"
 export I_MPI_OFI_PROVIDER="efa"
 
+# Instructs Intel MPI to continuously check socket connection health
+export I_MPI_HEARTBEAT=1
+export I_MPI_EXTRA_TIMEOUT=60
+
 # This is where you define your 
 # shell script required inputs
 # to execute your model run

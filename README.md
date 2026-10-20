@@ -44,7 +44,7 @@ Comprehensive guides and instructions for provisioning, configuring, and executi
 * **[Cloudflow Workflow System Overview](CLOUDFLOW.md)**: An architectural overview of the Cloudflow orchestration framework and Prefect server setup.
 * **[Prefect v3 Setup & Troubleshooting Guide](PREFECTV3.md)**: Configuration details for running the local Prefect v3 server in the background, persisting results, establishing SSH tunnels to the dashboard UI (`http://localhost:4200/dashboard`), and managing active flow runs via CLI.
 * **[Local Python Miniforge3 Installation Guide](LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md)**: Step-by-step instructions for installing a isolated Miniforge3 package manager and compiling a Cloudflow-compatible Python environment under your personal directory on the EFS volume of a given head node.
-
+* **[Zombie Job Checklist](ZOMBIE_JOB_CHECKLIST.md)**: Operational protocols, environment flag standards (`I_MPI`), Python deadlock hooks (`mpi4py`), Dask fast-fail configurations, and health-check steps to detect, prevent, and terminate hung or silent "zombie" processes on AWS EC2 instances.
 
 ## I want to...
 
