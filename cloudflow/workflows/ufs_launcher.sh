@@ -9,6 +9,11 @@ set -o pipefail
 #module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
 
 export MACHINE_ID=ioossb
+#VERBOSEOPT='-v'
+VERBOSEOPT=''
+
+#COMPILEONLYOPT='-o'
+COMPILEONLYOPT=''
 
 # Not used in ioossb but needed by rt.sh
 export ACCNR=IOOS
@@ -68,16 +73,14 @@ mkdir -p $DISKNM
 # Use -x to skip compile
 # Use -c to create to RT outputs
 # -o compile only
-# TODO: fix why results aren't being copied to REGRESSION_TESTS
 
-# RT_COMPILER intel or intellvm (schism supports ifx and ifort) (roms can only do ifort)
+# RT_COMPILER intel or intellvm (schism supports intel ifort, and intellvm ifx) (roms can only do intel ifort)
 
 if [[ ${SKIPCOMPILE} == 'YES' ]]; then
-  ./rt.sh -x -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
+  ./rt.sh -x -a $ACCNR -l $RTCONF_FILE $VERBOSEOPT -c -k -n "$TESTNAME intel"
   rc=$?
 else
-  ./rt.sh -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
-  # -o compile only
+  ./rt.sh -a $ACCNR -l $RTCONF_FILE $COMPILEONLYOPT $VERBOSEOPT -c -k -n "$TESTNAME intel"
   #./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 fi
