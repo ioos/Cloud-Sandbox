@@ -16,30 +16,28 @@ sudo setenforce 0
 # Use caution when changing the order of the following
 
 # System stuff
-#setup_paths
-#setup_aliases
-#setup_environment
+setup_paths
+setup_aliases
+setup_environment
 
 # Setup Prefect as a system daemon
-#setup_prefect-server
+setup_prefect-server
 
-#setup_ssh_mpi
+setup_ssh_mpi
 
 install_efa_driver
 
-exit
+install_fsx_driver
 
-#install_fsx_driver
-
-#install_python_modules_user
+install_python_modules_user
 
 # Install compilers, mkl, and mpi, etc.
-# install_intel_oneapi_dnf
+install_intel_oneapi_dnf
 
 if [[ "$USE_SPACK_STACK" == "YES" ]]; then
   echo "Using the ufs spack-stack instead of spack"
 
-#  install_spack-stack_prereqs
+  install_spack-stack_prereqs
 
   # install_gcc_toolset_dnf
 
@@ -49,20 +47,20 @@ if [[ "$USE_SPACK_STACK" == "YES" ]]; then
       echo "WARNING: Intel oneApi Compilers not found!"
   fi
 
-#  module use -a /save/environments/modulefiles
-#
-#  module load intel/compiler/2024.2.1
-#  module load intel/compiler-intel-llvm/2024.2.1
-#  module load intel/ifort/2024.2.1
-#  module load intel/mpi/2021.16
-#  module load intel/mkl/2024.2
+  module use -a /save/environments/modulefiles
 
-#  setup_modulefiles_lua
+  module load intel/compiler/2024.2.1
+  module load intel/compiler-intel-llvm/2024.2.1
+  module load intel/ifort/2024.2.1
+  module load intel/mpi/2021.16
+  module load intel/mkl/2024.2
 
-#  setup_spack-stack
+  setup_modulefiles_lua
 
-#  echo "Building spack-stack environment ... please wait"
-#  build_spack-stack-environment
+  setup_spack-stack
+
+  echo "Building spack-stack environment ... please wait"
+  build_spack-stack-environment
 
 else
 

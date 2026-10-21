@@ -23,28 +23,63 @@ setup_environment
 # Setup Prefect as a system daemon
 setup_prefect-server
 
-# install_jupyterhub # Requires some manual work
 setup_ssh_mpi
 
 install_efa_driver
+
 install_fsx_driver
 
-# Compilers and libraries
 install_python_modules_user
 
-install_spack
-
-. $SPACK_DIR/share/spack/setup-env.sh
-
 # Install compilers, mkl, and mpi, etc.
-
 install_intel_oneapi_dnf
 
-create_spack-environment
+if [[ "$USE_SPACK_STACK" == "YES" ]]; then
+  echo "Using the ufs spack-stack instead of spack"
 
-build_spack-environment
+  install_spack-stack_prereqs
 
-configure_optimizations
+  # install_gcc_toolset_dnf
+
+  # Install Intel Compiler outside of spack-stack environment
+  source /opt/intel/oneapi/setvars.sh
+  if [ $? -ne 0 ]; then
+      echo "WARNING: Intel oneApi Compilers not found!"
+  fi
+
+  module use -a /save/environments/modulefiles
+
+  module load intel/compiler/2024.2.1
+  module load intel/compiler-intel-llvm/2024.2.1
+  module load intel/ifort/2024.2.1
+  module load intel/mpi/2021.16
+  module load intel/mkl/2024.2
+
+  setup_modulefiles_lua
+
+  setup_spack-stack
+
+  echo "Building spack-stack environment ... please wait"
+  build_spack-stack-environment
+
+else
+
+  echo "Not using spack-stack "
+
+  setup_modulefiles_tcl
+
+  module --version
+
+  install_spack
+
+  . $SPACK_DIR/share/spack/setup-env.sh
+
+  create_spack-environment
+
+  build_spack-environment
+fi
+
+# configure_optimizations
 
 # create node image
 ###################################

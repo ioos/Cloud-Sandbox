@@ -2,15 +2,22 @@
 
 ### Prerequisites
 
-Spack-stack environment needs to be installed.
+### UFS Spack-Stack setup on head node
+The Spack-stack environment needs to be installed.
+See terraform/init_template.tpl: export USE_SPACK_STACK="YES"
+See Cloud-Sandbox/scripts/setup-instance.sh
+
 A spack binary mirror exists for this deployment to make this easier and faster.
-See Cloud-Sandbox/scripts/ufs-setup-instance.sh
+
 spack-stack should work on an older currently deployed head node alongside the regular spack.
 UFS uses spack-stack.
+
 
 ### Scripts
 
 setup.sh - Clone the gitHub repository and build the ROMS App.
+           Also can be used to test compilation of the different coastal applications
+
 Default location: /save/ec2-user/ufs-weather-model
 
 get_input_data.sh - Dowload the ROMS Irene and SCHISM Sandy test case inputs
@@ -22,17 +29,21 @@ Irene ROMS regression test
   Test runs on a 24 core c6i.12xlarge instance type and takes less than 15 minutes to compile the model and run the test.
 
 Sandy SCHISM regression test
+  Test requires 320 cores and is setup to run on 4 x hpc6a.48xlarge ec2-instances
 
 The run will launch a single node to build and run the preconfigured test(s).
 
-Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.rt).
+Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.irene.rt and ufs.sandy.rt).
 
 Set non-default directories in:  
   ../job.configs/UFS/ufs.irene
   ../job.configs/UFS/ufs.sandy
 
 Launch the job, example for irene:
-nohup workflows/workflow_main.py ../cluster.configs/IOOS/ufs.rt ../job.configs/UFS/ufs.irene > & ufs.out &
+nohup workflows/workflow_main.py ../cluster.configs/IOOS/ufs.irene.rt ../job.configs/UFS/ufs.irene > & ufs.out &
+
+For testing, and to save time, if the executable for that test has already been compiled, set the following job.configs file option to NO:
+"SKIPCOMPILE" : "NO"
 
 Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.
 See ufs_launcher.sh for additional options.
@@ -41,8 +52,4 @@ Other links:
 https://www.epic.noaa.gov/ufs-coastal-app-development/
 https://ufs-coastal-application.readthedocs.io/en/latest/index.html
 https://github.com/oceanmodeling/ufs-weather-model
-
-Next steps:
-https://epic.noaa.gov/unified-workflow-tools/
-
 

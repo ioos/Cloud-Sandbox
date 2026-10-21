@@ -39,12 +39,14 @@ fi
 cd ufs-weather-model
 
 # Copy the modulefiles that work with this deployment
+# Build modules are same modulefiles with different name/location
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua modulefiles/
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua modulefiles/
 
-cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua tests/modules.fv3_atm2roms_intel
-cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2roms_intel.lua
-cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2sch_intel.lua
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua tests/modules.fv3_atm2roms_intel.lua
+
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua tests/modules.fv3_atm2sch_intel.lua
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2sch_intelllvm.lua
 
 # SCHISM needed some help to use our metis, paramatis libraries
 cp -p $CURHOME/FindMETIS.cmake $SAVEDIR/ufs-weather-model/SCHISM-interface/SCHISM/cmake/modules

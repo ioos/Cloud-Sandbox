@@ -5,7 +5,7 @@
 "nodeTypeHP"  : "hpc6a.48xlarge",
 "nodeTypeC5n"     : "c5n.9xlarge",
 "nodeTypeC6"     : "c6i.12xlarge",
-"nodeCount" : 1,
+"nodeCount" : 4,
 "tags"      : [ 
                 { "Key": "Name", "Value": "UFS Regression Test SCHISM Sandy" },
                 { "Key": "Project", "Value": "IOOS-Cloud-Sandbox" }
