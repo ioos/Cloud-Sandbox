@@ -21,7 +21,7 @@ export CSHOME="${PWD%/*/*}"
 echo "Cloud-Sandbox/ directory is: $CSHOME"
 
 export REPO="https://github.com/asascience-open/ufs-weather-model.git"
-export BRANCH=""
+export BRANCH="ioossb_coastal"
 
 #module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
 module use -a $CURHOME/modulefiles
@@ -31,17 +31,23 @@ cd $SAVEDIR
 
 if [ ! -d ufs-weather-model ]; then
   git clone --recursive $REPO
+  git checkout $BRANCH
 else
   echo "ufs-weather-model already present, not fetching from github"
 fi
 
 cd ufs-weather-model
 
+# Copy the modulefiles that work with this deployment
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua modulefiles/
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua modulefiles/
 
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intel.lua tests/modules.fv3_atm2roms_intel
 cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2roms_intel.lua
+cp -p $CURHOME/modulefiles/lua/ufs_ioossb.intelllvm.lua tests/modules.fv3_atm2sch_intel.lua
+
+# SCHISM needed some help to use our metis, paramatis libraries
+cp -p $CURHOME/FindMETIS.cmake $SAVEDIR/ufs-weather-model/SCHISM-interface/SCHISM/cmake/modules
 
 module purge
 #module load ufs_ioossb.intel.tcl
@@ -58,7 +64,7 @@ export CMAKE_FLAGS="-DAPP=CSTLR -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMA
 # SCHISM supported
 #APP CSTLS = Cstl SCHISM -  builds ifort and ifx
 #export CMAKE_FLAGS="-DAPP=CSTLS -DUSE_ATMOS=ON -DNO_PARMETIS=OFF -DOLDIO=OFF"
-#cp -p $CURHOME/FindMETIS.cmake $SAVEDIR/ufs-weather-model/SCHISM-interface/SCHISM/cmake/modules
+#
 
 # Not yet tested
 #APP CSTLF = Cstl FVCOM

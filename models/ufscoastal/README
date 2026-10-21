@@ -13,21 +13,25 @@ UFS uses spack-stack.
 setup.sh - Clone the gitHub repository and build the ROMS App.
 Default location: /save/ec2-user/ufs-weather-model
 
-get_input_data.sh - Dowload the ROMS Irene and SCHISM Ike test case inputs
+get_input_data.sh - Dowload the ROMS Irene and SCHISM Sandy test case inputs
 Default location: /com/ufs-weather-model/RT/NEMSfv3gfs/input-data-20250507
 
 ### How To Run
 
-Currently the Irene ROMS regression test has been tested.
-Ike SCHISM tests should be easy to add at this point.
+Irene ROMS regression test
+  Test runs on a 24 core c6i.12xlarge instance type and takes less than 15 minutes to compile the model and run the test.
+
+Sandy SCHISM regression test
 
 The run will launch a single node to build and run the preconfigured test(s).
 
 Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.rt).
 
-Set non-default directories in:  ../job.configs/UFS/ufs.irene
+Set non-default directories in:  
+  ../job.configs/UFS/ufs.irene
+  ../job.configs/UFS/ufs.sandy
 
-Launch the job:
+Launch the job, example for irene:
 nohup workflows/workflow_main.py ../cluster.configs/IOOS/ufs.rt ../job.configs/UFS/ufs.irene > & ufs.out &
 
 Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.

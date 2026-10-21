@@ -23,6 +23,8 @@ nprocs=$(nproc)
 export SAVEDIR=${1:-"/save/$USER"}
 export PTMP=${2:-"/ptmp/$USER"}
 export TESTNAME=${3:-coastal_irene_atm2roms}
+
+echo "PT DEBUG: TESTNAME=$TESTNAME"
 export SKIPCOMPILE=${4:-"NO"}
 # export SKIPCOMPILE="YES"
 export HOSTS=${5:-localhost}
@@ -43,7 +45,10 @@ export dprefix=/mnt/efs/fs1
 export STMP=$PTMP
 
 cd $SAVEDIR/ufs-weather-model/tests || exit 1
-RTCONF_FILE=rt_ioossb.conf
+
+# Had to use a single conf file per test to run only one test at a time
+# using run single test -n not working
+RTCONF_FILE=rt_${TESTNAME}.conf
 
 mkdir -p $DISKNM
 
