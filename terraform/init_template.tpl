@@ -5,6 +5,9 @@ echo `date` > ~/setup.log
 
 BRANCH=${sandbox_version}
 
+# Uncomment this if creating head node for UFS
+# export USE_SPACK_STACK="YES"
+
 RUNUSER="ec2-user"
 
 EFS_VERS='v3.1.3'
