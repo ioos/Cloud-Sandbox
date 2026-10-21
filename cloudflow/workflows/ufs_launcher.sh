@@ -9,6 +9,11 @@ set -o pipefail
 #module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
 
 export MACHINE_ID=ioossb
+#VERBOSEOPT='-v'
+VERBOSEOPT=''
+
+#COMPILEONLYOPT='-o'
+COMPILEONLYOPT=''
 
 # Not used in ioossb but needed by rt.sh
 export ACCNR=IOOS
@@ -18,25 +23,32 @@ nprocs=$(nproc)
 export SAVEDIR=${1:-"/save/$USER"}
 export PTMP=${2:-"/ptmp/$USER"}
 export TESTNAME=${3:-coastal_irene_atm2roms}
+
+echo "PT DEBUG: TESTNAME=$TESTNAME"
 export SKIPCOMPILE=${4:-"NO"}
 # export SKIPCOMPILE="YES"
 export HOSTS=${5:-localhost}
 export NPROCS=${6:-$nprocs}
 
+
 # PPN conflicts and gets changed by rt.sh system
 export CFPPN=${7:-$nprocs}
 if [[ $HOSTS =~ 'localhost' ]]; then
   export CFPPN=$NPROCS
-else
-  export CFPPN=24
 fi
+
+export NPROCS=24
+export CFPPN=$NPROCS
 
 export DISKNM=/com/ufs-weather-model/RT
 export dprefix=/mnt/efs/fs1
 export STMP=$PTMP
 
 cd $SAVEDIR/ufs-weather-model/tests || exit 1
-RTCONF_FILE=rt_ioossb.conf
+
+# Had to use a single conf file per test to run only one test at a time
+# using run single test -n not working
+RTCONF_FILE=rt_${TESTNAME}.conf
 
 mkdir -p $DISKNM
 
@@ -47,6 +59,8 @@ mkdir -p $DISKNM
 
 # Also downloaded this with help from Jason
 #INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20250507}
+
+# Don't have this
 #INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT}/WW3_input_data_20250225
 #INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
 
@@ -64,15 +78,15 @@ mkdir -p $DISKNM
 # Use -x to skip compile
 # Use -c to create to RT outputs
 # -o compile only
-# TODO: fix why results aren't being copied to REGRESSION_TESTS
+
+# RT_COMPILER intel or intellvm (schism supports intel ifort, and intellvm ifx) (roms can only do intel ifort)
 
 if [[ ${SKIPCOMPILE} == 'YES' ]]; then
-  ./rt.sh -x -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
+  ./rt.sh -x -a $ACCNR -l $RTCONF_FILE $VERBOSEOPT -c -k -n "$TESTNAME intel"
   rc=$?
 else
-  ./rt.sh -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
-  # -o compile only
-  # ./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
+  ./rt.sh -a $ACCNR -l $RTCONF_FILE $COMPILEONLYOPT $VERBOSEOPT -c -k -n "$TESTNAME intel"
+  #./rt.sh -o -a $ACCNR -l $RTCONF_FILE -c -k -n "$TESTNAME intel"
   rc=$?
 fi
 
