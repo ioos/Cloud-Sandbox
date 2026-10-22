@@ -36,6 +36,11 @@ if [[ $HOSTS =~ 'localhost' ]]; then
   export CFPPN=$NPROCS
 fi
 
+# PT debugging  parmetis error
+#if [[ "$TESTNAME" == "coastal_sandy_duck_atm2sch" ]]; then
+#  export NPROCS=48
+#fi
+
 export DISKNM=/com/ufs-weather-model/RT
 export dprefix=/mnt/efs/fs1
 export STMP=$PTMP
