@@ -29,9 +29,9 @@ Irene ROMS regression test
   Test runs on a 24 core c6i.12xlarge instance type and takes less than 15 minutes to compile the model and run the test.
 
 Sandy SCHISM regression test
-  Test requires 320 cores and is setup to run on 4 x hpc6a.48xlarge ec2-instances
+  Testing on 1 to 4 x hpc6a.48xlarge ec2-instances
 
-The run will launch a single node to build and run the preconfigured test(s).
+The runs launch the on-demand node(s) to build and run the preconfigured test(s).
 
 Modify the cluster/configs for your deployment (see cluster/configs/IOOS/ufs.irene.rt and ufs.sandy.rt).
 
@@ -42,11 +42,20 @@ Set non-default directories in:
 Launch the job, example for irene:
 nohup workflows/workflow_main.py ../cluster.configs/IOOS/ufs.irene.rt ../job.configs/UFS/ufs.irene > & ufs.out &
 
-For testing, and to save time, if the executable for that test has already been compiled, set the following job.configs file option to NO:
+For testing, and to save time, if the executable for that test has already been compiled and there have been no model code changes, set the following job.configs file option to NO:
 "SKIPCOMPILE" : "NO"
 
 Cloudflow workflow uses cloudflow/workflow/ufs_launcher.sh to call the rt.sh script in the UFS /save/ec2-user/ufs-weather-model/tests.
 See ufs_launcher.sh for additional options.
+
+## Environment, modulefiles
+To load the environment used for this run and build, run these commands:
+module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles/lua
+module load ufs_ioossb.intel
+or 
+module load ufs_ioossb.intelllvm
+
+module avail
 
 Other links:
 https://www.epic.noaa.gov/ufs-coastal-app-development/

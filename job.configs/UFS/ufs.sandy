@@ -4,7 +4,7 @@
   "RT_COMPILER" : "intel",
   "JOBTYPE"     : "ufs_regressiontest",
   "TESTNAME"    : "coastal_sandy_duck_atm2sch",
-  "SKIPCOMPILE" : "YES",
+  "SKIPCOMPILE" : "NO",
   "SAVEDIR"     : "/save/ec2-user",
   "PTMP"        : "/ptmp",
   "DISKNM"      : "/com/ufs-weather-model/RT"

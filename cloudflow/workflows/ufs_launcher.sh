@@ -9,36 +9,32 @@ set -o pipefail
 #module use -a /save/ec2-user/Cloud-Sandbox/models/ufscoastal/modulefiles
 
 export MACHINE_ID=ioossb
-#VERBOSEOPT='-v'
 VERBOSEOPT=''
+#VERBOSEOPT='-v'
 
-#COMPILEONLYOPT='-o'
 COMPILEONLYOPT=''
+#COMPILEONLYOPT='-o'
 
 # Not used in ioossb but needed by rt.sh
 export ACCNR=IOOS
 
+# nproc is nproc on current machine should be same as PPN
 nprocs=$(nproc)
 
 export SAVEDIR=${1:-"/save/$USER"}
 export PTMP=${2:-"/ptmp/$USER"}
 export TESTNAME=${3:-coastal_irene_atm2roms}
-
-echo "PT DEBUG: TESTNAME=$TESTNAME"
 export SKIPCOMPILE=${4:-"NO"}
-# export SKIPCOMPILE="YES"
 export HOSTS=${5:-localhost}
-export NPROCS=${6:-$nprocs}
+export NPROCS=${6:-$nprocs}   # NPROCS is total number of procs in cluster
 
-
-# PPN conflicts and gets changed by rt.sh system
+# PPN conflicts and gets changed by rt.sh system, using CFPPN instead
 export CFPPN=${7:-$nprocs}
+
+# for testing standalone on localhost, e.g. testing build
 if [[ $HOSTS =~ 'localhost' ]]; then
   export CFPPN=$NPROCS
 fi
-
-export NPROCS=24
-export CFPPN=$NPROCS
 
 export DISKNM=/com/ufs-weather-model/RT
 export dprefix=/mnt/efs/fs1
