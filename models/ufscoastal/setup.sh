@@ -66,7 +66,6 @@ export CMAKE_FLAGS="-DAPP=CSTLR -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMA
 # SCHISM supported
 #APP CSTLS = Cstl SCHISM -  builds ifort and ifx
 #export CMAKE_FLAGS="-DAPP=CSTLS -DUSE_ATMOS=ON -DNO_PARMETIS=OFF -DOLDIO=OFF"
-#
 
 # Not yet tested
 #APP CSTLF = Cstl FVCOM
@@ -77,8 +76,6 @@ export CMAKE_FLAGS="-DAPP=CSTLR -DMY_CPP_FLAGS=BULK_FLUXES -DCMAKE_AR=xiar -DCMA
 # cmake -DCMAKE_AR="xiar" -DCMAKE_RANLIB="xild" ..
 #DCMAKE_AR
 #export AR=/path/to/your/custom-ar
-#
-#spack env activate -p /save/environments/spack-stack.v2.0/envs/aws-ioossb-rhel8
 
 ./build.sh --platform=ioossb --compiler=intel
 
