@@ -33,8 +33,7 @@ aws s3 cp s3://ioos-transfers/script.py ./script.py --recursive --no-sign-reques
 git clone [https://github.com/ioos/Cloud-Sandbox.git](https://github.com/ioos/Cloud-Sandbox.git)
 cd Cloud-Sandbox/cloudflow/
 ```
-
-> **Note:** If you do not have a compatible Python environment installed, follow the **Python Miniforge3 Installation** guide on the main [Cloud-Sandbox Repository](https://github.com/ioos/Cloud-Sandbox.git).
+> **Prerequisite:** If you have not yet created your personal `cloudflow` Python environment on the EFS volume, please follow the step-by-step instructions in the **[Local Python Miniforge3 Installation Guide](https://github.com/ioos/Cloud-Sandbox/blob/main/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md)** before proceeding.
 
 ---
 
