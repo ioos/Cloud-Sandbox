@@ -37,8 +37,6 @@ aws s3 cp s3://ioos-transfers/your_model_setup ./your_model_setup --recursive --
 git clone https://github.com/ioos/Cloud-Sandbox.git
 ```
 
-> **Note:** If you do not have a working Python environment set up for Cloudflow, follow the **Python Miniforge3 Installation** directives on the main [Cloud-Sandbox Repository]([https://github.com/ioos/Cloud-Sandbox.git](https://github.com/ioos/Cloud-Sandbox/blob/main/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md)).
-
 ---
 
 ## 3. Module Environment & Model Compilation
@@ -72,6 +70,7 @@ cd /save/jason.ducker/Cloud-Sandbox/cloudflow/
 # Update the hashbang line in workflow_main.py to point to your Python executable
 sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/jason.ducker/miniforge3/envs/cloudflow/bin/python|' workflows/workflow_main.py
 ```
+> **Note:** If you do not have a working Python environment set up for Cloudflow, follow the **Python Miniforge3 Installation** directives on the main [Cloud-Sandbox Repository]([https://github.com/ioos/Cloud-Sandbox.git](https://github.com/ioos/Cloud-Sandbox/blob/main/LOCAL_PYTHON_MINIFORGE3_INSTALLATION_CLOUD_SANDBOX_INSTRUCTIONS.md)).
 
 ### Configure Model Job Specifications
 Edit or create your target model job configuration file. Pre-configured templates (ADCIRC, FVCOM, ROMS, SCHISM, D-Flow FM) reside in `Cloud-Sandbox/cloudflow/job.configs/MODEL_EXPERIMENTS/`.
