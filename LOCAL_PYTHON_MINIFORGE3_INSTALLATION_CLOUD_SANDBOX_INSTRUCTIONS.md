@@ -15,7 +15,7 @@ $USER will be associated with your own user login credentials on the head node
 ```bash#
 mkdir FirstName_LastName_Miniforge_Installation; 
 ```
-Replace the `FirstName` and `LastName` above with your first and last name. This is only suggested for keeping track of your own miniforge3 installation, but you are free to name it anything as you wish or just move on to the next step. 
+Replace the `FirstName` and `LastName` above with your first and last name. This is only suggested for keeping track of your own miniforge3 installation, but you are free to name it anything as you wish.
 
 ### Change To Your Personal Installation Directory
 ```bash
