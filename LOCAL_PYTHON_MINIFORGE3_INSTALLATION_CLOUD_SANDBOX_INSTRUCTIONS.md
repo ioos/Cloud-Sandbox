@@ -1,4 +1,4 @@
-# Installing miniforge Python package manager for local ec2-user on ioos Cloud-Sandbox 
+# Installing miniforge Python package manager for users on a IOOS Cloud-Sandbox head node
 
 ## Miniforge Setup 
 
@@ -6,16 +6,16 @@ You need to create a unique directory to install your local version of mamba, an
 
 ### Change Directory to Your Affiliation
 ```bash
-cd /save/ec2-user/Affiliation
+cd /save/$USER
 ```
-Replace `Affiliation` above with your working group.
+$USER will be associated with your own user login credentials on the head node
 
 ### Create Your Personal Installation Directory
 
 ```bash#
 mkdir FirstName_LastName_Miniforge_Installation; 
 ```
-Replace the `FirstName` and `LastName` above with your first and last name.
+Replace the `FirstName` and `LastName` above with your first and last name. This is only suggested for keeping track of your own miniforge3 installation, but you are free to name it anything as you wish or just move on to the next step. 
 
 ### Change To Your Personal Installation Directory
 ```bash
