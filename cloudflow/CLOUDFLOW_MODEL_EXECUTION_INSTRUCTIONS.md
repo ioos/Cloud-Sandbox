@@ -64,13 +64,13 @@ export FC=mpiifx
 
 ## 4. Cloudflow Execution Setup
 
-Navigate to the Cloudflow package directory and bind your custom Python environment.
+Navigate to the Cloudflow package directory and bind your personal `cloudflow` Python environment previously installed in Step #2
 
 ```bash
-cd /save/jason.ducker/Cloud-Sandbox/cloudflow/
+cd /save/$USER/Cloud-Sandbox/cloudflow/
 
 # Update the hashbang line in workflow_main.py to point to your Python executable
-sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/jason.ducker/miniforge3/envs/cloudflow/bin/python|' workflows/workflow_main.py
+sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/'"$USER"'/miniforge3/envs/cloudflow/bin/python|' workflows/workflow_main.py
 ```
 
 ### Configure Model Job Specifications
@@ -188,8 +188,8 @@ fi
 If no active server is detected, start and configure it:
 
 ```bash
-/save/jason.ducker/miniforge3/envs/cloudflow/bin/prefect server start --background
-/save/jason.ducker/miniforge3/envs/cloudflow/bin/prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+/save/$USER/miniforge3/envs/cloudflow/bin/prefect server start --background
+/save/$USER/miniforge3/envs/cloudflow/bin/prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
 ```
 
 ### Submit and Monitor the Job
