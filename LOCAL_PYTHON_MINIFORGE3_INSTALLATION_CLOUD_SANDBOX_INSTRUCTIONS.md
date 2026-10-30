@@ -7,21 +7,10 @@ You need to create a unique directory to install your local version of mamba, an
 ### Change Directory to Your Affiliation
 ```bash
 cd /save/$USER
+export WORKINGDIR=$(pwd)
 ```
 $USER will be associated with your own user login credentials on the head node
 
-### Create Your Personal Installation Directory
-
-```bash#
-mkdir FirstName_LastName_Miniforge_Installation; 
-```
-Replace the `FirstName` and `LastName` above with your first and last name. This is only suggested for keeping track of your own miniforge3 installation, but you are free to name it anything as you wish.
-
-### Change To Your Personal Installation Directory
-```bash
-cd FirstName_LastName_Miniforge_Installation
-export WORKINGDIR=$(pwd)
-```
 > [!IMPORTANT]
 > Do not log out after this step!  The `WORKINGDIR` environment variable is used
 in later steps.  If, for some reason, you do log out or your shell gets killed, just change to your affiliation directory and then repeat the steps in this section.
