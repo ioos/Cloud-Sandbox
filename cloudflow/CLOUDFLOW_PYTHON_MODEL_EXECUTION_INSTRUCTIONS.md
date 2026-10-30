@@ -52,8 +52,8 @@ fi
 
 If no server is detected, start and configure it:
 ```bash
-/save/jason.ducker/miniforge3/envs/cloudflow/bin/prefect server start --background
-/save/jason.ducker/miniforge3/envs/cloudflow/bin/prefect config set PREFECT_API_URL=[http://127.0.0.1:4200/api](http://127.0.0.1:4200/api)
+/save/$USER/miniforge3/envs/cloudflow/bin/prefect server start --background
+/save/$USER/miniforge3/envs/cloudflow/bin/prefect config set PREFECT_API_URL=[http://127.0.0.1:4200/api](http://127.0.0.1:4200/api)
 ```
 
 ---
@@ -76,7 +76,7 @@ Single-node execution utilizing one EC2 instance for serial execution or node-le
 
 #### Step 1: Bind Python Cloudflow Executable
 ```bash
-sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/jason.ducker/miniforge3/envs/cloudflow/bin/python|' workflows/workflow_main.py
+sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/'"$USER"'/miniforge3/envs/cloudflow/bin/python|' workflows/workflow_main.py
 ```
 
 #### Step 2: Configure Job Specification
@@ -570,7 +570,7 @@ dependencies:
 Build environment and bind main workflow script:
 ```bash
 mamba env create -f dask_miniforge3_installation.yml -y
-sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/jason.ducker/miniforge3/envs/cloudflow_dask/bin/python|' workflows/workflow_main.py
+sed -i 's|#!/usr/bin/env -S python3 -u|#!/usr/bin/env /save/'"$USER"'/miniforge3/envs/cloudflow_dask/bin/python|' workflows/workflow_main.py
 ```
 
 #### Step 2: Configure Script Logging
