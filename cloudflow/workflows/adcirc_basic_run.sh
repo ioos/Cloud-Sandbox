@@ -30,6 +30,10 @@ export I_MPI_JOB_ABORT_SIGNAL=9
 # Ensure the job terminates immediately if any process exits with a non-zero status
 export I_MPI_JOB_TIMEOUT_SIGNAL=9
 
+# Instructs Intel MPI to continuously check socket connection health
+export I_MPI_HEARTBEAT=1
+export I_MPI_EXTRA_TIMEOUT=60
+
 export MODEL_DIR=$1
 export EXEC=$2
 
